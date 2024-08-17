@@ -11,10 +11,12 @@ public record WhereStatement(
 ) implements BiPredicate<ProgramContext, HashMap<Object, Long>>, ASTNode {
     public static final WhereStatement ALWAYS_TRUE = new WhereStatement((__, ___) -> true, "");
 
+    @Override
     public boolean test(ProgramContext context, HashMap<Object, Long> resourceTable) {
         return pred.test(context, resourceTable);
     }
 
+    @Override
     public WhereStatement negate() {
         return new WhereStatement(pred.negate(), "NOT " + sourceCode);
     }
