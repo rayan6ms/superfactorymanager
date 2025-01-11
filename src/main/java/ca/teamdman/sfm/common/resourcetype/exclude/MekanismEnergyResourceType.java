@@ -1,5 +1,6 @@
-package ca.teamdman.sfm.common.resourcetype;
+package ca.teamdman.sfm.common.resourcetype.exclude;
 
+import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import mekanism.api.Action;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.api.math.FloatingLong;
