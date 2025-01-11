@@ -63,13 +63,6 @@ public class SFMConfig {
                     .defineInRange("maxIfStatementsInTriggerBeforeSimulationIsntAllowed", 10, 0, Integer.MAX_VALUE);
             disallowedResourceTypesForTransfer = builder
                     .comment("What resource types should SFM not be allowed to move")
-                    .comment("SFM has the following resource types:")
-                    .comment(SFMResourceTypes.DEFERRED_TYPES
-                                     .entrySet()
-                                     .stream()
-                                     .map(entry -> entry.getKey().toString())
-                                     .collect(
-                                             Collectors.joining("\n")))
                     .defineListAllowEmpty(
                             "disallowedResourceTypesForTransfer",
                             List.of(),
