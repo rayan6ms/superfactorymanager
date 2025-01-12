@@ -14,6 +14,7 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.registries.RegistryObject;
 
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.function.BiConsumer;
 
@@ -30,18 +31,35 @@ public class SFMLootTables extends LootTableProvider {
 
     public static class SFMBlockLootProvider implements LootTableSubProvider {
 
+        @Override
         public void generate(BiConsumer<ResourceLocation, LootTable.Builder> writer) {
             dropSelf(SFMBlocks.MANAGER_BLOCK, writer);
             dropSelf(SFMBlocks.CABLE_BLOCK, writer);
             dropSelf(SFMBlocks.WATER_TANK_BLOCK, writer);
             dropSelf(SFMBlocks.PRINTING_PRESS_BLOCK, writer);
-
+            dropSelf(SFMBlocks.MANAGER_BLOCK, writer);
+            dropSelf(SFMBlocks.TUNNELLED_MANAGER_BLOCK, writer);
+            dropSelf(SFMBlocks.CABLE_BLOCK, writer);
+            dropOther(SFMBlocks.CABLE_FACADE_BLOCK, SFMBlocks.CABLE_BLOCK, writer);
+            dropSelf(SFMBlocks.FANCY_CABLE_BLOCK, writer);
+            dropSelf(SFMBlocks.PRINTING_PRESS_BLOCK, writer);
+            dropSelf(SFMBlocks.WATER_TANK_BLOCK, writer);
         }
 
-        private void dropSelf(RegistryObject<Block> block, BiConsumer<ResourceLocation, LootTable.Builder> writer) {
+
+
+        private void dropSelf(RegistryObject<? extends Block> block, BiConsumer<ResourceLocation, LootTable.Builder> writer) {
             var pool = LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
                     .add(LootItem.lootTableItem(block.get()));
+            writer.accept(block.get().getLootTable(), LootTable.lootTable().withPool(pool));
+        }
+
+        @SuppressWarnings("SameParameterValue")
+        private void dropOther(RegistryObject<? extends Block> block, RegistryObject<? extends Block> other, BiConsumer<ResourceLocation, LootTable.Builder> writer) {
+            var pool = LootPool.lootPool()
+                    .setRolls(ConstantValue.exactly(1))
+                    .add(LootItem.lootTableItem(other.get()));
             writer.accept(block.get().getLootTable(), LootTable.lootTable().withPool(pool));
         }
     }

@@ -2,7 +2,6 @@ package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
-import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.program.LimitedInputSlot;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.program.SimulateExploreAllPathsProgramBehaviour;
@@ -10,15 +9,12 @@ import ca.teamdman.sfm.common.program.SimulateExploreAllPathsProgramBehaviour.Br
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import ca.teamdman.sfm.common.util.SFMUtils;
+import ca.teamdman.sfm.common.util.SFMASTUtils;
 import ca.teamdman.sfml.ast.Number;
 import ca.teamdman.sfml.ast.*;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.NetworkEvent;
-import net.minecraftforge.network.PacketDistributor;
 import org.antlr.v4.runtime.misc.Pair;
 
 import java.util.ArrayList;
@@ -27,84 +23,12 @@ import java.util.ListIterator;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
-import java.util.function.Supplier;
 
 public record ServerboundOutputInspectionRequestPacket(
         String programString,
         int outputNodeIndex
-) {
-    public static void encode(
-            ServerboundOutputInspectionRequestPacket msg,
-            FriendlyByteBuf friendlyByteBuf
-    ) {
-        friendlyByteBuf.writeUtf(msg.programString, Program.MAX_PROGRAM_LENGTH);
-        friendlyByteBuf.writeInt(msg.outputNodeIndex());
-    }
-
-    public static ServerboundOutputInspectionRequestPacket decode(FriendlyByteBuf friendlyByteBuf) {
-        return new ServerboundOutputInspectionRequestPacket(
-                friendlyByteBuf.readUtf(Program.MAX_PROGRAM_LENGTH),
-                friendlyByteBuf.readInt()
-        );
-    }
-
-    public static void handle(
-            ServerboundOutputInspectionRequestPacket msg,
-            Supplier<NetworkEvent.Context> contextSupplier
-    ) {
-        contextSupplier.get().enqueueWork(() -> {
-            // todo: duplicate code
-            // we don't know if the player has the program edit screen open from a manager or a disk in hand
-            ServerPlayer player = contextSupplier.get().getSender();
-            if (player == null) return;
-            ManagerBlockEntity manager;
-            if (player.containerMenu instanceof ManagerContainerMenu mcm) {
-                if (player.getLevel().getBlockEntity(mcm.MANAGER_POSITION) instanceof ManagerBlockEntity mbe) {
-                    manager = mbe;
-                } else {
-                    return;
-                }
-            } else {
-                //todo: localize
-                SFMPackets.INSPECTION_CHANNEL.send(
-                        PacketDistributor.PLAYER.with(() -> player),
-                        new ClientboundInputInspectionResultsPacket(
-                                "This inspection is only available when editing inside a manager.")
-                );
-                return;
-            }
-            Program.compile(
-                    msg.programString,
-                    successProgram -> successProgram.builder()
-                            .getNodeAtIndex(msg.outputNodeIndex)
-                            .filter(OutputStatement.class::isInstance)
-                            .map(OutputStatement.class::cast)
-                            .ifPresent(outputStatement -> {
-                                String payload = getOutputStatementInspectionResultsString(
-                                        manager,
-                                        successProgram,
-                                        outputStatement
-                                );
-                                SFM.LOGGER.debug(
-                                        "Sending output inspection results packet with length {}",
-                                        payload.length()
-                                );
-                                SFMPackets.INSPECTION_CHANNEL.send(
-                                        PacketDistributor.PLAYER.with(() -> player),
-                                        new ClientboundOutputInspectionResultsPacket(payload)
-                                );
-                            }),
-                    failure -> {
-                        //todo: translate
-                        SFMPackets.INSPECTION_CHANNEL.send(
-                                PacketDistributor.PLAYER.with(() -> player),
-                                new ClientboundOutputInspectionResultsPacket("failed to compile program")
-                        );
-                    }
-            );
-        });
-        contextSupplier.get().setPacketHandled(true);
-    }
+) implements SFMPacket {
+    private static final int MAX_RESULTS_LENGTH = 20480;
 
     public static String getOutputStatementInspectionResultsString(
             ManagerBlockEntity manager,
@@ -147,11 +71,11 @@ public record ServerboundOutputInspectionRequestPacket(
                         .forEach(branch -> {
                             if (branch.wasTrue()) {
                                 payload
-                                        .append(branch.ifStatement().condition().sourceCode())
+                                        .append(branch.ifStatement().condition().toStringPretty())
                                         .append(" -- true");
                             } else {
                                 payload
-                                        .append(branch.ifStatement().condition().sourceCode())
+                                        .append(branch.ifStatement().condition().toStringPretty())
                                         .append(" -- false");
                             }
                             payload.append("\n");
@@ -171,7 +95,7 @@ public record ServerboundOutputInspectionRequestPacket(
                                 ))
                         ));
                 List<InputStatement> inputStatements = inputSlots.stream()
-                        .map(slot -> SFMUtils.getInputStatementForSlot(slot.a, slot.b))
+                        .map(slot -> SFMASTUtils.getInputStatementForSlot(slot.a, slot.b))
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .toList();
@@ -222,9 +146,14 @@ public record ServerboundOutputInspectionRequestPacket(
                             while (iter.hasNext()) {
                                 ResourceLimit resourceLimit = iter.next();
                                 if (resourceLimit.resourceIds().size() != 1) {
-                                    throw new IllegalStateException("Expected resource limit to have exactly one resource id");
+                                    throw new IllegalStateException(
+                                            "Expected resource limit to have exactly one resource id");
                                 }
-                                ResourceIdentifier<?,?,?> resourceId = resourceLimit.resourceIds().stream().iterator().next();
+                                ResourceIdentifier<?, ?, ?> resourceId = resourceLimit
+                                        .resourceIds()
+                                        .stream()
+                                        .iterator()
+                                        .next();
 
                                 // because these resource limits were generated from resource stacks
                                 // they should always be valid resource locations (not patterns)
@@ -238,7 +167,8 @@ public record ServerboundOutputInspectionRequestPacket(
                                         .stream()
                                         .filter(outputResourceLimit -> outputResourceLimit
                                                                                .resourceIds()
-                                                                               .anyMatchResourceLocation(resourceLimitLocation)
+                                                                               .anyMatchResourceLocation(
+                                                                                       resourceLimitLocation)
                                                                        && outputStatement
                                                                                .resourceLimits()
                                                                                .exclusions()
@@ -332,5 +262,66 @@ public record ServerboundOutputInspectionRequestPacket(
                 amountLimit,
                 With.ALWAYS_TRUE
         );
+    }
+
+    public static class Daddy implements SFMPacketDaddy<ServerboundOutputInspectionRequestPacket> {
+        @Override
+        public PacketDirection getPacketDirection() {
+            return PacketDirection.SERVERBOUND;
+        }
+        @Override
+        public void encode(
+                ServerboundOutputInspectionRequestPacket msg,
+                FriendlyByteBuf friendlyByteBuf
+        ) {
+            friendlyByteBuf.writeUtf(msg.programString, Program.MAX_PROGRAM_LENGTH);
+            friendlyByteBuf.writeInt(msg.outputNodeIndex());
+        }
+
+        @Override
+        public ServerboundOutputInspectionRequestPacket decode(FriendlyByteBuf friendlyByteBuf) {
+            return new ServerboundOutputInspectionRequestPacket(
+                    friendlyByteBuf.readUtf(Program.MAX_PROGRAM_LENGTH),
+                    friendlyByteBuf.readInt()
+            );
+        }
+
+        @Override
+        public void handle(
+                ServerboundOutputInspectionRequestPacket msg,
+                SFMPacketHandlingContext context
+        ) {
+            context.compileAndThen(
+                    msg.programString,
+                    (program, player, managerBlockEntity) -> program.builder()
+                            .getNodeAtIndex(msg.outputNodeIndex)
+                            .filter(OutputStatement.class::isInstance)
+                            .map(OutputStatement.class::cast)
+                            .ifPresent(outputStatement -> {
+                                String payload = getOutputStatementInspectionResultsString(
+                                        managerBlockEntity,
+                                        program,
+                                        outputStatement
+                                );
+                                payload = SFMPacketDaddy.truncate(
+                                        payload,
+                                        ServerboundOutputInspectionRequestPacket.MAX_RESULTS_LENGTH
+                                );
+                                SFM.LOGGER.debug(
+                                        "Sending output inspection results packet with length {}",
+                                        payload.length()
+                                );
+                                SFMPackets.sendToPlayer(
+                                        () -> player,
+                                        new ClientboundOutputInspectionResultsPacket(payload)
+                                );
+                            })
+            );
+        }
+
+        @Override
+        public Class<ServerboundOutputInspectionRequestPacket> getPacketClass() {
+            return ServerboundOutputInspectionRequestPacket.class;
+        }
     }
 }

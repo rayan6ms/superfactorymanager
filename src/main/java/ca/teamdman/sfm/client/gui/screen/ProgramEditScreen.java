@@ -4,7 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
 import ca.teamdman.sfm.client.gui.EditorUtils;
-import ca.teamdman.sfm.common.SFMConfig;
+import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -46,13 +46,20 @@ public class ProgramEditScreen extends Screen {
     protected String lastProgram = "";
     protected List<MutableComponent> lastProgramWithSyntaxHighlighting = Collections.emptyList();
 
-    public ProgramEditScreen(String initialContent, Consumer<String> saveCallback) {
+    public ProgramEditScreen(
+            String initialContent,
+            Consumer<String> saveCallback
+    ) {
         super(LocalizationKeys.PROGRAM_EDIT_SCREEN_TITLE.getComponent());
         this.INITIAL_CONTENT = initialContent;
         this.SAVE_CALLBACK = saveCallback;
     }
 
-    public static MutableComponent substring(MutableComponent component, int start, int end) {
+    public static MutableComponent substring(
+            MutableComponent component,
+            int start,
+            int end
+    ) {
         var rtn = Component.empty();
         AtomicInteger seen = new AtomicInteger(0);
         component.visit((style, content) -> {
@@ -77,49 +84,9 @@ public class ProgramEditScreen extends Screen {
         return false;
     }
 
-    @Override
-    protected void init() {
-        super.init();
-        assert this.minecraft != null;
-        this.textarea = this.addRenderableWidget(new MyMultiLineEditBox());
-        textarea.setValue(INITIAL_CONTENT);
-        this.setInitialFocus(textarea);
-
-        this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                this.width / 2 - 200,
-                this.height / 2 - 100 + 195,
-                16,
-                20,
-                Component.literal("#"),
-                (button) -> this.onToggleLineNumbersButtonClicked(),
-                Tooltip.create(PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP.getComponent())
-        ));
-        this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                this.width / 2 - 2 - 150,
-                this.height / 2 - 100 + 195,
-                200,
-                20,
-                CommonComponents.GUI_DONE,
-                (button) -> this.saveAndClose(),
-                Tooltip.create(PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP.getComponent())
-        ));
-        this.addRenderableWidget(new ExtendedButton(
-                this.width / 2 - 2 + 100,
-                this.height / 2 - 100 + 195,
-                100,
-                20,
-                CommonComponents.GUI_CANCEL,
-                (button) -> this.onClose()
-        ));
-    }
-
-    private static boolean shouldShowLineNumbers() {
-        return SFMConfig.getOrDefault(SFMConfig.CLIENT.showLineNumbers);
-    }
-    private void onToggleLineNumbersButtonClicked() {
-        SFMConfig.CLIENT.showLineNumbers.set(!shouldShowLineNumbers());
-    }
-
+    /**
+     * The user has indicated to save by hitting Shift+Enter or by pressing the Done button
+     */
     public void saveAndClose() {
         SAVE_CALLBACK.accept(textarea.getValue());
 
@@ -132,9 +99,11 @@ public class ProgramEditScreen extends Screen {
         this.minecraft.popGuiLayer();
     }
 
+    /**
+     * The user has tried to close the GUI without saving by hitting the Esc key
+     */
     @Override
     public void onClose() {
-        // The user has requested to close the screen.
         // If the content is different, ask to save
         if (!INITIAL_CONTENT.equals(textarea.getValue())) {
             assert this.minecraft != null;
@@ -146,48 +115,12 @@ public class ProgramEditScreen extends Screen {
         }
     }
 
-    protected @NotNull ConfirmScreen getSaveConfirmScreen(Runnable onConfirm) {
-        return new ConfirmScreen(
-                doSave -> {
-                    assert this.minecraft != null;
-                    this.minecraft.popGuiLayer(); // Close confirm screen
-
-                    //noinspection StatementWithEmptyBody
-                    if (doSave) {
-                        onConfirm.run();
-                    } else {
-                        // do nothing, continue editing
-                    }
-                },
-                LocalizationKeys.SAVE_CHANGES_CONFIRM_SCREEN_TITLE.getComponent(),
-                LocalizationKeys.SAVE_CHANGES_CONFIRM_SCREEN_MESSAGE.getComponent(),
-                LocalizationKeys.SAVE_CHANGES_CONFIRM_SCREEN_YES_BUTTON.getComponent(),
-                LocalizationKeys.SAVE_CHANGES_CONFIRM_SCREEN_NO_BUTTON.getComponent()
-        );
-    }
-
-    protected @NotNull ConfirmScreen getExitWithoutSavingConfirmScreen() {
-        return new ConfirmScreen(
-                doSave -> {
-                    assert this.minecraft != null;
-                    this.minecraft.popGuiLayer(); // Close confirm screen
-
-                    //noinspection StatementWithEmptyBody
-                    if (doSave) {
-                        closeWithoutSaving();
-                    } else {
-                        // do nothing; continue editing
-                    }
-                },
-                LocalizationKeys.EXIT_WITHOUT_SAVING_CONFIRM_SCREEN_TITLE.getComponent(),
-                LocalizationKeys.EXIT_WITHOUT_SAVING_CONFIRM_SCREEN_MESSAGE.getComponent(),
-                LocalizationKeys.EXIT_WITHOUT_SAVING_CONFIRM_SCREEN_YES_BUTTON.getComponent(),
-                LocalizationKeys.EXIT_WITHOUT_SAVING_CONFIRM_SCREEN_NO_BUTTON.getComponent()
-        );
-    }
-
     @Override
-    public boolean keyReleased(int pKeyCode, int pScanCode, int pModifiers) {
+    public boolean keyReleased(
+            int pKeyCode,
+            int pScanCode,
+            int pModifiers
+    ) {
         if (pKeyCode == GLFW.GLFW_KEY_LEFT_CONTROL || pKeyCode == GLFW.GLFW_KEY_RIGHT_CONTROL) {
             // if control released => update syntax highlighting
             textarea.rebuild(Screen.hasControlDown());
@@ -197,7 +130,10 @@ public class ProgramEditScreen extends Screen {
     }
 
     @Override
-    public boolean charTyped(char pCodePoint, int pModifiers) {
+    public boolean charTyped(
+            char pCodePoint,
+            int pModifiers
+    ) {
         if (Screen.hasControlDown() && pCodePoint == ' ') {
             return true;
         }
@@ -205,7 +141,11 @@ public class ProgramEditScreen extends Screen {
     }
 
     @Override
-    public boolean keyPressed(int pKeyCode, int pScanCode, int pModifiers) {
+    public boolean keyPressed(
+            int pKeyCode,
+            int pScanCode,
+            int pModifiers
+    ) {
         // TODO: add separate keybindings for
         // context action - hold to arm
         // context action - execute
@@ -267,7 +207,11 @@ public class ProgramEditScreen extends Screen {
     }
 
     @Override
-    public void resize(Minecraft mc, int x, int y) {
+    public void resize(
+            Minecraft mc,
+            int x,
+            int y
+    ) {
         var prev = this.textarea.getValue();
         init(mc, x, y);
         super.resize(mc, x, y);
@@ -275,12 +219,104 @@ public class ProgramEditScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mx, int my, float partialTicks) {
+    public void render(
+            PoseStack poseStack,
+            int mx,
+            int my,
+            float partialTicks
+    ) {
         this.renderBackground(poseStack);
         super.render(poseStack, mx, my, partialTicks);
     }
+    private static boolean shouldShowLineNumbers() {
+        return SFMConfig.getOrDefault(SFMConfig.CLIENT.showLineNumbers);
+    }
 
-    // TODO: enable scrolling without focus
+    @Override
+    protected void init() {
+        super.init();
+        assert this.minecraft != null;
+        this.textarea = this.addRenderableWidget(new MyMultiLineEditBox());
+        textarea.setValue(INITIAL_CONTENT);
+        this.setInitialFocus(textarea);
+
+
+        this.addRenderableWidget(new ExtendedButtonWithTooltip(
+                this.width / 2 - 200,
+                this.height / 2 - 100 + 195,
+                16,
+                20,
+                Component.literal("#"),
+                (button) -> this.onToggleLineNumbersButtonClicked(),
+                buildTooltip(PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP)
+        ));
+        this.addRenderableWidget(new ExtendedButtonWithTooltip(
+                this.width / 2 - 2 - 150,
+                this.height / 2 - 100 + 195,
+                200,
+                20,
+                CommonComponents.GUI_DONE,
+                (button) -> this.saveAndClose(),
+                buildTooltip(PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP)
+        ));
+        this.addRenderableWidget(new ExtendedButton(
+                this.width / 2 - 2 + 100,
+                this.height / 2 - 100 + 195,
+                100,
+                20,
+                CommonComponents.GUI_CANCEL,
+                (button) -> this.onClose()
+        ));
+    }
+
+    private Tooltip buildTooltip(LocalizationEntry entry) {
+        return Tooltip.create(entry.getComponent());
+    }
+
+    private void onToggleLineNumbersButtonClicked() {
+        SFMConfig.CLIENT.showLineNumbers.set(!shouldShowLineNumbers());
+    }
+
+    protected @NotNull ConfirmScreen getSaveConfirmScreen(Runnable onConfirm) {
+        return new ConfirmScreen(
+                doSave -> {
+                    assert this.minecraft != null;
+                    this.minecraft.popGuiLayer(); // Close confirm screen
+
+                    //noinspection StatementWithEmptyBody
+                    if (doSave) {
+                        onConfirm.run();
+                    } else {
+                        // do nothing, continue editing
+                    }
+                },
+                LocalizationKeys.SAVE_CHANGES_CONFIRM_SCREEN_TITLE.getComponent(),
+                LocalizationKeys.SAVE_CHANGES_CONFIRM_SCREEN_MESSAGE.getComponent(),
+                LocalizationKeys.SAVE_CHANGES_CONFIRM_SCREEN_YES_BUTTON.getComponent(),
+                LocalizationKeys.SAVE_CHANGES_CONFIRM_SCREEN_NO_BUTTON.getComponent()
+        );
+    }
+
+    protected @NotNull ConfirmScreen getExitWithoutSavingConfirmScreen() {
+        return new ConfirmScreen(
+                doSave -> {
+                    assert this.minecraft != null;
+                    this.minecraft.popGuiLayer(); // Close confirm screen
+
+                    //noinspection StatementWithEmptyBody
+                    if (doSave) {
+                        closeWithoutSaving();
+                    } else {
+                        // do nothing; continue editing
+                    }
+                },
+                LocalizationKeys.EXIT_WITHOUT_SAVING_CONFIRM_SCREEN_TITLE.getComponent(),
+                LocalizationKeys.EXIT_WITHOUT_SAVING_CONFIRM_SCREEN_MESSAGE.getComponent(),
+                LocalizationKeys.EXIT_WITHOUT_SAVING_CONFIRM_SCREEN_YES_BUTTON.getComponent(),
+                LocalizationKeys.EXIT_WITHOUT_SAVING_CONFIRM_SCREEN_NO_BUTTON.getComponent()
+        );
+    }
+
     protected class MyMultiLineEditBox extends MultiLineEditBox {
         public MyMultiLineEditBox() {
             super(
@@ -314,6 +350,7 @@ public class ProgramEditScreen extends Screen {
             }
         }
 
+        @Override
         public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
             // Accommodate line numbers
             if (pMouseX >= this.getX() + 1 && pMouseX <= this.getX() + this.width - 1) {
@@ -356,6 +393,14 @@ public class ProgramEditScreen extends Screen {
                 return false;
             }
         }
+
+        @Override
+        public int getInnerHeight() {
+            // parent method uses this.textField.getLineCount() which is split for text wrapping
+            // we don't use the wrapped text, so we need to calculate the height ourselves to avoid overshooting
+            return this.font.lineHeight * (lastProgramWithSyntaxHighlighting.size() + 2);
+        }
+
         @Override
         public boolean mouseDragged(
                 double mx,
@@ -414,7 +459,7 @@ public class ProgramEditScreen extends Screen {
             for (int line = 0; line < lines.size(); ++line) {
                 var componentColoured = lines.get(line);
                 int lineLength = componentColoured.getString().length();
-                int lineHeight = this.font.lineHeight + (line == 0 ? 2 : 0);
+                int lineHeight = this.font.lineHeight;
                 boolean cursorOnThisLine = isCursorVisible
                                            && cursorIndex >= charCount
                                            && cursorIndex <= charCount + lineLength;

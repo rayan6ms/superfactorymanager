@@ -2,7 +2,7 @@ package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientDiagnosticInfo;
-import ca.teamdman.sfm.client.ClientStuff;
+import ca.teamdman.sfm.client.ClientTranslationHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationEntry;
@@ -39,7 +39,6 @@ import java.util.*;
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP;
 
 // todo: checkbox for auto-scrolling
-// todo: clear button
 public class LogsScreen extends Screen {
     private final ManagerContainerMenu MENU;
     @SuppressWarnings("NotNullFieldNotInitialized")
@@ -74,37 +73,6 @@ public class LogsScreen extends Screen {
             button.active = !MENU.logLevel.equals(level.name());
         }
         lastKnownLogLevel = MENU.logLevel;
-    }
-
-    @Override
-    public void onClose() {
-        SFMPackets.MANAGER_CHANNEL.sendToServer(new ServerboundManagerLogDesireUpdatePacket(
-                MENU.containerId,
-                MENU.MANAGER_POSITION,
-                false
-        ));
-        super.onClose();
-    }
-
-    public void scrollToBottom() {
-        textarea.setScrollAmount(Double.MAX_VALUE);
-    }
-
-    @Override
-    public void resize(Minecraft mc, int x, int y) {
-        var prev = this.textarea.getValue();
-        init(mc, x, y);
-        super.resize(mc, x, y);
-        this.textarea.setValue(prev);
-    }
-
-    @Override
-    public void render(PoseStack poseStack, int mx, int my, float partialTicks) {
-        this.renderBackground(poseStack);
-        super.render(poseStack, mx, my, partialTicks);
-        if (!MENU.logLevel.equals(lastKnownLogLevel)) {
-            onLogLevelChange();
-        }
     }
 
     private boolean shouldRebuildText() {
@@ -143,7 +111,7 @@ public class LogsScreen extends Screen {
                 level = level.withStyle(ChatFormatting.DARK_GRAY);
             }
 
-            String[] lines = ClientStuff.resolveTranslation(log.contents()).split("\n", -1);
+            String[] lines = ClientTranslationHelpers.resolveTranslation(log.contents()).split("\n", -1);
 
             StringBuilder codeBlock = new StringBuilder();
             boolean insideCodeBlock = false;
@@ -226,7 +194,7 @@ public class LogsScreen extends Screen {
                     Component.literal(level.name()),
                     button -> {
                         String logLevel = level.name();
-                        SFMPackets.MANAGER_CHANNEL.sendToServer(new ServerboundManagerSetLogLevelPacket(
+                        SFMPackets.sendToServer(new ServerboundManagerSetLogLevelPacket(
                                 MENU.containerId,
                                 MENU.MANAGER_POSITION,
                                 logLevel
@@ -288,7 +256,7 @@ public class LogsScreen extends Screen {
                     20,
                     LocalizationKeys.LOGS_GUI_CLEAR_LOGS_BUTTON.getComponent(),
                     (button) -> {
-                        SFMPackets.MANAGER_CHANNEL.sendToServer(new ServerboundManagerClearLogsPacket(
+                        SFMPackets.sendToServer(new ServerboundManagerClearLogsPacket(
                                 MENU.containerId,
                                 MENU.MANAGER_POSITION
                         ));
@@ -303,6 +271,38 @@ public class LogsScreen extends Screen {
         return Tooltip.create(entry.getComponent());
     }
 
+    @Override
+    public void onClose() {
+        SFMPackets.sendToServer(new ServerboundManagerLogDesireUpdatePacket(
+                MENU.containerId,
+                MENU.MANAGER_POSITION,
+                false
+        ));
+        super.onClose();
+    }
+
+    public void scrollToBottom() {
+        textarea.scrollToBottom();
+    }
+
+    @Override
+    public void resize(Minecraft mc, int x, int y) {
+        var prev = this.textarea.getValue();
+        init(mc, x, y);
+        super.resize(mc, x, y);
+        this.textarea.setValue(prev);
+    }
+
+    @Override
+    public void render(PoseStack poseStack, int mx, int my, float partialTicks) {
+        this.renderBackground(poseStack);
+        super.render(poseStack, mx, my, partialTicks);
+        if (!MENU.logLevel.equals(lastKnownLogLevel)) {
+            onLogLevelChange();
+        }
+    }
+
+
     // TODO: enable scrolling without focus
     private class MyMultiLineEditBox extends MultiLineEditBox {
         public MyMultiLineEditBox() {
@@ -315,6 +315,10 @@ public class LogsScreen extends Screen {
                     Component.literal(""),
                     Component.literal("")
             );
+        }
+
+        public void scrollToBottom() {
+            setScrollAmount(Double.MAX_VALUE);
         }
 
         @Override
@@ -332,6 +336,13 @@ public class LogsScreen extends Screen {
                 SFM.LOGGER.error("Error in LogsScreen.MyMultiLineEditBox.mouseClicked", e);
                 return false;
             }
+        }
+
+        @Override
+        public int getInnerHeight() {
+            // parent method uses this.textField.getLineCount() which is split for text wrapping
+            // we don't use the wrapped text, so we need to calculate the height ourselves to avoid overshooting
+            return this.font.lineHeight * (content.size() + 2);
         }
 
         @Override

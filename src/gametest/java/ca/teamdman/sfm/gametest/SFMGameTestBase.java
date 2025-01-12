@@ -3,6 +3,7 @@ package ca.teamdman.sfm.gametest;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.program.ProgramContext;
+import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfml.ast.Block;
 import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.ast.Trigger;
@@ -12,15 +13,15 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.enchantment.Enchantment;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
+import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
-import java.util.Collections;
-import java.util.List;
-import java.util.Locale;
-import java.util.Optional;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -28,7 +29,20 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
 public abstract class SFMGameTestBase {
-    protected static void assertTrue(boolean condition, String message) {
+
+    public static ItemStack enchant(
+            ItemStack stack,
+            Enchantment enchantment,
+            int level
+    ) {
+        EnchantmentHelper.setEnchantments(Map.of(enchantment, level), stack);
+        return stack;
+    }
+
+    protected static void assertTrue(
+            boolean condition,
+            String message
+    ) {
         if (!condition) {
             throw new GameTestAssertException(message);
         }
@@ -59,23 +73,26 @@ public abstract class SFMGameTestBase {
         // to
         // EVERY REDSTONE PULSE DO
         // and it will patiently wait
-        assertManagerDidThingWithoutLagging(helper, manager, () -> {
-            assertion.run();
-            helper.succeed();
-        });
+        assertManagerDidThingWithoutLagging(
+                helper,
+                manager,
+                assertion,
+                helper::succeed
+        );
     }
-
 
     protected static void assertManagerDidThingWithoutLagging(
             GameTestHelper helper,
             ManagerBlockEntity manager,
-            Runnable assertion
+            Runnable assertion,
+            Runnable onSuccess
     ) {
         SFMGameTestBase.assertManagerRunning(manager); // the program should already be compiled so we can monkey patch it
+        manager.enableRebuildProgramLock();
         var hasExecuted = new AtomicBoolean(false);
         var startTime = new AtomicLong();
         var endTime = new AtomicLong();
-        @SuppressWarnings("OptionalGetWithoutIsPresent") List<Trigger> triggers = manager.getProgram().get().triggers();
+        List<Trigger> triggers = Objects.requireNonNull(manager.getProgram()).triggers();
         var oldFirstTrigger = triggers.get(0);
         long timeoutTicks = 200;
 
@@ -123,6 +140,7 @@ public abstract class SFMGameTestBase {
         triggers.add(0, startTimerTrigger);
         triggers.add(endTimerTrigger);
 
+
         LongStream
                 .range(helper.getTick() + 1, timeoutTicks - helper.getTick())
                 .forEach(i -> helper.runAfterDelay(i, () -> {
@@ -137,35 +155,45 @@ public abstract class SFMGameTestBase {
                                         .format(endTime.get() - startTime.get()) + "ns"
                         );
                         hasExecuted.set(false); // prevent the assertion from running again
+                        onSuccess.run();
                     }
                 }));
     }
 
     protected static void assertManagerRunning(ManagerBlockEntity manager) {
-        SFMGameTestBase.assertTrue(manager.getDisk().isPresent(), "No disk in manager");
+        SFMGameTestBase.assertTrue(manager.getDisk() != null, "No disk in manager");
         SFMGameTestBase.assertTrue(
                 manager.getState() == ManagerBlockEntity.State.RUNNING,
-                "Program did not start running " + DiskItem.getErrors(manager.getDisk().get())
+                "Program did not start running " + DiskItem.getErrors(manager.getDisk())
         );
     }
 
-    protected static int count(Container chest, Item item) {
+    protected static int count(
+            Container chest,
+            @Nullable Item item
+    ) {
         return IntStream.range(0, chest.getContainerSize())
                 .mapToObj(chest::getItem)
-                .filter(stack -> stack.getItem() == item)
+                .filter(stack -> item == null || stack.getItem() == item)
                 .mapToInt(ItemStack::getCount)
                 .sum();
     }
 
-    protected static int count(IItemHandler chest, Item item) {
+    protected static int count(
+            IItemHandler chest,
+            @Nullable Item item
+    ) {
         return IntStream.range(0, chest.getSlots())
                 .mapToObj(chest::getStackInSlot)
-                .filter(stack -> stack.getItem() == item)
+                .filter(stack -> item == null || stack.getItem() == item)
                 .mapToInt(ItemStack::getCount)
                 .sum();
     }
 
-    protected static IItemHandler getItemHandler(GameTestHelper helper, BlockPos pos) {
+    protected static IItemHandler getItemHandler(
+            GameTestHelper helper,
+            @NotStored BlockPos pos
+    ) {
         BlockEntity blockEntity = helper
                 .getBlockEntity(pos);
         SFMGameTestBase.assertTrue(blockEntity != null, "No block entity found at " + pos);

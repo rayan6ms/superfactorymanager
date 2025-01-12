@@ -1,7 +1,8 @@
 package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.ClientStuff;
+import ca.teamdman.sfm.client.ClientRaycastHelpers;
+import ca.teamdman.sfm.client.ClientScreenHelpers;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundContainerExportsInspectionRequestPacket;
@@ -23,14 +24,12 @@ import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.client.gui.widget.ExtendedButton;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 @Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class ContainerScreenInspectorHandler {
     private static boolean visible = false;
-    @Nullable
-    private static AbstractContainerScreen<?> lastScreen = null;
+    private static @Nullable AbstractContainerScreen<?> lastScreen = null;
     private static final ExtendedButton exportInspectorButton = new ExtendedButton(
             5,
             50,
@@ -38,9 +37,9 @@ public class ContainerScreenInspectorHandler {
             20,
             LocalizationKeys.CONTAINER_INSPECTOR_SHOW_EXPORTS_BUTTON.getComponent(),
             (button) -> {
-                BlockEntity lookBlockEntity = ClientStuff.getLookBlockEntity();
+                BlockEntity lookBlockEntity = ClientRaycastHelpers.getLookBlockEntity();
                 if (lastScreen != null && lookBlockEntity != null) {
-                    SFMPackets.INSPECTION_CHANNEL.sendToServer(new ServerboundContainerExportsInspectionRequestPacket(
+                    SFMPackets.sendToServer(new ServerboundContainerExportsInspectionRequestPacket(
                             lastScreen.getMenu().containerId,
                             lookBlockEntity.getBlockPos()
                     ));
@@ -154,7 +153,7 @@ public class ContainerScreenInspectorHandler {
                 if (hoveredSlot != null) {
                     ItemStack hoveredStack = hoveredSlot.getItem();
                     if (!hoveredStack.isEmpty()) {
-                        ClientStuff.showItemInspectorScreen(hoveredStack);
+                        ClientScreenHelpers.showItemInspectorScreen(hoveredStack);
                     }
                 }
             }

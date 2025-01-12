@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.datagen;
 
+import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.recipe.PrintingPressFinishedRecipe;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
@@ -36,6 +37,20 @@ public class SFMRecipes extends RecipeProvider {
                 .unlockedBy("has_chest", RecipeProvider.has(Tags.Items.CHESTS))
                 .save(consumer);
 
+        ShapelessRecipeBuilder
+                .shapeless(RecipeCategory.REDSTONE, SFMBlocks.FANCY_CABLE_BLOCK.get())
+                .requires(SFMBlocks.CABLE_BLOCK.get(), 1)
+                .unlockedBy("has_iron_ingot", RecipeProvider.has(Items.IRON_INGOT))
+                .unlockedBy("has_chest", RecipeProvider.has(Tags.Items.CHESTS))
+                .save(consumer);
+
+        ShapelessRecipeBuilder
+                .shapeless(RecipeCategory.REDSTONE, SFMBlocks.CABLE_BLOCK.get())
+                .requires(SFMBlocks.FANCY_CABLE_BLOCK.get(), 1)
+                .unlockedBy("has_iron_ingot", RecipeProvider.has(Items.IRON_INGOT))
+                .unlockedBy("has_chest", RecipeProvider.has(Tags.Items.CHESTS))
+                .save(consumer, new ResourceLocation(SFM.MOD_ID, "fancy_to_cable"));
+
         ShapedRecipeBuilder
                 .shaped(RecipeCategory.REDSTONE, SFMBlocks.MANAGER_BLOCK.get())
                 .define('A', Tags.Items.CHESTS)
@@ -46,6 +61,17 @@ public class SFMRecipes extends RecipeProvider {
                 .pattern("ABA")
                 .pattern("BCB")
                 .pattern("ABA")
+                .save(consumer);
+
+        ShapedRecipeBuilder
+                .shaped(RecipeCategory.REDSTONE, SFMBlocks.TUNNELLED_MANAGER_BLOCK.get())
+                .define('M', SFMBlocks.MANAGER_BLOCK.get())
+                .define('H', Items.HOPPER)
+                .unlockedBy("has_iron_ingot", RecipeProvider.has(Items.IRON_INGOT))
+                .unlockedBy("has_chest", RecipeProvider.has(Tags.Items.CHESTS))
+                .pattern("M  ")
+                .pattern("H  ")
+                .pattern("   ")
                 .save(consumer);
 
         ShapedRecipeBuilder
@@ -156,6 +182,9 @@ public class SFMRecipes extends RecipeProvider {
         SpecialRecipeBuilder
                 .special(SFMRecipeSerializers.DISK_RESET.get())
                 .save(consumer, SFMRecipeSerializers.DISK_RESET.getId().getPath());
+        SpecialRecipeBuilder
+                .special(SFMRecipeSerializers.LABEL_GUN_RESET.get())
+                .save(consumer, SFMRecipeSerializers.LABEL_GUN_RESET.getId().getPath());
     }
 
     private void addPrintingPressRecipe(

@@ -1,16 +1,18 @@
 package ca.teamdman.sfm.common.item;
 
-import ca.teamdman.sfm.client.ClientStuff;
+import ca.teamdman.sfm.client.ClientKeyHelpers;
+import ca.teamdman.sfm.client.ClientScreenHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundDiskItemSetProgramPacket;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
-import ca.teamdman.sfm.common.program.ProgramLinter;
+import ca.teamdman.sfm.common.program.linting.ProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMPackets;
-import ca.teamdman.sfm.common.util.SFMUtils;
+import ca.teamdman.sfm.common.util.SFMItemUtils;
+import ca.teamdman.sfm.common.util.SFMTranslationUtils;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
@@ -29,12 +31,11 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -56,7 +57,7 @@ public class DiskItem extends Item {
 
     }
 
-    public static Optional<Program> compileAndUpdateErrorsAndWarnings(ItemStack stack, @Nullable ManagerBlockEntity manager) {
+    public static @Nullable Program compileAndUpdateErrorsAndWarnings(ItemStack stack, @Nullable ManagerBlockEntity manager) {
         if (manager != null) {
             manager.logger.info(x -> x.accept(LocalizationKeys.PROGRAM_COMPILE_FROM_DISK_BEGIN.get()));
         }
@@ -98,7 +99,7 @@ public class DiskItem extends Item {
                     setErrors(stack, errors);
                 }
         );
-        return Optional.ofNullable(rtn.get());
+        return rtn.get();
     }
 
     public static List<TranslatableContents> getErrors(ItemStack stack) {
@@ -107,7 +108,7 @@ public class DiskItem extends Item {
                 .getList("sfm:errors", Tag.TAG_COMPOUND)
                 .stream()
                 .map(CompoundTag.class::cast)
-                .map(SFMUtils::deserializeTranslation)
+                .map(SFMTranslationUtils::deserializeTranslation)
                 .toList();
     }
 
@@ -118,7 +119,7 @@ public class DiskItem extends Item {
                         "sfm:errors",
                         errors
                                 .stream()
-                                .map(SFMUtils::serializeTranslation)
+                                .map(SFMTranslationUtils::serializeTranslation)
                                 .collect(ListTag::new, ListTag::add, ListTag::addAll)
                 );
     }
@@ -129,7 +130,7 @@ public class DiskItem extends Item {
                 .getList("sfm:warnings", Tag.TAG_COMPOUND)
                 .stream()
                 .map(CompoundTag.class::cast)
-                .map(SFMUtils::deserializeTranslation)
+                .map(SFMTranslationUtils::deserializeTranslation)
                 .collect(
                         Collectors.toList());
     }
@@ -141,7 +142,7 @@ public class DiskItem extends Item {
                         "sfm:warnings",
                         warnings
                                 .stream()
-                                .map(SFMUtils::serializeTranslation)
+                                .map(SFMTranslationUtils::serializeTranslation)
                                 .collect(ListTag::new, ListTag::add, ListTag::addAll)
                 );
     }
@@ -164,9 +165,9 @@ public class DiskItem extends Item {
     public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
         var stack = pPlayer.getItemInHand(pUsedHand);
         if (pLevel.isClientSide) {
-            ClientStuff.showProgramEditScreen(
+            ClientScreenHelpers.showProgramEditScreen(
                     getProgram(stack),
-                    programString -> SFMPackets.DISK_ITEM_CHANNEL.sendToServer(new ServerboundDiskItemSetProgramPacket(
+                    programString -> SFMPackets.sendToServer(new ServerboundDiskItemSetProgramPacket(
                                 programString,
                                 pUsedHand
                         ))
@@ -178,73 +179,42 @@ public class DiskItem extends Item {
     @Override
     public Component getName(ItemStack stack) {
         if (FMLEnvironment.dist == Dist.CLIENT) {
-            if (ClientStuff.isMoreInfoKeyDown()) return super.getName(stack);
+            if (ClientKeyHelpers.isKeyDown(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY)) return super.getName(stack);
         }
         var name = getProgramName(stack);
         if (name.isEmpty()) return super.getName(stack);
         return Component.literal(name).withStyle(ChatFormatting.AQUA);
     }
 
-    @SuppressWarnings("UnnecessaryLocalVariable")
     @Override
     public void appendHoverText(
-            ItemStack stack, @Nullable Level level, List<Component> list, TooltipFlag detail
+            ItemStack stack, @Nullable Level level, List<Component> lines, TooltipFlag detail
     ) {
         if (stack.hasTag()) {
-            boolean isClient = FMLEnvironment.dist.isClient();
-            boolean isMoreInfoKeyDown = isClient && ClientStuff.isMoreInfoKeyDown();
-            boolean showProgram = isMoreInfoKeyDown;
-            if (!showProgram) {
-                list.addAll(LabelPositionHolder.from(stack).asHoverText());
+            if (SFMItemUtils.isClientAndMoreInfoKeyPressed()) {
+                // show the program
+                var program = getProgram(stack);
+                if (!program.isEmpty()) {
+                    lines.add(SFMItemUtils.getRainbow(getName(stack).getString().length()));
+                    lines.addAll(ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(program, false));
+                }
+            } else {
+                lines.addAll(LabelPositionHolder.from(stack).asHoverText());
                 getErrors(stack)
                         .stream()
                         .map(MutableComponent::create)
                         .map(line -> line.withStyle(ChatFormatting.RED))
-                        .forEach(list::add);
+                        .forEach(lines::add);
                 getWarnings(stack)
                         .stream()
                         .map(MutableComponent::create)
                         .map(line -> line.withStyle(ChatFormatting.YELLOW))
-                        .forEach(list::add);
-                if (isClient) {
-                    list.add(LocalizationKeys.GUI_ADVANCED_TOOLTIP_HINT
-                                     .getComponent(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY.get().getTranslatedKeyMessage())
-                                     .withStyle(ChatFormatting.AQUA));
-                }
-            } else {
-                var program = getProgram(stack);
-                if (!program.isEmpty()) {
-                    var start = Component.empty();
-                    ChatFormatting[] rainbowColors = new ChatFormatting[]{
-                            ChatFormatting.DARK_RED,
-                            ChatFormatting.RED,
-                            ChatFormatting.GOLD,
-                            ChatFormatting.YELLOW,
-                            ChatFormatting.DARK_GREEN,
-                            ChatFormatting.GREEN,
-                            ChatFormatting.DARK_AQUA,
-                            ChatFormatting.AQUA,
-                            ChatFormatting.DARK_BLUE,
-                            ChatFormatting.BLUE,
-                            ChatFormatting.DARK_PURPLE,
-                            ChatFormatting.LIGHT_PURPLE
-                    };
-                    int rainbowColorsLength = rainbowColors.length;
-                    int fullCycleLength = 2 * rainbowColorsLength - 2;
-                    for (int i = 0; i < getName(stack).getString().length() - 2; i++) {
-                        int cyclePosition = i % fullCycleLength;
-                        int adjustedIndex = cyclePosition < rainbowColorsLength
-                                            ? cyclePosition
-                                            : fullCycleLength - cyclePosition;
-                        ChatFormatting color = rainbowColors[adjustedIndex];
-                        start = start.append(Component.literal("=").withStyle(color));
-                    }
-                    list.add(start);
-                    list.addAll(ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(program, false));
-                }
+                        .forEach(lines::add);
+                SFMItemUtils.appendMoreInfoKeyReminderTextIfOnClient(lines);
             }
         } else {
-            list.add(LocalizationKeys.DISK_EDIT_IN_HAND_TOOLTIP.getComponent().withStyle(ChatFormatting.GRAY));
+            lines.add(LocalizationKeys.DISK_EDIT_IN_HAND_TOOLTIP.getComponent().withStyle(ChatFormatting.GRAY));
         }
     }
+
 }

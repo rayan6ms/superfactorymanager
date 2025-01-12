@@ -2,17 +2,15 @@ package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientDiagnosticInfo;
-import ca.teamdman.sfm.client.ClientStuff;
+import ca.teamdman.sfm.client.ClientScreenHelpers;
+import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.net.ServerboundManagerFixPacket;
-import ca.teamdman.sfm.common.net.ServerboundManagerProgramPacket;
-import ca.teamdman.sfm.common.net.ServerboundManagerRebuildPacket;
-import ca.teamdman.sfm.common.net.ServerboundManagerResetPacket;
+import ca.teamdman.sfm.common.net.*;
+import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMPackets;
-import ca.teamdman.sfm.common.util.SFMUtils;
 import ca.teamdman.sfml.ast.Program;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -62,6 +60,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     private ExtendedButton logsButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
     private ExtendedButton rebuildButton;
+    @SuppressWarnings("NotNullFieldNotInitialized")
+    private ExtendedButton serverConfigButton;
 
     public ManagerScreen(
             ManagerContainerMenu menu,
@@ -78,7 +78,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                 examplesButton,
                 clipboardCopyButton,
                 logsButton,
-                rebuildButton
+                rebuildButton,
+                serverConfigButton
         );
     }
 
@@ -209,6 +210,14 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                 MANAGER_GUI_REBUILD_BUTTON.getComponent(),
                 button -> this.onRebuildButtonClicked()
         ));
+        serverConfigButton = this.addRenderableWidget(new ExtendedButton(
+                (this.width - this.imageWidth) / 2 - buttonWidth,
+                (this.height - this.imageHeight) / 2 + 16 * 11,
+                buttonWidth,
+                16,
+                MANAGER_GUI_SERVER_CONFIG_BUTTON.getComponent(),
+                button -> this.onServerConfigButtonClicked()
+        ));
         resetButton = this.addRenderableWidget(new ExtendedButtonWithTooltip(
                 (this.width - this.imageWidth) / 2 + 120,
                 (this.height - this.imageHeight) / 2 + 10,
@@ -240,31 +249,42 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         }
     }
 
+    private String getProgram() {
+        return menu.program;
+    }
+
     private void onEditButtonClicked() {
-        ClientStuff.showProgramEditScreen(DiskItem.getProgram(menu.getDisk()), this::sendProgram);
+        ClientScreenHelpers.showProgramEditScreen(getProgram(), this::sendProgram);
     }
 
     private void onExamplesButtonClicked() {
-        ClientStuff.showExampleListScreen(DiskItem.getProgram(menu.getDisk()), this::sendProgram);
+        ClientScreenHelpers.showExampleListScreen(getProgram(), this::sendProgram);
     }
 
     private void onLogsButtonClicked() {
-        ClientStuff.showLogsScreen(menu);
+        ClientScreenHelpers.showLogsScreen(menu);
+    }
+
+    private void performReset() {
+        SFMPackets.sendToServer(new ServerboundManagerResetPacket(
+                menu.containerId,
+                menu.MANAGER_POSITION
+        ));
+        status = MANAGER_GUI_STATUS_RESET.getComponent();
+        statusCountdown = STATUS_DURATION;
     }
 
     private void onResetButtonClicked() {
+        if (getProgram().isBlank() && LabelPositionHolder.from(menu.getDisk()).isEmpty()) {
+            performReset();
+            return;
+        }
         ConfirmScreen confirmScreen = new ConfirmScreen(
                 proceed -> {
                     assert this.minecraft != null;
                     this.minecraft.popGuiLayer(); // Close confirm screen
-
                     if (proceed) {
-                        SFMPackets.MANAGER_CHANNEL.sendToServer(new ServerboundManagerResetPacket(
-                                menu.containerId,
-                                menu.MANAGER_POSITION
-                        ));
-                        status = MANAGER_GUI_STATUS_RESET.getComponent();
-                        statusCountdown = STATUS_DURATION;
+                        performReset();
                     }
                 },
                 LocalizationKeys.MANAGER_RESET_CONFIRM_SCREEN_TITLE.getComponent(),
@@ -278,7 +298,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     private void onRebuildButtonClicked() {
-        SFMPackets.MANAGER_CHANNEL.sendToServer(new ServerboundManagerRebuildPacket(
+        SFMPackets.sendToServer(new ServerboundManagerRebuildPacket(
                 menu.containerId,
                 menu.MANAGER_POSITION
         ));
@@ -286,8 +306,12 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         statusCountdown = STATUS_DURATION;
     }
 
+    private void onServerConfigButtonClicked() {
+        SFMPackets.sendToServer(new ServerboundServerConfigRequestPacket(ConfigCommandBehaviourInput.SHOW));
+    }
+
     private void sendAttemptFix() {
-        SFMPackets.MANAGER_CHANNEL.sendToServer(new ServerboundManagerFixPacket(
+        SFMPackets.sendToServer(new ServerboundManagerFixPacket(
                 menu.containerId,
                 menu.MANAGER_POSITION
         ));
@@ -296,8 +320,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     private void sendProgram(String program) {
-        program = SFMUtils.truncate(program, Program.MAX_PROGRAM_LENGTH);
-        SFMPackets.MANAGER_CHANNEL.sendToServer(new ServerboundManagerProgramPacket(
+        program = SFMPacketDaddy.truncate(program, Program.MAX_PROGRAM_LENGTH);
+        SFMPackets.sendToServer(new ServerboundManagerProgramPacket(
                 menu.containerId,
                 menu.MANAGER_POSITION,
                 program
@@ -339,12 +363,36 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     private void onClipboardPasteButtonClicked() {
+        String clipboardContents;
         try {
-            String contents = Minecraft.getInstance().keyboardHandler.getClipboard();
-            sendProgram(contents);
+            clipboardContents = Minecraft.getInstance().keyboardHandler.getClipboard();
         } catch (Throwable t) {
             SFM.LOGGER.error("failed loading clipboard", t);
+            return;
         }
+        String existingProgram = getProgram();
+        boolean shouldConfirm = !existingProgram.isBlank() && !existingProgram.equals(clipboardContents);
+        if (!shouldConfirm) {
+            sendProgram(clipboardContents);
+            return;
+        }
+
+        ConfirmScreen confirmScreen = new ConfirmScreen(
+                proceed -> {
+                    assert this.minecraft != null;
+                    this.minecraft.popGuiLayer(); // Close confirm screen
+                    if (proceed) {
+                        sendProgram(clipboardContents);
+                    }
+                },
+                LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_TITLE.getComponent(),
+                LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_MESSAGE.getComponent(),
+                LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_YES_BUTTON.getComponent(),
+                LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_NO_BUTTON.getComponent()
+        );
+        assert this.minecraft != null;
+        this.minecraft.pushGuiLayer(confirmScreen);
+        confirmScreen.setDelay(20);
     }
 
     @Override
@@ -532,6 +580,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                     .forEach(w -> w.setFocused(false));
             return;
         }
+
+        // in 1.19.2 you have to manually render tooltips here
 
         // render hovered item
         super.renderTooltip(pose, mx, my);
