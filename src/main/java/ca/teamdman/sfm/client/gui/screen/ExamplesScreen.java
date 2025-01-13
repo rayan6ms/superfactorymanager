@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.client.gui.screen;
 
+import ca.teamdman.sfm.client.gui.ButtonBuilder;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
@@ -95,16 +96,15 @@ public class ExamplesScreen extends Screen {
                         + paddingX
                 );
                 int y = 50 + (i / buttonsPerRow) * (buttonHeight + paddingY);
-                addRenderableWidget(
-                        Button.builder(
-                                        Component.literal(entry.getKey()),
-                                        btn -> {
-                                            onClose();
-                                            CALLBACK.accept(entry.getValue(), templatePrograms);
-                                        }
-                                )
-                                .pos(x, y)
-                                .size(buttonWidth, buttonHeight)
+                this.addRenderableWidget(
+                        new ButtonBuilder()
+                                .setText(Component.literal(entry.getKey()))
+                                .setOnPress(btn -> {
+                                    onClose();
+                                    CALLBACK.accept(entry.getValue(), templatePrograms);
+                                })
+                                .setPosition(x, y)
+                                .setSize(buttonWidth, buttonHeight)
                                 .build()
                 );
                 i++;

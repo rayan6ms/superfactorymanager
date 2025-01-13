@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientDiagnosticInfo;
 import ca.teamdman.sfm.client.ClientTranslationHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
+import ca.teamdman.sfm.client.gui.ButtonBuilder;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
@@ -45,7 +46,7 @@ public class LogsScreen extends Screen {
     private MyMultiLineEditBox textarea;
     private List<MutableComponent> content = Collections.emptyList();
     private int lastSize = 0;
-    private Map<Level, Button> levelButtons = new HashMap<>();
+    private Map<Level,Button> levelButtons = new HashMap<>();
     private String lastKnownLogLevel;
 
 
@@ -58,21 +59,6 @@ public class LogsScreen extends Screen {
     @Override
     public boolean isPauseScreen() {
         return false;
-    }
-
-    public boolean isReadOnly() {
-        LocalPlayer player = Minecraft.getInstance().player;
-        return player == null || player.isSpectator();
-    }
-
-    public void onLogLevelChange() {
-        // disable buttons that equal the current level
-        for (var entry : levelButtons.entrySet()) {
-            var level = entry.getKey();
-            var button = entry.getValue();
-            button.active = !MENU.logLevel.equals(level.name());
-        }
-        lastKnownLogLevel = MENU.logLevel;
     }
 
     private boolean shouldRebuildText() {
@@ -158,6 +144,21 @@ public class LogsScreen extends Screen {
         lastSize = MENU.logs.size();
     }
 
+    public boolean isReadOnly() {
+        LocalPlayer player = Minecraft.getInstance().player;
+        return player == null || player.isSpectator();
+    }
+
+    public void onLogLevelChange() {
+        // disable buttons that equal the current level
+        for (var entry : levelButtons.entrySet()) {
+            var level = entry.getKey();
+            var button = entry.getValue();
+            button.active = !MENU.logLevel.equals(level.name());
+        }
+        lastKnownLogLevel = MENU.logLevel;
+    }
+
     @Override
     protected void init() {
         super.init();
@@ -210,65 +211,65 @@ public class LogsScreen extends Screen {
         onLogLevelChange();
 
 
-        this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                this.width / 2 - 200,
-                this.height / 2 - 100 + 195,
-                80,
-                20,
-                LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON.getComponent(),
-                (button) -> {
-                    StringBuilder clip = new StringBuilder();
-                    clip.append(ClientDiagnosticInfo.getDiagnosticInfo(MENU.program, MENU.getDisk()));
-                    clip.append("\n-- LOGS --\n");
-                    if (hasShiftDown()) {
-                        for (TranslatableLogEvent log : MENU.logs) {
-                            clip.append(log.level().name()).append(" ");
-                            clip.append(log.instant().toString()).append(" ");
-                            clip.append(log.contents().getKey());
-                            for (Object arg : log.contents().getArgs()) {
-                                clip.append(" ").append(arg);
-                            }
-                            clip.append("\n");
-                        }
-                    } else {
-                        for (MutableComponent line : content) {
-                            clip.append(line.getString()).append("\n");
-                        }
-                    }
-                    Minecraft.getInstance().keyboardHandler.setClipboard(clip.toString());
-                },
-                buildTooltip(LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON_TOOLTIP)
-        ));
-        this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                this.width / 2 - 2 - 100,
-                this.height / 2 - 100 + 195,
-                200,
-                20,
-                CommonComponents.GUI_DONE,
-                (p_97691_) -> this.onClose(),
-                buildTooltip(PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP)
-        ));
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(this.width / 2 - 200, this.height / 2 - 100 + 195)
+                        .setPosition(80, 20)
+                        .setText(LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON)
+                        .setOnPress(this::onCopyLogsClicked)
+                        .setTooltip(this, font, LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON_TOOLTIP)
+                        .build()
+        );
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(this.width / 2 - 2 - 100, this.height / 2 - 100 + 195)
+                        .setPosition(200, 20)
+                        .setText(CommonComponents.GUI_DONE)
+                        .setOnPress((p_97691_) -> this.onClose())
+                        .setTooltip(this, font, PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP)
+                        .build()
+        );
         if (!isReadOnly()) {
-            this.addRenderableWidget(new ExtendedButton(
-                    this.width / 2 - 2 + 115,
-                    this.height / 2 - 100 + 195,
-                    80,
-                    20,
-                    LocalizationKeys.LOGS_GUI_CLEAR_LOGS_BUTTON.getComponent(),
-                    (button) -> {
-                        SFMPackets.sendToServer(new ServerboundManagerClearLogsPacket(
-                                MENU.containerId,
-                                MENU.MANAGER_POSITION
-                        ));
-                        MENU.logs.clear();
-                    }
-            ));
+            this.addRenderableWidget(
+                    new ButtonBuilder()
+                            .setSize(this.width / 2 - 2 + 115, this.height / 2 - 100 + 195)
+                            .setPosition(80, 20)
+                            .setText(LocalizationKeys.LOGS_GUI_CLEAR_LOGS_BUTTON)
+                            .setOnPress((button) -> {
+                                SFMPackets.sendToServer(new ServerboundManagerClearLogsPacket(
+                                        MENU.containerId,
+                                        MENU.MANAGER_POSITION
+                                ));
+                                MENU.logs.clear();
+                            })
+                            .build()
+            );
         }
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private Tooltip buildTooltip(LocalizationEntry entry) {
-        return Tooltip.create(entry.getComponent());
+    private void onCopyLogsClicked(Button button) {
+        StringBuilder clip = new StringBuilder();
+        clip.append(ClientDiagnosticInfo.getDiagnosticInfo(
+                MENU.program,
+                MENU.getDisk()
+        ));
+        clip.append("\n-- LOGS --\n");
+        if (hasShiftDown()) {
+            for (TranslatableLogEvent log : MENU.logs) {
+                clip.append(log.level().name()).append(" ");
+                clip.append(log.instant().toString()).append(" ");
+                clip.append(log.contents().getKey());
+                for (Object arg : log.contents().getArgs()) {
+                    clip.append(" ").append(arg);
+                }
+                clip.append("\n");
+            }
+        } else {
+            for (MutableComponent line : content) {
+                clip.append(line.getString()).append("\n");
+            }
+        }
+        Minecraft.getInstance().keyboardHandler.setClipboard(clip.toString());
     }
 
     @Override

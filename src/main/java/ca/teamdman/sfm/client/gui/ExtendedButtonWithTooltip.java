@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.client.gui.screen;
+package ca.teamdman.sfm.client.gui;
 
 import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
