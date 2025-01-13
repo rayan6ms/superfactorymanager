@@ -8,7 +8,6 @@ import ca.teamdman.sfm.client.gui.ExtendedButtonWithTooltip;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.item.DiskItem;
-import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.*;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
@@ -29,7 +28,6 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.client.gui.widget.ExtendedButton;
 import org.apache.logging.log4j.Level;
 import org.lwjgl.glfw.GLFW;
 

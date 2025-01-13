@@ -6,7 +6,6 @@ import ca.teamdman.sfm.client.ClientTranslationHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.gui.ButtonBuilder;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
-import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.logging.TranslatableLogEvent;
 import ca.teamdman.sfm.common.net.ServerboundManagerClearLogsPacket;
