@@ -5,17 +5,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class SFMModCompat {
-    private static final List<Capability<?>> CAPABILITIES = new ArrayList<>();
-
     public static boolean isMekanismLoaded() {
         return isModLoaded("mekanism");
     }
@@ -26,38 +19,6 @@ public class SFMModCompat {
 
     public static boolean isModLoaded(String modid) {
         return ModList.get().getModContainerById(modid).isPresent();
-    }
-
-    /**
-     * Do not modify the result of this since it returns a direct reference to the cache
-     */
-    public static List<Capability<?>> getCapabilitiesUnsafe() {
-        if (CAPABILITIES.isEmpty()) {
-            // populate cache
-            CAPABILITIES.addAll(List.of(
-                    ForgeCapabilities.ITEM_HANDLER,
-                    ForgeCapabilities.FLUID_HANDLER,
-                    ForgeCapabilities.ENERGY
-            ));
-
-            if (isMekanismLoaded()) {
-//                CAPABILITIES.addAll(List.of(
-//                        GasResourceType.CAP,
-//                        InfuseResourceType.CAP,
-//                        PigmentResourceType.CAP,
-//                        SlurryResourceType.CAP
-//                ));
-            }
-        }
-        return CAPABILITIES;
-    }
-
-    public static List<Capability<?>> getCapabilities() {
-        return List.of(
-                ForgeCapabilities.ITEM_HANDLER,
-                ForgeCapabilities.FLUID_HANDLER,
-                ForgeCapabilities.ENERGY
-        );
     }
 
     public static boolean isMekanismBlock(

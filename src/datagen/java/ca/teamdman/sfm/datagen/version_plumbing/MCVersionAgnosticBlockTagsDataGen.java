@@ -1,0 +1,32 @@
+package ca.teamdman.sfm.datagen.version_plumbing;
+
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import net.minecraft.core.HolderLookup;
+import net.minecraftforge.common.data.BlockTagsProvider;
+import net.minecraftforge.data.event.GatherDataEvent;
+
+public abstract class MCVersionAgnosticBlockTagsDataGen extends BlockTagsProvider {
+    @MCVersionDependentBehaviour
+    public MCVersionAgnosticBlockTagsDataGen(GatherDataEvent event, String modId) {
+        super(
+                event.getGenerator().getPackOutput(),
+                event.getLookupProvider(),
+                modId,
+                event.getExistingFileHelper()
+        );
+    }
+
+    @MCVersionDependentBehaviour
+    @Override
+    public String getName() {
+        return modId + " Block Tags";
+    }
+
+    @MCVersionDependentBehaviour
+    @Override
+    protected void addTags(HolderLookup.Provider pProvider) {
+        this.addBlockTags();
+    }
+
+    protected abstract void addBlockTags();
+}
