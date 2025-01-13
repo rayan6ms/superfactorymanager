@@ -1,9 +1,6 @@
 package ca.teamdman.sfm.datagen.version_plumbing;
 
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.loot.LootTableSubProvider;
 import net.minecraft.resources.ResourceLocation;

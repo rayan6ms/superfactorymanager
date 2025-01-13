@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.datagen.version_plumbing;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.data.event.GatherDataEvent;
