@@ -16,7 +16,7 @@ public class ButtonBuilder {
     private int width = 150;
     private int height = 20;
     private @Nullable Button.OnPress onPress = null;
-    private @Nullable Button.OnTooltip tooltip = null;
+    private @MCVersionDependentBehaviour @Nullable Button.OnTooltip tooltip = null;
 
     public ButtonBuilder setText(LocalizationEntry text) {
         return setText(text.getComponent());

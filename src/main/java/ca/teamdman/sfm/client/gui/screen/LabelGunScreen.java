@@ -58,8 +58,8 @@ public class LabelGunScreen extends Screen {
 
         this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(this.width / 2 - 210, 50)
-                        .setPosition(50, 20)
+                        .setSize(50, 20)
+                        .setPosition(this.width / 2 - 210, 50)
                         .setText(LocalizationKeys.LABEL_GUN_GUI_CLEAR_BUTTON)
                         .setOnPress((btn) -> {
                             SFMPackets.sendToServer(new ServerboundLabelGunClearPacket(HAND));
@@ -70,8 +70,8 @@ public class LabelGunScreen extends Screen {
         );
         this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(this.width / 2 + 160, 50)
-                        .setPosition(50, 20)
+                        .setSize(50, 20)
+                        .setPosition(this.width / 2 + 160, 50)
                         .setText(LocalizationKeys.LABEL_GUN_GUI_PRUNE_BUTTON)
                         .setOnPress((btn) -> {
                             SFMPackets.sendToServer(new ServerboundLabelGunPrunePacket(HAND));
@@ -82,8 +82,8 @@ public class LabelGunScreen extends Screen {
         );
         this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(this.width / 2 - 2 - 100, this.height - 25)
-                        .setPosition(200, 20)
+                        .setSize(200, 20)
+                        .setPosition(this.width / 2 - 2 - 100, this.height - 25)
                         .setText(LocalizationKeys.LABEL_GUN_GUI_TOGGLE_LABEL_VIEW_BUTTON)
                         .setOnPress((btn) -> {
                             SFMPackets.sendToServer(new ServerboundLabelGunToggleLabelViewPacket(HAND));
@@ -93,8 +93,8 @@ public class LabelGunScreen extends Screen {
         );
         this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(this.width / 2 - 2 - 150, this.height - 50)
-                        .setPosition(300, 20)
+                        .setSize(300, 20)
+                        .setPosition(this.width / 2 - 2 - 150, this.height - 50)
                         .setText(CommonComponents.GUI_DONE)
                         .setOnPress((p_97691_) -> this.onDone())
                         .build()
@@ -167,20 +167,23 @@ public class LabelGunScreen extends Screen {
         }
     }
 
-    private void addLabelButton(String label, int x, int y, int width, int height) {
+    private void addLabelButton(
+            String label,
+            int x,
+            int y,
+            int width,
+            int height
+    ) {
         int count = LABEL_HOLDER.getPositions(label).size();
-        Button button = new Button(
-                x,
-                y,
-                width,
-                height,
-                LocalizationKeys.LABEL_GUN_GUI_LABEL_BUTTON.getComponent(label, count),
-                (btn) -> {
+        Button button = new ButtonBuilder()
+                .setSize(width, height)
+                .setPosition(x, y)
+                .setText(LocalizationKeys.LABEL_GUN_GUI_LABEL_BUTTON.getComponent(label, count))
+                .setOnPress((btn) -> {
                     this.labelField.setValue(label);
                     this.onDone();
-                }
-        );
-
+                })
+                .build();
         labelButtons.add(button);
         this.addRenderableWidget(button);
     }
