@@ -1,5 +1,6 @@
 {
   "type": "minecraft:crafting_shaped",
+  "category": "misc",
   "key": {
     "H": {
       "item": "minecraft:hopper"
@@ -15,5 +16,6 @@
   ],
   "result": {
     "item": "sfm:tunnelled_manager"
-  }
+  },
+  "show_notification": true
 }

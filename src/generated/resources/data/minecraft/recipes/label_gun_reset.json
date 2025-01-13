@@ -1,3 +1,4 @@
 {
-  "type": "sfm:label_gun_reset"
+  "type": "sfm:label_gun_reset",
+  "category": "misc"
 }
