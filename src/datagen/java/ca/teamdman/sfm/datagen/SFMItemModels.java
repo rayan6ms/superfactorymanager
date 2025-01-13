@@ -18,6 +18,7 @@ public class SFMItemModels extends MCVersionAgnosticItemModelsDataGen {
         super(event, SFM.MOD_ID);
     }
 
+
     @Override
     protected void registerModels() {
         justParent(SFMItems.MANAGER_ITEM, SFMBlocks.MANAGER_BLOCK);

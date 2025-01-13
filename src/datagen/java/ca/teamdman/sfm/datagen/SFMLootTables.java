@@ -16,7 +16,7 @@ public class SFMLootTables extends MCVersionAgnosticLootTablesDataGen {
     }
 
     @Override
-    protected void populate(MCVersionAgnosticLootTablesDataGen.BlockLootWriter writer) {
+    protected void populate(BlockLootWriter writer) {
         writer.dropSelf(SFMBlocks.MANAGER_BLOCK);
         writer.dropSelf(SFMBlocks.TUNNELLED_MANAGER_BLOCK);
         writer.dropSelf(SFMBlocks.CABLE_BLOCK);

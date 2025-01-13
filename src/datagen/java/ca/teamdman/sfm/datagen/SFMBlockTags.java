@@ -23,4 +23,9 @@ public class SFMBlockTags extends MCVersionAgnosticBlockTagsDataGen {
         tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(SFMBlocks.PRINTING_PRESS_BLOCK.get());
     }
+
+    @Override
+    public String getName() {
+        return "SuperFactoryManager Tags";
+    }
 }
