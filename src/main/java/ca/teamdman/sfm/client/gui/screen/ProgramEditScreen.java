@@ -3,6 +3,7 @@ package ca.teamdman.sfm.client.gui.screen;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
+import ca.teamdman.sfm.client.gui.ButtonBuilder;
 import ca.teamdman.sfm.client.gui.EditorUtils;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationEntry;
@@ -240,48 +241,31 @@ public class ProgramEditScreen extends Screen {
         this.setInitialFocus(textarea);
 
 
-        this.addRenderableWidget(new Button(
-                this.width / 2 - 200,
-                this.height / 2 - 100 + 195,
-                16,
-                20,
-                Component.literal("#"),
-                (button) -> this.onToggleLineNumbersButtonClicked(),
-                buildTooltip(PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP)
-        ));
-        this.addRenderableWidget(new Button(
-                this.width / 2 - 2 - 150,
-                this.height / 2 - 100 + 195,
-                200,
-                20,
-                CommonComponents.GUI_DONE,
-                (button) -> this.saveAndClose(),
-                buildTooltip(PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP)
-        ));
-        this.addRenderableWidget(new Button(
-                this.width / 2 - 2 + 100,
-                this.height / 2 - 100 + 195,
-                100,
-                20,
-                CommonComponents.GUI_CANCEL,
-                (button) -> this.onClose()
-        ));
-    }
-
-    private Button.OnTooltip buildTooltip(LocalizationEntry entry) {
-        return (btn, pose, mx, my) -> renderTooltip(
-                pose,
-                font.split(
-                        entry.getComponent(),
-                        Math.max(
-                                width
-                                / 2
-                                - 43,
-                                170
-                        )
-                ),
-                mx,
-                my
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(this.width / 2 - 200, this.height / 2 - 100 + 195)
+                        .setPosition(16, 20)
+                        .setText(Component.literal("#"))
+                        .setOnPress((button) -> this.onToggleLineNumbersButtonClicked())
+                        .setTooltip(this, font, PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP)
+                        .build()
+        );
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(this.width / 2 - 2 - 150, this.height / 2 - 100 + 195)
+                        .setPosition(200, 20)
+                        .setText(CommonComponents.GUI_DONE)
+                        .setOnPress((button) -> this.saveAndClose())
+                        .setTooltip(this, font, PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP)
+                        .build()
+        );
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(this.width / 2 - 2 + 100, this.height / 2 - 100 + 195)
+                        .setPosition(100, 20)
+                        .setText(CommonComponents.GUI_CANCEL)
+                        .setOnPress((button) -> this.onClose())
+                        .build()
         );
     }
 

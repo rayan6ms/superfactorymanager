@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.client.gui.screen;
+package ca.teamdman.sfm.client.gui;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;

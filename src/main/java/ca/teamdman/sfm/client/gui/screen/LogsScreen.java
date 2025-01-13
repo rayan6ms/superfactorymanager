@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientDiagnosticInfo;
 import ca.teamdman.sfm.client.ClientTranslationHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
+import ca.teamdman.sfm.client.gui.ButtonBuilder;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
@@ -207,78 +208,65 @@ public class LogsScreen extends Screen {
         onLogLevelChange();
 
 
-        this.addRenderableWidget(new Button(
-                this.width / 2 - 200,
-                this.height / 2 - 100 + 195,
-                80,
-                20,
-                LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON.getComponent(),
-                (button) -> {
-                    StringBuilder clip = new StringBuilder();
-                    clip.append(ClientDiagnosticInfo.getDiagnosticInfo(MENU.program, MENU.getDisk()));
-                    clip.append("\n-- LOGS --\n");
-                    if (hasShiftDown()) {
-                        for (TranslatableLogEvent log : MENU.logs) {
-                            clip.append(log.level().name()).append(" ");
-                            clip.append(log.instant().toString()).append(" ");
-                            clip.append(log.contents().getKey());
-                            for (Object arg : log.contents().getArgs()) {
-                                clip.append(" ").append(arg);
-                            }
-                            clip.append("\n");
-                        }
-                    } else {
-                        for (MutableComponent line : content) {
-                            clip.append(line.getString()).append("\n");
-                        }
-                    }
-                    Minecraft.getInstance().keyboardHandler.setClipboard(clip.toString());
-                },
-                buildTooltip(LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON_TOOLTIP)
-        ));
-        this.addRenderableWidget(new Button(
-                this.width / 2 - 2 - 100,
-                this.height / 2 - 100 + 195,
-                200,
-                20,
-                CommonComponents.GUI_DONE,
-                (p_97691_) -> this.onClose(),
-                buildTooltip(PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP)
-        ));
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(this.width / 2 - 200, this.height / 2 - 100 + 195)
+                        .setPosition(80, 20)
+                        .setText(LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON)
+                        .setOnPress(this::onCopyLogsClicked)
+                        .setTooltip(this, font, LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON_TOOLTIP)
+                        .build()
+        );
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(this.width / 2 - 2 - 100, this.height / 2 - 100 + 195)
+                        .setPosition(200, 20)
+                        .setText(CommonComponents.GUI_DONE)
+                        .setOnPress((p_97691_) -> this.onClose())
+                        .setTooltip(this, font, PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP)
+                        .build()
+        );
         if (!isReadOnly()) {
-            this.addRenderableWidget(new Button(
-                    this.width / 2 - 2 + 115,
-                    this.height / 2 - 100 + 195,
-                    80,
-                    20,
-                    LocalizationKeys.LOGS_GUI_CLEAR_LOGS_BUTTON.getComponent(),
-                    (button) -> {
-                        SFMPackets.sendToServer(new ServerboundManagerClearLogsPacket(
-                                MENU.containerId,
-                                MENU.MANAGER_POSITION
-                        ));
-                        MENU.logs.clear();
-                    }
-            ));
+            this.addRenderableWidget(
+                    new ButtonBuilder()
+                            .setSize(this.width / 2 - 2 + 115, this.height / 2 - 100 + 195)
+                            .setPosition(80, 20)
+                            .setText(LocalizationKeys.LOGS_GUI_CLEAR_LOGS_BUTTON)
+                            .setOnPress((button) -> {
+                                SFMPackets.sendToServer(new ServerboundManagerClearLogsPacket(
+                                        MENU.containerId,
+                                        MENU.MANAGER_POSITION
+                                ));
+                                MENU.logs.clear();
+                            })
+                            .build()
+            );
         }
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private Button.OnTooltip buildTooltip(LocalizationEntry entry) {
-        return (btn, pose, mx, my) -> renderTooltip(
-                pose,
-                font.split(
-                        entry.getComponent(),
-                        Math.max(
-                                width
-                                / 2
-                                - 43,
-                                170
-                        )
-                ),
-                mx,
-                my
-        );
+    private void onCopyLogsClicked(Button button) {
+        StringBuilder clip = new StringBuilder();
+        clip.append(ClientDiagnosticInfo.getDiagnosticInfo(
+                MENU.program,
+                MENU.getDisk()
+        ));
+        clip.append("\n-- LOGS --\n");
+        if (hasShiftDown()) {
+            for (TranslatableLogEvent log : MENU.logs) {
+                clip.append(log.level().name()).append(" ");
+                clip.append(log.instant().toString()).append(" ");
+                clip.append(log.contents().getKey());
+                for (Object arg : log.contents().getArgs()) {
+                    clip.append(" ").append(arg);
+                }
+                clip.append("\n");
+            }
+        } else {
+            for (MutableComponent line : content) {
+                clip.append(line.getString()).append("\n");
+            }
+        }
+        Minecraft.getInstance().keyboardHandler.setClipboard(clip.toString());
     }
 
     @Override

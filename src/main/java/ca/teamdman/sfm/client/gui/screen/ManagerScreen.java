@@ -3,6 +3,8 @@ package ca.teamdman.sfm.client.gui.screen;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientDiagnosticInfo;
 import ca.teamdman.sfm.client.ClientScreenHelpers;
+import ca.teamdman.sfm.client.gui.ButtonBuilder;
+import ca.teamdman.sfm.client.gui.ExtendedButtonWithTooltip;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.item.DiskItem;
@@ -45,23 +47,23 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     private Component status = Component.empty();
     private float statusCountdown = 0;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton diagButton;
+    private Button diagButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton clipboardPasteButton;
+    private Button clipboardPasteButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton clipboardCopyButton;
+    private Button clipboardCopyButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton resetButton;
+    private Button resetButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton editButton;
+    private Button editButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton examplesButton;
+    private Button examplesButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton logsButton;
+    private Button logsButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton rebuildButton;
+    private Button rebuildButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton serverConfigButton;
+    private Button serverConfigButton;
 
     public ManagerScreen(
             ManagerContainerMenu menu,
@@ -71,7 +73,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         super(menu, inv, title);
     }
 
-    public List<ExtendedButton> getButtonsForJEIExclusionZones() {
+    public List<Button> getButtonsForJEIExclusionZones() {
         return List.of(
                 clipboardPasteButton,
                 editButton,
@@ -151,98 +153,124 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         statusCountdown -= partialTicks;
     }
 
-    private Button.OnTooltip buildTooltip(LocalizationEntry entry) {
-        return (btn, pose, mx, my) -> renderTooltip(
-                pose,
-                font.split(entry.getComponent(), Math.max(width / 2 - 43, 170)),
-                mx,
-                my
-        );
-    }
-
     @Override
     protected void init() {
         super.init();
         int buttonWidth = 120;
-        clipboardPasteButton = this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                (this.width - this.imageWidth) / 2 - buttonWidth,
-                (this.height - this.imageHeight) / 2 + 16,
-                buttonWidth,
-                16,
-                MANAGER_GUI_PASTE_FROM_CLIPBOARD_BUTTON.getComponent(),
-                button -> this.onClipboardPasteButtonClicked(),
-                buildTooltip(MANAGER_GUI_PASTE_FROM_CLIPBOARD_BUTTON_TOOLTIP)
-        ));
-        editButton = this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                (this.width - this.imageWidth) / 2 - buttonWidth,
-                (this.height - this.imageHeight) / 2 + 16 + 50,
-                buttonWidth,
-                16,
-                MANAGER_GUI_EDIT_BUTTON.getComponent(),
-                button -> onEditButtonClicked(),
-                buildTooltip(MANAGER_GUI_EDIT_BUTTON_TOOLTIP)
-        ));
-        examplesButton = this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                (this.width - this.imageWidth) / 2 - buttonWidth,
-                (this.height - this.imageHeight) / 2 + 16 * 2 + 50,
-                buttonWidth,
-                16,
-                MANAGER_GUI_VIEW_EXAMPLES_BUTTON.getComponent(),
-                button -> onExamplesButtonClicked(),
-                buildTooltip(MANAGER_GUI_VIEW_EXAMPLES_BUTTON_TOOLTIP)
-        ));
-        clipboardCopyButton = this.addRenderableWidget(new ExtendedButton(
-                (this.width - this.imageWidth) / 2 - buttonWidth,
-                (this.height - this.imageHeight) / 2 + 128,
-                buttonWidth,
-                16,
-                MANAGER_GUI_COPY_TO_CLIPBOARD_BUTTON.getComponent(),
-                button -> this.onClipboardCopyButtonClicked()
-        ));
-        logsButton = this.addRenderableWidget(new ExtendedButton(
-                (this.width - this.imageWidth) / 2 - buttonWidth,
-                (this.height - this.imageHeight) / 2 + 16 * 9,
-                buttonWidth,
-                16,
-                MANAGER_GUI_VIEW_LOGS_BUTTON.getComponent(),
-                button -> onLogsButtonClicked()
-        ));
-        rebuildButton = this.addRenderableWidget(new ExtendedButton(
-                (this.width - this.imageWidth) / 2 - buttonWidth,
-                (this.height - this.imageHeight) / 2 + 16 * 10,
-                buttonWidth,
-                16,
-                MANAGER_GUI_REBUILD_BUTTON.getComponent(),
-                button -> this.onRebuildButtonClicked()
-        ));
-        serverConfigButton = this.addRenderableWidget(new ExtendedButton(
-                (this.width - this.imageWidth) / 2 - buttonWidth,
-                (this.height - this.imageHeight) / 2 + 16 * 11,
-                buttonWidth,
-                16,
-                MANAGER_GUI_SERVER_CONFIG_BUTTON.getComponent(),
-                button -> this.onServerConfigButtonClicked()
-        ));
-        resetButton = this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                (this.width - this.imageWidth) / 2 + 120,
-                (this.height - this.imageHeight) / 2 + 10,
-                50,
-                12,
-                MANAGER_GUI_RESET_BUTTON.getComponent(),
-                button -> onResetButtonClicked(),
-                buildTooltip(MANAGER_GUI_RESET_BUTTON_TOOLTIP)
-        ));
-        diagButton = this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                (this.width - this.imageWidth) / 2 + 35,
-                (this.height - this.imageHeight) / 2 + 48,
-                12,
-                14,
-                Component.literal("!"),
-                button -> onDiagButtonClicked(),
-                buildTooltip(isReadOnly()
-                             ? MANAGER_GUI_WARNING_BUTTON_TOOLTIP_READ_ONLY
-                             : MANAGER_GUI_WARNING_BUTTON_TOOLTIP)
-        ));
+        clipboardPasteButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 16
+                        )
+                        .setPosition(buttonWidth, 16)
+                        .setText(MANAGER_GUI_PASTE_FROM_CLIPBOARD_BUTTON)
+                        .setOnPress(button -> this.onClipboardPasteButtonClicked())
+                        .setTooltip(
+                                this,
+                                font,
+                                MANAGER_GUI_PASTE_FROM_CLIPBOARD_BUTTON_TOOLTIP
+                        )
+                        .build()
+        );
+        editButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 16 + 50
+                        )
+                        .setPosition(buttonWidth, 16)
+                        .setText(MANAGER_GUI_EDIT_BUTTON)
+                        .setOnPress(button -> onEditButtonClicked())
+                        .setTooltip(this, font, MANAGER_GUI_EDIT_BUTTON_TOOLTIP)
+                        .build()
+        );
+        examplesButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 16 * 2 + 50
+                        )
+                        .setPosition(buttonWidth, 16)
+                        .setText(MANAGER_GUI_VIEW_EXAMPLES_BUTTON)
+                        .setOnPress(button -> onExamplesButtonClicked())
+                        .setTooltip(
+                                this,
+                                font,
+                                MANAGER_GUI_VIEW_EXAMPLES_BUTTON_TOOLTIP
+                        )
+                        .build()
+        );
+        clipboardCopyButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 128
+                        )
+                        .setPosition(buttonWidth, 16)
+                        .setText(MANAGER_GUI_COPY_TO_CLIPBOARD_BUTTON)
+                        .setOnPress(button -> this.onClipboardCopyButtonClicked())
+                        .build()
+        );
+        logsButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 16 * 9
+                        )
+                        .setPosition(buttonWidth, 16)
+                        .setText(MANAGER_GUI_VIEW_LOGS_BUTTON)
+                        .setOnPress(button -> onLogsButtonClicked())
+                        .build()
+        );
+        rebuildButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 16 * 10
+                        )
+                        .setPosition(buttonWidth, 16)
+                        .setText(MANAGER_GUI_REBUILD_BUTTON)
+                        .setOnPress(button -> this.onRebuildButtonClicked())
+                        .build()
+        );
+        serverConfigButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 16 * 11
+                        )
+                        .setPosition(buttonWidth, 16)
+                        .setText(MANAGER_GUI_SERVER_CONFIG_BUTTON)
+                        .setOnPress(button -> this.onServerConfigButtonClicked())
+                        .build()
+        );
+        resetButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(
+                                (this.width - this.imageWidth) / 2 + 120,
+                                (this.height - this.imageHeight) / 2 + 10
+                        )
+                        .setPosition(50, 12)
+                        .setText(MANAGER_GUI_RESET_BUTTON)
+                        .setOnPress(button -> onResetButtonClicked())
+                        .setTooltip(this, font, MANAGER_GUI_RESET_BUTTON_TOOLTIP)
+                        .build()
+        );
+        diagButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(
+                                (this.width - this.imageWidth) / 2 + 35,
+                                (this.height - this.imageHeight) / 2 + 48
+                        )
+                        .setPosition(12, 14)
+                        .setText(Component.literal("!"))
+                        .setOnPress(button -> onDiagButtonClicked())
+                        .setTooltip(this, font, isReadOnly()
+                                                ? MANAGER_GUI_WARNING_BUTTON_TOOLTIP_READ_ONLY
+                                                : MANAGER_GUI_WARNING_BUTTON_TOOLTIP)
+                        .build()
+        );
         updateVisibilities();
     }
 

@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.gui.ExtendedButtonWithTooltip;
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -67,15 +68,6 @@ public class TestBarrelTankScreen extends AbstractContainerScreen<TestBarrelTank
         vertexBuffer.vertex(matrix, 0f, 0f, 1f).uv(fluidSprite.getU0(), fluidSprite.getV0()).endVertex();
         BufferUploader.drawWithShader(vertexBuffer.end());
         RenderSystem.disableBlend();
-    }
-
-    private Button.OnTooltip buildTooltip(LocalizationEntry entry) {
-        return (btn, pose, mx, my) -> renderTooltip(
-                pose,
-                font.split(entry.getComponent(), Math.max(width / 2 - 43, 170)),
-                mx,
-                my
-        );
     }
 
     @Override

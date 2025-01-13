@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.client.gui.screen;
 
+import ca.teamdman.sfm.client.gui.ButtonBuilder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunClearPacket;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunPrunePacket;
@@ -55,49 +56,49 @@ public class LabelGunScreen extends Screen {
         this.setFocused(labelField);
         this.labelField.setFocus(true);
 
-        this.addRenderableWidget(new Button(
-                this.width / 2 - 210,
-                50,
-                50,
-                20,
-                LocalizationKeys.LABEL_GUN_GUI_CLEAR_BUTTON.getComponent(),
-                (btn) -> {
-                    SFMPackets.sendToServer(new ServerboundLabelGunClearPacket(HAND));
-                    LABEL_HOLDER.clear();
-                    shouldRebuildWidgets = true;
-                }
-        ));
-        this.addRenderableWidget(new Button(
-                this.width / 2 + 160,
-                50,
-                50,
-                20,
-                LocalizationKeys.LABEL_GUN_GUI_PRUNE_BUTTON.getComponent(),
-                (btn) -> {
-                    SFMPackets.sendToServer(new ServerboundLabelGunPrunePacket(HAND));
-                    LABEL_HOLDER.prune();
-                    shouldRebuildWidgets = true;
-                }
-        ));
-        this.addRenderableWidget(new Button(
-                this.width / 2 - 2 - 100,
-                this.height - 25,
-                200,
-                20,
-                LocalizationKeys.LABEL_GUN_GUI_TOGGLE_LABEL_VIEW_BUTTON.getComponent(),
-                (btn) -> {
-                    SFMPackets.sendToServer(new ServerboundLabelGunToggleLabelViewPacket(HAND));
-                    onClose();
-                }
-        ));
-        this.addRenderableWidget(new Button(
-                this.width / 2 - 2 - 150,
-                this.height - 50,
-                300,
-                20,
-                CommonComponents.GUI_DONE,
-                (p_97691_) -> this.onDone()
-        ));
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(this.width / 2 - 210, 50)
+                        .setPosition(50, 20)
+                        .setText(LocalizationKeys.LABEL_GUN_GUI_CLEAR_BUTTON)
+                        .setOnPress((btn) -> {
+                            SFMPackets.sendToServer(new ServerboundLabelGunClearPacket(HAND));
+                            LABEL_HOLDER.clear();
+                            shouldRebuildWidgets = true;
+                        })
+                        .build()
+        );
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(this.width / 2 + 160, 50)
+                        .setPosition(50, 20)
+                        .setText(LocalizationKeys.LABEL_GUN_GUI_PRUNE_BUTTON)
+                        .setOnPress((btn) -> {
+                            SFMPackets.sendToServer(new ServerboundLabelGunPrunePacket(HAND));
+                            LABEL_HOLDER.prune();
+                            shouldRebuildWidgets = true;
+                        })
+                        .build()
+        );
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(this.width / 2 - 2 - 100, this.height - 25)
+                        .setPosition(200, 20)
+                        .setText(LocalizationKeys.LABEL_GUN_GUI_TOGGLE_LABEL_VIEW_BUTTON)
+                        .setOnPress((btn) -> {
+                            SFMPackets.sendToServer(new ServerboundLabelGunToggleLabelViewPacket(HAND));
+                            onClose();
+                        })
+                        .build()
+        );
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setSize(this.width / 2 - 2 - 150, this.height - 50)
+                        .setPosition(300, 20)
+                        .setText(CommonComponents.GUI_DONE)
+                        .setOnPress((p_97691_) -> this.onDone())
+                        .build()
+        );
         onTextUpdated("");
     }
 
