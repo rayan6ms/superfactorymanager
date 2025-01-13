@@ -160,11 +160,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         int buttonWidth = 120;
         clipboardPasteButton = this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(
+                        .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16
                         )
-                        .setPosition(buttonWidth, 16)
+                        .setSize(buttonWidth, 16)
                         .setText(MANAGER_GUI_PASTE_FROM_CLIPBOARD_BUTTON)
                         .setOnPress(button -> this.onClipboardPasteButtonClicked())
                         .setTooltip(
@@ -176,11 +176,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         );
         editButton = this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(
+                        .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 + 50
                         )
-                        .setPosition(buttonWidth, 16)
+                        .setSize(buttonWidth, 16)
                         .setText(MANAGER_GUI_EDIT_BUTTON)
                         .setOnPress(button -> onEditButtonClicked())
                         .setTooltip(this, font, MANAGER_GUI_EDIT_BUTTON_TOOLTIP)
@@ -188,11 +188,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         );
         examplesButton = this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(
+                        .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 * 2 + 50
                         )
-                        .setPosition(buttonWidth, 16)
+                        .setSize(buttonWidth, 16)
                         .setText(MANAGER_GUI_VIEW_EXAMPLES_BUTTON)
                         .setOnPress(button -> onExamplesButtonClicked())
                         .setTooltip(
@@ -204,55 +204,55 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         );
         clipboardCopyButton = this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(
+                        .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 128
                         )
-                        .setPosition(buttonWidth, 16)
+                        .setSize(buttonWidth, 16)
                         .setText(MANAGER_GUI_COPY_TO_CLIPBOARD_BUTTON)
                         .setOnPress(button -> this.onClipboardCopyButtonClicked())
                         .build()
         );
         logsButton = this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(
+                        .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 * 9
                         )
-                        .setPosition(buttonWidth, 16)
+                        .setSize(buttonWidth, 16)
                         .setText(MANAGER_GUI_VIEW_LOGS_BUTTON)
                         .setOnPress(button -> onLogsButtonClicked())
                         .build()
         );
         rebuildButton = this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(
+                        .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 * 10
                         )
-                        .setPosition(buttonWidth, 16)
+                        .setSize(buttonWidth, 16)
                         .setText(MANAGER_GUI_REBUILD_BUTTON)
                         .setOnPress(button -> this.onRebuildButtonClicked())
                         .build()
         );
         serverConfigButton = this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(
+                        .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 * 11
                         )
-                        .setPosition(buttonWidth, 16)
+                        .setSize(buttonWidth, 16)
                         .setText(MANAGER_GUI_SERVER_CONFIG_BUTTON)
                         .setOnPress(button -> this.onServerConfigButtonClicked())
                         .build()
         );
         resetButton = this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(
+                        .setPosition(
                                 (this.width - this.imageWidth) / 2 + 120,
                                 (this.height - this.imageHeight) / 2 + 10
                         )
-                        .setPosition(50, 12)
+                        .setSize(50, 12)
                         .setText(MANAGER_GUI_RESET_BUTTON)
                         .setOnPress(button -> onResetButtonClicked())
                         .setTooltip(this, font, MANAGER_GUI_RESET_BUTTON_TOOLTIP)
@@ -260,11 +260,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         );
         diagButton = this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(
+                        .setPosition(
                                 (this.width - this.imageWidth) / 2 + 35,
                                 (this.height - this.imageHeight) / 2 + 48
                         )
-                        .setPosition(12, 14)
+                        .setSize(12, 14)
                         .setText(Component.literal("!"))
                         .setOnPress(button -> onDiagButtonClicked())
                         .setTooltip(this, font, isReadOnly()

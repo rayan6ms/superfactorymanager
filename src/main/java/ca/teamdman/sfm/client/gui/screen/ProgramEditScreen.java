@@ -245,8 +245,8 @@ public class ProgramEditScreen extends Screen {
 
         this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(this.width / 2 - 200, this.height / 2 - 100 + 195)
-                        .setPosition(16, 20)
+                        .setPosition(this.width / 2 - 200, this.height / 2 - 100 + 195)
+                        .setSize(16, 20)
                         .setText(Component.literal("#"))
                         .setOnPress((button) -> this.onToggleLineNumbersButtonClicked())
                         .setTooltip(this, font, PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP)
@@ -254,8 +254,8 @@ public class ProgramEditScreen extends Screen {
         );
         this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(this.width / 2 - 2 - 150, this.height / 2 - 100 + 195)
-                        .setPosition(200, 20)
+                        .setPosition(this.width / 2 - 2 - 150, this.height / 2 - 100 + 195)
+                        .setSize(200, 20)
                         .setText(CommonComponents.GUI_DONE)
                         .setOnPress((button) -> this.saveAndClose())
                         .setTooltip(this, font, PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP)
@@ -263,8 +263,8 @@ public class ProgramEditScreen extends Screen {
         );
         this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(this.width / 2 - 2 + 100, this.height / 2 - 100 + 195)
-                        .setPosition(100, 20)
+                        .setPosition(this.width / 2 - 2 + 100, this.height / 2 - 100 + 195)
+                        .setSize(100, 20)
                         .setText(CommonComponents.GUI_CANCEL)
                         .setOnPress((button) -> this.onClose())
                         .build()

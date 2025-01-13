@@ -187,13 +187,14 @@ public class LogsScreen extends Screen {
 
         this.levelButtons = new HashMap<>();
         for (var level : buttons) {
-            Button levelButton = new ExtendedButton(
-                    startX + (buttonWidth + spacing) * buttonIndex,
-                    startY,
-                    buttonWidth,
-                    buttonHeight,
-                    Component.literal(level.name()),
-                    button -> {
+            Button levelButton = new ButtonBuilder()
+                    .setSize(buttonWidth, buttonHeight)
+                    .setPosition(
+                            startX + (buttonWidth + spacing) * buttonIndex,
+                            startY
+                    )
+                    .setText(Component.literal(level.name()))
+                    .setOnPress(button -> {
                         String logLevel = level.name();
                         SFMPackets.sendToServer(new ServerboundManagerSetLogLevelPacket(
                                 MENU.containerId,
@@ -202,8 +203,8 @@ public class LogsScreen extends Screen {
                         ));
                         MENU.logLevel = logLevel;
                         onLogLevelChange();
-                    }
-            );
+                    })
+                    .build();
             levelButtons.put(level, levelButton);
             this.addRenderableWidget(levelButton);
             buttonIndex++;
@@ -213,8 +214,8 @@ public class LogsScreen extends Screen {
 
         this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(this.width / 2 - 200, this.height / 2 - 100 + 195)
-                        .setPosition(80, 20)
+                        .setPosition(this.width / 2 - 200, this.height / 2 - 100 + 195)
+                        .setSize(80, 20)
                         .setText(LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON)
                         .setOnPress(this::onCopyLogsClicked)
                         .setTooltip(this, font, LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON_TOOLTIP)
@@ -222,8 +223,8 @@ public class LogsScreen extends Screen {
         );
         this.addRenderableWidget(
                 new ButtonBuilder()
-                        .setSize(this.width / 2 - 2 - 100, this.height / 2 - 100 + 195)
-                        .setPosition(200, 20)
+                        .setPosition(this.width / 2 - 2 - 100, this.height / 2 - 100 + 195)
+                        .setSize(200, 20)
                         .setText(CommonComponents.GUI_DONE)
                         .setOnPress((p_97691_) -> this.onClose())
                         .setTooltip(this, font, PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP)
@@ -232,8 +233,8 @@ public class LogsScreen extends Screen {
         if (!isReadOnly()) {
             this.addRenderableWidget(
                     new ButtonBuilder()
-                            .setSize(this.width / 2 - 2 + 115, this.height / 2 - 100 + 195)
-                            .setPosition(80, 20)
+                            .setPosition(this.width / 2 - 2 + 115, this.height / 2 - 100 + 195)
+                            .setSize(80, 20)
                             .setText(LocalizationKeys.LOGS_GUI_CLEAR_LOGS_BUTTON)
                             .setOnPress((button) -> {
                                 SFMPackets.sendToServer(new ServerboundManagerClearLogsPacket(
@@ -302,7 +303,6 @@ public class LogsScreen extends Screen {
             onLogLevelChange();
         }
     }
-
 
     // TODO: enable scrolling without focus
     private class MyMultiLineEditBox extends MultiLineEditBox {
