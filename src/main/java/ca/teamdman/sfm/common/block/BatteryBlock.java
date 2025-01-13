@@ -3,6 +3,8 @@ package ca.teamdman.sfm.common.block;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.blockentity.BatteryBlockEntity;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.util.NotStored;
+import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -27,7 +29,7 @@ public class BatteryBlock extends Block implements EntityBlock {
     }
 
     @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(@Stored BlockPos pos, BlockState state) {
         return SFMBlockEntities.BATTERY_BLOCK_ENTITY
                 .get()
                 .create(pos, state);
@@ -43,7 +45,7 @@ public class BatteryBlock extends Block implements EntityBlock {
     public InteractionResult use(
             BlockState pState,
             Level pLevel,
-            BlockPos pPos,
+            @NotStored BlockPos pPos,
             Player pPlayer,
             InteractionHand pHand,
             BlockHitResult pHit

@@ -3,27 +3,28 @@ package ca.teamdman.sfm.datagen;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticItemModelsDataGen;
 import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.data.DataGenerator;
-import net.minecraft.data.PackOutput;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.registries.RegistryObject;
 
-public class SFMItemModels extends ItemModelProvider {
+public class SFMItemModels extends MCVersionAgnosticItemModelsDataGen {
     public SFMItemModels(
             GatherDataEvent event
     ) {
-        super(event.getGenerator().getPackOutput(), SFM.MOD_ID, event.getExistingFileHelper());
+        super(event, SFM.MOD_ID);
     }
+
 
     @Override
     protected void registerModels() {
         justParent(SFMItems.MANAGER_ITEM, SFMBlocks.MANAGER_BLOCK);
+        justParent(SFMItems.TUNNELLED_MANAGER_ITEM, SFMBlocks.TUNNELLED_MANAGER_BLOCK);
         justParent(SFMItems.CABLE_ITEM, SFMBlocks.CABLE_BLOCK);
+        justParent(SFMItems.FANCY_CABLE_ITEM, SFMBlocks.FANCY_CABLE_BLOCK, "_core");
         justParent(SFMItems.PRINTING_PRESS_ITEM, SFMBlocks.PRINTING_PRESS_BLOCK);
         justParent(SFMItems.WATER_TANK_ITEM, SFMBlocks.WATER_TANK_BLOCK, "_active");
         basicItem(SFMItems.DISK_ITEM);
@@ -42,13 +43,16 @@ public class SFMItemModels extends ItemModelProvider {
     }
 
     private void justParent(
-            RegistryObject<? extends Item> item, RegistryObject<? extends Block> block
+            RegistryObject<? extends Item> item,
+            RegistryObject<? extends Block> block
     ) {
         justParent(item, block, "");
     }
 
     private void justParent(
-            RegistryObject<? extends Item> item, RegistryObject<? extends Block> block, String extra
+            RegistryObject<? extends Item> item,
+            RegistryObject<? extends Block> block,
+            String extra
     ) {
         withExistingParent(block.getId().getPath(), SFM.MOD_ID + ":block/" + item.getId().getPath() + extra);
     }

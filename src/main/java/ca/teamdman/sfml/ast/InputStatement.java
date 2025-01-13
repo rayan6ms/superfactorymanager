@@ -3,6 +3,7 @@ package ca.teamdman.sfml.ast;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.*;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
+import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import org.jetbrains.annotations.Nullable;
@@ -67,7 +68,7 @@ public final class InputStatement implements IOStatement {
         context.getLogger().trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_CACHE_MISS.get()));
 
         // prepare cache state
-        limitedInputSlotsCache = new ArrayDeque<>();
+        limitedInputSlotsCache = new ArrayDeque<>(27);
 
         // monkey patch the results acceptor to update the cache before returning results
         {
@@ -135,7 +136,7 @@ public final class InputStatement implements IOStatement {
 
     @Override
     public String toString() {
-        return "INPUT " + resourceLimits.toStringPretty(Limit.MAX_QUANTITY_NO_RETENTION) + " FROM " + (
+        return "INPUT " + resourceLimits.toStringCondensed(Limit.MAX_QUANTITY_NO_RETENTION) + " FROM " + (
                 each ? "EACH " : ""
         ) + labelAccess;
     }
@@ -144,14 +145,16 @@ public final class InputStatement implements IOStatement {
     public String toStringPretty() {
         StringBuilder sb = new StringBuilder();
         sb.append("INPUT");
-        String rls = resourceLimits.toStringPretty(Limit.MAX_QUANTITY_NO_RETENTION);
+        String rls = resourceLimits.toStringCondensed(Limit.MAX_QUANTITY_NO_RETENTION);
         if (rls.lines().count() > 1) {
             sb.append("\n");
             sb.append(rls.lines().map(s -> "  " + s).collect(Collectors.joining("\n")));
             sb.append("\n");
-        } else {
+        } else if (!rls.isEmpty()) {
             sb.append(" ");
             sb.append(rls);
+            sb.append(" ");
+        } else {
             sb.append(" ");
         }
         sb.append("FROM ");
@@ -234,7 +237,7 @@ public final class InputStatement implements IOStatement {
             ProgramContext context,
             ResourceType<STACK, ITEM, CAP> type,
             Label label,
-            BlockPos pos,
+            @Stored BlockPos pos,
             Direction direction,
             CAP capability,
             List<IInputResourceTracker> trackers,

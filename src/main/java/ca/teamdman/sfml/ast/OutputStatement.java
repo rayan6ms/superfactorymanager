@@ -1,12 +1,19 @@
 package ca.teamdman.sfml.ast;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.*;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
+import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -70,6 +77,7 @@ public class OutputStatement implements IOStatement {
                     .trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_DESTINATION_TRACKER_REJECT.get()));
             return;
         }
+
         // find out how much we can fit
         STACK potentialRemainder = destination.insert(potential, true);
 
@@ -181,27 +189,93 @@ public class OutputStatement implements IOStatement {
         // THIS SHOULD NEVER HAPPEN
         // will void items if it does
         if (!destination.type.isEmpty(extractedRemainder)) {
-            context.getLogger().error(x -> x.accept(LOG_PROGRAM_VOIDED_RESOURCES.get(
-                    potential,
-                    SFMResourceTypes.DEFERRED_TYPES
-                            .get()
-                            .getKey(source.type),
-                    destination.type.getRegistryKey(
-                            potential),
-                    extracted,
-                    extractedRemainder
-            )));
-            SFM.LOGGER.error(
-                    "!!!RESOURCE LOSS HAS OCCURRED!!! Manager at {} in {} failed to move all promised items, found {} {}:{}, took {} but had {} left over after insertion.",
-                    context.getManager().getBlockPos(),
-                    context.getManager().getLevel(),
-                    potential,
-                    SFMResourceTypes.DEFERRED_TYPES.get().getKey(source.type),
-                    destination.type.getRegistryKey(potential),
-                    extracted,
-                    extractedRemainder
-            );
+            ResourceLocation resourceTypeName = SFMResourceTypes.DEFERRED_TYPES.get().getKey(source.type);
+            String stackName = destination.type.getItem(potential).toString();
+            Level level = context.getManager().getLevel();
+            assert level != null;
+            StringBuilder report = new StringBuilder();
+            report.append("!!!RESOURCE LOSS HAS OCCURRED!!!");
+            String currentLine = Thread.currentThread().getStackTrace()[1].toString();
+            report.append("    ").append(currentLine).append("\n");
+            report.append("=== Summary ===\n");
+            int width = -32;
+            report.append(String.format("%"+width+"s", "Simulated extraction")).append(": ").append(potential).append("\n");
+            report
+                    .append(String.format("%"+width+"s", "Simulated insertion remainder")).append(": ")
+                    .append(potentialRemainder)
+                    .append(" (moved=").append(resourceType.getAmountDifference(potential, potentialRemainder)).append(")")
+                    .append(" <-- the output block lied here\n");
+            report.append(String.format("%"+width+"s", "Actual extraction")).append(": ").append(extracted).append("\n");
+            report.append(String.format("%"+width+"s", "Actual insertion")).append(": ").append(moved).append(" ").append(stackName).append("\n");
+            report.append(String.format("%"+width+"s", "Actual insertion remainder")).append(": ")
+                    .append(extractedRemainder)
+                    .append(" (")
+                    .append(resourceTypeName)
+                    .append(":")
+                    .append(stackName)
+                    .append(") <-- this is what was lost\n");
+
+            report.append("=== Manager ===\n");
+            report
+                    .append("Level: ")
+                    .append(level.dimensionTypeId().location())
+                    .append(" (")
+                    .append(level)
+                    .append(")\n");
+            report.append("Position: ").append(context.getManager().getBlockPos()).append("\n");
+
+            report.append("=== Input Slot ===\n");
+            addSlotDetailsToReport(report, source, level);
+
+            report.append("=== Output Slot ===\n");
+            addSlotDetailsToReport(report, destination, level);
+
+            context.getLogger().error(x -> x.accept(LOG_PROGRAM_VOIDED_RESOURCES.get(report.toString())));
+            if (SFMConfig.SERVER.logResourceLossToConsole.get()) {
+                report.append("\nThis can be silenced in the SFM config.\n");
+                report.append("Operators can use `/sfm config edit` to open a GUI to change the SFM config while the game is running.\n");
+                report.append("This can be caused by output inventory logic encountering an integer overflow when moving large quantities of items.\n");
+                report.append("The SFM issue tracker can be found at ").append(SFM.ISSUE_TRACKER_URL).append(" because this shouldn't be happening lol");
+                SFM.LOGGER.error(report.toString());
+            }
         }
+    }
+
+    private static <STACK, ITEM, CAP> void addSlotDetailsToReport(
+            StringBuilder report,
+            LimitedSlot<STACK, ITEM, CAP> slot,
+            Level level
+    ) {
+        report.append("Slot: ").append(slot.getSlot()).append("\n");
+        report.append("Position: ").append(slot.getPos()).append("\n");
+        report.append("Direction: ").append(slot.getDirection()).append("\n");
+        report
+                .append("Capability: ")
+                .append(slot.getHandler())
+                .append(" (")
+                .append(slot.getHandler().getClass().getName())
+                .append(")\n");
+        BlockEntity inputBlockEntity = level.getBlockEntity(slot.getPos());
+        if (inputBlockEntity != null) {
+            ResourceLocation inputBlockEntityType = ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(inputBlockEntity.getType());
+            report
+                    .append("Block Entity: ")
+                    .append(inputBlockEntity.getClass().getName())
+                    .append(" (")
+                    .append(inputBlockEntityType)
+                    .append(")\n");
+        } else {
+            report.append("Block Entity: null\n");
+        }
+        BlockState blockState = level.getBlockState(slot.getPos());
+        ResourceLocation blockType = ForgeRegistries.BLOCKS.getKey(blockState.getBlock());
+        report
+                .append("Block: ")
+                .append(blockState.getBlock().getClass().getName())
+                .append(" (")
+                .append(blockType)
+                .append(")\n");
+        report.append("Block State: ").append(blockState).append("\n");
     }
 
     /**
@@ -338,7 +412,7 @@ public class OutputStatement implements IOStatement {
      * <p>
      * We want collect the slots from all the labelled blocks.
      */
-    @SuppressWarnings({"rawtypes", "unchecked"}) // basically impossible to make this method generic safe
+    @SuppressWarnings({"unchecked"}) // basically impossible to make this method generic safe
     public void gatherSlots(
             ProgramContext context,
             Consumer<LimitedOutputSlot<?, ?, ?>> slotConsumer
@@ -429,7 +503,7 @@ public class OutputStatement implements IOStatement {
 
     @Override
     public String toString() {
-        return "OUTPUT " + resourceLimits.toStringPretty(Limit.MAX_QUANTITY_MAX_RETENTION) + " TO " + (
+        return "OUTPUT " + resourceLimits.toStringCondensed(Limit.MAX_QUANTITY_MAX_RETENTION) + " TO " + (
                 each ? "EACH " : ""
         ) + labelAccess;
     }
@@ -438,14 +512,16 @@ public class OutputStatement implements IOStatement {
     public String toStringPretty() {
         StringBuilder sb = new StringBuilder();
         sb.append("OUTPUT");
-        String rls = resourceLimits.toStringPretty(Limit.MAX_QUANTITY_MAX_RETENTION);
+        String rls = resourceLimits.toStringCondensed(Limit.MAX_QUANTITY_MAX_RETENTION);
         if (rls.lines().count() > 1) {
             sb.append("\n");
             sb.append(rls.lines().map(s -> "  " + s).collect(Collectors.joining("\n")));
             sb.append("\n");
-        } else {
+        } else if (!rls.isEmpty()) {
             sb.append(" ");
             sb.append(rls);
+            sb.append(" ");
+        } else {
             sb.append(" ");
         }
         sb.append("TO ");
@@ -458,7 +534,7 @@ public class OutputStatement implements IOStatement {
             ProgramContext context,
             ResourceType<STACK, ITEM, CAP> type,
             Label label,
-            BlockPos pos,
+            @Stored BlockPos pos,
             Direction direction,
             CAP capability,
             List<IOutputResourceTracker> trackers,

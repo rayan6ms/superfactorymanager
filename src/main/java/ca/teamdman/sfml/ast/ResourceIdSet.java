@@ -1,7 +1,9 @@
 package ca.teamdman.sfml.ast;
 
+import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import net.minecraft.resources.ResourceLocation;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -10,41 +12,47 @@ import java.util.stream.Stream;
 
 /**
  * A read-only set of {@link ResourceIdentifier} objects.
- * Do NOT modify this after creation since the cache of resource types will become inaccurate.
+ * Do NOT modify this after creation since the {@link this#referencedResourceTypes} will become inaccurate.
  */
 public final class ResourceIdSet implements ASTNode {
-    public static final ResourceIdSet EMPTY = new ResourceIdSet(new LinkedHashSet<>());
-    public static final ResourceIdSet MATCH_ALL = new ResourceIdSet(new LinkedHashSet<>(List.of(ResourceIdentifier.MATCH_ALL)));
-    private final LinkedHashSet<ResourceIdentifier<?, ?, ?>> resourceIds;
+    public static final ResourceIdSet EMPTY = new ResourceIdSet(List.of());
+    public static final ResourceIdSet MATCH_ALL = new ResourceIdSet(List.of(ResourceIdentifier.MATCH_ALL));
+    private final ResourceIdentifier<?, ?, ?>[] resourceIds;
+    private @NotNull ResourceType<?,?,?> @Nullable [] referencedResourceTypes = null;
 
-    public ResourceIdSet(Collection<ResourceIdentifier<?, ?, ?>> contents) {
-        this(new LinkedHashSet<>(contents));
+    public ResourceIdSet(ResourceIdentifier<?, ?, ?>[] resourceIds) {
+        this.resourceIds = resourceIds;
     }
 
-    public Set<ResourceType<?,?,?>> getReferencedResourceTypes() {
-        HashSet<ResourceType<?,?,?>> rtn = new HashSet<>(8);
-        for (ResourceIdentifier<?, ?, ?> resourceId : this.resourceIds) {
-            rtn.add(resourceId.getResourceType());
+    public ResourceIdSet(Collection<ResourceIdentifier<?, ?, ?>> contents) {
+        this(contents.toArray(new ResourceIdentifier[0]));
+    }
+
+    /**
+     * See also: {@link ResourceLimits#getReferencedResourceTypes()}
+     */
+    public ResourceType<?,?,?>[] getReferencedResourceTypes() {
+        if (referencedResourceTypes == null) {
+            var found = new LinkedHashSet<>(SFMResourceTypes.getResourceTypeCount());
+            for (ResourceIdentifier<?, ?, ?> resourceId : resourceIds) {
+                found.add(resourceId.getResourceType());
+            }
+            //noinspection SuspiciousToArrayCall
+            referencedResourceTypes = found.toArray(new ResourceType[0]);
         }
-        return rtn;
+        return referencedResourceTypes;
     }
 
     public boolean couldMatchMoreThanOne() {
-        return resourceIds.size() > 1 || stream().anyMatch(ResourceIdentifier::usesRegex);
+        return size() > 1 || stream().anyMatch(ResourceIdentifier::usesRegex);
     }
 
     public int size() {
-        return resourceIds.size();
+        return resourceIds.length;
     }
 
     public boolean isEmpty() {
-        return resourceIds.isEmpty();
-    }
-
-    public ResourceIdSet(
-            LinkedHashSet<ResourceIdentifier<?, ?, ?>> resourceIds
-    ) {
-        this.resourceIds = resourceIds;
+        return size() == 0;
     }
 
     public @Nullable ResourceIdentifier<?, ?, ?> getMatchingFromStack(Object stack) {
@@ -61,22 +69,22 @@ public final class ResourceIdSet implements ASTNode {
     }
 
     public boolean anyMatchResourceLocation(ResourceLocation location) {
-        return resourceIds.stream().anyMatch(x -> x.matchesResourceLocation(location));
+        return this.stream().anyMatch(x -> x.matchesResourceLocation(location));
     }
 
     @Override
     public String toString() {
         return "ResourceIdSet{" +
-               resourceIds.stream().map(ResourceIdentifier::toString).collect(Collectors.joining(", ")) +
+               this.stream().map(ResourceIdentifier::toString).collect(Collectors.joining(", ")) +
                '}';
     }
 
     public String toStringCondensed() {
-        return resourceIds.stream().map(ResourceIdentifier::toStringCondensed).collect(Collectors.joining(" OR "));
+        return this.stream().map(ResourceIdentifier::toStringCondensed).collect(Collectors.joining(" OR "));
     }
 
     public Stream<ResourceIdentifier<?,?,?>> stream() {
-        return resourceIds.stream();
+        return Arrays.stream(resourceIds);
     }
 
     @Override
@@ -84,12 +92,12 @@ public final class ResourceIdSet implements ASTNode {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (ResourceIdSet) obj;
-        return Objects.equals(this.resourceIds, that.resourceIds);
+        return Arrays.equals(this.resourceIds, that.resourceIds);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(resourceIds);
+        return Objects.hash((Object[]) resourceIds);
     }
 
 }
