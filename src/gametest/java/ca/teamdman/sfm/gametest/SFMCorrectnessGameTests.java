@@ -3021,7 +3021,7 @@ public class SFMCorrectnessGameTests extends SFMGameTestBase {
                 ItemStack insertParamCopy = insertParam.copy();
                 ItemStack ignoredInsertResult = inv.insertItem(0, insertParam, false);
                 assertTrue(
-                        ItemStack.isSame(insertParam, insertParamCopy),
+                        ItemStack.isSameItem(insertParam, insertParamCopy),
                         "stackSize="
                         + stackSize
                         + " insert param should not be modified after insertion, is now "
@@ -3035,14 +3035,14 @@ public class SFMCorrectnessGameTests extends SFMGameTestBase {
                 );
                 ItemStack extractResult = inv.extractItem(0, stackSize, false);
                 assertTrue(
-                        ItemStack.isSame(insertParam, insertParamCopy),
+                        ItemStack.isSameItem(insertParam, insertParamCopy),
                         "stackSize="
                         + stackSize
                         + " insert param should not be modified after extraction, is now "
                         + insertParam
                 );
                 assertTrue(
-                        ItemStack.isSame(insertParam, extractResult),
+                        ItemStack.isSameItem(insertParam, extractResult),
                         "stackSize=" + stackSize + " extract result should match insertion param"
                 );
             }
