@@ -7,7 +7,10 @@ import net.minecraftforge.data.event.GatherDataEvent;
 
 public abstract class MCVersionAgnosticBlockTagsDataGen extends BlockTagsProvider {
     @MCVersionDependentBehaviour
-    public MCVersionAgnosticBlockTagsDataGen(GatherDataEvent event, String modId) {
+    public MCVersionAgnosticBlockTagsDataGen(
+            GatherDataEvent event,
+            String modId
+    ) {
         super(
                 event.getGenerator().getPackOutput(),
                 event.getLookupProvider(),
@@ -15,6 +18,8 @@ public abstract class MCVersionAgnosticBlockTagsDataGen extends BlockTagsProvide
                 event.getExistingFileHelper()
         );
     }
+
+    protected abstract void addBlockTags();
 
     @MCVersionDependentBehaviour
     @Override
@@ -27,6 +32,4 @@ public abstract class MCVersionAgnosticBlockTagsDataGen extends BlockTagsProvide
     protected void addTags(HolderLookup.Provider pProvider) {
         this.addBlockTags();
     }
-
-    protected abstract void addBlockTags();
 }
