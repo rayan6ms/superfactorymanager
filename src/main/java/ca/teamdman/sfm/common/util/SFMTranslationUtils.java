@@ -56,6 +56,7 @@ public class SFMTranslationUtils {
     /**
      * Helper method to avoid noisy git merges between versions
      */
+    @MCVersionDependentBehaviour
     public static TranslatableContents getTranslatableContents(
             String key,
             Object... args
