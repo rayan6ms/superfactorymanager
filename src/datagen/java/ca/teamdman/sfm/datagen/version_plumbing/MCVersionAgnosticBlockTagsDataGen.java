@@ -32,4 +32,9 @@ public abstract class MCVersionAgnosticBlockTagsDataGen extends BlockTagsProvide
     protected void addTags(HolderLookup.Provider pProvider) {
         this.addBlockTags();
     }
+
+    @Override
+    public String getName() {
+        return modId + " Block Tags";
+    }
 }
