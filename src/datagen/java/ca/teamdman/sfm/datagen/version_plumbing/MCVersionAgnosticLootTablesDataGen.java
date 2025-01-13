@@ -1,17 +1,12 @@
 package ca.teamdman.sfm.datagen.version_plumbing;
 
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.loot.LootTableSubProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.LootTables;
-import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
@@ -19,7 +14,10 @@ import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.registries.RegistryObject;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
 
@@ -71,14 +69,14 @@ public abstract class MCVersionAgnosticLootTablesDataGen extends LootTableProvid
         return new MyBlockLoot(behaviours);
     }
 
-    @MCVersionDependentBehaviour
-    @Override
-    protected void validate(
-            Map<ResourceLocation, LootTable> map,
-            ValidationContext tracker
-    ) {
-        map.forEach((k, v) -> LootTables.validate(tracker, k, v));
-    }
+//    @MCVersionDependentBehaviour
+//    @Override
+//    protected void validate(
+//            Map<ResourceLocation, LootTable> map,
+//            ValidationContext tracker
+//    ) {
+//        map.forEach((k, v) -> LootTables.validate(tracker, k, v));
+//    }
 
     private interface BlockLootBehaviour {
         List<RegistryObject<? extends Block>> getInvolvedBlocks();

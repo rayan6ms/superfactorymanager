@@ -41,5 +41,6 @@
     "recipes": [
       "sfm:tunnelled_manager"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }

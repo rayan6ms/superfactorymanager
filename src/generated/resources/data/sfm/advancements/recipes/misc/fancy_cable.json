@@ -41,5 +41,6 @@
     "recipes": [
       "sfm:fancy_cable"
     ]
-  }
+  },
+  "sends_telemetry_event": false
 }
