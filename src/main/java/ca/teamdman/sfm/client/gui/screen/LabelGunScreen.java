@@ -55,6 +55,7 @@ public class LabelGunScreen extends Screen {
 
         this.setInitialFocus(labelField);
         this.setFocused(labelField);
+        this.labelField.setFocused(true);
 
         this.addRenderableWidget(new Button.Builder(
                                          LocalizationKeys.LABEL_GUN_GUI_CLEAR_BUTTON.getComponent(),
