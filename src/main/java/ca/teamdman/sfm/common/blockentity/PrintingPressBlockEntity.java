@@ -1,9 +1,11 @@
 package ca.teamdman.sfm.common.blockentity;
 
 import ca.teamdman.sfm.common.recipe.NotContainer;
+import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMRecipeTypes;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -209,11 +211,16 @@ public class PrintingPressBlockEntity extends BlockEntity implements NotContaine
             if (paper.isEmpty() || ink.isEmpty() || form.isEmpty()) {
                 return;
             }
-            paper = recipe.assemble(this);
+            paper = assembleRecipe(recipe);
             PAPER.setStackInSlot(0, paper);
             ink.shrink(1);
             INK.setStackInSlot(0, ink);
         });
+    }
+
+    @MCVersionDependentBehaviour
+    private ItemStack assembleRecipe(PrintingPressRecipe recipe) {
+        return recipe.assemble(this);
     }
 
     public ItemStack[] getStacksToDrop() {
