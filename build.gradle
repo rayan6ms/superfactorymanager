@@ -30,6 +30,7 @@ sourceSets {
         java {
             srcDir "src/gametest/java"
             exclude "ca/teamdman/sfm/gametest/compat/**"
+            exclude "ca/teamdman/sfm/gametest/ai/**"
         }
         compileClasspath += main.output
         resources {

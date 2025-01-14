@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.ai;
+package ca.teamdman.sfm.gametest.ai;
 
 import ca.teamdman.sfm.SFM;
 import com.mojang.brigadier.builder.LiteralArgumentBuilder;
