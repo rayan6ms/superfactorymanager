@@ -29,20 +29,20 @@ public class ButtonBuilder {
     }
 
     public ButtonBuilder setSize(
-            int x,
-            int y
-    ) {
-        this.x = x;
-        this.y = y;
-        return this;
-    }
-
-    public ButtonBuilder setPosition(
             int width,
             int height
     ) {
         this.width = width;
         this.height = height;
+        return this;
+    }
+
+    public ButtonBuilder setPosition(
+            int x,
+            int y
+    ) {
+        this.x = x;
+        this.y = y;
         return this;
     }
 
@@ -60,6 +60,7 @@ public class ButtonBuilder {
     }
 
     @MCVersionDependentBehaviour
+    @SuppressWarnings("unused")
     public ButtonBuilder setTooltip(
             Screen screen,
             Font font,

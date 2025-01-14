@@ -6,6 +6,7 @@ import ca.teamdman.sfm.client.gui.ButtonBuilder;
 import ca.teamdman.sfm.client.gui.EditorUtils;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.client.Minecraft;
@@ -342,6 +343,7 @@ public class ProgramEditScreen extends Screen {
             }
         }
 
+        @MCVersionDependentBehaviour
         @Override
         public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
             // Accommodate line numbers
