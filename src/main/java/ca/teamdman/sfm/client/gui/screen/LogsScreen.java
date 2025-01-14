@@ -4,8 +4,8 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientDiagnosticInfo;
 import ca.teamdman.sfm.client.ClientTranslationHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
+import ca.teamdman.sfm.client.gui.ButtonBuilder;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
-import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.logging.TranslatableLogEvent;
 import ca.teamdman.sfm.common.net.ServerboundManagerClearLogsPacket;
@@ -16,20 +16,16 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.components.MultilineTextField;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraftforge.client.gui.widget.ExtendedButton;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.time.MutableInstant;
 import org.joml.Matrix4f;
@@ -45,7 +41,7 @@ public class LogsScreen extends Screen {
     private MyMultiLineEditBox textarea;
     private List<MutableComponent> content = Collections.emptyList();
     private int lastSize = 0;
-    private Map<Level, Button> levelButtons = new HashMap<>();
+    private Map<Level,Button> levelButtons = new HashMap<>();
     private String lastKnownLogLevel;
 
 
@@ -58,21 +54,6 @@ public class LogsScreen extends Screen {
     @Override
     public boolean isPauseScreen() {
         return false;
-    }
-
-    public boolean isReadOnly() {
-        LocalPlayer player = Minecraft.getInstance().player;
-        return player == null || player.isSpectator();
-    }
-
-    public void onLogLevelChange() {
-        // disable buttons that equal the current level
-        for (var entry : levelButtons.entrySet()) {
-            var level = entry.getKey();
-            var button = entry.getValue();
-            button.active = !MENU.logLevel.equals(level.name());
-        }
-        lastKnownLogLevel = MENU.logLevel;
     }
 
     private boolean shouldRebuildText() {
@@ -158,6 +139,21 @@ public class LogsScreen extends Screen {
         lastSize = MENU.logs.size();
     }
 
+    public boolean isReadOnly() {
+        LocalPlayer player = Minecraft.getInstance().player;
+        return player == null || player.isSpectator();
+    }
+
+    public void onLogLevelChange() {
+        // disable buttons that equal the current level
+        for (var entry : levelButtons.entrySet()) {
+            var level = entry.getKey();
+            var button = entry.getValue();
+            button.active = !MENU.logLevel.equals(level.name());
+        }
+        lastKnownLogLevel = MENU.logLevel;
+    }
+
     @Override
     protected void init() {
         super.init();
@@ -186,13 +182,14 @@ public class LogsScreen extends Screen {
 
         this.levelButtons = new HashMap<>();
         for (var level : buttons) {
-            Button levelButton = new ExtendedButton(
-                    startX + (buttonWidth + spacing) * buttonIndex,
-                    startY,
-                    buttonWidth,
-                    buttonHeight,
-                    Component.literal(level.name()),
-                    button -> {
+            Button levelButton = new ButtonBuilder()
+                    .setSize(buttonWidth, buttonHeight)
+                    .setPosition(
+                            startX + (buttonWidth + spacing) * buttonIndex,
+                            startY
+                    )
+                    .setText(Component.literal(level.name()))
+                    .setOnPress(button -> {
                         String logLevel = level.name();
                         SFMPackets.sendToServer(new ServerboundManagerSetLogLevelPacket(
                                 MENU.containerId,
@@ -201,8 +198,8 @@ public class LogsScreen extends Screen {
                         ));
                         MENU.logLevel = logLevel;
                         onLogLevelChange();
-                    }
-            );
+                    })
+                    .build();
             levelButtons.put(level, levelButton);
             this.addRenderableWidget(levelButton);
             buttonIndex++;
@@ -210,65 +207,65 @@ public class LogsScreen extends Screen {
         onLogLevelChange();
 
 
-        this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                this.width / 2 - 200,
-                this.height / 2 - 100 + 195,
-                80,
-                20,
-                LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON.getComponent(),
-                (button) -> {
-                    StringBuilder clip = new StringBuilder();
-                    clip.append(ClientDiagnosticInfo.getDiagnosticInfo(MENU.program, MENU.getDisk()));
-                    clip.append("\n-- LOGS --\n");
-                    if (hasShiftDown()) {
-                        for (TranslatableLogEvent log : MENU.logs) {
-                            clip.append(log.level().name()).append(" ");
-                            clip.append(log.instant().toString()).append(" ");
-                            clip.append(log.contents().getKey());
-                            for (Object arg : log.contents().getArgs()) {
-                                clip.append(" ").append(arg);
-                            }
-                            clip.append("\n");
-                        }
-                    } else {
-                        for (MutableComponent line : content) {
-                            clip.append(line.getString()).append("\n");
-                        }
-                    }
-                    Minecraft.getInstance().keyboardHandler.setClipboard(clip.toString());
-                },
-                buildTooltip(LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON_TOOLTIP)
-        ));
-        this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                this.width / 2 - 2 - 100,
-                this.height / 2 - 100 + 195,
-                200,
-                20,
-                CommonComponents.GUI_DONE,
-                (p_97691_) -> this.onClose(),
-                buildTooltip(PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP)
-        ));
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(this.width / 2 - 200, this.height / 2 - 100 + 195)
+                        .setSize(80, 20)
+                        .setText(LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON)
+                        .setOnPress(this::onCopyLogsClicked)
+                        .setTooltip(this, font, LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON_TOOLTIP)
+                        .build()
+        );
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(this.width / 2 - 2 - 100, this.height / 2 - 100 + 195)
+                        .setSize(200, 20)
+                        .setText(CommonComponents.GUI_DONE)
+                        .setOnPress((p_97691_) -> this.onClose())
+                        .setTooltip(this, font, PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP)
+                        .build()
+        );
         if (!isReadOnly()) {
-            this.addRenderableWidget(new ExtendedButton(
-                    this.width / 2 - 2 + 115,
-                    this.height / 2 - 100 + 195,
-                    80,
-                    20,
-                    LocalizationKeys.LOGS_GUI_CLEAR_LOGS_BUTTON.getComponent(),
-                    (button) -> {
-                        SFMPackets.sendToServer(new ServerboundManagerClearLogsPacket(
-                                MENU.containerId,
-                                MENU.MANAGER_POSITION
-                        ));
-                        MENU.logs.clear();
-                    }
-            ));
+            this.addRenderableWidget(
+                    new ButtonBuilder()
+                            .setPosition(this.width / 2 - 2 + 115, this.height / 2 - 100 + 195)
+                            .setSize(80, 20)
+                            .setText(LocalizationKeys.LOGS_GUI_CLEAR_LOGS_BUTTON)
+                            .setOnPress((button) -> {
+                                SFMPackets.sendToServer(new ServerboundManagerClearLogsPacket(
+                                        MENU.containerId,
+                                        MENU.MANAGER_POSITION
+                                ));
+                                MENU.logs.clear();
+                            })
+                            .build()
+            );
         }
     }
 
-    @SuppressWarnings("SameParameterValue")
-    private Tooltip buildTooltip(LocalizationEntry entry) {
-        return Tooltip.create(entry.getComponent());
+    private void onCopyLogsClicked(Button button) {
+        StringBuilder clip = new StringBuilder();
+        clip.append(ClientDiagnosticInfo.getDiagnosticInfo(
+                MENU.program,
+                MENU.getDisk()
+        ));
+        clip.append("\n-- LOGS --\n");
+        if (hasShiftDown()) {
+            for (TranslatableLogEvent log : MENU.logs) {
+                clip.append(log.level().name()).append(" ");
+                clip.append(log.instant().toString()).append(" ");
+                clip.append(log.contents().getKey());
+                for (Object arg : log.contents().getArgs()) {
+                    clip.append(" ").append(arg);
+                }
+                clip.append("\n");
+            }
+        } else {
+            for (MutableComponent line : content) {
+                clip.append(line.getString()).append("\n");
+            }
+        }
+        Minecraft.getInstance().keyboardHandler.setClipboard(clip.toString());
     }
 
     @Override
@@ -295,7 +292,8 @@ public class LogsScreen extends Screen {
 
     @Override
     public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
-        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+        // not sure why here twice, todo: remove this lol
+//        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
 
         this.renderBackground(pGuiGraphics);
         super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
@@ -303,7 +301,6 @@ public class LogsScreen extends Screen {
             onLogLevelChange();
         }
     }
-
 
     // TODO: enable scrolling without focus
     private class MyMultiLineEditBox extends MultiLineEditBox {
@@ -357,8 +354,8 @@ public class LogsScreen extends Screen {
             boolean isCursorVisible = this.isFocused() && this.frame / 6 % 2 == 0;
             boolean isCursorAtEndOfLine = false;
             int cursorIndex = textField.cursor();
-            int lineX = this.getX() + this.innerPadding();
-            int lineY = this.getY() + this.innerPadding();
+            int lineX = SFMScreenUtils.getX(this) + this.innerPadding();
+            int lineY = SFMScreenUtils.getY(this) + this.innerPadding();
             int charCount = 0;
             int cursorX = 0;
             int cursorY = 0;
@@ -382,43 +379,34 @@ public class LogsScreen extends Screen {
                     cursorY = lineY;
                     // we draw the raw before coloured in case of token recognition errors
                     // draw before cursor
-                    cursorX = this.font.drawInBatch(
+                    cursorX = SFMScreenUtils.drawInBatch(
                             ProgramEditScreen.substring(componentColoured, 0, cursorIndex - charCount),
+                            font,
                             lineX,
                             lineY,
-                            -1,
                             true,
+                            false,
                             matrix4f,
-                            buffer,
-                            Font.DisplayMode.NORMAL,
-                            0,
-                            LightTexture.FULL_BRIGHT
-                    ) - 1;
-                    this.font.drawInBatch(
+                            buffer) - 1;
+                    SFMScreenUtils.drawInBatch(
                             ProgramEditScreen.substring(componentColoured, cursorIndex - charCount, lineLength),
+                            font,
                             cursorX,
                             lineY,
-                            -1,
                             true,
+                            false,
                             matrix4f,
-                            buffer,
-                            Font.DisplayMode.NORMAL,
-                            0,
-                            LightTexture.FULL_BRIGHT
-                    );
+                            buffer);
                 } else {
-                    this.font.drawInBatch(
+                    SFMScreenUtils.drawInBatch(
                             componentColoured,
+                            font,
                             lineX,
                             lineY,
-                            -1,
                             true,
+                            false,
                             matrix4f,
-                            buffer,
-                            Font.DisplayMode.NORMAL,
-                            0,
-                            LightTexture.FULL_BRIGHT
-                    );
+                            buffer);
                 }
                 buffer.endBatch();
 

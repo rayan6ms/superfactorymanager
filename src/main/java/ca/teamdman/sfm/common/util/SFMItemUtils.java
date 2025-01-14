@@ -61,7 +61,7 @@ public class SFMItemUtils {
 
     @MCVersionDependentBehaviour
     public static boolean isSameItem(ItemStack a, ItemStack b) {
-        return ItemStack.isSame(a,b);
+        return ItemStack.isSameItem(a,b);
     }
     public static boolean isSameItemSameTags(ItemStack a, ItemStack b) {
         return ItemStack.isSameItemSameTags(a,b);

@@ -2,6 +2,7 @@ package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -91,13 +92,27 @@ public class TestBarrelTankScreen extends AbstractContainerScreen<TestBarrelTank
     @Override
     protected void renderTooltip(
             GuiGraphics pGuiGraphics,
-            int pX,
-            int pY
+            int mx,
+            int my
     ) {
-        // in 1.19.2 you have to manually render tooltips here
+        drawChildTooltips(pGuiGraphics, mx, my);
 
         // render hovered item
-        super.renderTooltip(pGuiGraphics, pX, pY);
+        super.renderTooltip(pGuiGraphics, mx, my);
+    }
+
+    @MCVersionDependentBehaviour
+    private void drawChildTooltips(
+            GuiGraphics guiGraphics,
+            int mx,
+            int my
+    ) {
+        // 1.19.2: manually render button tooltips
+//        this.renderables
+//                .stream()
+//                .filter(ExtendedButtonWithTooltip.class::isInstance)
+//                .map(ExtendedButtonWithTooltip.class::cast)
+//                .forEach(x -> x.renderToolTip(pose, mx, my));
     }
 
     @Override

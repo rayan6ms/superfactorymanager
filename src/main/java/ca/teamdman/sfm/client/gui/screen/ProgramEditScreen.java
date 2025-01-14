@@ -1,32 +1,24 @@
 package ca.teamdman.sfm.client.gui.screen;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
+import ca.teamdman.sfm.client.gui.ButtonBuilder;
 import ca.teamdman.sfm.client.gui.EditorUtils;
 import ca.teamdman.sfm.common.config.SFMConfig;
-import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import com.mojang.blaze3d.vertex.PoseStack;
-import ca.teamdman.sfm.common.item.DiskItem;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.components.MultilineTextField;
-import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.ConfirmScreen;
-import net.minecraft.client.gui.components.Whence;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
-import net.minecraftforge.client.gui.widget.ExtendedButton;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
@@ -225,6 +217,7 @@ public class ProgramEditScreen extends Screen {
         this.renderBackground(graphics);
         super.render(graphics, mx, my, partialTicks);
     }
+
     private static boolean shouldShowLineNumbers() {
         return SFMConfig.getOrDefault(SFMConfig.CLIENT.showLineNumbers);
     }
@@ -233,41 +226,38 @@ public class ProgramEditScreen extends Screen {
     protected void init() {
         super.init();
         assert this.minecraft != null;
+        SFMScreenUtils.enableKeyRepeating();
         this.textarea = this.addRenderableWidget(new MyMultiLineEditBox());
         textarea.setValue(INITIAL_CONTENT);
         this.setInitialFocus(textarea);
 
 
-        this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                this.width / 2 - 200,
-                this.height / 2 - 100 + 195,
-                16,
-                20,
-                Component.literal("#"),
-                (button) -> this.onToggleLineNumbersButtonClicked(),
-                buildTooltip(PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP)
-        ));
-        this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                this.width / 2 - 2 - 150,
-                this.height / 2 - 100 + 195,
-                200,
-                20,
-                CommonComponents.GUI_DONE,
-                (button) -> this.saveAndClose(),
-                buildTooltip(PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP)
-        ));
-        this.addRenderableWidget(new ExtendedButton(
-                this.width / 2 - 2 + 100,
-                this.height / 2 - 100 + 195,
-                100,
-                20,
-                CommonComponents.GUI_CANCEL,
-                (button) -> this.onClose()
-        ));
-    }
-
-    private Tooltip buildTooltip(LocalizationEntry entry) {
-        return Tooltip.create(entry.getComponent());
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(this.width / 2 - 200, this.height / 2 - 100 + 195)
+                        .setSize(16, 20)
+                        .setText(Component.literal("#"))
+                        .setOnPress((button) -> this.onToggleLineNumbersButtonClicked())
+                        .setTooltip(this, font, PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP)
+                        .build()
+        );
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(this.width / 2 - 2 - 150, this.height / 2 - 100 + 195)
+                        .setSize(200, 20)
+                        .setText(CommonComponents.GUI_DONE)
+                        .setOnPress((button) -> this.saveAndClose())
+                        .setTooltip(this, font, PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP)
+                        .build()
+        );
+        this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(this.width / 2 - 2 + 100, this.height / 2 - 100 + 195)
+                        .setSize(100, 20)
+                        .setText(CommonComponents.GUI_CANCEL)
+                        .setOnPress((button) -> this.onClose())
+                        .build()
+        );
     }
 
     private void onToggleLineNumbersButtonClicked() {
@@ -347,6 +337,7 @@ public class ProgramEditScreen extends Screen {
             }
         }
 
+        @MCVersionDependentBehaviour
         @Override
         public boolean mouseClicked(double pMouseX, double pMouseY, int pButton) {
             // Accommodate line numbers
@@ -407,7 +398,8 @@ public class ProgramEditScreen extends Screen {
                 double dy
         ) {
             // if mouse in bounds, translate to accommodate line numbers
-            if (mx >= this.getX() + 1 && mx <= this.getX() + this.width - 1) {
+            int thisX = SFMScreenUtils.getX(this);
+            if (mx >= thisX + 1 && mx <= thisX + this.width - 1) {
                 mx -= getLineNumberWidth();
             }
             return super.mouseDragged(mx, my, button, dx, dy);
@@ -439,8 +431,8 @@ public class ProgramEditScreen extends Screen {
             boolean isCursorVisible = this.isFocused() && this.frame / 6 % 2 == 0;
             boolean isCursorAtEndOfLine = false;
             int cursorIndex = textField.cursor();
-            int lineX = this.getX() + this.innerPadding() + getLineNumberWidth();
-            int lineY = this.getY() + this.innerPadding();
+            int lineX = SFMScreenUtils.getX(this) + this.innerPadding() + getLineNumberWidth();
+            int lineY = SFMScreenUtils.getY(this) + this.innerPadding();
             int charCount = 0;
             int cursorX = 0;
             int cursorY = 0;
@@ -461,17 +453,15 @@ public class ProgramEditScreen extends Screen {
                 if (shouldShowLineNumbers()) {
                     // Draw line number
                     String lineNumber = String.valueOf(line + 1);
-                    this.font.drawInBatch(
+                    SFMScreenUtils.drawInBatch(
                             lineNumber,
+                            this.font,
                             lineX - 2 - this.font.width(lineNumber),
                             lineY,
-                            -1,
                             true,
                             matrix4f,
                             buffer,
-                            Font.DisplayMode.NORMAL,
-                            0,
-                            LightTexture.FULL_BRIGHT
+                            false
                     );
                 }
 
@@ -479,43 +469,37 @@ public class ProgramEditScreen extends Screen {
                     isCursorAtEndOfLine = cursorIndex == charCount + lineLength;
                     cursorY = lineY;
                     // draw text before cursor
-                    cursorX = this.font.drawInBatch(
+                    cursorX = SFMScreenUtils.drawInBatch(
                             substring(componentColoured, 0, cursorIndex - charCount),
+                            font,
                             lineX,
                             lineY,
-                            -1,
                             true,
+                            false,
                             matrix4f,
-                            buffer,
-                            Font.DisplayMode.NORMAL,
-                            0,
-                            LightTexture.FULL_BRIGHT
+                            buffer
                     ) - 1;
                     // draw text after cursor
-                    this.font.drawInBatch(
+                    SFMScreenUtils.drawInBatch(
                             substring(componentColoured, cursorIndex - charCount, lineLength),
+                            font,
                             cursorX,
                             lineY,
-                            -1,
                             true,
+                            false,
                             matrix4f,
-                            buffer,
-                            Font.DisplayMode.NORMAL,
-                            0,
-                            LightTexture.FULL_BRIGHT
+                            buffer
                     );
                 } else {
-                    this.font.drawInBatch(
+                    SFMScreenUtils.drawInBatch(
                             componentColoured,
+                            font,
                             lineX,
                             lineY,
-                            -1,
                             true,
+                            false,
                             matrix4f,
-                            buffer,
-                            Font.DisplayMode.NORMAL,
-                            0,
-                            LightTexture.FULL_BRIGHT
+                            buffer
                     );
                 }
                 buffer.endBatch();
