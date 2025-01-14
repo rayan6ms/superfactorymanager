@@ -2,6 +2,7 @@ package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -89,10 +90,24 @@ public class TestBarrelTankScreen extends AbstractContainerScreen<TestBarrelTank
             int mx,
             int my
     ) {
-        // in 1.19.2 you have to manually render tooltips here
+        drawChildTooltips(pose, mx, my);
 
         // render hovered item
         super.renderTooltip(pose, mx, my);
+    }
+
+    @MCVersionDependentBehaviour
+    private void drawChildTooltips(
+            PoseStack pose,
+            int mx,
+            int my
+    ) {
+        // 1.19.2: manually render button tooltips
+//        this.renderables
+//                .stream()
+//                .filter(ExtendedButtonWithTooltip.class::isInstance)
+//                .map(ExtendedButtonWithTooltip.class::cast)
+//                .forEach(x -> x.renderToolTip(pose, mx, my));
     }
 
     @Override

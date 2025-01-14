@@ -9,13 +9,11 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.components.MultilineTextField;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -233,6 +231,7 @@ public class ProgramEditScreen extends Screen {
     protected void init() {
         super.init();
         assert this.minecraft != null;
+        SFMScreenUtils.enableKeyRepeating();
         this.textarea = this.addRenderableWidget(new MyMultiLineEditBox());
         textarea.setValue(INITIAL_CONTENT);
         this.setInitialFocus(textarea);
@@ -403,7 +402,8 @@ public class ProgramEditScreen extends Screen {
                 double dy
         ) {
             // if mouse in bounds, translate to accommodate line numbers
-            if (mx >= this.getX() + 1 && mx <= this.getX() + this.width - 1) {
+            int thisX = SFMScreenUtils.getX(this);
+            if (mx >= thisX + 1 && mx <= thisX + this.width - 1) {
                 mx -= getLineNumberWidth();
             }
             return super.mouseDragged(mx, my, button, dx, dy);
@@ -440,8 +440,8 @@ public class ProgramEditScreen extends Screen {
             boolean isCursorVisible = this.isFocused() && this.frame / 6 % 2 == 0;
             boolean isCursorAtEndOfLine = false;
             int cursorIndex = textField.cursor();
-            int lineX = this.getX() + this.innerPadding() + getLineNumberWidth();
-            int lineY = this.getY() + this.innerPadding();
+            int lineX = SFMScreenUtils.getX(this) + this.innerPadding() + getLineNumberWidth();
+            int lineY = SFMScreenUtils.getY(this) + this.innerPadding();
             int charCount = 0;
             int cursorX = 0;
             int cursorY = 0;
@@ -462,17 +462,15 @@ public class ProgramEditScreen extends Screen {
                 if (shouldShowLineNumbers()) {
                     // Draw line number
                     String lineNumber = String.valueOf(line + 1);
-                    this.font.drawInBatch(
+                    SFMScreenUtils.drawInBatch(
                             lineNumber,
+                            this.font,
                             lineX - 2 - this.font.width(lineNumber),
                             lineY,
-                            -1,
                             true,
                             matrix4f,
                             buffer,
-                            Font.DisplayMode.NORMAL,
-                            0,
-                            LightTexture.FULL_BRIGHT
+                            false
                     );
                 }
 
@@ -480,43 +478,37 @@ public class ProgramEditScreen extends Screen {
                     isCursorAtEndOfLine = cursorIndex == charCount + lineLength;
                     cursorY = lineY;
                     // draw text before cursor
-                    cursorX = this.font.drawInBatch(
+                    cursorX = SFMScreenUtils.drawInBatch(
                             substring(componentColoured, 0, cursorIndex - charCount),
+                            font,
                             lineX,
                             lineY,
-                            -1,
                             true,
+                            false,
                             matrix4f,
-                            buffer,
-                            Font.DisplayMode.NORMAL,
-                            0,
-                            LightTexture.FULL_BRIGHT
+                            buffer
                     ) - 1;
                     // draw text after cursor
-                    this.font.drawInBatch(
+                    SFMScreenUtils.drawInBatch(
                             substring(componentColoured, cursorIndex - charCount, lineLength),
+                            font,
                             cursorX,
                             lineY,
-                            -1,
                             true,
+                            false,
                             matrix4f,
-                            buffer,
-                            Font.DisplayMode.NORMAL,
-                            0,
-                            LightTexture.FULL_BRIGHT
+                            buffer
                     );
                 } else {
-                    this.font.drawInBatch(
+                    SFMScreenUtils.drawInBatch(
                             componentColoured,
+                            font,
                             lineX,
                             lineY,
-                            -1,
                             true,
+                            false,
                             matrix4f,
-                            buffer,
-                            Font.DisplayMode.NORMAL,
-                            0,
-                            LightTexture.FULL_BRIGHT
+                            buffer
                     );
                 }
                 buffer.endBatch();

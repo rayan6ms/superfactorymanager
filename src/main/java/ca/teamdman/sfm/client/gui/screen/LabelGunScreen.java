@@ -39,7 +39,7 @@ public class LabelGunScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        assert this.minecraft != null;
+        SFMScreenUtils.enableKeyRepeating();
         this.labelField = addRenderableWidget(new EditBox(
                 this.font,
                 this.width / 2 - 150,

@@ -11,6 +11,7 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.*;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfml.ast.Program;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -425,6 +426,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         confirmScreen.setDelay(20);
     }
 
+    @MCVersionDependentBehaviour
+    private void disableTexture() {
+//        RenderSystem.disableTexture(); // 1.19.2
+    }
+
     @Override
     protected void renderLabels(
             PoseStack poseStack,
@@ -490,6 +496,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
 
         // Set up rendering
+        disableTexture();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
@@ -526,7 +533,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
             float blue = (c.getColor() & 0xFF) / 255f;
 
             bufferbuilder
-                    .vertex(pose, (float) plotPosX, (float) plotPosY, 0f)
+                    .vertex(pose, (float) plotPosX, (float) plotPosY, getBlitOffsetGood())
                     .color(red, green, blue, 1f)
                     .endVertex();
 
@@ -568,11 +575,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
             int x = plotX + spaceBetweenPoints * mouseTickTimeIndex;
             bufferbuilder
-                    .vertex(pose, (float) x, (float) plotY, 0f)
+                    .vertex(pose, (float) x, (float) plotY, getBlitOffsetGood())
                     .color(1f, 1f, 1f, 1f)
                     .endVertex();
             bufferbuilder
-                    .vertex(pose, (float) x, (float) plotY + plotHeight, 0f)
+                    .vertex(pose, (float) x, (float) plotY + plotHeight, getBlitOffsetGood())
                     .color(1f, 1f, 1f, 1f)
                     .endVertex();
             tesselator.end();
@@ -593,6 +600,17 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
         // Restore stuff
         RenderSystem.disableBlend();
+        enableTexture();
+    }
+
+    @MCVersionDependentBehaviour
+    private void enableTexture(){
+//        RenderSystem.enableTexture(); // 1.19.2
+    }
+
+    @MCVersionDependentBehaviour
+    public float getBlitOffsetGood() {
+        return 0F;
     }
 
     @Override
@@ -610,11 +628,23 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                     .forEach(w -> w.setFocused(false));
             return;
         }
-
-        // in 1.19.2 you have to manually render tooltips here
-
+        drawChildTooltips(pose, mx, my);
         // render hovered item
         super.renderTooltip(pose, mx, my);
+    }
+
+    @MCVersionDependentBehaviour
+    private void drawChildTooltips(
+            PoseStack pose,
+            int mx,
+            int my
+    ) {
+        // 1.19.2: manually render button tooltips
+//        this.renderables
+//                .stream()
+//                .filter(ExtendedButtonWithTooltip.class::isInstance)
+//                .map(ExtendedButtonWithTooltip.class::cast)
+//                .forEach(x -> x.renderToolTip(pose, mx, my));
     }
 
     @Override
