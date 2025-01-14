@@ -190,7 +190,6 @@ public class DiskItem extends Item {
     public void appendHoverText(
             ItemStack stack, @Nullable Level level, List<Component> lines, TooltipFlag detail
     ) {
-
         if (stack.hasTag()) {
             if (SFMItemUtils.isClientAndMoreInfoKeyPressed()) {
                 // show the program

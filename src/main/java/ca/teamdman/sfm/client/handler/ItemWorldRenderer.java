@@ -128,7 +128,7 @@ public class ItemWorldRenderer {
         if ((z % 1 == 0) && (zla < 0)) z -= 0.01;
 
         // @MCVersionDependentBehaviour, the double constructor doesn't exist in 1.19.4
-        return new BlockPos(Math.floor(x),Math.floor(y),Math.floor(z));
+        return new BlockPos((int) Math.floor(x),(int) Math.floor(y),(int) Math.floor(z));
     }
 
     private static @Nullable ItemStack getHeldItemOfType(

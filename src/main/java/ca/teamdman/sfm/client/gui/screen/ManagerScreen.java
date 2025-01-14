@@ -156,13 +156,14 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     protected void init() {
         super.init();
         int buttonWidth = 120;
+        int buttonHeight = 16;
         clipboardPasteButton = this.addRenderableWidget(
                 new ButtonBuilder()
                         .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16
                         )
-                        .setSize(buttonWidth, 16)
+                        .setSize(buttonWidth, buttonHeight)
                         .setText(MANAGER_GUI_PASTE_FROM_CLIPBOARD_BUTTON)
                         .setOnPress(button -> this.onClipboardPasteButtonClicked())
                         .setTooltip(
@@ -178,7 +179,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 + 50
                         )
-                        .setSize(buttonWidth, 16)
+                        .setSize(buttonWidth, buttonHeight)
                         .setText(MANAGER_GUI_EDIT_BUTTON)
                         .setOnPress(button -> onEditButtonClicked())
                         .setTooltip(this, font, MANAGER_GUI_EDIT_BUTTON_TOOLTIP)
@@ -190,7 +191,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 * 2 + 50
                         )
-                        .setSize(buttonWidth, 16)
+                        .setSize(buttonWidth, buttonHeight)
                         .setText(MANAGER_GUI_VIEW_EXAMPLES_BUTTON)
                         .setOnPress(button -> onExamplesButtonClicked())
                         .setTooltip(
@@ -206,7 +207,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 128
                         )
-                        .setSize(buttonWidth, 16)
+                        .setSize(buttonWidth, buttonHeight)
                         .setText(MANAGER_GUI_COPY_TO_CLIPBOARD_BUTTON)
                         .setOnPress(button -> this.onClipboardCopyButtonClicked())
                         .build()
@@ -217,7 +218,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 * 9
                         )
-                        .setSize(buttonWidth, 16)
+                        .setSize(buttonWidth, buttonHeight)
                         .setText(MANAGER_GUI_VIEW_LOGS_BUTTON)
                         .setOnPress(button -> onLogsButtonClicked())
                         .build()
@@ -228,7 +229,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 * 10
                         )
-                        .setSize(buttonWidth, 16)
+                        .setSize(buttonWidth, buttonHeight)
                         .setText(MANAGER_GUI_REBUILD_BUTTON)
                         .setOnPress(button -> this.onRebuildButtonClicked())
                         .build()
@@ -239,7 +240,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 * 11
                         )
-                        .setSize(buttonWidth, 16)
+                        .setSize(buttonWidth, buttonHeight)
                         .setText(MANAGER_GUI_SERVER_CONFIG_BUTTON)
                         .setOnPress(button -> this.onServerConfigButtonClicked())
                         .build()

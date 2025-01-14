@@ -7,6 +7,7 @@ import ca.teamdman.sfm.client.gui.ButtonBuilder;
 import ca.teamdman.sfm.client.gui.EditorUtils;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
@@ -343,6 +344,7 @@ public class ProgramEditScreen extends Screen {
             }
         }
 
+        @MCVersionDependentBehaviour
         @Override
         public boolean mouseClicked(
                 double mx,
@@ -515,7 +517,6 @@ public class ProgramEditScreen extends Screen {
                 GuiComponent.fill(poseStack, cursorX, cursorY - 1, cursorX + 1, cursorY + 1 + 9, -1);
             }
         }
-
     }
 }
 
