@@ -380,6 +380,8 @@ public class LogsScreen extends Screen {
                             font,
                             lineX,
                             lineY,
+                            true,
+                            false,
                             matrix4f,
                             buffer) - 1;
                     SFMScreenUtils.drawInBatch(
@@ -387,6 +389,8 @@ public class LogsScreen extends Screen {
                             font,
                             cursorX,
                             lineY,
+                            true,
+                            false,
                             matrix4f,
                             buffer);
                 } else {
@@ -395,6 +399,8 @@ public class LogsScreen extends Screen {
                             font,
                             lineX,
                             lineY,
+                            true,
+                            false,
                             matrix4f,
                             buffer);
                 }

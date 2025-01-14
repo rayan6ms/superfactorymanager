@@ -30,6 +30,8 @@ public class SFMScreenUtils {
             Font font,
             float x,
             float y,
+            boolean dropShadow,
+            boolean transparent,
             Matrix4f matrix4f,
             MultiBufferSource bufferSource
     ) {
@@ -38,10 +40,10 @@ public class SFMScreenUtils {
                 x,
                 y,
                 -1,
-                true,
+                dropShadow,
                 matrix4f,
                 bufferSource,
-                false,
+                transparent,
                 0,
                 LightTexture.FULL_BRIGHT
         );
@@ -50,24 +52,27 @@ public class SFMScreenUtils {
      * Draws text to the screen
      * @return the width of the drawn text
      */
+    @SuppressWarnings("UnusedReturnValue")
     @MCVersionDependentBehaviour
     public static int drawInBatch(
             String text,
             Font font,
             float x,
             float y,
+            boolean dropShadow,
             Matrix4f matrix4f,
-            MultiBufferSource bufferSource
+            MultiBufferSource bufferSource,
+            boolean transparent
     ) {
         return font.drawInBatch(
                 text,
                 x,
                 y,
                 -1,
-                true,
+                dropShadow,
                 matrix4f,
                 bufferSource,
-                false,
+                transparent,
                 0,
                 LightTexture.FULL_BRIGHT
         );

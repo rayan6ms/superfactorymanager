@@ -438,12 +438,14 @@ public class ProgramEditScreen extends Screen {
                     // Draw line number
                     String lineNumber = String.valueOf(line + 1);
                     SFMScreenUtils.drawInBatch(
-                        lineNumber,
-                        this.font,
-                        lineX - 2 - this.font.width(lineNumber),
-                        lineY,
-                        matrix4f,
-                        buffer
+                            lineNumber,
+                            this.font,
+                            lineX - 2 - this.font.width(lineNumber),
+                            lineY,
+                            true,
+                            matrix4f,
+                            buffer,
+                            false
                     );
                 }
 
@@ -456,6 +458,8 @@ public class ProgramEditScreen extends Screen {
                             font,
                             lineX,
                             lineY,
+                            true,
+                            false,
                             matrix4f,
                             buffer
                     ) - 1;
@@ -465,6 +469,8 @@ public class ProgramEditScreen extends Screen {
                             font,
                             cursorX,
                             lineY,
+                            true,
+                            false,
                             matrix4f,
                             buffer
                     );
@@ -474,6 +480,8 @@ public class ProgramEditScreen extends Screen {
                             font,
                             lineX,
                             lineY,
+                            true,
+                            false,
                             matrix4f,
                             buffer
                     );
