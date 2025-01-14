@@ -23,7 +23,6 @@ import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.components.MultilineTextField;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
@@ -351,8 +350,8 @@ public class LogsScreen extends Screen {
             boolean isCursorVisible = this.isFocused() && this.frame / 6 % 2 == 0;
             boolean isCursorAtEndOfLine = false;
             int cursorIndex = textField.cursor();
-            int lineX = this.x + this.innerPadding();
-            int lineY = this.y + this.innerPadding();
+            int lineX = SFMScreenUtils.getX(this) + this.innerPadding();
+            int lineY = SFMScreenUtils.getY(this) + this.innerPadding();
             int charCount = 0;
             int cursorX = 0;
             int cursorY = 0;
@@ -376,43 +375,28 @@ public class LogsScreen extends Screen {
                     cursorY = lineY;
                     // we draw the raw before coloured in case of token recognition errors
                     // draw before cursor
-                    cursorX = this.font.drawInBatch(
+                    cursorX = SFMScreenUtils.drawInBatch(
                             ProgramEditScreen.substring(componentColoured, 0, cursorIndex - charCount),
+                            font,
                             lineX,
                             lineY,
-                            -1,
-                            true,
                             matrix4f,
-                            buffer,
-                            false,
-                            0,
-                            LightTexture.FULL_BRIGHT
-                    ) - 1;
-                    this.font.drawInBatch(
+                            buffer) - 1;
+                    SFMScreenUtils.drawInBatch(
                             ProgramEditScreen.substring(componentColoured, cursorIndex - charCount, lineLength),
+                            font,
                             cursorX,
                             lineY,
-                            -1,
-                            true,
                             matrix4f,
-                            buffer,
-                            false,
-                            0,
-                            LightTexture.FULL_BRIGHT
-                    );
+                            buffer);
                 } else {
-                    this.font.drawInBatch(
+                    SFMScreenUtils.drawInBatch(
                             componentColoured,
+                            font,
                             lineX,
                             lineY,
-                            -1,
-                            true,
                             matrix4f,
-                            buffer,
-                            false,
-                            0,
-                            LightTexture.FULL_BRIGHT
-                    );
+                            buffer);
                 }
                 buffer.endBatch();
 

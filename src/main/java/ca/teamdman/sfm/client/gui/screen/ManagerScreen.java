@@ -12,6 +12,7 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.*;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfml.ast.Program;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -426,6 +427,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         confirmScreen.setDelay(20);
     }
 
+    @MCVersionDependentBehaviour
+    private void disableTexture() {
+        RenderSystem.disableTexture();
+    }
+
     @Override
     protected void renderLabels(
             PoseStack poseStack,
@@ -491,7 +497,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
 
         // Set up rendering
-        RenderSystem.disableTexture();
+        disableTexture();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
@@ -528,7 +534,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
             float blue = (c.getColor() & 0xFF) / 255f;
 
             bufferbuilder
-                    .vertex(pose, (float) plotPosX, (float) plotPosY, (float) getBlitOffset())
+                    .vertex(pose, (float) plotPosX, (float) plotPosY, getBlitOffsetGood())
                     .color(red, green, blue, 1f)
                     .endVertex();
 
@@ -570,11 +576,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
             int x = plotX + spaceBetweenPoints * mouseTickTimeIndex;
             bufferbuilder
-                    .vertex(pose, (float) x, (float) plotY, (float) getBlitOffset())
+                    .vertex(pose, (float) x, (float) plotY, getBlitOffsetGood())
                     .color(1f, 1f, 1f, 1f)
                     .endVertex();
             bufferbuilder
-                    .vertex(pose, (float) x, (float) plotY + plotHeight, (float) getBlitOffset())
+                    .vertex(pose, (float) x, (float) plotY + plotHeight, getBlitOffsetGood())
                     .color(1f, 1f, 1f, 1f)
                     .endVertex();
             tesselator.end();
@@ -595,7 +601,17 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
         // Restore stuff
         RenderSystem.disableBlend();
+        enableTexture();
+    }
+
+    @MCVersionDependentBehaviour
+    private void enableTexture(){
         RenderSystem.enableTexture();
+    }
+
+    @MCVersionDependentBehaviour
+    public float getBlitOffsetGood() {
+        return (float) getBlitOffset();
     }
 
     @Override
@@ -613,16 +629,23 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                     .forEach(w -> w.setFocused(false));
             return;
         }
+        drawChildTooltips(pose, mx, my);
+        // render hovered item
+        super.renderTooltip(pose, mx, my);
+    }
 
+    @MCVersionDependentBehaviour
+    private void drawChildTooltips(
+            PoseStack pose,
+            int mx,
+            int my
+    ) {
         // 1.19.2: manually render button tooltips
         this.renderables
                 .stream()
                 .filter(ExtendedButtonWithTooltip.class::isInstance)
                 .map(ExtendedButtonWithTooltip.class::cast)
                 .forEach(x -> x.renderToolTip(pose, mx, my));
-
-        // render hovered item
-        super.renderTooltip(pose, mx, my);
     }
 
     @Override
@@ -641,6 +664,6 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE_LOCATION);
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
-        this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
     }
 }

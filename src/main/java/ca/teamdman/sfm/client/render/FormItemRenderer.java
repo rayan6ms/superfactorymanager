@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientKeyHelpers;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.item.FormItem;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
@@ -38,7 +39,7 @@ public class FormItemRenderer extends BlockEntityWithoutLevelRenderer {
     @Override
     public void renderByItem(
             ItemStack stack,
-            ItemTransforms.TransformType transformType,
+            @MCVersionDependentBehaviour ItemTransforms.TransformType transformType,
             PoseStack poseStack,
             MultiBufferSource multiBuffer,
             int packedLight,

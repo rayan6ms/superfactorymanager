@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.client.gui;
 
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.client.gui.widget.ExtendedButton;
@@ -7,6 +8,7 @@ import net.minecraftforge.client.gui.widget.ExtendedButton;
 public class ExtendedButtonWithTooltip extends ExtendedButton {
     private final OnTooltip TOOLTIP;
 
+    @MCVersionDependentBehaviour
     public ExtendedButtonWithTooltip(
             int xPos,
             int yPos,
@@ -20,6 +22,7 @@ public class ExtendedButtonWithTooltip extends ExtendedButton {
         TOOLTIP = tooltip;
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public void renderToolTip(PoseStack pose, int mx, int my) {
         if (isHovered && visible) {

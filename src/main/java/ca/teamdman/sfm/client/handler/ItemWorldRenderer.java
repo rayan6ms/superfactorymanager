@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenUtils;
 import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.item.NetworkToolItem;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
@@ -126,7 +127,8 @@ public class ItemWorldRenderer {
         if ((y % 1 == 0) && (yla < 0)) y -= 0.01;
         if ((z % 1 == 0) && (zla < 0)) z -= 0.01;
 
-        return new BlockPos(x, y, z);
+        // @MCVersionDependentBehaviour, the double constructor doesn't exist in 1.19.4
+        return new BlockPos(Math.floor(x),Math.floor(y),Math.floor(z));
     }
 
     private static @Nullable ItemStack getHeldItemOfType(
@@ -283,17 +285,13 @@ public class ItemWorldRenderer {
         Font font = Minecraft.getInstance().font;
         poseStack.translate(0, labels.size() * (font.lineHeight + 0.1) / -2f, 0);
         for (String label : labels) {
-            font.drawInBatch(
+            SFMScreenUtils.drawInBatch(
                     label,
+                    font,
                     -font.width(label) / 2f,
                     0,
-                    -0x1,
-                    false,
                     poseStack.last().pose(),
-                    mbs,
-                    true,
-                    0,
-                    0xF000F0
+                    mbs
             );
             poseStack.translate(0, font.lineHeight + 0.1, 0);
 
