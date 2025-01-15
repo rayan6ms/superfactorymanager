@@ -76,6 +76,9 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     );
 
 
+    /**
+     * @return the remainder, what was not inserted
+     */
     public abstract STACK insert(
             CAP cap,
             int slot,

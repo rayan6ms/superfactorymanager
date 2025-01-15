@@ -95,6 +95,8 @@ EVERY 20G+5 TICKS DO END
 -- Add swapping between fancy and normal cables with network tool
 -- Performance improvements by reducing memory allocations iterating block neighbours
 -- Fix inaccurate scrollbar
+-- Fix industrial foregoing ore meat fluid not moving because SFM mishandling fluid tags
+---- Thanks @luxxiz for the report!
 
 
 ---- 4.19.1 ----
