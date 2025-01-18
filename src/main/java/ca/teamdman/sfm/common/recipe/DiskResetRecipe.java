@@ -16,8 +16,8 @@ import net.minecraft.world.level.Level;
  * Printing press copies a form using ink and paper.
  */
 public class DiskResetRecipe extends CustomRecipe {
-    public DiskResetRecipe(ResourceLocation pId, CraftingBookCategory pGroup) {
-        super(pId, pGroup);
+    public DiskResetRecipe(ResourceLocation id, CraftingBookCategory pGroup) {
+        super(id, pGroup);
     }
 
     @Override

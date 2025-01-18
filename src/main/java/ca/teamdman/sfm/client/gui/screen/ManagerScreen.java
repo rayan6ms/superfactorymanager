@@ -2,17 +2,16 @@ package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientDiagnosticInfo;
-import ca.teamdman.sfm.client.ClientStuff;
+import ca.teamdman.sfm.client.ClientScreenHelpers;
+import ca.teamdman.sfm.client.gui.ButtonBuilder;
+import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.item.DiskItem;
-import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.net.ServerboundManagerFixPacket;
-import ca.teamdman.sfm.common.net.ServerboundManagerProgramPacket;
-import ca.teamdman.sfm.common.net.ServerboundManagerRebuildPacket;
-import ca.teamdman.sfm.common.net.ServerboundManagerResetPacket;
+import ca.teamdman.sfm.common.net.*;
+import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMPackets;
-import ca.teamdman.sfm.common.util.SFMUtils;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfml.ast.Program;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -20,7 +19,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
-import net.minecraft.client.gui.components.Tooltip;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -29,7 +28,6 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
-import net.minecraftforge.client.gui.widget.ExtendedButton;
 import org.apache.logging.log4j.Level;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
@@ -48,21 +46,23 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     private Component status = Component.empty();
     private float statusCountdown = 0;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton diagButton;
+    private Button diagButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton clipboardPasteButton;
+    private Button clipboardPasteButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton clipboardCopyButton;
+    private Button clipboardCopyButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton resetButton;
+    private Button resetButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton editButton;
+    private Button editButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton examplesButton;
+    private Button examplesButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton logsButton;
+    private Button logsButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
-    private ExtendedButton rebuildButton;
+    private Button rebuildButton;
+    @SuppressWarnings("NotNullFieldNotInitialized")
+    private Button serverConfigButton;
 
     public ManagerScreen(
             ManagerContainerMenu menu,
@@ -72,14 +72,15 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         super(menu, inv, title);
     }
 
-    public List<ExtendedButton> getButtonsForJEIExclusionZones() {
+    public List<Button> getButtonsForJEIExclusionZones() {
         return List.of(
                 clipboardPasteButton,
                 editButton,
                 examplesButton,
                 clipboardCopyButton,
                 logsButton,
-                rebuildButton
+                rebuildButton,
+                serverConfigButton
         );
     }
 
@@ -151,85 +152,125 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         statusCountdown -= partialTicks;
     }
 
-    private Tooltip buildTooltip(LocalizationEntry entry) {
-        return Tooltip.create(entry.getComponent());
-    }
-
     @Override
     protected void init() {
         super.init();
         int buttonWidth = 120;
-        clipboardPasteButton = this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                (this.width - this.imageWidth) / 2 - buttonWidth,
-                (this.height - this.imageHeight) / 2 + 16,
-                buttonWidth,
-                16,
-                MANAGER_GUI_PASTE_FROM_CLIPBOARD_BUTTON.getComponent(),
-                button -> this.onClipboardPasteButtonClicked(),
-                buildTooltip(MANAGER_GUI_PASTE_FROM_CLIPBOARD_BUTTON_TOOLTIP)
-        ));
-        editButton = this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                (this.width - this.imageWidth) / 2 - buttonWidth,
-                (this.height - this.imageHeight) / 2 + 16 + 50,
-                buttonWidth,
-                16,
-                MANAGER_GUI_EDIT_BUTTON.getComponent(),
-                button -> onEditButtonClicked(),
-                buildTooltip(MANAGER_GUI_EDIT_BUTTON_TOOLTIP)
-        ));
-        examplesButton = this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                (this.width - this.imageWidth) / 2 - buttonWidth,
-                (this.height - this.imageHeight) / 2 + 16 * 2 + 50,
-                buttonWidth,
-                16,
-                MANAGER_GUI_VIEW_EXAMPLES_BUTTON.getComponent(),
-                button -> onExamplesButtonClicked(),
-                buildTooltip(MANAGER_GUI_VIEW_EXAMPLES_BUTTON_TOOLTIP)
-        ));
-        clipboardCopyButton = this.addRenderableWidget(new ExtendedButton(
-                (this.width - this.imageWidth) / 2 - buttonWidth,
-                (this.height - this.imageHeight) / 2 + 128,
-                buttonWidth,
-                16,
-                MANAGER_GUI_COPY_TO_CLIPBOARD_BUTTON.getComponent(),
-                button -> this.onClipboardCopyButtonClicked()
-        ));
-        logsButton = this.addRenderableWidget(new ExtendedButton(
-                (this.width - this.imageWidth) / 2 - buttonWidth,
-                (this.height - this.imageHeight) / 2 + 16 * 9,
-                buttonWidth,
-                16,
-                MANAGER_GUI_VIEW_LOGS_BUTTON.getComponent(),
-                button -> onLogsButtonClicked()
-        ));
-        rebuildButton = this.addRenderableWidget(new ExtendedButton(
-                (this.width - this.imageWidth) / 2 - buttonWidth,
-                (this.height - this.imageHeight) / 2 + 16 * 10,
-                buttonWidth,
-                16,
-                MANAGER_GUI_REBUILD_BUTTON.getComponent(),
-                button -> this.onRebuildButtonClicked()
-        ));
-        resetButton = this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                (this.width - this.imageWidth) / 2 + 120,
-                (this.height - this.imageHeight) / 2 + 10,
-                50,
-                12,
-                MANAGER_GUI_RESET_BUTTON.getComponent(),
-                button -> onResetButtonClicked(),
-                buildTooltip(MANAGER_GUI_RESET_BUTTON_TOOLTIP)
-        ));
-        diagButton = this.addRenderableWidget(new ExtendedButtonWithTooltip(
-                (this.width - this.imageWidth) / 2 + 35,
-                (this.height - this.imageHeight) / 2 + 48,
-                12,
-                14,
-                Component.literal("!"),
-                button -> onDiagButtonClicked(),
-                buildTooltip(isReadOnly()
-                             ? MANAGER_GUI_WARNING_BUTTON_TOOLTIP_READ_ONLY
-                             : MANAGER_GUI_WARNING_BUTTON_TOOLTIP)
-        ));
+        int buttonHeight = 16;
+        clipboardPasteButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 16
+                        )
+                        .setSize(buttonWidth, buttonHeight)
+                        .setText(MANAGER_GUI_PASTE_FROM_CLIPBOARD_BUTTON)
+                        .setOnPress(button -> this.onClipboardPasteButtonClicked())
+                        .setTooltip(
+                                this,
+                                font,
+                                MANAGER_GUI_PASTE_FROM_CLIPBOARD_BUTTON_TOOLTIP
+                        )
+                        .build()
+        );
+        editButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 16 + 50
+                        )
+                        .setSize(buttonWidth, buttonHeight)
+                        .setText(MANAGER_GUI_EDIT_BUTTON)
+                        .setOnPress(button -> onEditButtonClicked())
+                        .setTooltip(this, font, MANAGER_GUI_EDIT_BUTTON_TOOLTIP)
+                        .build()
+        );
+        examplesButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 16 * 2 + 50
+                        )
+                        .setSize(buttonWidth, buttonHeight)
+                        .setText(MANAGER_GUI_VIEW_EXAMPLES_BUTTON)
+                        .setOnPress(button -> onExamplesButtonClicked())
+                        .setTooltip(
+                                this,
+                                font,
+                                MANAGER_GUI_VIEW_EXAMPLES_BUTTON_TOOLTIP
+                        )
+                        .build()
+        );
+        clipboardCopyButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 128
+                        )
+                        .setSize(buttonWidth, buttonHeight)
+                        .setText(MANAGER_GUI_COPY_TO_CLIPBOARD_BUTTON)
+                        .setOnPress(button -> this.onClipboardCopyButtonClicked())
+                        .build()
+        );
+        logsButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 16 * 9
+                        )
+                        .setSize(buttonWidth, buttonHeight)
+                        .setText(MANAGER_GUI_VIEW_LOGS_BUTTON)
+                        .setOnPress(button -> onLogsButtonClicked())
+                        .build()
+        );
+        rebuildButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 16 * 10
+                        )
+                        .setSize(buttonWidth, buttonHeight)
+                        .setText(MANAGER_GUI_REBUILD_BUTTON)
+                        .setOnPress(button -> this.onRebuildButtonClicked())
+                        .build()
+        );
+        serverConfigButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 16 * 11
+                        )
+                        .setSize(buttonWidth, buttonHeight)
+                        .setText(MANAGER_GUI_SERVER_CONFIG_BUTTON)
+                        .setOnPress(button -> this.onServerConfigButtonClicked())
+                        .build()
+        );
+        resetButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(
+                                (this.width - this.imageWidth) / 2 + 120,
+                                (this.height - this.imageHeight) / 2 + 10
+                        )
+                        .setSize(50, 12)
+                        .setText(MANAGER_GUI_RESET_BUTTON)
+                        .setOnPress(button -> onResetButtonClicked())
+                        .setTooltip(this, font, MANAGER_GUI_RESET_BUTTON_TOOLTIP)
+                        .build()
+        );
+        diagButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(
+                                (this.width - this.imageWidth) / 2 + 35,
+                                (this.height - this.imageHeight) / 2 + 48
+                        )
+                        .setSize(12, 14)
+                        .setText(Component.literal("!"))
+                        .setOnPress(button -> onDiagButtonClicked())
+                        .setTooltip(this, font, isReadOnly()
+                                                ? MANAGER_GUI_WARNING_BUTTON_TOOLTIP_READ_ONLY
+                                                : MANAGER_GUI_WARNING_BUTTON_TOOLTIP)
+                        .build()
+        );
         updateVisibilities();
     }
 
@@ -241,31 +282,42 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         }
     }
 
+    private String getProgram() {
+        return menu.program;
+    }
+
     private void onEditButtonClicked() {
-        ClientStuff.showProgramEditScreen(DiskItem.getProgram(menu.getDisk()), this::sendProgram);
+        ClientScreenHelpers.showProgramEditScreen(getProgram(), this::sendProgram);
     }
 
     private void onExamplesButtonClicked() {
-        ClientStuff.showExampleListScreen(DiskItem.getProgram(menu.getDisk()), this::sendProgram);
+        ClientScreenHelpers.showExampleListScreen(getProgram(), this::sendProgram);
     }
 
     private void onLogsButtonClicked() {
-        ClientStuff.showLogsScreen(menu);
+        ClientScreenHelpers.showLogsScreen(menu);
+    }
+
+    private void performReset() {
+        SFMPackets.sendToServer(new ServerboundManagerResetPacket(
+                menu.containerId,
+                menu.MANAGER_POSITION
+        ));
+        status = MANAGER_GUI_STATUS_RESET.getComponent();
+        statusCountdown = STATUS_DURATION;
     }
 
     private void onResetButtonClicked() {
+        if (getProgram().isBlank() && LabelPositionHolder.from(menu.getDisk()).isEmpty()) {
+            performReset();
+            return;
+        }
         ConfirmScreen confirmScreen = new ConfirmScreen(
                 proceed -> {
                     assert this.minecraft != null;
                     this.minecraft.popGuiLayer(); // Close confirm screen
-
                     if (proceed) {
-                        SFMPackets.MANAGER_CHANNEL.sendToServer(new ServerboundManagerResetPacket(
-                                menu.containerId,
-                                menu.MANAGER_POSITION
-                        ));
-                        status = MANAGER_GUI_STATUS_RESET.getComponent();
-                        statusCountdown = STATUS_DURATION;
+                        performReset();
                     }
                 },
                 LocalizationKeys.MANAGER_RESET_CONFIRM_SCREEN_TITLE.getComponent(),
@@ -279,7 +331,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     private void onRebuildButtonClicked() {
-        SFMPackets.MANAGER_CHANNEL.sendToServer(new ServerboundManagerRebuildPacket(
+        SFMPackets.sendToServer(new ServerboundManagerRebuildPacket(
                 menu.containerId,
                 menu.MANAGER_POSITION
         ));
@@ -287,8 +339,12 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         statusCountdown = STATUS_DURATION;
     }
 
+    private void onServerConfigButtonClicked() {
+        SFMPackets.sendToServer(new ServerboundServerConfigRequestPacket(ConfigCommandBehaviourInput.SHOW));
+    }
+
     private void sendAttemptFix() {
-        SFMPackets.MANAGER_CHANNEL.sendToServer(new ServerboundManagerFixPacket(
+        SFMPackets.sendToServer(new ServerboundManagerFixPacket(
                 menu.containerId,
                 menu.MANAGER_POSITION
         ));
@@ -297,8 +353,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     private void sendProgram(String program) {
-        program = SFMUtils.truncate(program, Program.MAX_PROGRAM_LENGTH);
-        SFMPackets.MANAGER_CHANNEL.sendToServer(new ServerboundManagerProgramPacket(
+        program = SFMPacketDaddy.truncate(program, Program.MAX_PROGRAM_LENGTH);
+        SFMPackets.sendToServer(new ServerboundManagerProgramPacket(
                 menu.containerId,
                 menu.MANAGER_POSITION,
                 program
@@ -340,12 +396,41 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     private void onClipboardPasteButtonClicked() {
+        String clipboardContents;
         try {
-            String contents = Minecraft.getInstance().keyboardHandler.getClipboard();
-            sendProgram(contents);
+            clipboardContents = Minecraft.getInstance().keyboardHandler.getClipboard();
         } catch (Throwable t) {
             SFM.LOGGER.error("failed loading clipboard", t);
+            return;
         }
+        String existingProgram = getProgram();
+        boolean shouldConfirm = !existingProgram.isBlank() && !existingProgram.equals(clipboardContents);
+        if (!shouldConfirm) {
+            sendProgram(clipboardContents);
+            return;
+        }
+
+        ConfirmScreen confirmScreen = new ConfirmScreen(
+                proceed -> {
+                    assert this.minecraft != null;
+                    this.minecraft.popGuiLayer(); // Close confirm screen
+                    if (proceed) {
+                        sendProgram(clipboardContents);
+                    }
+                },
+                LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_TITLE.getComponent(),
+                LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_MESSAGE.getComponent(),
+                LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_YES_BUTTON.getComponent(),
+                LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_NO_BUTTON.getComponent()
+        );
+        assert this.minecraft != null;
+        this.minecraft.pushGuiLayer(confirmScreen);
+        confirmScreen.setDelay(20);
+    }
+
+    @MCVersionDependentBehaviour
+    private void disableTexture() {
+//        RenderSystem.disableTexture(); // 1.19.2
     }
 
     @Override
@@ -416,6 +501,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
 
         // Set up rendering
+        disableTexture();
         RenderSystem.enableBlend();
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
@@ -452,7 +538,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
             float blue = (c.getColor() & 0xFF) / 255f;
 
             bufferbuilder
-                    .vertex(pose, (float) plotPosX, (float) plotPosY, 0f)
+                    .vertex(pose, (float) plotPosX, (float) plotPosY, getBlitOffsetGood())
                     .color(red, green, blue, 1f)
                     .endVertex();
 
@@ -495,11 +581,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
             int x = plotX + spaceBetweenPoints * mouseTickTimeIndex;
             bufferbuilder
-                    .vertex(pose, (float) x, (float) plotY, 0f)
+                    .vertex(pose, (float) x, (float) plotY, getBlitOffsetGood())
                     .color(1f, 1f, 1f, 1f)
                     .endVertex();
             bufferbuilder
-                    .vertex(pose, (float) x, (float) plotY + plotHeight, 0f)
+                    .vertex(pose, (float) x, (float) plotY + plotHeight, getBlitOffsetGood())
                     .color(1f, 1f, 1f, 1f)
                     .endVertex();
             tesselator.end();
@@ -521,6 +607,17 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
         // Restore stuff
         RenderSystem.disableBlend();
+        enableTexture();
+    }
+
+    @MCVersionDependentBehaviour
+    private void enableTexture(){
+//        RenderSystem.enableTexture(); // 1.19.2
+    }
+
+    @MCVersionDependentBehaviour
+    public float getBlitOffsetGood() {
+        return 0F;
     }
 
     @Override
@@ -538,9 +635,24 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                     .forEach(w -> w.setFocused(false));
             return;
         }
-
+        drawChildTooltips(pGuiGraphics, pX, pY);
         // render hovered item
         super.renderTooltip(pGuiGraphics, pX, pY);
+    }
+
+    @SuppressWarnings("unused")
+    @MCVersionDependentBehaviour
+    private void drawChildTooltips(
+            GuiGraphics guiGraphics,
+            int mx,
+            int my
+    ) {
+        // 1.19.2: manually render button tooltips
+//        this.renderables
+//                .stream()
+//                .filter(ExtendedButtonWithTooltip.class::isInstance)
+//                .map(ExtendedButtonWithTooltip.class::cast)
+//                .forEach(x -> x.renderToolTip(pose, mx, my));
     }
 
     @Override

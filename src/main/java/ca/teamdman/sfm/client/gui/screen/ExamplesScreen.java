@@ -1,5 +1,7 @@
 package ca.teamdman.sfm.client.gui.screen;
 
+import ca.teamdman.sfm.client.gui.ButtonBuilder;
+import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfml.ast.Program;
@@ -16,6 +18,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.function.BiConsumer;
 import java.util.stream.Collectors;
@@ -43,10 +46,17 @@ public class ExamplesScreen extends Screen {
             try (BufferedReader reader = entry.getValue().openAsReader()) {
                 String program = reader.lines().collect(Collectors.joining("\n"));
                 if (program.contains("$REPLACE_RESOURCE_TYPES_HERE$")) {
-                    var replacement = SFMResourceTypes.DEFERRED_TYPES.get().getEntries()
+                    List<? extends String> disallowedResourceTypesForTransfer = SFMConfig.getOrDefault(SFMConfig.SERVER.disallowedResourceTypesForTransfer);
+                    var replacement = SFMResourceTypes.DEFERRED_TYPES.get().getKeys()
                             .stream()
-                            .map(e -> e.getKey().location().getPath())
-                            .map(e -> "INPUT " + e + ":: FROM a")
+                            .map(ResourceLocation::getPath)
+                            .map(e -> {
+                                String text = "";
+                                if (disallowedResourceTypesForTransfer.contains(e))
+                                    text += "-- (disallowed in config) ";
+                                text += "INPUT " + e + ":: FROM a";
+                                return text;
+                            })
                             .collect(Collectors.joining("\n    "));
                     program = program.replace("$REPLACE_RESOURCE_TYPES_HERE$", replacement);
                 }
@@ -86,16 +96,15 @@ public class ExamplesScreen extends Screen {
                         + paddingX
                 );
                 int y = 50 + (i / buttonsPerRow) * (buttonHeight + paddingY);
-                addRenderableWidget(
-                        Button.builder(
-                                        Component.literal(entry.getKey()),
-                                        btn -> {
-                                            onClose();
-                                            CALLBACK.accept(entry.getValue(), templatePrograms);
-                                        }
-                                )
-                                .pos(x, y)
-                                .size(buttonWidth, buttonHeight)
+                this.addRenderableWidget(
+                        new ButtonBuilder()
+                                .setText(Component.literal(entry.getKey()))
+                                .setOnPress(btn -> {
+                                    onClose();
+                                    CALLBACK.accept(entry.getValue(), templatePrograms);
+                                })
+                                .setPosition(x, y)
+                                .setSize(buttonWidth, buttonHeight)
                                 .build()
                 );
                 i++;

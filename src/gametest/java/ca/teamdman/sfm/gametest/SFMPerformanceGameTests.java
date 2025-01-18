@@ -21,9 +21,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
-@SuppressWarnings({"DataFlowIssue", "OptionalGetWithoutIsPresent", "DuplicatedCode"})
+@SuppressWarnings({"DataFlowIssue", "DuplicatedCode", "DefaultAnnotationParam"})
 @GameTestHolder(SFM.MOD_ID)
-@PrefixGameTestTemplate(false)
+@PrefixGameTestTemplate(value=true)
 public class SFMPerformanceGameTests extends SFMGameTestBase {
     @GameTest(template = "25x3x25", batch = "laggy")
     public static void move_many_inventories(GameTestHelper helper) {
@@ -67,13 +67,13 @@ public class SFMPerformanceGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .addAll("a", sourceBlocks.stream().map(helper::absolutePos).toList())
                 .addAll("b", destBlocks.stream().map(helper::absolutePos).toList())
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         // load the program
         manager.setProgram(program);
         assertTrue(
                 manager.getState() == ManagerBlockEntity.State.RUNNING,
-                "Program did not start running " + DiskItem.getErrors(manager.getDisk().get())
+                "Program did not start running " + DiskItem.getErrors(manager.getDisk())
         );
 
         succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
@@ -100,7 +100,7 @@ public class SFMPerformanceGameTests extends SFMGameTestBase {
         });
     }
 
-    @GameTest(template = "25x3x25", batch = "laggy") //todo : fix whatever the heck is going on here
+    @GameTest(template = "25x3x25", batch = "laggy")
     public static void move_many_full(GameTestHelper helper) {
         // fill the platform with cables and barrels
         var sourceBlocks = new ArrayList<BlockPos>();
@@ -143,13 +143,13 @@ public class SFMPerformanceGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .addAll("a", sourceBlocks.stream().map(helper::absolutePos).toList())
                 .addAll("b", destBlocks.stream().map(helper::absolutePos).toList())
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         // load the program
         manager.setProgram(program);
         assertTrue(
                 manager.getState() == ManagerBlockEntity.State.RUNNING,
-                "Program did not start running " + DiskItem.getErrors(manager.getDisk().get())
+                "Program did not start running " + DiskItem.getErrors(manager.getDisk())
         );
 
         succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
@@ -237,7 +237,7 @@ public class SFMPerformanceGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .addAll("a", sourceBlocks.stream().map(helper::absolutePos).toList())
                 .addAll("b", destBlocks.stream().map(helper::absolutePos).toList())
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         // load the program
         manager.setProgram(program);
@@ -348,7 +348,7 @@ public class SFMPerformanceGameTests extends SFMGameTestBase {
                 .add("b", helper.absolutePos(bPos))
                 .add("c", helper.absolutePos(cPos))
                 .add("d", helper.absolutePos(dPos))
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         // load the program
         manager.setProgram(program);
@@ -530,7 +530,7 @@ public class SFMPerformanceGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .addAll("storage", storage.stream().map(helper::absolutePos).toList())
                 .add("chest", helper.absolutePos(new BlockPos(0, 2, 0)))
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         // load the program
         manager.setProgram(program);

@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.client;
 
-import ca.teamdman.sfml.SFMLLexer;
+import ca.teamdman.langs.SFMLLexer;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -106,6 +106,8 @@ public class ProgramSyntaxHighlightingHelper {
                 return ChatFormatting.GREEN;
             case SFMLLexer.TICKS:
             case SFMLLexer.TICK:
+            case SFMLLexer.GLOBAL:
+            case SFMLLexer.NUMBER_WITH_G_SUFFIX:
             case SFMLLexer.SECONDS:
             case SFMLLexer.SLOTS:
             case SFMLLexer.EXCEPT:
@@ -119,6 +121,7 @@ public class ProgramSyntaxHighlightingHelper {
             case SFMLLexer.OR:
                 return ChatFormatting.GOLD;
             case SFMLLexer.NUMBER:
+            case SFMLLexer.PLUS:
             case SFMLLexer.GT:
             case SFMLLexer.LT:
             case SFMLLexer.EQ:
@@ -130,6 +133,8 @@ public class ProgramSyntaxHighlightingHelper {
             case SFMLLexer.GE_SYMBOL:
             case SFMLLexer.LE_SYMBOL:
             case SFMLLexer.WITH:
+            case SFMLLexer.WITHOUT:
+            case SFMLLexer.HASHTAG:
             case SFMLLexer.TAG:
                 return ChatFormatting.AQUA;
             case SFMLLexer.UNUSED:
