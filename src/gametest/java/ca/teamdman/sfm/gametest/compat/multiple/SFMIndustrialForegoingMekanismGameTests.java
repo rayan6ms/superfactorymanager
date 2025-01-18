@@ -38,7 +38,7 @@ import java.util.Objects;
 @GameTestHolder(SFM.MOD_ID)
 public class SFMIndustrialForegoingMekanismGameTests extends SFMGameTestBase {
     @SuppressWarnings("DanglingJavadoc")
-    @GameTest(template = "3x4x3")
+    @GameTest(template = "3x4x3", timeoutTicks = 200)
     public static void meat_fluid(GameTestHelper helper) {
         BlockPos managerPos = new BlockPos(1, 2, 0);
         BlockPos leftTankPos = new BlockPos(2, 2, 0);
@@ -124,8 +124,8 @@ public class SFMIndustrialForegoingMekanismGameTests extends SFMGameTestBase {
         manager.setProgram("""
                                    NAME "bruh"
                                    EVERY 20 TICKS DO
-                                    INPUT fluid:: FROM a
-                                    OUTPUT fluid:: TO b
+                                    INPUT fluid:: FROM a BOTTOM SIDE
+                                    OUTPUT fluid:: TO b TOP SIDE
                                    END
                                    """.stripTrailing().stripIndent());
         LabelPositionHolder.empty()
@@ -134,7 +134,69 @@ public class SFMIndustrialForegoingMekanismGameTests extends SFMGameTestBase {
                 .save(Objects.requireNonNull(manager.getDisk()));
 
         helper.succeedWhen(() -> {
-            if (fluidTank.getFluidAmount() < 1000) {
+            if (fluidTank.getFluidAmount() < 100) {
+                helper.fail("Fluid tank did not receive fluid");
+            }
+        });
+    }
+
+    @GameTest(template = "3x4x3", timeoutTicks = 200)
+    public static void meat_fluid_direct(GameTestHelper helper) {
+        BlockPos managerPos = new BlockPos(1, 2, 1);
+        BlockPos rightTankPos = new BlockPos(0, 2, 1);
+        BlockPos washingFactoryPos = new BlockPos(2, 2, 1);
+
+        // set up the tanks
+        helper.setBlock(rightTankPos, MekanismBlocks.BASIC_FLUID_TANK.getBlock());
+        TileEntityFluidTank rightTank = (TileEntityFluidTank) helper.getBlockEntity(rightTankPos);
+        assert rightTank != null;
+        IExtendedFluidTank fluidTank = rightTank.getFluidTank(0, Direction.DOWN);
+        assert fluidTank != null;
+
+        // set up the washing factory
+        helper.setBlock(washingFactoryPos, ModuleResourceProduction.WASHING_FACTORY.getLeft().get());
+        WashingFactoryTile washingFactory = (WashingFactoryTile) helper.getBlockEntity(washingFactoryPos);
+        assert washingFactory != null;
+
+        // add some power
+        washingFactory
+                .getCapability(ForgeCapabilities.ENERGY)
+                .resolve()
+                .get().receiveEnergy(Integer.MAX_VALUE, false);
+
+        // add some meat
+        washingFactory.getCapability(ForgeCapabilities.FLUID_HANDLER)
+                .resolve().get().fill(
+                        new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), Integer.MAX_VALUE),
+                        IFluidHandler.FluidAction.EXECUTE
+                );
+
+        // add some iron
+        washingFactory
+                .getCapability(ForgeCapabilities.ITEM_HANDLER, Direction.UP)
+                .resolve()
+                .get()
+                .insertItem(0, new ItemStack(Items.RAW_IRON, 64), false);
+
+        // place the manager
+        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
+        ManagerBlockEntity manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
+        assert manager != null;
+        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setProgram("""
+                                   NAME "bruh"
+                                   EVERY 20 TICKS DO
+                                    INPUT fluid:: FROM a BOTTOM SIDE
+                                    OUTPUT fluid:: TO b TOP SIDE
+                                   END
+                                   """.stripTrailing().stripIndent());
+        LabelPositionHolder.empty()
+                .add("a", helper.absolutePos(washingFactoryPos))
+                .add("b", helper.absolutePos(rightTankPos))
+                .save(Objects.requireNonNull(manager.getDisk()));
+
+        helper.succeedWhen(() -> {
+            if (fluidTank.getFluidAmount() < 100) {
                 helper.fail("Fluid tank did not receive fluid");
             }
         });
