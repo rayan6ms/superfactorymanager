@@ -76,6 +76,9 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     );
 
 
+    /**
+     * @return the remainder, what was not inserted
+     */
     public abstract STACK insert(
             CAP cap,
             int slot,
@@ -183,6 +186,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
         return rtn.build();
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean registryKeyExists(ResourceLocation location) {
         return getRegistry().containsKey(location);
     }
