@@ -5,10 +5,10 @@ import mekanism.api.Action;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.api.math.FloatingLong;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.neoforged.common.capabilities.Capability;
+import net.neoforged.common.capabilities.CapabilityManager;
+import net.neoforged.common.capabilities.CapabilityToken;
+import net.neoforged.registries.IForgeRegistry;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.stream.Stream;

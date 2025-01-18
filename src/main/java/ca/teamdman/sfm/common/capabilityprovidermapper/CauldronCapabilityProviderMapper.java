@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.capabilityprovidermapper;
 
+import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
@@ -16,19 +17,16 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import java.util.Optional;
-
 public class CauldronCapabilityProviderMapper implements CapabilityProviderMapper {
     @Override
-    public Optional<ICapabilityProvider> getProviderFor(LevelAccessor level, BlockPos pos) {
+    public @Nullable ICapabilityProvider getProviderFor(LevelAccessor level, @Stored BlockPos pos) {
         var state = level.getBlockState(pos);
         if (state.getBlock() == Blocks.CAULDRON
             || state.getBlock() == Blocks.WATER_CAULDRON
             || state.getBlock() == Blocks.LAVA_CAULDRON) {
-            return Optional.of(new CauldronCapabilityProvider(level, pos));
+            return new CauldronCapabilityProvider(level, pos);
         }
-        return Optional.empty();
+        return null;
     }
 
     private static class CauldronCapabilityProvider implements ICapabilityProvider {
@@ -39,9 +37,8 @@ public class CauldronCapabilityProviderMapper implements CapabilityProviderMappe
             this.fluidHandlerLazyOptional = LazyOptional.of(() -> new CauldronFluidHandler(level, pos));
         }
 
-        @Nonnull
         @Override
-        public @NotNull <T> LazyOptional<T> getCapability(@Nonnull Capability<T> cap, @Nullable Direction side) {
+        public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
             if (cap == Capabilities.FLUID_HANDLER) {
                 return fluidHandlerLazyOptional.cast();
             }

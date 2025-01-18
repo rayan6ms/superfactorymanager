@@ -2,7 +2,10 @@ package ca.teamdman.sfm.common.cablenetwork;
 
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.logging.TranslatableLogger;
-import ca.teamdman.sfm.common.util.SFMUtils;
+import ca.teamdman.sfm.common.registry.SFMCapabilityProviderMappers;
+import ca.teamdman.sfm.common.util.NotStored;
+import ca.teamdman.sfm.common.util.SFMDirections;
+import ca.teamdman.sfm.common.util.SFMStreamUtils;
 import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
@@ -11,11 +14,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.common.util.LazyOptional;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -32,58 +34,78 @@ public class CableNetwork {
     /**
      * Only cable blocks are valid network members
      */
-    public static boolean isCable(@Nullable Level world, BlockPos cablePos) {
+    public static boolean isCable(
+            @Nullable Level world,
+            @NotStored BlockPos cablePos
+    ) {
         if (world == null) return false;
         return world
                 .getBlockState(cablePos)
                 .getBlock() instanceof ICableBlock;
     }
 
-    public void rebuildNetwork(BlockPos start) {
+    public void rebuildNetwork(@NotStored BlockPos start) {
         CABLE_POSITIONS.clear();
         CAPABILITY_CACHE.clear();
-        discoverCables(start).forEach(this::addCable);
+        discoverCables(getLevel(), start).forEach(this::addCable);
     }
 
-    public void rebuildNetworkFromCache(BlockPos start, CableNetwork other) {
+    public void rebuildNetworkFromCache(
+            @NotStored BlockPos start,
+            CableNetwork other
+    ) {
         CABLE_POSITIONS.clear();
         CAPABILITY_CACHE.clear();
 
         // discover connected cables
-        var cables = SFMUtils.getRecursiveStream((current, next, results) -> {
+        var cables = SFMStreamUtils.<BlockPos, BlockPos>getRecursiveStream((current, next, results) -> {
             results.accept(current);
-            for (Direction d : Direction.values()) {
-                BlockPos offset = current.offset(d.getNormal());
-                if (other.containsCablePosition(offset)) {
-                    next.accept(offset);
+            BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
+            for (Direction d : SFMDirections.DIRECTIONS) {
+                target.set(current).move(d);
+                if (other.containsCablePosition(target)) {
+                    next.accept(target.immutable());
                 }
             }
         }, start).toList();
+
+        // restore cable positions
         for (BlockPos cablePos : cables) {
             CABLE_POSITIONS.add(cablePos.asLong());
         }
 
-        // discover capabilities
-        cables
-                .stream()
-                .flatMap(cablePos -> Arrays.stream(Direction.values()).map(Direction::getNormal).map(cablePos::offset))
-                .distinct()
-                .forEach(pos -> CAPABILITY_CACHE.overwriteFromOther(pos, other.CAPABILITY_CACHE));
+        // restore capabilities
+        BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
+        LongSet seenCapabilityPositions = new LongOpenHashSet();
+        for (BlockPos cablePos : cables) {
+            for (Direction direction : SFMDirections.DIRECTIONS) {
+                target.set(cablePos).move(direction);
+                // the same block may be touching multiple cables in the network
+                boolean firstVisit = seenCapabilityPositions.add(target.asLong());
+                if (firstVisit) {
+                    CAPABILITY_CACHE.overwriteFromOther(target, other.CAPABILITY_CACHE);
+                }
+            }
+        }
     }
 
-    public Stream<BlockPos> discoverCables(BlockPos startPos) {
-        return SFMUtils.getRecursiveStream((current, next, results) -> {
+    public static Stream<BlockPos> discoverCables(
+            Level level,
+            @NotStored BlockPos startPos
+    ) {
+        return SFMStreamUtils.getRecursiveStream((current, next, results) -> {
             results.accept(current);
-            for (Direction d : Direction.values()) {
-                BlockPos offset = current.offset(d.getNormal());
-                if (isCable(getLevel(), offset)) {
-                    next.accept(offset);
+            BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
+            for (Direction d : SFMDirections.DIRECTIONS) {
+                target.set(current).move(d);
+                if (isCable(level, target)) {
+                    next.accept(target.immutable());
                 }
             }
         }, startPos);
     }
 
-    public void addCable(BlockPos pos) {
+    public void addCable(@NotStored BlockPos pos) {
         CABLE_POSITIONS.add(pos.asLong());
     }
 
@@ -108,31 +130,77 @@ public class CableNetwork {
      * @param pos Candidate cable position
      * @return {@code true} if adjacent to cable in network
      */
-    public boolean isAdjacentToCable(BlockPos pos) {
-        for (Direction direction : Direction.values()) {
-            if (containsCablePosition(pos.offset(direction.getNormal()))) {
+    public boolean isAdjacentToCable(@NotStored BlockPos pos) {
+        BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
+        for (Direction direction : SFMDirections.DIRECTIONS) {
+            target.set(pos).move(direction);
+            if (containsCablePosition(target)) {
                 return true;
             }
         }
         return false;
     }
 
-    public boolean containsCablePosition(BlockPos pos) {
+    public boolean containsCablePosition(@NotStored BlockPos pos) {
         return CABLE_POSITIONS.contains(pos.asLong());
     }
 
-    public <CAP> @Nonnull LazyOptional<CAP> getCapability(
-            Capability<CAP> cap,
-            BlockPos pos,
+    public <CAP> @NotNull LazyOptional<CAP> getCapability(
+            Capability<CAP> capKind,
+            @NotStored BlockPos pos,
             @Nullable Direction direction,
             TranslatableLogger logger
     ) {
-        // TODO: move this check higher up the chain
+        // we assume that if there is a cache entry that it is adjacent to a cable
+        var found = CAPABILITY_CACHE.getCapability(pos, capKind, direction);
+        if (found != null) {
+            // CACHE HIT
+            if (found.isPresent()) {
+                logger.trace(x -> x.accept(LocalizationKeys.LOG_CAPABILITY_CACHE_HIT.get(
+                        pos,
+                        capKind.getName(),
+                        direction
+                )));
+                return found;
+            } else {
+                // CACHE HIT BUT STALE
+                logger.error(x -> x.accept(LocalizationKeys.LOG_CAPABILITY_CACHE_HIT_INVALID.get(
+                        pos,
+                        capKind.getName(),
+                        direction
+                )));
+            }
+        } else {
+            // CACHE MISS
+            logger.trace(x -> x.accept(LocalizationKeys.LOG_CAPABILITY_CACHE_MISS.get(pos, capKind.getName(), direction)));
+        }
+
+        // NEED TO DISCOVER
+
+        // any BlockPos can have labels assigned
+        // we must only proceed here if there is an adjacent cable from this network
         if (!isAdjacentToCable(pos)) {
-            logger.warn(x->x.accept(LocalizationKeys.LOGS_MISSING_ADJACENT_CABLE.get(pos)));
+            logger.warn(x -> x.accept(LocalizationKeys.LOGS_MISSING_ADJACENT_CABLE.get(pos)));
             return LazyOptional.empty();
         }
-        return CAPABILITY_CACHE.getOrDiscoverCapability(LEVEL, pos, cap, direction, logger);
+        var capabilityProvider = SFMCapabilityProviderMappers.discoverCapabilityProvider(LEVEL, pos.immutable());
+        if (capabilityProvider != null) {
+            var cap = capabilityProvider.getCapability(capKind, direction);
+            if (cap.isPresent()) {
+                CAPABILITY_CACHE.putCapability(pos, capKind, direction, cap);
+                cap.addListener(x -> CAPABILITY_CACHE.remove(pos, capKind, direction));
+            } else {
+                logger.warn(x -> x.accept(LocalizationKeys.LOGS_EMPTY_CAPABILITY.get(pos, capKind.getName(), direction)));
+            }
+            return cap;
+        } else {
+            logger.warn(x -> x.accept(LocalizationKeys.LOGS_MISSING_CAPABILITY_PROVIDER.get(
+                    pos,
+                    capKind.getName(),
+                    direction
+            )));
+            return LazyOptional.empty();
+        }
     }
 
     public int getCableCount() {
@@ -161,9 +229,12 @@ public class CableNetwork {
         return CABLE_POSITIONS;
     }
 
-    // TODO: replace the logging that uses this with something that shows sidedness
     public Stream<BlockPos> getCapabilityProviderPositions() {
         return CAPABILITY_CACHE.getPositions();
+    }
+
+    public void bustCacheForChunk(ChunkAccess chunkAccess) {
+        CAPABILITY_CACHE.bustCacheForChunk(chunkAccess);
     }
 
     /**
@@ -172,22 +243,19 @@ public class CableNetwork {
      * @param cablePos cable position to be removed
      * @return resulting networks to replace this network
      */
-    protected List<CableNetwork> withoutCable(BlockPos cablePos) {
+    protected List<CableNetwork> withoutCable(@NotStored BlockPos cablePos) {
         CABLE_POSITIONS.remove(cablePos.asLong());
         List<CableNetwork> branches = new ArrayList<>();
-        for (var direction : Direction.values()) {
-            var offsetPos = cablePos.offset(direction.getNormal());
-            if (!containsCablePosition(offsetPos)) continue;
+        BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
+        for (Direction direction : SFMDirections.DIRECTIONS) {
+            target.set(cablePos).move(direction);
+            if (!containsCablePosition(target)) continue;
             // make sure that a branch network doesn't already contain this cable
-            if (branches.stream().anyMatch(n -> n.containsCablePosition(offsetPos))) continue;
+            if (branches.stream().anyMatch(n -> n.containsCablePosition(target))) continue;
             var branchNetwork = new CableNetwork(this.getLevel());
-            branchNetwork.rebuildNetworkFromCache(offsetPos, this);
+            branchNetwork.rebuildNetworkFromCache(target, this);
             branches.add(branchNetwork);
         }
         return branches;
-    }
-
-    public void bustCacheForChunk(ChunkAccess chunkAccess) {
-        CAPABILITY_CACHE.bustCacheForChunk(chunkAccess);
     }
 }

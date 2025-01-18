@@ -5,49 +5,70 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.registry.SFMPackets;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.neoforge.network.NetworkEvent;
 
 public record ServerboundManagerRebuildPacket(
         int windowId,
         BlockPos pos
-) {
-    public static void encode(ServerboundManagerRebuildPacket msg, FriendlyByteBuf friendlyByteBuf) {
-        friendlyByteBuf.writeVarInt(msg.windowId());
-        friendlyByteBuf.writeBlockPos(msg.pos());
-    }
+) implements SFMPacket {
+    public static class Daddy implements SFMPacketDaddy<ServerboundManagerRebuildPacket> {
+        @Override
+        public PacketDirection getPacketDirection() {
+            return PacketDirection.SERVERBOUND;
+        }
+        @Override
+        public void encode(
+                ServerboundManagerRebuildPacket msg,
+                FriendlyByteBuf friendlyByteBuf
+        ) {
+            friendlyByteBuf.writeVarInt(msg.windowId());
+            friendlyByteBuf.writeBlockPos(msg.pos());
+        }
 
-    public static ServerboundManagerRebuildPacket decode(FriendlyByteBuf friendlyByteBuf) {
-        return new ServerboundManagerRebuildPacket(
-                friendlyByteBuf.readVarInt(),
-                friendlyByteBuf.readBlockPos()
-        );
-    }
+        @Override
+        public ServerboundManagerRebuildPacket decode(FriendlyByteBuf friendlyByteBuf) {
+            return new ServerboundManagerRebuildPacket(
+                    friendlyByteBuf.readVarInt(),
+                    friendlyByteBuf.readBlockPos()
+            );
+        }
 
-    public static void handle(ServerboundManagerRebuildPacket msg, NetworkEvent.Context context) {
-        SFMPackets.handleServerboundContainerPacket(
-                context,
-                ManagerContainerMenu.class,
-                ManagerBlockEntity.class,
-                msg.pos,
-                msg.windowId,
-                (menu, manager) -> {
-                    // perform rebuild by unregistering the cable network
-                    CableNetworkManager.purgeCableNetworkForManager(manager);
-                    manager.logger.warn(x -> x.accept(LocalizationKeys.LOG_MANAGER_CABLE_NETWORK_REBUILD.get()));
+        @Override
+        public void handle(
+                ServerboundManagerRebuildPacket msg,
+                SFMPacketHandlingContext context
+        ) {
+            context.handleServerboundContainerPacket(
+                    ManagerContainerMenu.class,
+                    ManagerBlockEntity.class,
+                    msg.pos,
+                    msg.windowId,
+                    (menu, manager) -> {
+                        ServerPlayer player = context.sender();
+                        if (player == null) {
+                            SFM.LOGGER.error("Received {} from null player", this.getPacketClass().getName());
+                            return;
+                        }
+                        // perform rebuild by unregistering the cable network
+                        CableNetworkManager.purgeCableNetworkForManager(manager);
+                        manager.logger.warn(x -> x.accept(LocalizationKeys.LOG_MANAGER_CABLE_NETWORK_REBUILD.get()));
 
-                    // log it
-                    String sender = "UNKNOWN SENDER";
-                    ServerPlayer player = context.getSender();
-                    if (player != null) {
-                        sender = player.getName().getString();
+                        // log it
+                        SFM.LOGGER.debug(
+                                "{} performed rebuild for manager {} {}",
+                                player.getName().getString(),
+                                msg.pos(),
+                                manager.getLevel()
+                        );
                     }
-                    SFM.LOGGER.debug("{} performed rebuild for manager {} {}", sender, msg.pos(), manager.getLevel());
-                }
-        );
-       context.setPacketHandled(true);
+            );
+        }
+
+        @Override
+        public Class<ServerboundManagerRebuildPacket> getPacketClass() {
+            return ServerboundManagerRebuildPacket.class;
+        }
     }
 }

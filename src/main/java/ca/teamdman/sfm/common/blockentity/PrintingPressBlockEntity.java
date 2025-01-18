@@ -1,9 +1,11 @@
 package ca.teamdman.sfm.common.blockentity;
 
 import ca.teamdman.sfm.common.recipe.NotContainer;
+import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMRecipeTypes;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -174,9 +176,8 @@ public class PrintingPressBlockEntity extends BlockEntity implements NotContaine
         return tag;
     }
 
-    @Nullable
     @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
+    public @Nullable Packet<ClientGamePacketListener> getUpdatePacket() {
         return ClientboundBlockEntityDataPacket.create(this);
     }
 
@@ -215,6 +216,12 @@ public class PrintingPressBlockEntity extends BlockEntity implements NotContaine
             ink.shrink(1);
             INK.setStackInSlot(0, ink);
         });
+    }
+
+    @MCVersionDependentBehaviour
+    private ItemStack assembleRecipe(PrintingPressRecipe recipe) {
+        assert level != null;
+        return recipe.assemble(this, level.registryAccess());
     }
 
     public ItemStack[] getStacksToDrop() {

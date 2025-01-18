@@ -1,7 +1,9 @@
 package ca.teamdman.sfm.common.blockentity;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
+import ca.teamdman.sfm.common.handler.OpenContainerTracker;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
@@ -12,7 +14,6 @@ import ca.teamdman.sfm.common.net.ClientboundManagerLogsPacket;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.registry.SFMPackets;
-import ca.teamdman.sfm.common.handler.OpenContainerTracker;
 import ca.teamdman.sfm.common.util.SFMContainerUtil;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.ChatFormatting;
@@ -27,13 +28,13 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.network.PacketDistributor;
 import org.apache.logging.log4j.core.time.MutableInstant;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.Collections;
-import java.util.Optional;
 import java.util.Set;
 
 public class ManagerBlockEntity extends BaseContainerBlockEntity {
@@ -45,10 +46,22 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     private int tick = 0;
     private int unprocessedRedstonePulses = 0; // used by redstone trigger
     private boolean shouldRebuildProgram = false;
+    private boolean shouldRebuildProgramLock = false;
     private int tickIndex = 0;
 
-    public ManagerBlockEntity(BlockPos blockPos, BlockState blockState) {
-        super(SFMBlockEntities.MANAGER_BLOCK_ENTITY.get(), blockPos, blockState);
+    public ManagerBlockEntity(
+            BlockPos blockPos,
+            BlockState blockState
+    ) {
+        this(SFMBlockEntities.MANAGER_BLOCK_ENTITY.get(), blockPos, blockState);
+    }
+
+    public ManagerBlockEntity(
+            BlockEntityType<?> pType,
+            BlockPos blockPos,
+            BlockState blockState
+    ) {
+        super(pType, blockPos, blockState);
         // Logger name should be unique to (isClient,managerpos)
         // We can't check isClient here, so instead to guarantee uniqueness we can just use hash
         // This is necessary because setLogLevel in game tests will get clobbered when the client constructs the block entity
@@ -62,8 +75,17 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     @Override
     public String toString() {
         return "ManagerBlockEntity{" +
-               "hasDisk=" + getDisk().isPresent() +
+               "hasDisk=" + (getDisk() != null) +
                '}';
+    }
+
+    /**
+     * Used to prevent tests which modify configs from interfering with other tests.
+     * <p>
+     * When the manager detects a config change and rebuilds, it clobbers the monkey patching used by the tests.
+     */
+    public void enableRebuildProgramLock() {
+        shouldRebuildProgramLock = true;
     }
 
     public static void serverTick(
@@ -74,7 +96,10 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     ) {
         long start = System.nanoTime();
         manager.tick++;
-        if (manager.shouldRebuildProgram) {
+        if (manager.program != null && manager.program.configRevision() != SFMConfig.SERVER.getRevision()) {
+            manager.shouldRebuildProgram = true;
+        }
+        if (manager.shouldRebuildProgram && !manager.shouldRebuildProgramLock) {
             manager.rebuildProgramAndUpdateDisk();
             manager.shouldRebuildProgram = false;
         }
@@ -117,16 +142,17 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         return tick;
     }
 
-    public Optional<Program> getProgram() {
-        return Optional.ofNullable(program);
+    public @Nullable Program getProgram() {
+        return program;
     }
 
     public void setProgram(String program) {
-        getDisk().ifPresent(disk -> {
+        var disk = getDisk();
+        if (disk != null) {
             DiskItem.setProgram(disk, program);
             rebuildProgramAndUpdateDisk();
             setChanged();
-        });
+        }
     }
 
     public void trackRedstonePulseUnprocessed() {
@@ -142,14 +168,25 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     }
 
     public State getState() {
-        if (getDisk().isEmpty()) return State.NO_DISK;
-        if (getProgramString().isEmpty()) return State.NO_PROGRAM;
+        if (getDisk() == null) return State.NO_DISK;
+        if (getProgramString() == null) return State.NO_PROGRAM;
         if (program == null) return State.INVALID_PROGRAM;
         return State.RUNNING;
     }
 
-    public Optional<String> getProgramString() {
-        return getDisk().map(DiskItem::getProgram).filter(prog -> !prog.isBlank());
+    public @Nullable String getProgramString() {
+        var disk = getDisk();
+        if (disk == null) {
+            return null;
+        }
+
+        var program = DiskItem.getProgram(disk);
+        return program.isBlank() ? null : program;
+    }
+
+    public String getProgramStringOrEmptyIfNull() {
+        var programString = this.getProgramString();
+        return programString == null ? "" : programString;
     }
 
     public Set<String> getReferencedLabels() {
@@ -157,17 +194,20 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         return program.referencedLabels();
     }
 
-    public Optional<ItemStack> getDisk() {
+    public @Nullable ItemStack getDisk() {
         var item = getItem(0);
-        if (item.getItem() instanceof DiskItem) return Optional.of(item);
-        return Optional.empty();
+        if (item.getItem() instanceof DiskItem) return item;
+        return null;
     }
 
     public void rebuildProgramAndUpdateDisk() {
         if (level != null && level.isClientSide()) return;
-        this.program = getDisk()
-                .flatMap(itemStack -> DiskItem.compileAndUpdateErrorsAndWarnings(itemStack, this))
-                .orElse(null);
+        var disk = getDisk();
+        if (disk == null) {
+            this.program = null;
+        } else {
+            this.program = DiskItem.compileAndUpdateErrorsAndWarnings(disk, this);
+        }
         sendUpdatePacket();
     }
 
@@ -188,7 +228,10 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     }
 
     @Override
-    public ItemStack removeItem(int slot, int amount) {
+    public ItemStack removeItem(
+            int slot,
+            int amount
+    ) {
         var result = ContainerHelper.removeItem(ITEMS, slot, amount);
         if (slot == 0) rebuildProgramAndUpdateDisk();
         setChanged();
@@ -204,7 +247,10 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     }
 
     @Override
-    public void setItem(int slot, ItemStack stack) {
+    public void setItem(
+            int slot,
+            ItemStack stack
+    ) {
         if (slot < 0 || slot >= ITEMS.size()) return;
         ITEMS.set(slot, stack);
         if (slot == 0) rebuildProgramAndUpdateDisk();
@@ -217,7 +263,10 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     }
 
     @Override
-    public boolean canPlaceItem(int slot, ItemStack stack) {
+    public boolean canPlaceItem(
+            int slot,
+            ItemStack stack
+    ) {
         return stack.getItem() instanceof DiskItem;
     }
 
@@ -231,6 +280,9 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         super.load(tag);
         ContainerHelper.loadAllItems(tag, ITEMS);
         this.shouldRebuildProgram = true;
+        if (level != null) {
+            this.tick = level.random.nextInt();
+        }
     }
 
     @Override
@@ -239,12 +291,13 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     }
 
     public void reset() {
-        getDisk().ifPresent(disk -> {
+        var disk = getDisk();
+        if (disk != null) {
             LabelPositionHolder.purge(disk);
             disk.setTag(null);
             setItem(0, disk);
             setChanged();
-        });
+        }
     }
 
     public long[] getTickTimeNanos() {
@@ -259,7 +312,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         // Create one packet and clone it for each receiver
         var managerUpdatePacket = new ClientboundManagerGuiUpdatePacket(
                 -1,
-                getProgramString().orElse(""),
+                getProgramStringOrEmptyIfNull(),
                 getState(),
                 getTickTimeNanos()
         );
@@ -269,23 +322,17 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
                     ManagerContainerMenu menu = entry.getValue();
 
                     // Send a copy of the manager update packet
-                    SFMPackets.MANAGER_CHANNEL.send(
-                            PacketDistributor.PLAYER.with(entry::getKey),
-                            managerUpdatePacket.cloneWithWindowId(menu.containerId)
-                    );
+                    SFMPackets.sendToPlayer(entry::getKey, managerUpdatePacket.cloneWithWindowId(menu.containerId));
 
                     // The rest of the sync is only relevant if the log screen is open
                     if (!menu.isLogScreenOpen) return;
 
                     // Send log level changes
                     if (!menu.logLevel.equals(logger.getLogLevel().name())) {
-                        SFMPackets.MANAGER_CHANNEL.send(
-                                PacketDistributor.PLAYER.with(entry::getKey),
-                                new ClientboundManagerLogLevelUpdatedPacket(
-                                        menu.containerId,
-                                        logger.getLogLevel().name()
-                                )
-                        );
+                        SFMPackets.sendToPlayer(entry::getKey, new ClientboundManagerLogLevelUpdatedPacket(
+                                menu.containerId,
+                                logger.getLogLevel().name()
+                        ));
                         menu.logLevel = logger.getLogLevel().name();
                     }
 
@@ -303,13 +350,10 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
                         // Send the logs
                         while (!logsToSend.isEmpty()) {
                             int remaining = logsToSend.size();
-                            SFMPackets.MANAGER_CHANNEL.send(
-                                    PacketDistributor.PLAYER.with(entry::getKey),
-                                    ClientboundManagerLogsPacket.drainToCreate(
-                                            menu.containerId,
-                                            logsToSend
-                                    )
-                            );
+                            SFMPackets.sendToPlayer(entry::getKey, ClientboundManagerLogsPacket.drainToCreate(
+                                    menu.containerId,
+                                    logsToSend
+                            ));
                             if (logsToSend.size() >= remaining) {
                                 throw new IllegalStateException("Failed to send logs, infinite loop detected");
                             }
@@ -324,7 +368,10 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     }
 
     @Override
-    protected AbstractContainerMenu createMenu(int windowId, Inventory inv) {
+    protected AbstractContainerMenu createMenu(
+            int windowId,
+            Inventory inv
+    ) {
         return new ManagerContainerMenu(windowId, inv, this);
     }
 
@@ -349,7 +396,10 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         public final ChatFormatting COLOR;
         public final LocalizationEntry LOC;
 
-        State(ChatFormatting color, LocalizationEntry loc) {
+        State(
+                ChatFormatting color,
+                LocalizationEntry loc
+        ) {
             COLOR = color;
             LOC = loc;
         }

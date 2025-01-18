@@ -1,32 +1,45 @@
 package ca.teamdman.sfm.common.net;
 
-import ca.teamdman.sfm.client.ClientStuff;
+import ca.teamdman.sfm.client.ClientScreenHelpers;
 import net.minecraft.network.FriendlyByteBuf;
-import net.neoforged.neoforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 public record ClientboundLabelInspectionResultsPacket(
         String results
-) {
+) implements SFMPacket {
     public static final int MAX_RESULTS_LENGTH = 50_000;
 
-    public static void encode(
-            ClientboundLabelInspectionResultsPacket msg, FriendlyByteBuf friendlyByteBuf
-    ) {
-        friendlyByteBuf.writeUtf(msg.results(), MAX_RESULTS_LENGTH);
+    public static class Daddy implements SFMPacketDaddy<ClientboundLabelInspectionResultsPacket> {
+        @Override
+        public PacketDirection getPacketDirection() {
+            return PacketDirection.CLIENTBOUND;
+        }
+        @Override
+        public void encode(
+                ClientboundLabelInspectionResultsPacket msg,
+                FriendlyByteBuf friendlyByteBuf
+        ) {
+            friendlyByteBuf.writeUtf(msg.results(), MAX_RESULTS_LENGTH);
+        }
+
+        @Override
+        public ClientboundLabelInspectionResultsPacket decode(FriendlyByteBuf friendlyByteBuf) {
+            return new ClientboundLabelInspectionResultsPacket(
+                    friendlyByteBuf.readUtf(MAX_RESULTS_LENGTH)
+            );
+        }
+
+        @Override
+        public void handle(
+                ClientboundLabelInspectionResultsPacket msg,
+                SFMPacketHandlingContext context
+        ) {
+            ClientScreenHelpers.showProgramEditScreen(msg.results());
+        }
+
+        @Override
+        public Class<ClientboundLabelInspectionResultsPacket> getPacketClass() {
+            return ClientboundLabelInspectionResultsPacket.class;
+        }
     }
 
-    public static ClientboundLabelInspectionResultsPacket decode(FriendlyByteBuf friendlyByteBuf) {
-        return new ClientboundLabelInspectionResultsPacket(
-                friendlyByteBuf.readUtf(MAX_RESULTS_LENGTH)
-        );
-    }
-
-    public static void handle(
-            ClientboundLabelInspectionResultsPacket msg, NetworkEvent.Context context
-    ) {
-        context.enqueueWork(() -> ClientStuff.showProgramEditScreen(msg.results));
-        context.setPacketHandled(true);
-    }
 }
