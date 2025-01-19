@@ -6,6 +6,8 @@ logs/
 .metadata
 .classpath
 .project
+.conda
+
 
 logs/debug.log
 logs/latest.log
@@ -17,6 +19,8 @@ out
 *.iws
 *.iml
 .idea
+.idea.bak
+.idea.bak.*
 
 # gradle
 build

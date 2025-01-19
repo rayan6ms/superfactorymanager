@@ -8,48 +8,41 @@ import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-
-import net.neoforged.neoforge.network.PacketDistributor;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
-
-import java.util.Set;
-import java.util.function.Supplier;
 
 public record ServerboundLabelInspectionRequestPacket(
         String label
-) implements CustomPacketPayload {
-    @Override
-    public void write(FriendlyByteBuf friendlyByteBuf) {
-        encode(this, friendlyByteBuf);
-    }
+) implements SFMPacket {
+    private static final int MAX_RESULTS_LENGTH = 20480;
 
-    public static final ResourceLocation ID = new ResourceLocation(SFM.MOD_ID, "serverbound_label_inspection_request_packet");
-    @Override
-    public ResourceLocation id() {
-        return ID;
-    }
-    public static void encode(ServerboundLabelInspectionRequestPacket msg, FriendlyByteBuf friendlyByteBuf) {
-        friendlyByteBuf.writeUtf(msg.label(), Program.MAX_LABEL_LENGTH);
-    }
+    public static class Daddy implements SFMPacketDaddy<ServerboundLabelInspectionRequestPacket> {
+        @Override
+        public PacketDirection getPacketDirection() {
+            return PacketDirection.SERVERBOUND;
+        }
+        @Override
+        public void encode(
+                ServerboundLabelInspectionRequestPacket msg,
+                FriendlyByteBuf friendlyByteBuf
+        ) {
+            friendlyByteBuf.writeUtf(msg.label(), Program.MAX_LABEL_LENGTH);
+        }
 
-    public static ServerboundLabelInspectionRequestPacket decode(FriendlyByteBuf friendlyByteBuf) {
-        return new ServerboundLabelInspectionRequestPacket(
-                friendlyByteBuf.readUtf(Program.MAX_LABEL_LENGTH)
-        );
-    }
+        @Override
+        public ServerboundLabelInspectionRequestPacket decode(FriendlyByteBuf friendlyByteBuf) {
+            return new ServerboundLabelInspectionRequestPacket(
+                    friendlyByteBuf.readUtf(Program.MAX_LABEL_LENGTH)
+            );
+        }
 
-    public static void handle(
-            ServerboundLabelInspectionRequestPacket msg,
-            PlayPayloadContext context
-    ) {
-        context.workHandler().submitAsync(() -> {
+        @Override
+        public void handle(
+                ServerboundLabelInspectionRequestPacket msg,
+                SFMPacketHandlingContext context
+        ) {
             // we don't know if the player has the program edit screen open from a manager or a disk in hand
-            if (!(context.player().orElse(null) instanceof ServerPlayer player)) {
-                return;
-            }
+            ServerPlayer player = context.sender();
+            if (player == null) return;
             SFM.LOGGER.info("Received label inspection request packet from player {}", player.getStringUUID());
             LabelPositionHolder labelPositionHolder;
             if (player.containerMenu instanceof ManagerContainerMenu mcm) {
@@ -73,7 +66,7 @@ public record ServerboundLabelInspectionRequestPacket(
             payload.append("-- Positions for label \"").append(msg.label()).append("\" --\n");
             payload.append(labelPositionHolder.getPositions(msg.label()).size()).append(" assignments\n");
             payload.append("-- Summary --\n");
-            labelPositionHolder.get().getOrDefault(msg.label(), Set.of()).forEach(pos -> {
+            labelPositionHolder.getPositions(msg.label()).forEach(pos -> {
                 payload
                         .append(pos.getX())
                         .append(",")
@@ -93,7 +86,7 @@ public record ServerboundLabelInspectionRequestPacket(
             });
 
             payload.append("\n\n\n-- Detailed --\n");
-            for (BlockPos pos : labelPositionHolder.get().getOrDefault(msg.label(), Set.of())) {
+            for (BlockPos pos : labelPositionHolder.getPositions(msg.label())) {
                 if (payload.length() > 20_000) {
                     payload.append("... (truncated)");
                     break;
@@ -124,12 +117,18 @@ public record ServerboundLabelInspectionRequestPacket(
                     payload.length(),
                     player.getStringUUID()
             );
-            PacketDistributor.PLAYER.with(player).send(
-                    new ClientboundLabelInspectionResultsPacket(
-                            payload.toString()
+            SFMPackets.sendToPlayer(() -> player, new ClientboundLabelInspectionResultsPacket(
+                    SFMPacketDaddy.truncate(
+                            payload.toString(),
+                            ServerboundLabelInspectionRequestPacket.MAX_RESULTS_LENGTH
                     )
-            );
-        });
-        
+            ));
+        }
+
+        @Override
+        public Class<ServerboundLabelInspectionRequestPacket> getPacketClass() {
+            return ServerboundLabelInspectionRequestPacket.class;
+        }
     }
+
 }

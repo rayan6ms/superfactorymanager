@@ -1,50 +1,44 @@
 package ca.teamdman.sfm.common.net;
 
-import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.ClientStuff;
+import ca.teamdman.sfm.client.ClientScreenHelpers;
 import net.minecraft.network.FriendlyByteBuf;
-
-
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.PlayPayloadContext;
 
 public record ClientboundBoolExprStatementInspectionResultsPacket(
         String results
-) implements CustomPacketPayload {
-    public static final ResourceLocation ID = new ResourceLocation(SFM.MOD_ID, "clientbound_bool_expr_statement_inspection_results_packet");
+) implements SFMPacket {
     public static final int MAX_RESULTS_LENGTH = 2048;
 
-    @Override
-    public ResourceLocation id() {
-        return ID;
-    }
+    public static class Daddy implements SFMPacketDaddy<ClientboundBoolExprStatementInspectionResultsPacket> {
+        @Override
+        public PacketDirection getPacketDirection() {
+            return PacketDirection.CLIENTBOUND;
+        }
+        @Override
+        public Class<ClientboundBoolExprStatementInspectionResultsPacket> getPacketClass() {
+            return ClientboundBoolExprStatementInspectionResultsPacket.class;
+        }
 
-    @Override
-    public void write(FriendlyByteBuf friendlyByteBuf) {
-        encode(this, friendlyByteBuf);
-    }
+        @Override
+        public void encode(
+                ClientboundBoolExprStatementInspectionResultsPacket msg,
+                FriendlyByteBuf friendlyByteBuf
+        ) {
+            friendlyByteBuf.writeUtf(msg.results(), MAX_RESULTS_LENGTH);
+        }
 
-    public static void encode(
-            ClientboundBoolExprStatementInspectionResultsPacket msg, FriendlyByteBuf friendlyByteBuf
-    ) {
-        friendlyByteBuf.writeUtf(msg.results(), MAX_RESULTS_LENGTH);
-    }
+        @Override
+        public ClientboundBoolExprStatementInspectionResultsPacket decode(FriendlyByteBuf friendlyByteBuf) {
+            return new ClientboundBoolExprStatementInspectionResultsPacket(
+                    friendlyByteBuf.readUtf(MAX_RESULTS_LENGTH)
+            );
+        }
 
-    public static ClientboundBoolExprStatementInspectionResultsPacket decode(FriendlyByteBuf friendlyByteBuf) {
-        return new ClientboundBoolExprStatementInspectionResultsPacket(
-                friendlyByteBuf.readUtf(MAX_RESULTS_LENGTH)
-        );
-    }
-
-    public static void handle(
-            ClientboundBoolExprStatementInspectionResultsPacket msg, PlayPayloadContext context
-    ) {
-        context.workHandler().submitAsync(msg::handleInner);
-        
-    }
-
-    public void handleInner() {
-        ClientStuff.showProgramEditScreen(results);
+        @Override
+        public void handle(
+                ClientboundBoolExprStatementInspectionResultsPacket msg,
+                SFMPacketHandlingContext context
+        ) {
+            ClientScreenHelpers.showProgramEditScreen(msg.results);
+        }
     }
 }

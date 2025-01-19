@@ -1,11 +1,11 @@
 package ca.teamdman.sfm.client;
 
+import ca.teamdman.langs.SFMLLexer;
+import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.net.*;
-import ca.teamdman.sfml.SFMLLexer;
-import ca.teamdman.sfml.SFMLParser;
+import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfml.ast.*;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -17,7 +17,10 @@ import java.util.stream.Stream;
 
 public class ProgramTokenContextActions {
 
-    public static Optional<Runnable> getContextAction(String programString, int cursorPosition) {
+    public static Optional<Runnable> getContextAction(
+            String programString,
+            int cursorPosition
+    ) {
         var lexer = new SFMLLexer(CharStreams.fromString(programString));
         var tokens = new CommonTokenStream(lexer);
         var parser = new SFMLParser(tokens);
@@ -33,13 +36,19 @@ public class ProgramTokenContextActions {
                                     .getNodesUnderCursor(cursorPosition - 1)
                                     .stream()
                     )
-                    .map(pair -> getContextAction(programString, builder, pair.getFirst(), pair.getSecond(), cursorPosition))
+                    .map(pair -> getContextAction(
+                            programString,
+                            builder,
+                            pair.getFirst(),
+                            pair.getSecond(),
+                            cursorPosition
+                    ))
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .findFirst();
         } catch (Throwable t) {
-            return Optional.of(() -> ClientStuff.showProgramEditScreen("-- Encountered error, program parse failed:\n--"
-                                                                       + t.getMessage()));
+            return Optional.of(() -> ClientScreenHelpers.showProgramEditScreen("-- Encountered error, program parse failed:\n--"
+                                                                               + t.getMessage()));
         }
     }
 
@@ -59,11 +68,11 @@ public class ProgramTokenContextActions {
                         .stream()
                         .map(ResourceIdentifier::toStringCondensed)
                         .collect(Collectors.joining(",\n"));
-                ClientStuff.showProgramEditScreen(expansion);
+                ClientScreenHelpers.showProgramEditScreen(expansion);
             });
         } else if (node instanceof Label label) {
             SFM.LOGGER.info("Found context action for label node");
-            return Optional.of(() -> PacketDistributor.SERVER.noArg().send(new ServerboundLabelInspectionRequestPacket(
+            return Optional.of(() -> SFMPackets.sendToServer(new ServerboundLabelInspectionRequestPacket(
                     label.name()
             )));
         } else if (node instanceof InputStatement) {
@@ -73,7 +82,7 @@ public class ProgramTokenContextActions {
             }
             SFM.LOGGER.info("Found context action for input node");
             int nodeIndex = builder.getIndexForNode(node);
-            return Optional.of(() -> PacketDistributor.SERVER.noArg().send(new ServerboundInputInspectionRequestPacket(
+            return Optional.of(() -> SFMPackets.sendToServer(new ServerboundInputInspectionRequestPacket(
                     programString,
                     nodeIndex
             )));
@@ -84,25 +93,26 @@ public class ProgramTokenContextActions {
             }
             SFM.LOGGER.info("Found context action for output node");
             int nodeIndex = builder.getIndexForNode(node);
-            return Optional.of(() -> PacketDistributor.SERVER.noArg().send(new ServerboundOutputInspectionRequestPacket(
+            return Optional.of(() -> SFMPackets.sendToServer(new ServerboundOutputInspectionRequestPacket(
                     programString,
                     nodeIndex
             )));
         } else if (node instanceof BoolExpr) {
             SFM.LOGGER.info("Found context action for BoolExpr node");
             int nodeIndex = builder.getIndexForNode(node);
-            return Optional.of(() -> PacketDistributor.SERVER.noArg().send(new ServerboundBoolExprStatementInspectionRequestPacket(
+            return Optional.of(() -> SFMPackets.sendToServer(new ServerboundBoolExprStatementInspectionRequestPacket(
                     programString,
                     nodeIndex
             )));
         } else if (node instanceof IfStatement) {
             SFM.LOGGER.info("Found context action for if statement node");
             int nodeIndex = builder.getIndexForNode(node);
-            return Optional.of(() -> PacketDistributor.SERVER.noArg().send(new ServerboundIfStatementInspectionRequestPacket(
+            return Optional.of(() -> SFMPackets.sendToServer(new ServerboundIfStatementInspectionRequestPacket(
                     programString,
                     nodeIndex
             )));
         }
+        // todo: add ctrl+space inspection for WITH TAG to show items matching tag
         return Optional.empty();
     }
 

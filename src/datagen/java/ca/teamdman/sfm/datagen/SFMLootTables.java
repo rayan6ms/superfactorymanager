@@ -1,48 +1,43 @@
 package ca.teamdman.sfm.datagen;
 
+import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
-import com.google.common.collect.ImmutableList;
-import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.data.loot.LootTableSubProvider;
-import net.minecraft.resources.ResourceLocation;
+import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticLootTablesDataGen;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.storage.loot.LootPool;
-import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.entries.LootItem;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
-import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
-import java.util.Collections;
-import java.util.function.BiConsumer;
+import java.util.Set;
 import java.util.function.Supplier;
+import java.util.stream.Collectors;
 
-public class SFMLootTables extends LootTableProvider {
+public class SFMLootTables extends MCVersionAgnosticLootTablesDataGen {
 
     public SFMLootTables(GatherDataEvent event) {
-        super(
-                event.getGenerator().getPackOutput(),
-              // specify registry names of the tables that are required to generate, or can leave empty
-              Collections.emptySet(),
-              // Sub providers which generate the loot
-              ImmutableList.of(new SubProviderEntry(SFMBlockLootProvider::new, LootContextParamSets.BLOCK)));
+        super(event, SFM.MOD_ID);
     }
 
-    public static class SFMBlockLootProvider implements LootTableSubProvider {
+    @Override
+    protected void populate(BlockLootWriter writer) {
+        writer.dropSelf(SFMBlocks.MANAGER_BLOCK);
+        writer.dropSelf(SFMBlocks.TUNNELLED_MANAGER_BLOCK);
+        writer.dropSelf(SFMBlocks.CABLE_BLOCK);
+        writer.dropOther(SFMBlocks.CABLE_FACADE_BLOCK, SFMBlocks.CABLE_BLOCK);
+        writer.dropSelf(SFMBlocks.FANCY_CABLE_BLOCK);
+        writer.dropOther(SFMBlocks.FANCY_CABLE_FACADE_BLOCK, SFMBlocks.FANCY_CABLE_BLOCK);
+        writer.dropSelf(SFMBlocks.PRINTING_PRESS_BLOCK);
+        writer.dropSelf(SFMBlocks.WATER_TANK_BLOCK);
+    }
 
-        public void generate(BiConsumer<ResourceLocation, LootTable.Builder> writer) {
-            dropSelf(SFMBlocks.MANAGER_BLOCK, writer);
-            dropSelf(SFMBlocks.CABLE_BLOCK, writer);
-            dropSelf(SFMBlocks.WATER_TANK_BLOCK, writer);
-            dropSelf(SFMBlocks.PRINTING_PRESS_BLOCK, writer);
-
-        }
-
-        private void dropSelf(Supplier<Block> block, BiConsumer<ResourceLocation, LootTable.Builder> writer) {
-            var pool = LootPool.lootPool()
-                    .setRolls(ConstantValue.exactly(1))
-                    .add(LootItem.lootTableItem(block.get()));
-            writer.accept(block.get().getLootTable(), LootTable.lootTable().withPool(pool));
-        }
+    @Override
+    protected Set<? extends Block> getExpectedBlocks() {
+        Set<? extends Block> exclude = Set.of(
+                SFMBlocks.TEST_BARREL_BLOCK.get(),
+                SFMBlocks.TEST_BARREL_TANK_BLOCK.get(),
+                SFMBlocks.BATTERY_BLOCK.get()
+        );
+        Set<? extends Block> rtn = SFMBlocks.getBlocks().stream().map(DeferredHolder::get).collect(Collectors.toSet());
+        rtn.removeIf(exclude::contains);
+        return rtn;
     }
 }

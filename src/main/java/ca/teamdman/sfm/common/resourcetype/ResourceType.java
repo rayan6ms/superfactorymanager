@@ -7,6 +7,7 @@ import ca.teamdman.sfm.common.program.CapabilityConsumer;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.util.Stored;
 import ca.teamdman.sfml.ast.*;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
@@ -23,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 public abstract class ResourceType<STACK, ITEM, CAP> {
@@ -81,6 +83,9 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     );
 
 
+    /**
+     * @return the remainder, what was not inserted
+     */
     public abstract STACK insert(
             CAP cap,
             int slot,
@@ -122,36 +127,41 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
                         labelAccess
                 )));
 
-        CableNetwork network = programContext.getNetwork();
-        RoundRobin roundRobin = labelAccess.roundRobin();
+        DirectionQualifier directions = labelAccess.directions();
         LabelPositionHolder labelPositionHolder = programContext.getLabelPositionHolder();
-        ArrayList<Pair<Label, BlockPos>> positions = roundRobin.getPositionsForLabels(
-                labelAccess,
-                labelPositionHolder
-        );
+        ArrayList<Pair<Label, BlockPos>> positions = labelAccess.getLabelledPositions(labelPositionHolder);
 
         for (var pair : positions) {
             Label label = pair.getFirst();
             BlockPos pos = pair.getSecond();
-            // Expand pos to (pos, direction) pairs
-            for (Direction dir : labelAccess.directions()) {
-                // Get capability from the network
-                var maybeCap = network
-                        .getCapability(CAPABILITY_KIND, pos, dir, programContext.getLogger());
-                if (maybeCap != null) {
-                    CAP cap = maybeCap.getCapability();
-                    if (cap != null) {
-                        programContext
-                                .getLogger()
-                                .debug(x -> x.accept(LocalizationKeys.LOG_RESOURCE_TYPE_GET_CAPABILITIES_CAP_PRESENT.get(
-                                        displayAsCapabilityClass(),
-                                        pos,
-                                        dir
-                                )));
-                        consumer.accept(label, pos, dir, cap);
-                        continue;
-                    }
-                }
+            forEachDirectionalCapability(
+                    programContext,
+                    directions,
+                    pos,
+                    (dir, cap) -> consumer.accept(label, pos, dir, cap)
+            );
+        }
+    }
+
+    public void forEachDirectionalCapability(
+            ProgramContext programContext,
+            DirectionQualifier directions,
+            @Stored BlockPos pos,
+            BiConsumer<Direction, CAP> consumer
+    ) {
+        for (Direction dir : directions) {
+            @Nullable CAP maybeCap = programContext.getNetwork()
+                    .getCapability(CAPABILITY_KIND, pos, dir, programContext.getLogger());
+            if (maybeCap != null) {
+                programContext
+                        .getLogger()
+                        .debug(x -> x.accept(LocalizationKeys.LOG_RESOURCE_TYPE_GET_CAPABILITIES_CAP_PRESENT.get(
+                                displayAsCapabilityClass(),
+                                pos,
+                                dir
+                        )));
+                consumer.accept(dir, maybeCap);
+            } else {
                 // Log error
                 programContext
                         .getLogger()
@@ -181,6 +191,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
         return rtn.build();
     }
 
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     public boolean registryKeyExists(ResourceLocation location) {
         return getRegistry().containsKey(location);
     }

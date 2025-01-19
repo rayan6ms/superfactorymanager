@@ -1,13 +1,13 @@
 package ca.teamdman.sfm.common.program;
 
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
+import ca.teamdman.sfm.common.util.Stored;
 import ca.teamdman.sfml.ast.Label;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
-
-public class LimitedOutputSlot<STACK, ITEM, CAP> {
+public class LimitedOutputSlot<STACK, ITEM, CAP> implements LimitedSlot<STACK, ITEM, CAP> {
     @SuppressWarnings("NotNullFieldNotInitialized") // done in init method in constructor
     public ResourceType<STACK, ITEM, CAP> type;
     @SuppressWarnings("NotNullFieldNotInitialized") // done in init method in constructor
@@ -21,7 +21,7 @@ public class LimitedOutputSlot<STACK, ITEM, CAP> {
     @SuppressWarnings("NotNullFieldNotInitialized") // done in init method in constructor
     public IOutputResourceTracker tracker;
     @SuppressWarnings("NotNullFieldNotInitialized") // done in init method in constructor
-    private Direction direction;
+    public Direction direction;
     private @Nullable STACK stackInSlotCache = null;
 
     public LimitedOutputSlot(
@@ -76,7 +76,7 @@ public class LimitedOutputSlot<STACK, ITEM, CAP> {
     public void init(
             CAP handler,
             Label label,
-            BlockPos pos,
+            @Stored BlockPos pos,
             Direction direction,
             int slot,
             IOutputResourceTracker tracker,
@@ -104,5 +104,35 @@ public class LimitedOutputSlot<STACK, ITEM, CAP> {
                + ", cap=" + type.displayAsCapabilityClass()
                + ", tracker=" + tracker
                + '}';
+    }
+
+    @Override
+    public ResourceType<STACK, ITEM, CAP> getType() {
+        return type;
+    }
+
+    @Override
+    public CAP getHandler() {
+        return handler;
+    }
+
+    @Override
+    public BlockPos getPos() {
+        return pos;
+    }
+
+    @Override
+    public Label getLabel() {
+        return label;
+    }
+
+    @Override
+    public Direction getDirection() {
+        return direction;
+    }
+
+    @Override
+    public int getSlot() {
+        return slot;
     }
 }
