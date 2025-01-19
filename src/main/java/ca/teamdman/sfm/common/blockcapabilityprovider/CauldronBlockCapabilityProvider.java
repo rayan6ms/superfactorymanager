@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.blockcapabilityprovider;
 
+import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -20,7 +21,7 @@ public class CauldronBlockCapabilityProvider implements IBlockCapabilityProvider
     @Override
     public @Nullable IFluidHandler getCapability(
             Level level,
-            BlockPos pos,
+            @Stored BlockPos pos,
             BlockState state,
             @Nullable BlockEntity blockEntity,
             @Nullable Direction context

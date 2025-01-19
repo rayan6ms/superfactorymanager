@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.blockentity;
 
 import ca.teamdman.sfm.common.block.WaterTankBlock;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.watertanknetwork.WaterNetworkManager;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -11,39 +12,54 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 import org.jetbrains.annotations.NotNull;
 
 public class WaterTankBlockEntity extends BlockEntity {
-    public void setConnectedCount(int connectedCount) {
-        TANK.setCapacity(connectedCount * 1000);
-        TANK.getFluid().setAmount(TANK.getCapacity());
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        //noinspection DataFlowIssue
-        ((WaterTankBlock) getBlockState().getBlock()).recount(getLevel(), getBlockPos());
-    }
-
     // can't fill, only extract
     public final FluidTank TANK = new FluidTank(1000, fluidStack -> false) {
-        {
-            setFluid(new FluidStack(Fluids.WATER, 1000));
-        }
-
         @Override
-        public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
-            //noinspection DataFlowIssue
-            if (!getLevel().getBlockState(getBlockPos()).getValue(WaterTankBlock.IN_WATER)) return FluidStack.EMPTY;
-            int        drained = Math.min(maxDrain, TANK.getCapacity());
-            FluidStack copy    = fluid.copy();
+        public @NotNull FluidStack drain(
+                int maxDrain,
+                FluidAction action
+        ) {
+            if (getFluidAmount() == 0) return FluidStack.EMPTY; // Return empty if inactive
+            int drained = Math.min(maxDrain, getFluidAmount());
+            FluidStack copy = getFluid().copy();
             copy.setAmount(drained);
             return copy;
         }
     };
+    private boolean active = false;
+
 
     public WaterTankBlockEntity(
             BlockPos pos,
             BlockState state
     ) {
         super(SFMBlockEntities.WATER_TANK_BLOCK_ENTITY.get(), pos, state);
+        setActive(state.getOptionalValue(WaterTankBlock.IN_WATER).orElse(false));
+    }
+
+    public void setConnectedCount(int connectedCount) {
+        int newCapacity = (int) Math.pow(2, connectedCount-1) * 1000;
+        if (newCapacity < 0) newCapacity = Integer.MAX_VALUE;
+        TANK.setCapacity(newCapacity);
+        updateTank();
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
+        updateTank();
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        WaterNetworkManager.onLoad(this);
+    }
+
+    private void updateTank() {
+        if (active) {
+            TANK.setFluid(new FluidStack(Fluids.WATER, TANK.getCapacity()));
+        } else {
+            TANK.setFluid(FluidStack.EMPTY);
+        }
     }
 }

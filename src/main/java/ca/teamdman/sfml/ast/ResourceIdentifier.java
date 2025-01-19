@@ -8,8 +8,8 @@ import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.NotImplementedException;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -17,7 +17,7 @@ import java.util.regex.PatternSyntaxException;
 
 // resourceTypeName resourceNamespace, resourceTypeName name, resource resourceNamespace, resource name
 // sfm:item:minecraft:stone
-public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode {
+public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode, ToStringCondensed {
 
     public static final ResourceIdentifier<?, ?, ?> MATCH_ALL = new ResourceIdentifier<>(
             ".*",
@@ -40,7 +40,7 @@ public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode {
     ) {
         // prevent crash on ctrl+space on "Gas::" (capital)
         // we could throw an exception and let it get bubbled to the user
-        // but why bother when we know we know lowercasing it fixes it
+        // but why bother when we know lowercasing it fixes it
         resourceTypeNamespace = resourceTypeNamespace.toLowerCase(Locale.ROOT);
         resourceTypeName = resourceTypeName.toLowerCase(Locale.ROOT);
 
@@ -180,7 +180,7 @@ public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode {
         return resourceTypeNamespace + ":" + resourceTypeName + ":" + resourceNamespace + ":" + resourceName;
     }
 
-    // todo: make this a ShortStatement impl
+    @Override
     public String toStringCondensed() {
         boolean isRegexNamespace = RegexCache.isRegexPattern(resourceNamespace);
         boolean isRegexNamespaceMatchAll = resourceNamespace.equals(".*");

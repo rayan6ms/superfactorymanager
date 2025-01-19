@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.recipe.DiskResetRecipe;
+import ca.teamdman.sfm.common.recipe.LabelGunResetRecipe;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -25,6 +26,10 @@ public class SFMRecipeSerializers {
     public static final Supplier<SimpleCraftingRecipeSerializer<DiskResetRecipe>> DISK_RESET = RECIPE_SERIALIZERS.register(
             "disk_reset",
             () -> new SimpleCraftingRecipeSerializer<>(DiskResetRecipe::new)
+    );
+    public static final Supplier<SimpleCraftingRecipeSerializer<LabelGunResetRecipe>> LABEL_GUN_RESET = RECIPE_SERIALIZERS.register(
+            "label_gun_reset",
+            () -> new SimpleCraftingRecipeSerializer<>(LabelGunResetRecipe::new)
     );
 
     public static void register(IEventBus bus) {

@@ -1,11 +1,11 @@
 package ca.teamdman.sfm.common.net;
 
-import ca.teamdman.sfm.common.compat.SFMCompat;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import ca.teamdman.sfm.common.util.SFMUtils;
+import ca.teamdman.sfm.common.util.SFMASTUtils;
+import ca.teamdman.sfm.common.util.SFMDirections;
 import ca.teamdman.sfml.ast.*;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
@@ -18,95 +18,46 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.network.NetworkEvent;
-import net.neoforged.neoforge.network.PacketDistributor;
-
-import javax.annotation.Nullable;
-import java.util.*;
-import java.util.function.Supplier;
+import org.jetbrains.annotations.Nullable;
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
 
 public record ServerboundContainerExportsInspectionRequestPacket(
         int windowId,
         BlockPos pos
-) {
-    public static void encode(
-            ServerboundContainerExportsInspectionRequestPacket msg,
-            FriendlyByteBuf friendlyByteBuf
-    ) {
-        friendlyByteBuf.writeVarInt(msg.windowId());
-        friendlyByteBuf.writeBlockPos(msg.pos());
-    }
-
-    public static ServerboundContainerExportsInspectionRequestPacket decode(FriendlyByteBuf friendlyByteBuf) {
-        return new ServerboundContainerExportsInspectionRequestPacket(
-                friendlyByteBuf.readVarInt(),
-                friendlyByteBuf.readBlockPos()
-        );
-    }
-
-    public static void handle(
-            ServerboundContainerExportsInspectionRequestPacket msg,
-            NetworkEvent.Context context
-    ) {
-        SFMPackets.handleServerboundContainerPacket(
-                context,
-                AbstractContainerMenu.class,
-                BlockEntity.class,
-                msg.pos,
-                msg.windowId,
-                (menu, blockEntity) -> {
-                    assert blockEntity.getLevel() != null;
-                    String payload = buildInspectionResults(blockEntity.getLevel(), blockEntity.getBlockPos());
-                    var player = context.getSender();
-
-                    SFMPackets.INSPECTION_CHANNEL.send(
-                            PacketDistributor.PLAYER.with(() -> player),
-                            new ClientboundContainerExportsInspectionResultsPacket(
-                                    msg.windowId,
-                                    SFMUtils.truncate(
-                                            payload,
-                                            ClientboundContainerExportsInspectionResultsPacket.MAX_RESULTS_LENGTH
-                                    )
-                            )
-                    );
-                }
-        );
-       context.setPacketHandled(true);
-    }
-
-
+) implements SFMPacket {
     public static String buildInspectionResults(
             Level level,
             BlockPos pos
     ) {
         StringBuilder sb = new StringBuilder();
-        Direction[] dirs = Arrays.copyOf(Direction.values(), Direction.values().length + 1);
-        dirs[dirs.length - 1] = null;
-        for (Direction direction : dirs) {
+        for (Direction direction : SFMDirections.DIRECTIONS_WITH_NULL) {
             sb.append("-- ").append(direction).append("\n");
             int len = sb.length();
             //noinspection unchecked,rawtypes
             SFMResourceTypes.DEFERRED_TYPES
-                    .entrySet()
-                    .forEach(entry -> sb.append(buildInspectionResults(
+                    .entrySet().stream().map(entry -> buildInspectionResults(
                             (ResourceKey) entry.getKey(),
                             entry.getValue(),
                             level,
                             pos,
                             direction
-                    )));
+                    ))
+                    .filter(s -> !s.isBlank())
+                    .forEach(results -> sb.append(results).append("\n"));
             if (sb.length() == len) {
                 sb.append("No exports found");
             }
             sb.append("\n");
         }
 
-        if (SFMCompat.isMekanismLoaded()) {
-            BlockEntity be = level.getBlockEntity(pos);
-            if (be != null) {
-//                sb.append(ca.teamdman.sfm.common.compat.SFMMekanismCompat.gatherInspectionResults(be)).append("\n");
-            }
-        }
+//        if (SFMModCompat.isMekanismLoaded()) {
+//            BlockEntity be = level.getBlockEntity(pos);
+//            if (be != null) {
+//                sb.append(SFMMekanismCompat.gatherInspectionResults(be)).append("\n");
+//            }
+//        }
 
         return sb.toString();
     }
@@ -116,8 +67,7 @@ public record ServerboundContainerExportsInspectionRequestPacket(
             ResourceType<STACK, ITEM, CAP> resourceType,
             Level level,
             BlockPos pos,
-            @Nullable
-            Direction direction
+            @Nullable Direction direction
     ) {
         StringBuilder sb = new StringBuilder();
         var cap = level.getCapability(resourceType.CAPABILITY_KIND, pos, direction);
@@ -133,7 +83,7 @@ public record ServerboundContainerExportsInspectionRequestPacket(
 
             if (!slotContents.isEmpty()) {
                 slotContents.forEach((slot, stack) -> {
-                    InputStatement inputStatement = SFMUtils.getInputStatementForStack(
+                    InputStatement inputStatement = SFMASTUtils.getInputStatementForStack(
                             resourceTypeResourceKey,
                             resourceType,
                             stack,
@@ -193,6 +143,61 @@ public record ServerboundContainerExportsInspectionRequestPacket(
             }
         }
         return result;
+    }
+
+    public static class Daddy implements SFMPacketDaddy<ServerboundContainerExportsInspectionRequestPacket> {
+        @Override
+        public PacketDirection getPacketDirection() {
+            return PacketDirection.SERVERBOUND;
+        }
+
+        @Override
+        public void encode(
+                ServerboundContainerExportsInspectionRequestPacket msg,
+                FriendlyByteBuf friendlyByteBuf
+        ) {
+            friendlyByteBuf.writeVarInt(msg.windowId());
+            friendlyByteBuf.writeBlockPos(msg.pos());
+        }
+
+        @Override
+        public ServerboundContainerExportsInspectionRequestPacket decode(FriendlyByteBuf friendlyByteBuf) {
+            return new ServerboundContainerExportsInspectionRequestPacket(
+                    friendlyByteBuf.readVarInt(),
+                    friendlyByteBuf.readBlockPos()
+            );
+        }
+
+        @Override
+        public void handle(
+                ServerboundContainerExportsInspectionRequestPacket msg,
+                SFMPacketHandlingContext context
+        ) {
+            context.handleServerboundContainerPacket(
+                    AbstractContainerMenu.class,
+                    BlockEntity.class,
+                    msg.pos,
+                    msg.windowId,
+                    (menu, blockEntity) -> {
+                        assert blockEntity.getLevel() != null;
+                        String payload = buildInspectionResults(blockEntity.getLevel(), blockEntity.getBlockPos());
+                        var player = context.sender();
+
+                        SFMPackets.sendToPlayer(() -> player, new ClientboundContainerExportsInspectionResultsPacket(
+                                msg.windowId,
+                                SFMPacketDaddy.truncate(
+                                        payload,
+                                        ClientboundContainerExportsInspectionResultsPacket.MAX_RESULTS_LENGTH
+                                )
+                        ));
+                    }
+            );
+        }
+
+        @Override
+        public Class<ServerboundContainerExportsInspectionRequestPacket> getPacketClass() {
+            return ServerboundContainerExportsInspectionRequestPacket.class;
+        }
     }
 
 }

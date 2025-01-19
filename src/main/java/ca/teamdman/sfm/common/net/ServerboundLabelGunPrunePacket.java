@@ -4,28 +4,34 @@ import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
-import net.neoforged.neoforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
 
 public record ServerboundLabelGunPrunePacket(
         InteractionHand hand
-) {
-    public static void encode(ServerboundLabelGunPrunePacket msg, FriendlyByteBuf buf) {
-        buf.writeEnum(msg.hand);
-    }
+) implements SFMPacket {
+    public static class Daddy implements SFMPacketDaddy<ServerboundLabelGunPrunePacket> {
+        @Override
+        public PacketDirection getPacketDirection() {
+            return PacketDirection.SERVERBOUND;
+        }
+        @Override
+        public void encode(
+                ServerboundLabelGunPrunePacket msg,
+                FriendlyByteBuf buf
+        ) {
+            buf.writeEnum(msg.hand);
+        }
 
-    public static ServerboundLabelGunPrunePacket decode(
-            FriendlyByteBuf buf
-    ) {
-        return new ServerboundLabelGunPrunePacket(buf.readEnum(InteractionHand.class));
-    }
+        @Override
+        public ServerboundLabelGunPrunePacket decode(FriendlyByteBuf buf) {
+            return new ServerboundLabelGunPrunePacket(buf.readEnum(InteractionHand.class));
+        }
 
-    public static void handle(
-            ServerboundLabelGunPrunePacket msg, NetworkEvent.Context context
-    ) {
-        context.enqueueWork(() -> {
-            var sender = context.getSender();
+        @Override
+        public void handle(
+                ServerboundLabelGunPrunePacket msg,
+                SFMPacketHandlingContext context
+        ) {
+            var sender = context.sender();
             if (sender == null) {
                 return;
             }
@@ -33,7 +39,11 @@ public record ServerboundLabelGunPrunePacket(
             if (stack.getItem() instanceof LabelGunItem) {
                 LabelPositionHolder.from(stack).prune().save(stack);
             }
-        });
-        context.setPacketHandled(true);
+        }
+
+        @Override
+        public Class<ServerboundLabelGunPrunePacket> getPacketClass() {
+            return ServerboundLabelGunPrunePacket.class;
+        }
     }
 }
