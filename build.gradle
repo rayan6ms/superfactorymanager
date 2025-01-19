@@ -124,6 +124,10 @@ runs {
 //        https://discord.com/channels/313125603924639766/1232440595738529913/1246122881516048445
         configure('client')
 
+        modSource project.sourceSets.gametest
+        // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+
         programArguments '--username', 'TeamDman', '--uuid', '83f1df8b-0ba3-4de0-8a26-e51a1fd74318', '--width', '1708', '--height', '960'
     }
 
