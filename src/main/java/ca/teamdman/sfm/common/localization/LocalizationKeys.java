@@ -620,6 +620,10 @@ public final class LocalizationKeys {
             "program.sfm.error.unknown_resource_type",
             "Program references an unknown resource type \"%s\""
     );
+    public static final LocalizationEntry PROGRAM_ERROR_DISALLOWED_RESOURCE_TYPE = new LocalizationEntry(
+            "program.sfm.error.disallowed_resource_type",
+            "Program references a disallowed resource type \"%s\""
+    );
     public static final LocalizationEntry MANAGER_GUI_STATE_NO_PROGRAM = new LocalizationEntry(
             "gui.sfm.manager.state.no_program",
             "no program"

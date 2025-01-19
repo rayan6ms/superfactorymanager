@@ -10,6 +10,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 
 import java.util.EnumSet;
@@ -70,5 +71,12 @@ public class SFMTests {
         map.put(123L, "hi");
         assertEquals("hi", map.get(123L));
         assertNull(map.get(124L));
+    }
+
+    @Test
+    public void iForgetIfICanUseResourceLocationsHere() {
+        ResourceLocation bruh = new ResourceLocation("sfm","bruh");
+        assertEquals("sfm", bruh.getNamespace());
+        assertEquals("bruh", bruh.getPath());
     }
 }

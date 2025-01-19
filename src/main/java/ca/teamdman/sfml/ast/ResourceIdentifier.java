@@ -164,13 +164,14 @@ public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode, ToStringCo
         this.resourceTypeCache = resourceTypeCache;
     }
 
+    public ResourceLocation getResourceTypeId() {
+        return new ResourceLocation(resourceTypeNamespace, resourceTypeName);
+    }
+
     public @Nullable ResourceType<STACK, ITEM, CAP> getResourceType() {
         if (resourceTypeCache == null) {
             //noinspection unchecked
-            setResourceTypeCache((ResourceType<STACK, ITEM, CAP>) SFMResourceTypes.fastLookup(
-                    resourceTypeNamespace,
-                    resourceTypeName
-            ));
+            setResourceTypeCache((ResourceType<STACK, ITEM, CAP>) SFMResourceTypes.fastLookup(getResourceTypeId()));
         }
         return resourceTypeCache;
     }

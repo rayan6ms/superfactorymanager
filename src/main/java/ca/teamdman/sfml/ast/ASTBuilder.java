@@ -2,13 +2,8 @@ package ca.teamdman.sfml.ast;
 
 import ca.teamdman.langs.SFMLBaseVisitor;
 import ca.teamdman.langs.SFMLParser;
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.config.SFMConfig;
-import ca.teamdman.sfm.common.registry.SFMResourceTypes;
-import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import com.mojang.datafixers.util.Pair;
-import cpw.mods.modlauncher.Launcher;
-import net.minecraft.resources.ResourceLocation;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -21,7 +16,6 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     private final Set<Label> USED_LABELS = new HashSet<>();
     private final Set<ResourceIdentifier<?, ?, ?>> USED_RESOURCES = new HashSet<>();
     private final List<Pair<ASTNode, ParserRuleContext>> AST_NODE_CONTEXTS = new LinkedList<>();
-    private final List<? extends String> DISALLOWED_RESOURCE_TYPES_FOR_TRANSFER = SFMConfig.getOrDefault(SFMConfig.SERVER.disallowedResourceTypesForTransfer);
 
     public List<Pair<ASTNode, ParserRuleContext>> getNodesUnderCursor(int cursorPos) {
         return AST_NODE_CONTEXTS
@@ -271,7 +265,6 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         var exclusions = visitResourceExclusion(ctx.resourceExclusion());
         var each = ctx.EACH() != null;
         InputStatement inputStatement = new InputStatement(labelAccess, matchers.withExclusions(exclusions), each);
-        assertDisallowedResourceTypeNotUsed(inputStatement);
         AST_NODE_CONTEXTS.add(new Pair<>(inputStatement, ctx));
         return inputStatement;
     }
@@ -283,7 +276,6 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         var exclusions = visitResourceExclusion(ctx.resourceExclusion());
         var each = ctx.EACH() != null;
         OutputStatement outputStatement = new OutputStatement(labelAccess, matchers.withExclusions(exclusions), each);
-        assertDisallowedResourceTypeNotUsed(outputStatement);
         AST_NODE_CONTEXTS.add(new Pair<>(outputStatement, ctx));
         return outputStatement;
     }
@@ -766,20 +758,5 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         Block block = new Block(statements);
         AST_NODE_CONTEXTS.add(new Pair<>(block, ctx));
         return block;
-    }
-
-    private void assertDisallowedResourceTypeNotUsed(IOStatement statement) {
-        if (Launcher.INSTANCE == null) {
-            SFM.LOGGER.warn("The game isn't loaded. Are we in a unit test? Skipping disallowed resource types check.");
-            return;
-        }
-        for (ResourceType<?, ?, ?> resourceType : statement.resourceLimits().getReferencedResourceTypes()) {
-            ResourceLocation resourceTypeId = Objects.requireNonNull(SFMResourceTypes.DEFERRED_TYPES.get().getKey(resourceType));
-            if (DISALLOWED_RESOURCE_TYPES_FOR_TRANSFER.contains(resourceTypeId.toString())) {
-                throw new IllegalArgumentException("Resource type \""
-                                                   + resourceTypeId
-                                                   + "\" has been disallowed for transfer in the config.");
-            }
-        }
     }
 }
