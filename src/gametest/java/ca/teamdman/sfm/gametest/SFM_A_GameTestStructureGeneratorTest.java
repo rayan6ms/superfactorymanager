@@ -77,20 +77,24 @@ public class SFM_A_GameTestStructureGeneratorTest extends SFMGameTestBase {
                         .getParent()
                         .getParent()
                         .getParent()
+                        .getParent()
                         .getParent();
                 Path targetDir = repoDir.resolve("src/gametest/resources/data/sfm/structures");
 //                    SFM.LOGGER.info("Copying {} to {}", structurePath, targetDir);
-                try {
+                Path dest = targetDir.resolve(structurePath.getFileName());
+                if (!java.nio.file.Files.exists(dest)) {
                     try {
-                        java.nio.file.Files.copy(
-                                structurePath,
-                                targetDir.resolve(structurePath.getFileName())
-                        );
-                    } catch (FileAlreadyExistsException e) {
-                        existingCount++;
+                        try {
+                            java.nio.file.Files.copy(
+                                    structurePath,
+                                    dest
+                            );
+                        } catch (FileAlreadyExistsException e) {
+                            existingCount++;
+                        }
+                    } catch (Exception e) {
+                        SFM.LOGGER.error("Failed to copy structure", e);
                     }
-                } catch (Exception e) {
-                    SFM.LOGGER.error("Failed to copy structure", e);
                 }
             }
             if (existingCount > 0) {
