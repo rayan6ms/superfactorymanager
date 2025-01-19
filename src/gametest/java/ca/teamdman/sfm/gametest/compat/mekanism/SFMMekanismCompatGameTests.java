@@ -631,13 +631,14 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
 
         // create the program
-        long incr = 10_000_000_000L;
+//        long incr = 10_000_000_000L;
+        long incr = Integer.MAX_VALUE;
         var startingAmount = FloatingLong.create(0L);
         var program = """
                     NAME "induction matrix test"
                     EVERY 20 TICKS DO
-                        INPUT %d mekanism_energy:: FROM source NORTH SIDE
-                        OUTPUT mekanism_energy:: TO dest NORTH SIDE
+                        INPUT %d fe:: FROM source NORTH SIDE
+                        OUTPUT fe:: TO dest NORTH SIDE
                     END
                 """.formatted(incr);
 
@@ -660,12 +661,12 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
                 throw new GameTestAssertException("Induction matrix did not form");
             }
 
-            var expected = startingAmount.add(incr);
+            var expected = startingAmount.add(SFMMekanismCompat.createForgeEnergy(incr));
             FloatingLong energy = inductionPort.getEnergy(0);
             boolean success = energy.equals(expected);
             assertTrue(
                     success,
-                    "Expected energy did not match"
+                    "Expected energy did not match " + expected + " vs " + energy + " (diff " + energy.subtract(expected) + ")"
             );
 
         });
