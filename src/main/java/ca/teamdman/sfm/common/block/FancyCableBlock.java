@@ -22,7 +22,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -197,6 +196,6 @@ public class FancyCableBlock extends CableBlock implements IFacadableBlock {
 
         return SFMResourceTypes
                 .getCapabilities()
-                .anyMatch(cap -> blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER, direction).isPresent());
+                .anyMatch(cap -> blockEntity.getCapability(cap, direction).isPresent());
     }
 }
