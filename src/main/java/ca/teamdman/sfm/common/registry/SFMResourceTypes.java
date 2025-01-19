@@ -6,7 +6,7 @@ import ca.teamdman.sfm.common.resourcetype.FluidResourceType;
 import ca.teamdman.sfm.common.resourcetype.ForgeEnergyResourceType;
 import ca.teamdman.sfm.common.resourcetype.ItemResourceType;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -47,7 +47,7 @@ public class SFMResourceTypes {
             "forge_energy",
             ForgeEnergyResourceType::new
     );
-    private static final Int2ObjectArrayMap<ResourceType<?, ?, ?>> DEFERRED_TYPES_BY_ID = new Int2ObjectArrayMap<>();
+    private static final Object2ObjectOpenHashMap<ResourceLocation, ResourceType<?, ?, ?>> DEFERRED_TYPES_BY_ID = new Object2ObjectOpenHashMap<>();
 
     static {
         if (SFMModCompat.isMekanismLoaded()) {
@@ -60,12 +60,11 @@ public class SFMResourceTypes {
     }
 
     public static @Nullable ResourceType<?, ?, ?> fastLookup(
-            String resourceTypeNamespace,
-            String resourceTypeName
+            ResourceLocation resourceTypeId
     ) {
         return DEFERRED_TYPES_BY_ID.computeIfAbsent(
-                resourceTypeNamespace.hashCode() ^ resourceTypeName.hashCode(),
-                i -> DEFERRED_TYPES.get().getValue(new ResourceLocation(resourceTypeNamespace, resourceTypeName))
+                resourceTypeId,
+                i -> DEFERRED_TYPES.get().getValue(resourceTypeId)
         );
     }
 
