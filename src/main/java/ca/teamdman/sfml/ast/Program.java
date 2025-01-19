@@ -7,10 +7,12 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.*;
+import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.SFMTranslationUtils;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.level.Level;
@@ -75,20 +77,8 @@ public record Program(
         if (errors.isEmpty()) {
             try {
                 program = builder.visitProgram(context);
-                // make sure all referenced resources exist now during compilation instead of waiting for the program to tick
-
-                for (ResourceIdentifier<?, ?, ?> referencedResource : program.referencedResources) {
-                    try {
-                        ResourceType<?, ?, ?> resourceType = referencedResource.getResourceType();
-                        if (resourceType == null) {
-                            errors.add(LocalizationKeys.PROGRAM_ERROR_UNKNOWN_RESOURCE_TYPE.get(
-                                    referencedResource));
-                        }
-                    } catch (ResourceLocationException e) {
-                        errors.add(LocalizationKeys.PROGRAM_ERROR_MALFORMED_RESOURCE_TYPE.get(
-                                referencedResource));
-                    }
-                }
+                // Make sure all referenced resources are valid during compilation instead of waiting for the program to tick
+                checkResourceTypes(program, errors);
             } catch (ResourceLocationException | IllegalArgumentException | AssertionError e) {
                 errors.add(LocalizationKeys.PROGRAM_ERROR_LITERAL.get(e.getMessage()));
             } catch (Throwable t) {
@@ -123,6 +113,31 @@ public record Program(
             onSuccess.accept(program);
         } else {
             onFailure.accept(errors);
+        }
+    }
+
+    private static void checkResourceTypes(
+            Program program,
+            List<TranslatableContents> errors
+    ) {
+        List<? extends String> disallowedResourcetypes = SFMConfig.getOrDefault(SFMConfig.SERVER.disallowedResourceTypesForTransfer);
+        for (ResourceIdentifier<?, ?, ?> referencedResource : program.referencedResources) {
+            try {
+                ResourceType<?, ?, ?> resourceType = referencedResource.getResourceType();
+                if (resourceType == null) {
+                    errors.add(LocalizationKeys.PROGRAM_ERROR_UNKNOWN_RESOURCE_TYPE.get(
+                            referencedResource));
+                } else {
+                    ResourceLocation resourceTypeId = Objects.requireNonNull(SFMResourceTypes.DEFERRED_TYPES.get().getKey(resourceType));
+                    if (disallowedResourcetypes.contains(resourceTypeId.toString())) {
+                        errors.add(LocalizationKeys.PROGRAM_ERROR_UNKNOWN_RESOURCE_TYPE.get(
+                                referencedResource));
+                    }
+                }
+            } catch (ResourceLocationException e) {
+                errors.add(LocalizationKeys.PROGRAM_ERROR_MALFORMED_RESOURCE_TYPE.get(
+                        referencedResource));
+            }
         }
     }
 
