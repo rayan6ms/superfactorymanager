@@ -145,4 +145,17 @@ public class CompressedBlockPosSet {
             );
         }
     }
+
+    @Override
+    public int hashCode() {
+        return this.boundingVolumes.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj instanceof CompressedBlockPosSet set) {
+            return set.boundingVolumes.equals(this.boundingVolumes);
+        }
+        return false;
+    }
 }
