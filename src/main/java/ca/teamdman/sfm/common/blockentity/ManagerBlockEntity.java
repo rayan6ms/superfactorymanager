@@ -292,7 +292,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     public void reset() {
         var disk = getDisk();
         if (disk != null) {
-            LabelPositionHolder.purge(disk);
+            LabelPositionHolder.clear(disk);
             disk.setTag(null);
             setItem(0, disk);
             setChanged();
