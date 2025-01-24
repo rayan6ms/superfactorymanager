@@ -35,6 +35,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 
 import java.util.*;
 import java.util.Collection;
@@ -253,7 +254,7 @@ public class ItemWorldRenderer {
         if (vbo != null) {
             poseStack.pushPose();
             // we need to pass in a new destination quaternion to avoid undesired camera mutation
-//            poseStack.mulPose(event.getCamera().rotation().invert(new Quaternionf()));
+            poseStack.mulPose(event.getCamera().rotation().invert(new Quaternionf()));
             poseStack.translate(
                     -event.getCamera().getPosition().x,
                     -event.getCamera().getPosition().y,
