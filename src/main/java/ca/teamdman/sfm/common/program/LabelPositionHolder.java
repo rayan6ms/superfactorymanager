@@ -96,11 +96,6 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
         CACHE.remove(stack);
     }
 
-    public static void purge(ItemStack stack) {
-        stack.getOrCreateTag().remove("sfm:labels");
-        CACHE.remove(stack);
-    }
-
     public CompoundTag serialize() {
         var tag = new CompoundTag();
         for (var entry : labels().entrySet()) {
