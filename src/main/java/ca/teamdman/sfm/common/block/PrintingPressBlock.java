@@ -2,6 +2,8 @@ package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.util.NotStored;
+import ca.teamdman.sfm.common.util.Stored;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
@@ -26,12 +28,14 @@ public class PrintingPressBlock extends BaseEntityBlock implements EntityBlock {
     }
 
     @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(@Stored BlockPos pos, BlockState state) {
         return SFMBlockEntities.PRINTING_PRESS_BLOCK_ENTITY
                 .get()
                 .create(pos, state);
     }
 
+    @Override
+    @SuppressWarnings("deprecation")
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
     }
@@ -41,9 +45,9 @@ public class PrintingPressBlock extends BaseEntityBlock implements EntityBlock {
     public void neighborChanged(
             BlockState pState,
             Level pLevel,
-            BlockPos pPos,
+            @Stored BlockPos pPos,
             Block pBlock,
-            BlockPos pFromPos,
+            @Stored BlockPos pFromPos,
             boolean pIsMoving
     ) {
         super.neighborChanged(pState, pLevel, pPos, pBlock, pFromPos, pIsMoving);
@@ -65,7 +69,7 @@ public class PrintingPressBlock extends BaseEntityBlock implements EntityBlock {
             ItemStack stack,
             BlockState state,
             Level level,
-            BlockPos pos,
+            @NotStored BlockPos pos,
             Player player,
             InteractionHand hand,
             BlockHitResult hitResult
@@ -76,8 +80,9 @@ public class PrintingPressBlock extends BaseEntityBlock implements EntityBlock {
         return ItemInteractionResult.SUCCESS;
     }
 
+    @Override
     @SuppressWarnings("deprecation")
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+    public void onRemove(BlockState pState, Level pLevel, @Stored BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         if (!pState.is(pNewState.getBlock())) {
             BlockEntity blockentity = pLevel.getBlockEntity(pPos);
             if (blockentity instanceof PrintingPressBlockEntity blockEntity) {

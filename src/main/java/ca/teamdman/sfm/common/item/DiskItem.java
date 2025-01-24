@@ -1,14 +1,17 @@
 package ca.teamdman.sfm.common.item;
 
-import ca.teamdman.sfm.client.ClientStuff;
+import ca.teamdman.sfm.client.ClientKeyHelpers;
+import ca.teamdman.sfm.client.ClientScreenHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundDiskItemSetProgramPacket;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
-import ca.teamdman.sfm.common.program.ProgramLinter;
+import ca.teamdman.sfm.common.program.linting.ProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMDataComponents;
+import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.component.DataComponents;
@@ -22,15 +25,14 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
-import net.neoforged.neoforge.network.PacketDistributor;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
@@ -59,7 +61,7 @@ public class DiskItem extends Item {
         stack.remove(SFMDataComponents.LABEL_POSITION_HOLDER);
     }
 
-    public static Optional<Program> compileAndUpdateErrorsAndWarnings(
+    public static @Nullable Program compileAndUpdateErrorsAndWarnings(
             ItemStack stack,
             @Nullable ManagerBlockEntity manager
     ) {
@@ -108,7 +110,7 @@ public class DiskItem extends Item {
                     setErrors(stack, errors);
                 }
         );
-        return Optional.ofNullable(rtn.get());
+        return rtn.get();
     }
 
     public static List<Component> getErrors(ItemStack stack) {
@@ -160,76 +162,57 @@ public class DiskItem extends Item {
     ) {
         var stack = pPlayer.getItemInHand(pUsedHand);
         if (pLevel.isClientSide) {
-            ClientStuff.showProgramEditScreen(
+            ClientScreenHelpers.showProgramEditScreen(
                     getProgram(stack),
-                    programString -> PacketDistributor.sendToServer(new ServerboundDiskItemSetProgramPacket(
-                            programString,
-                            pUsedHand
-                    ))
+                    programString -> SFMPackets.sendToServer(new ServerboundDiskItemSetProgramPacket(
+                                programString,
+                                pUsedHand
+                        ))
             );
         }
         return InteractionResultHolder.sidedSuccess(stack, pLevel.isClientSide());
     }
 
-    @SuppressWarnings("UnnecessaryLocalVariable")
+    @Override
+    public Component getName(ItemStack stack) {
+        if (FMLEnvironment.dist == Dist.CLIENT) {
+            if (ClientKeyHelpers.isKeyDown(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY)) return super.getName(stack);
+        }
+        var name = getProgramName(stack);
+        if (name.isEmpty()) return super.getName(stack);
+        return Component.literal(name).withStyle(ChatFormatting.AQUA);
+    }
+
     @Override
     public void appendHoverText(
             ItemStack stack,
             TooltipContext context,
-            List<Component> list,
+            List<Component> lines,
             TooltipFlag detail
     ) {
-        boolean isClient = FMLEnvironment.dist.isClient();
-        boolean isMoreInfoKeyDown = isClient && ClientStuff.isMoreInfoKeyDown();
-        boolean showProgram = isMoreInfoKeyDown;
-        if (!showProgram) {
-            list.addAll(LabelPositionHolder.from(stack).asHoverText());
-            getErrors(stack)
-                    .stream()
-                    .map(line -> line.copy().withStyle(ChatFormatting.RED))
-                    .forEach(list::add);
-            getWarnings(stack)
-                    .stream()
-                    .map(line -> line.copy().withStyle(ChatFormatting.YELLOW))
-                    .forEach(list::add);
-            if (isClient) {
-                list.add(LocalizationKeys.GUI_ADVANCED_TOOLTIP_HINT
-                                 .getComponent(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY.get().getTranslatedKeyMessage())
-                                 .withStyle(ChatFormatting.AQUA));
+        String program = DiskItem.getProgram(stack);
+        if (!program.isEmpty()) {
+            if (SFMItemUtils.isClientAndMoreInfoKeyPressed()) {
+                // show the program
+                lines.add(SFMItemUtils.getRainbow(getName(stack).getString().length()));
+                lines.addAll(ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(program, false));
+            } else {
+                lines.addAll(LabelPositionHolder.from(stack).asHoverText());
+                getErrors(stack)
+                        .stream()
+                        .map(Component::copy)
+                        .map(line -> line.withStyle(ChatFormatting.RED))
+                        .forEach(lines::add);
+                getWarnings(stack)
+                        .stream()
+                        .map(Component::copy)
+                        .map(line -> line.withStyle(ChatFormatting.YELLOW))
+                        .forEach(lines::add);
+                SFMItemUtils.appendMoreInfoKeyReminderTextIfOnClient(lines);
             }
         } else {
-            var program = getProgram(stack);
-            if (!program.isEmpty()) {
-                var start = Component.empty();
-                ChatFormatting[] rainbowColors = new ChatFormatting[]{
-                        ChatFormatting.DARK_RED,
-                        ChatFormatting.RED,
-                        ChatFormatting.GOLD,
-                        ChatFormatting.YELLOW,
-                        ChatFormatting.DARK_GREEN,
-                        ChatFormatting.GREEN,
-                        ChatFormatting.DARK_AQUA,
-                        ChatFormatting.AQUA,
-                        ChatFormatting.DARK_BLUE,
-                        ChatFormatting.BLUE,
-                        ChatFormatting.DARK_PURPLE,
-                        ChatFormatting.LIGHT_PURPLE
-                };
-                int rainbowColorsLength = rainbowColors.length;
-                int fullCycleLength = 2 * rainbowColorsLength - 2;
-                for (int i = 0; i < getName(stack).getString().length() - 2; i++) {
-                    int cyclePosition = i % fullCycleLength;
-                    int adjustedIndex = cyclePosition < rainbowColorsLength
-                                        ? cyclePosition
-                                        : fullCycleLength - cyclePosition;
-                    ChatFormatting color = rainbowColors[adjustedIndex];
-                    start = start.append(Component.literal("=").withStyle(color));
-                }
-                list.add(start);
-                list.addAll(ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(program, false));
-            } else {
-                list.add(LocalizationKeys.DISK_EDIT_IN_HAND_TOOLTIP.getComponent().withStyle(ChatFormatting.GRAY));
-            }
+            lines.add(LocalizationKeys.DISK_EDIT_IN_HAND_TOOLTIP.getComponent().withStyle(ChatFormatting.GRAY));
         }
     }
+
 }

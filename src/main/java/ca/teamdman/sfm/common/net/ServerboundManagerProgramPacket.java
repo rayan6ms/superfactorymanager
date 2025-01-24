@@ -1,67 +1,57 @@
 package ca.teamdman.sfm.common.net;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
-import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ServerboundManagerProgramPacket(
         int windowId,
         BlockPos pos,
         String program
-) implements CustomPacketPayload {
-    public static final Type<ServerboundManagerProgramPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(
-            SFM.MOD_ID,
-            "serverbound_manager_program_packet"
-    ));
+) implements SFMPacket {
+    public static class Daddy implements SFMPacketDaddy<ServerboundManagerProgramPacket> {
+        @Override
+        public PacketDirection getPacketDirection() {
+            return PacketDirection.SERVERBOUND;
+        }
+        @Override
+        public void encode(
+                ServerboundManagerProgramPacket msg,
+                RegistryFriendlyByteBuf friendlyByteBuf
+        ) {
+            friendlyByteBuf.writeVarInt(msg.windowId());
+            friendlyByteBuf.writeBlockPos(msg.pos());
+            friendlyByteBuf.writeUtf(msg.program(), Program.MAX_PROGRAM_LENGTH);
+        }
 
-    public static final StreamCodec<FriendlyByteBuf, ServerboundManagerProgramPacket> STREAM_CODEC = StreamCodec.ofMember(
-            ServerboundManagerProgramPacket::encode,
-            ServerboundManagerProgramPacket::decode
-    );
+        @Override
+        public ServerboundManagerProgramPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
+            return new ServerboundManagerProgramPacket(
+                    friendlyByteBuf.readVarInt(),
+                    friendlyByteBuf.readBlockPos(),
+                    friendlyByteBuf.readUtf(Program.MAX_PROGRAM_LENGTH)
+            );
+        }
 
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
-    }
+        @Override
+        public void handle(
+                ServerboundManagerProgramPacket msg,
+                SFMPacketHandlingContext context
+        ) {
+            context.handleServerboundContainerPacket(
+                    ManagerContainerMenu.class,
+                    ManagerBlockEntity.class,
+                    msg.pos,
+                    msg.windowId,
+                    (menu, manager) -> manager.setProgram(msg.program())
+            );
+        }
 
-    public static void encode(
-            ServerboundManagerProgramPacket msg,
-            FriendlyByteBuf friendlyByteBuf
-    ) {
-        friendlyByteBuf.writeVarInt(msg.windowId());
-        friendlyByteBuf.writeBlockPos(msg.pos());
-        friendlyByteBuf.writeUtf(msg.program(), Program.MAX_PROGRAM_LENGTH);
-    }
-
-    public static ServerboundManagerProgramPacket decode(FriendlyByteBuf friendlyByteBuf) {
-        return new ServerboundManagerProgramPacket(
-                friendlyByteBuf.readVarInt(),
-                friendlyByteBuf.readBlockPos(),
-                friendlyByteBuf.readUtf(Program.MAX_PROGRAM_LENGTH)
-        );
-    }
-
-    public static void handle(
-            ServerboundManagerProgramPacket msg,
-            IPayloadContext context
-    ) {
-        SFMPackets.handleServerboundContainerPacket(
-                context,
-                ManagerContainerMenu.class,
-                ManagerBlockEntity.class,
-                msg.pos,
-                msg.windowId,
-                (menu, manager) -> manager.setProgram(msg.program())
-        );
-
+        @Override
+        public Class<ServerboundManagerProgramPacket> getPacketClass() {
+            return ServerboundManagerProgramPacket.class;
+        }
     }
 }
-

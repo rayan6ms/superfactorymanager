@@ -2,9 +2,11 @@ package ca.teamdman.sfm.common.registry;
 
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.ClientStuff;
+import ca.teamdman.sfm.client.ClientRaycastHelpers;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
+import ca.teamdman.sfm.common.blockentity.TestBarrelTankBlockEntity;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
+import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -52,11 +54,49 @@ public class SFMMenus {
                                 Inventory inv
                         ) {
                             if (FMLEnvironment.dist.isClient()) {
-                                BlockEntity be = ClientStuff.getLookBlockEntity();
+                                BlockEntity be = ClientRaycastHelpers.getLookBlockEntity();
                                 if (!(be instanceof ManagerBlockEntity mbe)) {
                                     return IContainerFactory.super.create(windowId, inv);
                                 }
                                 return new ManagerContainerMenu(windowId, inv, mbe);
+                            } else {
+                                return IContainerFactory.super.create(
+                                        windowId,
+                                        inv
+                                );
+                            }
+                        }
+                    })
+    );
+
+    public static final Supplier<MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK_MENU = MENU_TYPES.register(
+            "test_barrel_tank",
+            () -> IMenuTypeExtension.create(
+                    new IContainerFactory<>() {
+                        @Override
+                        public TestBarrelTankContainerMenu create(
+                                int windowId,
+                                Inventory inv,
+                                RegistryFriendlyByteBuf data
+                        ) {
+                            return new TestBarrelTankContainerMenu(
+                                    windowId,
+                                    inv,
+                                    data
+                            );
+                        }
+
+                        @Override
+                        public TestBarrelTankContainerMenu create(
+                                int windowId,
+                                Inventory inv
+                        ) {
+                            if (FMLEnvironment.dist.isClient()) {
+                                BlockEntity be = ClientRaycastHelpers.getLookBlockEntity();
+                                if (!(be instanceof TestBarrelTankBlockEntity blockEntity)) {
+                                    return IContainerFactory.super.create(windowId, inv);
+                                }
+                                return new TestBarrelTankContainerMenu(windowId, inv, blockEntity);
                             } else {
                                 return IContainerFactory.super.create(
                                         windowId,

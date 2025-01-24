@@ -6,8 +6,10 @@ import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
-import ca.teamdman.sfm.common.program.ProgramLinter;
+import ca.teamdman.sfm.common.program.linting.ProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.util.NotStored;
+import ca.teamdman.sfm.common.util.Stored;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -28,9 +30,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import org.jetbrains.annotations.Nullable;
 import org.apache.commons.lang3.NotImplementedException;
-
-import javax.annotation.Nullable;
 
 public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICableBlock {
     public static final BooleanProperty TRIGGERED = BlockStateProperties.TRIGGERED;
@@ -43,10 +44,6 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
-        builder.add(TRIGGERED);
-    }
-
     @SuppressWarnings("deprecation")
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
@@ -62,9 +59,9 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
     public void neighborChanged(
             BlockState state,
             Level level,
-            BlockPos pos,
+            @NotStored BlockPos pos,
             Block block,
-            BlockPos neighbourPos,
+            @NotStored BlockPos neighbourPos,
             boolean movedByPiston
     ) {
         if (!(level.getBlockEntity(pos) instanceof ManagerBlockEntity mgr)) return;
@@ -82,7 +79,10 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
     }
 
     @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(
+            @Stored BlockPos pos,
+            BlockState state
+    ) {
         return SFMBlockEntities.MANAGER_BLOCK_ENTITY
                 .get()
                 .create(pos, state);
@@ -92,27 +92,30 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
     protected InteractionResult useWithoutItem(
             BlockState pState,
             Level level,
-            BlockPos pos,
+            @NotStored BlockPos pos,
             Player player,
             BlockHitResult pHitResult
     ) {
         if (level.getBlockEntity(pos) instanceof ManagerBlockEntity manager && player instanceof ServerPlayer sp) {
             // update warnings on disk as we open the gui
-            manager
-                    .getDisk()
-                    .ifPresent(disk -> manager
-                            .getProgram()
-                            .ifPresent(program -> DiskItem.setWarnings(disk, ProgramLinter.gatherWarnings(program,
-                                                                                                          LabelPositionHolder.from(disk), manager))));
+            var disk = manager.getDisk();
+            if (disk != null) {
+                var program = manager.getProgram();
+                if (program != null) {
+                    DiskItem.setWarnings(
+                            disk,
+                            ProgramLinter.gatherWarnings(program, LabelPositionHolder.from(disk), manager)
+                    );
+                }
+            }
             sp.openMenu(manager, buf -> ManagerContainerMenu.encode(manager, buf));
             return InteractionResult.CONSUME;
         }
         return InteractionResult.SUCCESS;
     }
 
-    @Nullable
     @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(
+    public @Nullable <T extends BlockEntity> BlockEntityTicker<T> getTicker(
             Level level,
             BlockState state,
             BlockEntityType<T> type
@@ -123,13 +126,25 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
 
     @Override
     @SuppressWarnings("deprecation")
-    public void onPlace(BlockState state, Level world, BlockPos pos, BlockState oldState, boolean isMoving) {
+    public void onPlace(
+            BlockState state,
+            Level world,
+            @NotStored BlockPos pos,
+            BlockState oldState,
+            boolean isMoving
+    ) {
         CableNetworkManager.onCablePlaced(world, pos);
     }
 
     @Override
     @SuppressWarnings("deprecation")
-    public void onRemove(BlockState state, Level level, BlockPos pos, BlockState newState, boolean isMoving) {
+    public void onRemove(
+            BlockState state,
+            Level level,
+            @Stored BlockPos pos,
+            BlockState newState,
+            boolean isMoving
+    ) {
         if (!state.is(newState.getBlock())) {
             if (level.getBlockEntity(pos) instanceof Container container) {
                 Containers.dropContents(level, pos, container);
@@ -138,5 +153,10 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
             CableNetworkManager.onCableRemoved(level, pos);
             super.onRemove(state, level, pos, newState, isMoving);
         }
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        builder.add(TRIGGERED);
     }
 }

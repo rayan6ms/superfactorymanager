@@ -1,28 +1,28 @@
 package ca.teamdman.sfml.ast;
 
+import ca.teamdman.langs.SFMLLexer;
+import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.common.SFMConfig;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
+import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.*;
+import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import ca.teamdman.sfm.common.util.SFMUtils;
-import ca.teamdman.sfml.SFMLLexer;
-import ca.teamdman.sfml.SFMLParser;
+import ca.teamdman.sfm.common.util.SFMTranslationUtils;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.network.chat.contents.TranslatableContents;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.level.Level;
 import net.neoforged.fml.loading.FMLEnvironment;
 import org.antlr.v4.runtime.*;
-import org.checkerframework.common.returnsreceiver.qual.This;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.function.Function;
 
 import static ca.teamdman.sfm.common.blockentity.ManagerBlockEntity.TICK_TIME_HISTORY_SIZE;
 import static ca.teamdman.sfm.common.net.ServerboundManagerSetLogLevelPacket.MAX_LOG_LEVEL_NAME_LENGTH;
@@ -32,12 +32,14 @@ public record Program(
         String name,
         List<Trigger> triggers,
         Set<String> referencedLabels,
-        Set<ResourceIdentifier<?, ?, ?>> referencedResources
+        Set<ResourceIdentifier<?, ?, ?>> referencedResources,
+        int configRevision
 ) implements Statement {
     /**
      * This comes from {@link java.io.DataOutputStream#writeUTF(String, DataOutput)}
      * and {@link NetworkHooks#openScreen(ServerPlayer, MenuProvider, Consumer)}
      */
+    @SuppressWarnings("JavadocReference")
     public static final int MAX_PROGRAM_LENGTH = 32600 // from openScreen
                                                  - 8 * TICK_TIME_HISTORY_SIZE
                                                  - MAX_LOG_LEVEL_NAME_LENGTH
@@ -50,6 +52,9 @@ public record Program(
             Consumer<Program> onSuccess,
             Consumer<List<TranslatableContents>> onFailure
     ) {
+        if (programString == null) {
+            programString = "";
+        }
         SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(programString));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         SFMLParser parser = new SFMLParser(tokens);
@@ -74,20 +79,8 @@ public record Program(
         if (errors.isEmpty()) {
             try {
                 program = builder.visitProgram(context);
-                // make sure all referenced resources exist now during compilation instead of waiting for the program to tick
-
-                for (ResourceIdentifier<?, ?, ?> referencedResource : program.referencedResources) {
-                    try {
-                        ResourceType<?, ?, ?> resourceType = referencedResource.getResourceType();
-                        if (resourceType == null) {
-                            errors.add(LocalizationKeys.PROGRAM_ERROR_UNKNOWN_RESOURCE_TYPE.get(
-                                    referencedResource));
-                        }
-                    } catch (ResourceLocationException e) {
-                        errors.add(LocalizationKeys.PROGRAM_ERROR_MALFORMED_RESOURCE_TYPE.get(
-                                referencedResource));
-                    }
-                }
+                // Make sure all referenced resources are valid during compilation instead of waiting for the program to tick
+                checkResourceTypes(program, errors);
             } catch (ResourceLocationException | IllegalArgumentException | AssertionError e) {
                 errors.add(LocalizationKeys.PROGRAM_ERROR_LITERAL.get(e.getMessage()));
             } catch (Throwable t) {
@@ -100,9 +93,11 @@ public record Program(
                 if (!FMLEnvironment.production) {
                     var message = t.getMessage();
                     if (message != null) {
-                        errors.add(SFMUtils.getTranslatableContents(t.getClass().getSimpleName() + ": " + message));
+                        errors.add(SFMTranslationUtils.getTranslatableContents(
+                                t.getClass().getSimpleName() + ": " + message
+                        ));
                     } else {
-                        errors.add(SFMUtils.getTranslatableContents(t.getClass().getSimpleName()));
+                        errors.add(SFMTranslationUtils.getTranslatableContents(t.getClass().getSimpleName()));
                     }
                 }
             }
@@ -120,6 +115,31 @@ public record Program(
             onSuccess.accept(program);
         } else {
             onFailure.accept(errors);
+        }
+    }
+
+    private static void checkResourceTypes(
+            Program program,
+            List<TranslatableContents> errors
+    ) {
+        List<? extends String> disallowedResourcetypes = SFMConfig.getOrDefault(SFMConfig.SERVER.disallowedResourceTypesForTransfer);
+        for (ResourceIdentifier<?, ?, ?> referencedResource : program.referencedResources) {
+            try {
+                ResourceType<?, ?, ?> resourceType = referencedResource.getResourceType();
+                if (resourceType == null) {
+                    errors.add(LocalizationKeys.PROGRAM_ERROR_UNKNOWN_RESOURCE_TYPE.get(
+                            referencedResource));
+                } else {
+                    ResourceLocation resourceTypeId = Objects.requireNonNull(SFMResourceTypes.DEFERRED_TYPES.getKey(resourceType));
+                    if (disallowedResourcetypes.contains(resourceTypeId.toString())) {
+                        errors.add(LocalizationKeys.PROGRAM_ERROR_UNKNOWN_RESOURCE_TYPE.get(
+                                referencedResource));
+                    }
+                }
+            } catch (ResourceLocationException e) {
+                errors.add(LocalizationKeys.PROGRAM_ERROR_MALFORMED_RESOURCE_TYPE.get(
+                        referencedResource));
+            }
         }
     }
 
@@ -171,11 +191,11 @@ public record Program(
             }
 
             // Log pretty triggers
-            if (triggers instanceof ShortStatement ss) {
+            if (triggers instanceof ToStringCondensed ss) {
                 context
                         .getLogger()
                         .debug(x -> x.accept(LocalizationKeys.LOG_PROGRAM_TICK_TRIGGER_STATEMENT.get(
-                                ss.toStringShort())));
+                                ss.toStringCondensed())));
             }
 
             // Start stopwatch
@@ -183,14 +203,22 @@ public record Program(
 
             // Perform tick
             if (context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
-                int maxConditionCount = SFMConfig.getOrDefault(SFMConfig.COMMON.maxIfStatementsInTriggerBeforeSimulationIsntAllowed);
-                int conditionCount = Math.min(trigger.getConditionCount(), maxConditionCount);
-                int numPossibleStates = (int) Math.max(1, Math.pow(2, conditionCount));
-                for (int i = 0; i < numPossibleStates; i++) {
-                    ProgramContext forkedContext = context.fork();
-                    trigger.tick(forkedContext);
-                    forkedContext.free();
-                    ((SimulateExploreAllPathsProgramBehaviour) forkedContext.getBehaviour()).terminatePathAndBeginAnew();
+                int maxConditionCount = SFMConfig.getOrDefault(SFMConfig.SERVER.maxIfStatementsInTriggerBeforeSimulationIsntAllowed);
+                int conditionCount = trigger.getConditionCount();
+                if (conditionCount <= maxConditionCount) {
+                    int numPossibleStates = (int) Math.max(1, Math.pow(2, conditionCount));
+                    for (int i = 0; i < numPossibleStates; i++) {
+                        ProgramContext forkedContext = context.fork();
+                        trigger.tick(forkedContext);
+                        forkedContext.free();
+                        ((SimulateExploreAllPathsProgramBehaviour) forkedContext.getBehaviour()).terminatePathAndBeginAnew();
+                    }
+                } else {
+                    context.getLogger().warn(LocalizationKeys.PROGRAM_WARNING_TOO_MANY_CONDITIONS.get(
+                            trigger.toString(),
+                            conditionCount,
+                            maxConditionCount
+                    ));
                 }
                 simulation.prepareNextTrigger();
             } else {
@@ -254,23 +282,6 @@ public record Program(
         }
     }
 
-    public void replaceAllOutputStatements(Function<OutputStatement, OutputStatement> mapper) {
-        Deque<Statement> toPatch = new ArrayDeque<>();
-        toPatch.add(this);
-        while (!toPatch.isEmpty()) {
-            Statement statement = toPatch.pollFirst();
-            List<Statement> children = statement.getStatements();
-            for (int i = 0; i < children.size(); i++) {
-                Statement child = children.get(i);
-                if (child instanceof OutputStatement outputStatement) {
-                    children.set(i, mapper.apply(outputStatement));
-                } else {
-                    toPatch.add(child);
-                }
-            }
-        }
-    }
-
     private static @NotNull Consumer<Consumer<TranslatableContents>> getTraceLogWriter(ProgramContext context) {
         return trace -> {
             trace.accept(LocalizationKeys.LOG_CABLE_NETWORK_DETAILS_HEADER_1.get());
@@ -303,9 +314,9 @@ public record Program(
 
             trace.accept(LocalizationKeys.LOG_LABEL_POSITION_HOLDER_DETAILS_HEADER.get());
             //noinspection DataFlowIssue
-            LabelPositionHolder labelPositionHolder = context
-                    .getLabelPositionHolder();
-            labelPositionHolder.labels()
+            context
+                    .getLabelPositionHolder()
+                    .labels()
                     .forEach((label, positions) -> positions
                             .stream()
                             .map(

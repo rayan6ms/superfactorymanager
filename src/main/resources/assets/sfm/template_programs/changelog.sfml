@@ -34,6 +34,70 @@ EVERY 20 TICKS DO
 END
 -- Update round robin example to advocate for using "retain" instead
 -- Add notice to inspector that slot numbers may not correspond with automation slots
+-- Fix syntax highlighting for "without", thanks @AkaiPandaTV
+-- Fix WITHOUT and WITH logic implementation
+EVERY 20 TICKS DO
+    INPUT minecraft: FROM left
+    OUTPUT WITH TAG ingots OR tag chests EXCEPT iron_ingot TO right
+    OUTPUT WITHOUT TAG ingots OR TAG nuggets TO "top"
+END
+-- Add fancy inventory cable, cable with non-full-block model, thanks @kevinrpb
+-- Optimized label gun and network tool rendering, thanks @Burkino <3
+-- Add label gun render-only-selected gui button added, thanks @Burkino
+-- Add label gun gui searching, thanks @Burkino
+-- Add cable facades, thanks @Burkino
+---- Network tool in off-hand will replace cable texture with block in main hand on right click
+-- Add resource type disallowing via config for pack makers, thanks @Burkino
+-- Add warning when using Mekanism blocks in IO statements with no side specified
+-- Add label gun pick-block modifier key for right clicking
+-- Fix label gun with no active label failing to shift-right-click to clear labels on blocks
+-- Remove confirmation dialog when reset is pressed with blank program and no labels
+-- Add confirmation screen when pasting
+-- Optimized water tank logic, thanks @WanderinWolf for the bug report
+---- Capacity scaling has been buffed from n to 2^n
+---- Added `/sfm bust_water_network_cache` in case I screwed up the cache logic lol
+-- Update network tool output; hide capabilities that aren't present, added newline
+-- Update water tank reminder text to mention that other tanks must be active for bonus
+-- Add issue tracker url to mods.toml, shown when SFM is suspected of causing a crash
+-- Add CompressedBlockPosSet data structure to fix packet length issues with network tool and label gun
+-- Invalidate network cache instead of recomputing when removing cables from large networks
+-- Fix network tool not working on dedicated servers, thanks @RacerDelux
+-- Fix only rendering one of label gun and network tool when both held at once
+-- Fix network tool not refreshing render data properly when in off-hand
+-- Fix cables being moved by pistons not updating the cable network
+-- Remove unused keyword tokens: WORLD, PROGRAM, MOVE
+-- Add random initialization of manager internal clock on load from world
+-- Add support for specifying global alignment and offset for timer intervals
+EVERY 20 GLOBAL TICKS DO END
+EVERY 20 GLOBAL PLUS 5 TICKS DO END
+EVERY 20G PLUS 5 TICKS DO END
+EVERY 20G + 5 TICKS DO END
+EVERY 20G+5 TICKS DO END
+-- Add timer_triggers.sfml example
+-- Fix manager asking for confirmation when pasting over empty disks
+-- Fix missing truncation on ctrl+space actions for label and output tokens
+-- Add tunnelled manager block, thanks @Qther
+-- Performance improvements by switching to imperative loops, thanks @Qther
+-- Add `/sfm config show` (anyone) and `/sfm config edit` (op) commands
+-- Add "show config" button to manager gui
+-- Improve resource loss logging
+-- Add config variable to disable config loss logging in console
+-- Add "(SFM)" to mod name in mods.toml so it shows up in searches for "SFM"
+-- Add crafting recipe to clear label guns
+-- Fix label gun clear not resetting active label
+-- Add label cleanup support for labels on blocks that are not detected as valid inventories
+-- Fix inspection results missing line endings when multiple resource types present
+-- Add exports for all side to network tool, listing selected side first
+-- Add hotkeys for label gun next/prev for people with no scroll wheel, unbound by default
+-- Add facades to fancy cables, HUGE thanks to CoFH for their RetexturedBakedQuad class <3
+-- Add direction support to fancy cable facades
+-- Add `/sfm changelog` command
+-- Add swapping between fancy and normal cables with network tool
+-- Performance improvements by reducing memory allocations iterating block neighbours
+-- Fix inaccurate scrollbar
+-- Fix industrial foregoing ore meat fluid not moving because SFM mishandling fluid tags
+---- Thanks @luxxiz for the report!
+
 
 ---- 4.19.1 ----
 -- Fix 1.19.4 build failures due to Gradle hating me

@@ -3,6 +3,7 @@ package ca.teamdman.sfm.common.registry;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.component.ItemStackBox;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
+import ca.teamdman.sfm.common.util.CompressedBlockPosSet;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
@@ -10,7 +11,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
-import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
@@ -40,6 +40,24 @@ public class SFMDataComponents {
                     .<String>builder()
                     .persistent(Codec.STRING)
                     .networkSynchronized(ByteBufCodecs.STRING_UTF8)
+                    .cacheEncoding()
+                    .build()
+    );
+    public static final Supplier<DataComponentType<Boolean>> ONLY_SHOW_ACTIVE_LABEL = DATA_COMPONENT_TYPES.register(
+            "only_show_active_label",
+            () -> DataComponentType
+                    .<Boolean>builder()
+                    .persistent(Codec.BOOL)
+                    .networkSynchronized(ByteBufCodecs.BOOL)
+                    .cacheEncoding()
+                    .build()
+    );
+    public static final Supplier<DataComponentType<Boolean>> OVERLAY_ENABLED = DATA_COMPONENT_TYPES.register(
+            "overlay_enabled",
+            () -> DataComponentType
+                    .<Boolean>builder()
+                    .persistent(Codec.BOOL)
+                    .networkSynchronized(ByteBufCodecs.BOOL)
                     .cacheEncoding()
                     .build()
     );
@@ -81,19 +99,23 @@ public class SFMDataComponents {
                     .build()
     );
 
-    public static final Supplier<DataComponentType<Set<BlockPos>>> CABLE_POSITIONS = DATA_COMPONENT_TYPES.register(
+    public static final Supplier<DataComponentType<CompressedBlockPosSet>> CABLE_POSITIONS = DATA_COMPONENT_TYPES.register(
             "cable_positions",
-            () -> DataComponentType.<Set<BlockPos>>builder()
-                    .networkSynchronized(BlockPos.STREAM_CODEC
-                                                 .apply(ByteBufCodecs.list())
-                                                 .map(HashSet::new, ArrayList::new)).build()
+            () -> DataComponentType
+                    .<CompressedBlockPosSet>builder()
+                    .networkSynchronized(CompressedBlockPosSet.STREAM_CODEC)
+                    .persistent(CompressedBlockPosSet.CODEC)
+                    .cacheEncoding()
+                    .build()
     );
-    public static final Supplier<DataComponentType<Set<BlockPos>>> CAPABILITY_POSITIONS = DATA_COMPONENT_TYPES.register(
+    public static final Supplier<DataComponentType<CompressedBlockPosSet>> CAPABILITY_POSITIONS = DATA_COMPONENT_TYPES.register(
             "capability_positions",
-            () -> DataComponentType.<Set<BlockPos>>builder()
-                    .networkSynchronized(BlockPos.STREAM_CODEC
-                                                 .apply(ByteBufCodecs.list())
-                                                 .map(HashSet::new, ArrayList::new)).build()
+            () -> DataComponentType
+                    .<CompressedBlockPosSet>builder()
+                    .networkSynchronized(CompressedBlockPosSet.STREAM_CODEC)
+                    .persistent(CompressedBlockPosSet.CODEC)
+                    .cacheEncoding()
+                    .build()
     );
 
 

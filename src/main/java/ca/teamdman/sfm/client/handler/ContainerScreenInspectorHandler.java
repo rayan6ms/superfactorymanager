@@ -1,16 +1,20 @@
 package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.ClientStuff;
+import ca.teamdman.sfm.client.ClientRaycastHelpers;
+import ca.teamdman.sfm.client.ClientScreenHelpers;
+import ca.teamdman.sfm.client.gui.ButtonBuilder;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundContainerExportsInspectionRequestPacket;
+import ca.teamdman.sfm.common.registry.SFMPackets;
 import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.player.Inventory;
@@ -24,31 +28,26 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 import net.neoforged.neoforge.client.gui.widget.ExtendedButton;
-import net.neoforged.neoforge.network.PacketDistributor;
-
-import javax.annotation.Nullable;
+import org.jetbrains.annotations.Nullable;
 
 @EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class ContainerScreenInspectorHandler {
     private static boolean visible = false;
-    @Nullable
-    private static AbstractContainerScreen<?> lastScreen = null;
-    private static final ExtendedButton exportInspectorButton = new ExtendedButton(
-            5,
-            50,
-            100,
-            20,
-            LocalizationKeys.CONTAINER_INSPECTOR_SHOW_EXPORTS_BUTTON.getComponent(),
-            (button) -> {
-                BlockEntity lookBlockEntity = ClientStuff.getLookBlockEntity();
+    private static @Nullable AbstractContainerScreen<?> lastScreen = null;
+    private static final Button exportInspectorButton = new ButtonBuilder()
+            .setSize(100, 20)
+            .setPosition(5, 50)
+            .setText(LocalizationKeys.CONTAINER_INSPECTOR_SHOW_EXPORTS_BUTTON)
+            .setOnPress((button) -> {
+                BlockEntity lookBlockEntity = ClientRaycastHelpers.getLookBlockEntity();
                 if (lastScreen != null && lookBlockEntity != null) {
-                    PacketDistributor.sendToServer(new ServerboundContainerExportsInspectionRequestPacket(
+                    SFMPackets.sendToServer(new ServerboundContainerExportsInspectionRequestPacket(
                             lastScreen.getMenu().containerId,
                             lookBlockEntity.getBlockPos()
                     ));
                 }
-            }
-    );
+            })
+            .build();
 
     @SubscribeEvent
     public static void onMouseClick(ScreenEvent.KeyPressed.MouseButtonPressed.Pre event) {
@@ -161,7 +160,7 @@ public class ContainerScreenInspectorHandler {
                 if (hoveredSlot != null) {
                     ItemStack hoveredStack = hoveredSlot.getItem();
                     if (!hoveredStack.isEmpty()) {
-                        ClientStuff.showItemInspectorScreen(hoveredStack);
+                        ClientScreenHelpers.showItemInspectorScreen(hoveredStack);
                     }
                 }
             }

@@ -81,8 +81,7 @@ public class ProgramContext {
         LEVEL = MANAGER.getLevel();
         REDSTONE_PULSES = MANAGER.getUnprocessedRedstonePulseCount();
         BEHAVIOUR = executionBehaviour;
-        //noinspection OptionalGetWithoutIsPresent
-        LABEL_POSITIONS = LabelPositionHolder.from(manager.getDisk().get());
+        LABEL_POSITIONS = LabelPositionHolder.from(Objects.requireNonNull(manager.getDisk()));
         LOGGER = manager.logger;
     }
 
@@ -125,13 +124,8 @@ public class ProgramContext {
         return REDSTONE_PULSES;
     }
 
-    /**
-     * We free in reverse order because the {@link InputStatement#inputCheck} needs LIFO ordering for the math to work
-     */
     public void free() {
-        for (int i = INPUTS.size() - 1; i >= 0; i--) {
-            INPUTS.get(i).freeSlots();
-        }
+        INPUTS.forEach(InputStatement::freeSlots);
     }
 
 

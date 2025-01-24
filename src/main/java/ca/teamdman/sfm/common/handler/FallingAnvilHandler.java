@@ -1,11 +1,14 @@
 package ca.teamdman.sfm.common.handler;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMRecipeTypes;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Holder;
 import net.minecraft.core.component.DataComponents;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.FallingBlockEntity;
@@ -13,6 +16,7 @@ import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
@@ -25,157 +29,173 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class FallingAnvilHandler {
     @SubscribeEvent
     public static void onLeave(EntityLeaveLevelEvent event) {
-        if (!(event.getEntity() instanceof FallingBlockEntity fbe)) {
-            return;
-        }
-        if (!(fbe.getBlockState().getBlock() instanceof AnvilBlock)) {
-            return;
-        }
-        var landPosition = fbe.blockPosition();
-        Level level = event.getLevel();
-        if (!level.isLoaded(landPosition.below())) {
-            // avoid problems when the server is shutting down
-            // https://github.com/TeamDman/SuperFactoryManager/issues/114
-            return;
-        }
+        if (event.getEntity() instanceof FallingBlockEntity fbe) {
+            if (fbe.getBlockState().getBlock() instanceof AnvilBlock) {
+                var landPosition = fbe.blockPosition();
+                Level level = event.getLevel();
+                if (!level.isLoaded(landPosition.below())) {
+                    // avoid problems when the server is shutting down
+                    // https://github.com/TeamDman/SuperFactoryManager/issues/114
+                    return;
+                }
+                Block block = level.getBlockState(landPosition.below()).getBlock();
+                if (block == Blocks.IRON_BLOCK) { // create a form
+                    var recipes = level
+                            .getRecipeManager()
+                            .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get());
+                    List<ItemEntity> items = new ArrayList<>();
+                    for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(landPosition))) {
+                        if (e.isAlive() && !e.getItem().isEmpty()) {
+                            items.add(e);
+                        }
+                    }
+                    boolean didForm = false;
 
-        Block block = level.getBlockState(landPosition.below()).getBlock();
-        if (block == Blocks.IRON_BLOCK) { // create a form
-            var items = getItemEntities(level, landPosition);
-            handleCreatePrintingPressForm(level, items, landPosition);
-        } else if (block == Blocks.OBSIDIAN) { // crush and disenchant items
-            List<ItemEntity> items = getItemEntities(level, landPosition);
-            handleEnchantedBookCrushing(items);
-            handleEnchantmentStripping(items, level, landPosition);
-        }
-    }
+                    for (ItemEntity item : items) {
+                        for (RecipeHolder<PrintingPressRecipe> recipe : recipes) {
+                            // check if the item can be turned into a form
+                            if (recipe.value().form().test(item.getItem())) {
+                                didForm = true;
+                                item.setItem(FormItem.getForm(item.getItem()));
+                                break;
+                            }
+                        }
+                    }
+                    if (didForm) {
+                        level.setBlockAndUpdate(landPosition.below(), Blocks.AIR.defaultBlockState());
+                    }
+                } else if (block == Blocks.OBSIDIAN) { // crush and disenchant items
+                    List<ItemEntity> items = new ArrayList<>();
+                    for (ItemEntity itemEntity : level.getEntitiesOfClass(ItemEntity.class, new AABB(landPosition))) {
+                        if (itemEntity.isAlive() && !itemEntity.getItem().isEmpty()) {
+                            items.add(itemEntity);
+                        }
+                    }
 
-    private static void handleEnchantmentStripping(
-            List<ItemEntity> items,
-            Level level,
-            BlockPos landPosition
-    ) {
-        // find enchanted items
-        List<ItemEntity> enchantedItemEntities = items
-                .stream()
-                .filter(entity -> !entity
-                        .getItem()
-                        .getOrDefault(DataComponents.ENCHANTMENTS, ItemEnchantments.EMPTY)
-                        .isEmpty())
-                .toList();
-        if (enchantedItemEntities.isEmpty()) return;
+                    { // crush enchanted books into xp shards
+                        for (ItemEntity e : items) {
+                            if (!e.getItem().is(Items.ENCHANTED_BOOK)) {
+                                continue;
+                            }
 
-        // count how many destination books we have
-        List<ItemEntity> bookEntities = items.stream().filter(e -> e.getItem().is(Items.BOOK)).toList();
-        int booksAvailable = bookEntities.stream().mapToInt(e -> e.getItem().getCount()).sum();
+                            var item = e.getItem();
+                            var enchantments = EnchantmentHelper.getEnchantmentsForCrafting(item);
 
-        // for each enchanted item, strip the enchantments
-        for (ItemEntity enchantedEntity : enchantedItemEntities) {
+                            long shardsForEnchantments = switch (SFMConfig.SERVER.levelsToShards.get()) {
+                                case JustOne -> 1;
+                                case EachOne -> enchantments.size();
+                                case SumLevels -> {
+                                    int sum = 0;
+                                    for (Object2IntMap.Entry<Holder<Enchantment>> holderEntry : enchantments.entrySet()) {
+                                        sum += holderEntry.getIntValue();
+                                    }
+                                    yield sum;
+                                }
+                                case SumLevelsScaledExponentially -> {
+                                    int sum = 0;
+                                    for (Object2IntMap.Entry<Holder<Enchantment>> holderEntry : enchantments.entrySet()) {
+                                        int incr = 1 << Math.max(0, holderEntry.getIntValue() - 1);
+                                        if (sum + incr > 0) {
+                                            sum += incr;
+                                        } else {
+                                            sum = Integer.MAX_VALUE; // lol
+                                        }
+                                    }
+                                    yield sum;
+                                }
+                            };
+                            long count = (long) item.getCount() * shardsForEnchantments;
 
-            ItemStack enchantedStack = enchantedEntity.getItem();
-            int enchantedStackSize = enchantedStack.getCount();
-            ItemEnchantments startingEnchantments = EnchantmentHelper.getEnchantmentsForCrafting(enchantedStack);
-            ItemEnchantments.Mutable resultEnchantments = new ItemEnchantments.Mutable(startingEnchantments);
+                            e.setItem(new ItemStack(
+                                    SFMItems.EXPERIENCE_SHARD_ITEM.get(),
+                                    (int) Math.min(64, count)
+                            ));
 
-            for (var entry : startingEnchantments.entrySet()) {
-                // Get enchantment to strip
-                var enchantmentKind = entry.getKey();
-                var enchantmentLevel = entry.getIntValue();
+                            count -= 64;
+                            while (count > 0) {
+                                e.spawnAtLocation(new ItemStack(
+                                        SFMItems.EXPERIENCE_SHARD_ITEM.get(),
+                                        (int) Math.min(64, count)
+                                ));
+                                count -= 64;
+                            }
+                        }
+                    }
+                    { // remove enchantments from items
+                        List<ItemEntity> bookEntities = new ArrayList<>();
+                        for (ItemEntity item : items) {
+                            if (item.getItem().is(Items.BOOK)) {
+                                bookEntities.add(item);
+                            }
+                        }
+                        int booksAvailable = 0;
+                        for (ItemEntity itemEntity : bookEntities) {
+                            int count = itemEntity.getItem().getCount();
+                            booksAvailable += count;
+                        }
+                        List<ItemEntity> enchanted = new ArrayList<>(items.size());
+                        for (ItemEntity e : items) {
+                            if (!EnchantmentHelper.getEnchantmentsForCrafting(e.getItem()).isEmpty()) {
+                                enchanted.add(e);
+                            }
+                        }
 
-                // Abort when not enough books
-                if (booksAvailable < enchantedStackSize) break;
 
-                // Create enchanted book
-                ItemStack resultBook = new ItemStack(Items.ENCHANTED_BOOK, enchantedStackSize);
-                resultBook.enchant(enchantmentKind, enchantmentLevel);
-                level.addFreshEntity(new ItemEntity(
-                        level,
-                        landPosition.getX(),
-                        landPosition.getY(),
-                        landPosition.getZ(),
-                        resultBook
-                ));
-                booksAvailable -= enchantedStackSize;
+                        for (ItemEntity enchItemEntity : enchanted) {
+                            ItemStack enchStack = enchItemEntity.getItem();
+                            int enchStackSize = enchStack.getCount();
+                            ItemEnchantments.Mutable enchantments = new ItemEnchantments.Mutable(EnchantmentHelper.getEnchantmentsForCrafting(enchStack));
 
-                // Strip the enchantment from the source item
-                //noinspection deprecation
-                resultEnchantments.removeIf(e -> e.is(enchantmentKind));
-                if (resultEnchantments.keySet().isEmpty()) {
-                    break;
+                            var enchIter = enchantments.keySet().iterator();
+                            while (enchIter.hasNext()) {
+                                var key = enchIter.next();
+                                var value = enchantments.getLevel(key);
+                                if (booksAvailable < enchStackSize) break;
+
+                                // Create an enchanted book with the enchantment
+                                ItemStack toSpawn = new ItemStack(Items.ENCHANTED_BOOK, enchStackSize);
+                                toSpawn.enchant(key, value);
+                                level.addFreshEntity(new ItemEntity(
+                                        level,
+                                        landPosition.getX(),
+                                        landPosition.getY(),
+                                        landPosition.getZ(),
+                                        toSpawn
+                                ));
+
+                                // Remove the enchantment from the item
+                                enchIter.remove();
+
+                                booksAvailable -= enchStackSize;
+                            }
+                            EnchantmentHelper.setEnchantments(enchStack, enchantments.toImmutable());
+                        }
+
+                        for (ItemEntity bookEntity : bookEntities) {
+                            bookEntity.kill();
+                        }
+                        while (booksAvailable > 0) {
+                            int toSpawn = Math.min(booksAvailable, 64);
+                            level.addFreshEntity(new ItemEntity(
+                                    level,
+                                    landPosition.getX(),
+                                    landPosition.getY(),
+                                    landPosition.getZ(),
+                                    new ItemStack(Items.BOOK, toSpawn)
+                            ));
+                            booksAvailable -= toSpawn;
+                        }
+                    }
                 }
             }
-
-            // Apply enchantment removal to source item
-            EnchantmentHelper.setEnchantments(enchantedStack, resultEnchantments.toImmutable());
         }
-
-        // Ensure remaining book count correct
-        for (ItemEntity bookEntity : bookEntities) {
-            bookEntity.kill();
-        }
-        while (booksAvailable > 0) {
-            int stackSize = Math.min(booksAvailable, 64);
-            level.addFreshEntity(new ItemEntity(
-                    level,
-                    landPosition.getX(),
-                    landPosition.getY(),
-                    landPosition.getZ(),
-                    new ItemStack(Items.BOOK, stackSize)
-            ));
-            booksAvailable -= stackSize;
-        }
-    }
-
-    private static void handleEnchantedBookCrushing(List<ItemEntity> items) {
-        items
-                .stream()
-                .filter(e -> e.getItem().is(Items.ENCHANTED_BOOK))
-                .forEach(e -> e.setItem(new ItemStack(
-                        SFMItems.EXPERIENCE_SHARD_ITEM.get(),
-                        e.getItem().getCount()
-                )));
-    }
-
-    private static void handleCreatePrintingPressForm(
-            Level level,
-            List<ItemEntity> items,
-            BlockPos landPosition
-    ) {
-        var recipes = level
-                .getRecipeManager()
-                .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get());
-        boolean didForm = false;
-
-        for (ItemEntity item : items) {
-            for (RecipeHolder<PrintingPressRecipe> recipe : recipes) {
-                // check if the item can be turned into a form
-                if (recipe.value().form().test(item.getItem())) {
-                    didForm = true;
-                    item.setItem(FormItem.getForm(item.getItem()));
-                    break;
-                }
-            }
-        }
-        if (didForm) {
-            level.setBlockAndUpdate(landPosition.below(), Blocks.AIR.defaultBlockState());
-        }
-    }
-
-    private static @NotNull List<ItemEntity> getItemEntities(
-            Level level,
-            BlockPos landPosition
-    ) {
-        return level
-                .getEntitiesOfClass(ItemEntity.class, new AABB(landPosition))
-                .stream()
-                .filter(Entity::isAlive)
-                .filter(e -> !e.getItem().isEmpty())
-                .toList();
     }
 }

@@ -1,6 +1,6 @@
 package ca.teamdman.sfm;
 
-import ca.teamdman.sfm.common.SFMConfig;
+import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.registry.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;
@@ -12,6 +12,7 @@ import org.apache.logging.log4j.Logger;
 public class SFM {
     public static final String MOD_ID = "sfm";
     public static final Logger LOGGER = LogManager.getLogger(SFM.MOD_ID);
+    public static final String ISSUE_TRACKER_URL = "https://github.com/TeamDman/SuperFactoryManager/issues";
 
     public SFM(IEventBus bus) {
         SFMBlocks.register(bus);
@@ -19,6 +20,7 @@ public class SFM {
         SFMDataComponents.register(bus);
         SFMCreativeTabs.register(bus);
         SFMResourceTypes.register(bus);
+        SFMProgramLinters.register(bus);
         SFMBlockEntities.register(bus);
         SFMMenus.register(bus);
         SFMRecipeTypes.register(bus);

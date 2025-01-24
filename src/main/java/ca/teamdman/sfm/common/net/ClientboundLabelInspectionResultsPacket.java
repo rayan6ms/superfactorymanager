@@ -1,51 +1,45 @@
 package ca.teamdman.sfm.common.net;
 
-import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.ClientStuff;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraft.network.codec.StreamCodec;
-import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
+import ca.teamdman.sfm.client.ClientScreenHelpers;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ClientboundLabelInspectionResultsPacket(
         String results
-) implements CustomPacketPayload {
-
-    public static final Type<ClientboundLabelInspectionResultsPacket> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(
-            SFM.MOD_ID,
-            "clientbound_label_inspection_results_packet"
-    ));
+) implements SFMPacket {
     public static final int MAX_RESULTS_LENGTH = 50_000;
-    public static final StreamCodec<FriendlyByteBuf, ClientboundLabelInspectionResultsPacket> STREAM_CODEC = StreamCodec.ofMember(
-            ClientboundLabelInspectionResultsPacket::encode,
-            ClientboundLabelInspectionResultsPacket::decode
-    );
 
-    @Override
-    public Type<? extends CustomPacketPayload> type() {
-        return TYPE;
+    public static class Daddy implements SFMPacketDaddy<ClientboundLabelInspectionResultsPacket> {
+        @Override
+        public PacketDirection getPacketDirection() {
+            return PacketDirection.CLIENTBOUND;
+        }
+        @Override
+        public void encode(
+                ClientboundLabelInspectionResultsPacket msg,
+                RegistryFriendlyByteBuf friendlyByteBuf
+        ) {
+            friendlyByteBuf.writeUtf(msg.results(), MAX_RESULTS_LENGTH);
+        }
+
+        @Override
+        public ClientboundLabelInspectionResultsPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
+            return new ClientboundLabelInspectionResultsPacket(
+                    friendlyByteBuf.readUtf(MAX_RESULTS_LENGTH)
+            );
+        }
+
+        @Override
+        public void handle(
+                ClientboundLabelInspectionResultsPacket msg,
+                SFMPacketHandlingContext context
+        ) {
+            ClientScreenHelpers.showProgramEditScreen(msg.results());
+        }
+
+        @Override
+        public Class<ClientboundLabelInspectionResultsPacket> getPacketClass() {
+            return ClientboundLabelInspectionResultsPacket.class;
+        }
     }
 
-    public static void encode(
-            ClientboundLabelInspectionResultsPacket msg,
-            FriendlyByteBuf friendlyByteBuf
-    ) {
-        friendlyByteBuf.writeUtf(msg.results(), MAX_RESULTS_LENGTH);
-    }
-
-    public static ClientboundLabelInspectionResultsPacket decode(FriendlyByteBuf friendlyByteBuf) {
-        return new ClientboundLabelInspectionResultsPacket(
-                friendlyByteBuf.readUtf(MAX_RESULTS_LENGTH)
-        );
-    }
-
-    public static void handle(
-            ClientboundLabelInspectionResultsPacket msg,
-            IPayloadContext context
-    ) {
-        ClientStuff.showProgramEditScreen(msg.results);
-
-    }
 }
-
