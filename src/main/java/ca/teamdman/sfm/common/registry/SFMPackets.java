@@ -20,36 +20,18 @@ public class SFMPackets {
     );
 
     private static int registrationIndex = 0;
-    public static <T extends SFMPacket> void registerServerboundPacket(
-            SFMPacketDaddy<T> packetDaddy
-    ) {
-        SFM_CHANNEL.registerMessage(
-                registrationIndex++,
-                packetDaddy.getPacketClass(),
-                packetDaddy::encode,
-                packetDaddy::decode,
-                packetDaddy::handleOuter
-        );
-    }
-
-    public static <T extends SFMPacket> void registerClientboundPacket(
-            SFMPacketDaddy<T> packetDaddy
-    ) {
-        SFM_CHANNEL.registerMessage(
-                registrationIndex++,
-                packetDaddy.getPacketClass(),
-                packetDaddy::encode,
-                packetDaddy::decode,
-                packetDaddy::handleOuter
-        );
-    }
 
     public static <T extends SFMPacket> void registerPacket(
             SFMPacketDaddy<T> packetDaddy
     ) {
         switch (packetDaddy.getPacketDirection()) {
-            case SERVERBOUND -> registerServerboundPacket(packetDaddy);
-            case CLIENTBOUND -> registerClientboundPacket(packetDaddy);
+            case SERVERBOUND, CLIENTBOUND -> SFM_CHANNEL.registerMessage(
+                    registrationIndex++,
+                    packetDaddy.getPacketClass(),
+                    packetDaddy::encode,
+                    packetDaddy::decode,
+                    packetDaddy::handleOuter
+            );
         }
     }
 
