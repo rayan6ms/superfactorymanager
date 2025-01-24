@@ -18,49 +18,34 @@ import java.util.function.Supplier;
 @Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class SFMPackets {
     private static final IdentityHashMap<Class<? extends SFMPacket>, SFMPacketDaddy<? extends SFMPacket>> DADDY_MAP = new IdentityHashMap<>();
-    private static int registrationIndex = 0;
-
-    public static <T extends SFMPacket> void registerServerboundPacket(
-            IPayloadRegistrar registrar,
-            SFMPacketDaddy<T> packetDaddy
-    ) {
-        DADDY_MAP.put(packetDaddy.getPacketClass(), packetDaddy);
-        registrar.play(
-                new ResourceLocation(SFM.MOD_ID, Integer.toString(registrationIndex++)),
-                buf -> {
-                    T packet = packetDaddy.decode(buf);
-                    return new SFMWrappedPacket<>(packet);
-                },
-                handler -> handler.server(
-                        (packet, context) -> packet.getDaddy().handleOuter(packet.inner(), context)
-                )
-        );
-    }
-
-    public static <T extends SFMPacket> void registerClientboundPacket(
-            IPayloadRegistrar registrar,
-            SFMPacketDaddy<T> packetDaddy
-    ) {
-        DADDY_MAP.put(packetDaddy.getPacketClass(), packetDaddy);
-        registrar.play(
-                new ResourceLocation(SFM.MOD_ID, Integer.toString(registrationIndex++)),
-                buf -> {
-                    T packet = packetDaddy.decode(buf);
-                    return new SFMWrappedPacket<>(packet);
-                },
-                handler -> handler.client(
-                        (packet, context) -> packet.getDaddy().handleOuter(packet.inner(), context)
-                )
-        );
-    }
 
     public static <T extends SFMPacket> void registerPacket(
             IPayloadRegistrar registrar,
             SFMPacketDaddy<T> packetDaddy
     ) {
+        DADDY_MAP.put(packetDaddy.getPacketClass(), packetDaddy);
+        ResourceLocation packetId = getPacketId(packetDaddy.getPacketClass());
         switch (packetDaddy.getPacketDirection()) {
-            case SERVERBOUND -> registerServerboundPacket(registrar, packetDaddy);
-            case CLIENTBOUND -> registerClientboundPacket(registrar, packetDaddy);
+            case SERVERBOUND -> registrar.play(
+                    packetId,
+                    buf -> {
+                        T packet = packetDaddy.decode(buf);
+                        return new SFMWrappedPacket<>(packet);
+                    },
+                    handler -> handler.server(
+                            (packet, context) -> packet.getDaddy().handleOuter(packet.inner(), context)
+                    )
+            );
+            case CLIENTBOUND -> registrar.play(
+                    packetId,
+                    buf -> {
+                        T packet = packetDaddy.decode(buf);
+                        return new SFMWrappedPacket<>(packet);
+                    },
+                    handler -> handler.client(
+                            (packet, context) -> packet.getDaddy().handleOuter(packet.inner(), context)
+                    )
+            );
         }
     }
 
