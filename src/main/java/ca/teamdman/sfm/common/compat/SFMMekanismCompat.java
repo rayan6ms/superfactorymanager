@@ -95,7 +95,7 @@ public class SFMMekanismCompat {
             if (!outputSides.isEmpty()) {
                 sb
                         .append("-- ")
-                        .append(LocalizationKeys.CONTAINER_INSPECTOR_MEKANISM_MACHINE_OUTPUTS.getString())
+                        .append(LocalizationKeys.CONTAINER_INSPECTOR_MEKANISM_MACHINE_OUTPUTS.getStub())
                         .append("\n");
                 sb.append("INPUT ").append(resourceTypeKey.location()).append(":: FROM target ");
                 sb.append(outputSides
@@ -118,7 +118,7 @@ public class SFMMekanismCompat {
             if (!inputSides.isEmpty()) {
                 sb
                         .append("-- ")
-                        .append(LocalizationKeys.CONTAINER_INSPECTOR_MEKANISM_MACHINE_INPUTS.getString())
+                        .append(LocalizationKeys.CONTAINER_INSPECTOR_MEKANISM_MACHINE_INPUTS.getStub())
                         .append("\n");
                 sb.append("OUTPUT ").append(resourceTypeKey.location()).append(":: TO target ");
                 sb.append(inputSides
