@@ -162,19 +162,6 @@ public class SFMMekanismCompat {
         );
     }
 
-    public static void configureTopBottomIO(TileComponentConfig config) {
-        for (TransmissionType transmissionType : TransmissionType.values()) {
-            ConfigInfo info = config.getConfig(transmissionType);
-            if (info == null) continue;
-            info.setDataType(DataType.INPUT, RelativeSide.TOP);
-            info.setDataType(DataType.OUTPUT, RelativeSide.BOTTOM);
-            info.addDisabledSides(RelativeSide.FRONT, RelativeSide.BACK, RelativeSide.LEFT, RelativeSide.RIGHT);
-            for (RelativeSide side : RelativeSide.values()) {
-                config.sideChanged(transmissionType, side);
-            }
-        }
-    }
-
     public static void configureExclusiveIO(
             ISideConfiguration mekanismBlockEntity,
             TransmissionType transmissionType,
