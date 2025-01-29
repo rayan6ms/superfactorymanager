@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.client.gui.screen;
 
-import ca.teamdman.sfm.common.SFMConfig;
+import ca.teamdman.sfm.client.gui.ButtonBuilder;
+import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfml.ast.Program;
@@ -45,7 +46,7 @@ public class ExamplesScreen extends Screen {
             try (BufferedReader reader = entry.getValue().openAsReader()) {
                 String program = reader.lines().collect(Collectors.joining("\n"));
                 if (program.contains("$REPLACE_RESOURCE_TYPES_HERE$")) {
-                    List<? extends String> disallowedResourceTypesForTransfer = SFMConfig.getOrDefault(SFMConfig.COMMON.disallowedResourceTypesForTransfer);
+                    List<? extends String> disallowedResourceTypesForTransfer = SFMConfig.getOrDefault(SFMConfig.SERVER.disallowedResourceTypesForTransfer);
                     var replacement = SFMResourceTypes.DEFERRED_TYPES.keySet()
                             .stream()
                             .map(ResourceLocation::getPath)
@@ -95,16 +96,15 @@ public class ExamplesScreen extends Screen {
                         + paddingX
                 );
                 int y = 50 + (i / buttonsPerRow) * (buttonHeight + paddingY);
-                addRenderableWidget(
-                        Button.builder(
-                                        Component.literal(entry.getKey()),
-                                        btn -> {
-                                            onClose();
-                                            CALLBACK.accept(entry.getValue(), templatePrograms);
-                                        }
-                                )
-                                .pos(x, y)
-                                .size(buttonWidth, buttonHeight)
+                this.addRenderableWidget(
+                        new ButtonBuilder()
+                                .setText(Component.literal(entry.getKey()))
+                                .setOnPress(btn -> {
+                                    onClose();
+                                    CALLBACK.accept(entry.getValue(), templatePrograms);
+                                })
+                                .setPosition(x, y)
+                                .setSize(buttonWidth, buttonHeight)
                                 .build()
                 );
                 i++;

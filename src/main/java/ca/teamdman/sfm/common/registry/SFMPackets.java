@@ -2,211 +2,145 @@ package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.net.*;
-import net.minecraft.core.BlockPos;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.inventory.AbstractContainerMenu;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
-import net.neoforged.neoforge.network.handling.IPayloadContext;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 
-import javax.annotation.Nullable;
-import java.util.function.BiConsumer;
+import java.util.IdentityHashMap;
+import java.util.function.Supplier;
 
 @EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class SFMPackets {
+    private static final IdentityHashMap<Class<? extends SFMPacket>, SFMPacketDaddy<? extends SFMPacket>> DADDY_MAP = new IdentityHashMap<>();
+    private static final IdentityHashMap<Class<? extends SFMPacket>, CustomPacketPayload.Type<? extends SFMWrappedPacket<? extends SFMPacket>>> TYPE_MAP = new IdentityHashMap<>();
+
+    @SuppressWarnings("ExtractMethodRecommender")
+    public static <T extends SFMPacket> void registerPacket(
+            PayloadRegistrar registrar,
+            SFMPacketDaddy<T> packetDaddy
+    ) {
+        // track the daddy
+        DADDY_MAP.put(packetDaddy.getPacketClass(), packetDaddy);
+
+        // create and track the packet type
+        ResourceLocation packetId = getPacketId(packetDaddy.getPacketClass());
+        CustomPacketPayload.Type<SFMWrappedPacket<T>> type = new CustomPacketPayload.Type<>(packetId);
+        TYPE_MAP.put(packetDaddy.getPacketClass(), type);
+
+        // create the codec
+        StreamCodec<RegistryFriendlyByteBuf, T> codec = StreamCodec.ofMember(
+                packetDaddy::encode,
+                packetDaddy::decode
+        );
+        StreamCodec<RegistryFriendlyByteBuf, SFMWrappedPacket<T>> wrappedCodec = StreamCodec.ofMember(
+                (wrappedPacket, friendlyByteBuf) -> wrappedPacket
+                        .getDaddy()
+                        .encode(wrappedPacket.inner, friendlyByteBuf),
+                (buf) -> {
+                    T packet = codec.decode(buf);
+                    return new SFMWrappedPacket<>(packet);
+                }
+        );
+
+        // register the packet
+        switch (packetDaddy.getPacketDirection()) {
+            case SERVERBOUND -> registrar.playToServer(
+                    type,
+                    wrappedCodec,
+                    (msg, ctx) -> packetDaddy.handleOuter(msg.inner, ctx)
+            );
+            case CLIENTBOUND -> registrar.playToClient(
+                    type,
+                    wrappedCodec,
+                    (msg, ctx) -> packetDaddy.handleOuter(msg.inner, ctx)
+            );
+        }
+    }
+
     @SubscribeEvent
     public static void register(final RegisterPayloadHandlersEvent event) {
         final PayloadRegistrar registrar = event.registrar(SFM.MOD_ID)
                 .versioned("1.0.0");
-        registrar.playToServer(
-                ServerboundManagerProgramPacket.TYPE,
-                ServerboundManagerProgramPacket.STREAM_CODEC,
-                ServerboundManagerProgramPacket::handle
-        );
-        registrar.playToServer(
-                ServerboundManagerResetPacket.TYPE,
-                ServerboundManagerResetPacket.STREAM_CODEC,
-                ServerboundManagerResetPacket::handle
-        );
-        registrar.playToServer(
-                ServerboundManagerFixPacket.TYPE,
-                ServerboundManagerFixPacket.STREAM_CODEC,
-                ServerboundManagerFixPacket::handle
-        );
-
-        registrar.playToClient(
-                ClientboundManagerGuiUpdatePacket.TYPE,
-                ClientboundManagerGuiUpdatePacket.STREAM_CODEC,
-                ClientboundManagerGuiUpdatePacket::handle
-        );
-        registrar.playToServer(
-                ServerboundManagerSetLogLevelPacket.TYPE,
-                ServerboundManagerSetLogLevelPacket.STREAM_CODEC,
-                ServerboundManagerSetLogLevelPacket::handle
-        );
-        registrar.playToServer(
-                ServerboundManagerClearLogsPacket.TYPE,
-                ServerboundManagerClearLogsPacket.STREAM_CODEC,
-                ServerboundManagerClearLogsPacket::handle
-        );
-        registrar.playToServer(
-                ServerboundManagerLogDesireUpdatePacket.TYPE,
-                ServerboundManagerLogDesireUpdatePacket.STREAM_CODEC,
-                ServerboundManagerLogDesireUpdatePacket::handle
-        );
-        registrar.playToClient(
-                ClientboundManagerLogsPacket.TYPE,
-                ClientboundManagerLogsPacket.STREAM_CODEC,
-                ClientboundManagerLogsPacket::handle
-        );
-        registrar.playToServer(
-                ServerboundManagerRebuildPacket.TYPE,
-                ServerboundManagerRebuildPacket.STREAM_CODEC,
-                ServerboundManagerRebuildPacket::handle
-        );
-        registrar.playToClient(
-                ClientboundManagerLogLevelUpdatedPacket.TYPE,
-                ClientboundManagerLogLevelUpdatedPacket.STREAM_CODEC,
-                ClientboundManagerLogLevelUpdatedPacket::handle
-        );
-
-        registrar.playToServer(
-                ServerboundLabelGunUpdatePacket.TYPE,
-                ServerboundLabelGunUpdatePacket.STREAM_CODEC,
-                ServerboundLabelGunUpdatePacket::handle
-        );
-        registrar.playToServer(
-                ServerboundLabelGunPrunePacket.TYPE,
-                ServerboundLabelGunPrunePacket.STREAM_CODEC,
-                ServerboundLabelGunPrunePacket::handle
-        );
-        registrar.playToServer(
-                ServerboundLabelGunClearPacket.TYPE,
-                ServerboundLabelGunClearPacket.STREAM_CODEC,
-                ServerboundLabelGunClearPacket::handle
-        );
-        registrar.playToServer(
-                ServerboundLabelGunShowActiveLabelPacket.TYPE,
-                ServerboundLabelGunShowActiveLabelPacket.STREAM_CODEC,
-                ServerboundLabelGunShowActiveLabelPacket::handle
-        );
-        registrar.playToServer(
-                ServerboundLabelGunUsePacket.TYPE,
-                ServerboundLabelGunUsePacket.STREAM_CODEC,
-                ServerboundLabelGunUsePacket::handle
-        );
-
-        registrar.playToServer(
-                ServerboundDiskItemSetProgramPacket.TYPE,
-                ServerboundDiskItemSetProgramPacket.STREAM_CODEC,
-                ServerboundDiskItemSetProgramPacket::handle
-        );
-
-        registrar.playToServer(
-                ServerboundContainerExportsInspectionRequestPacket.TYPE,
-                ServerboundContainerExportsInspectionRequestPacket.STREAM_CODEC,
-                ServerboundContainerExportsInspectionRequestPacket::handle
-        );
-        registrar.playToClient(
-                ClientboundContainerExportsInspectionResultsPacket.TYPE,
-                ClientboundContainerExportsInspectionResultsPacket.STREAM_CODEC,
-                ClientboundContainerExportsInspectionResultsPacket::handle
-        );
-        registrar.playToServer(
-                ServerboundLabelInspectionRequestPacket.TYPE,
-                ServerboundLabelInspectionRequestPacket.STREAM_CODEC,
-                ServerboundLabelInspectionRequestPacket::handle
-        );
-        registrar.playToClient(
-                ClientboundLabelInspectionResultsPacket.TYPE,
-                ClientboundLabelInspectionResultsPacket.STREAM_CODEC,
-                ClientboundLabelInspectionResultsPacket::handle
-        );
-        registrar.playToServer(
-                ServerboundInputInspectionRequestPacket.TYPE,
-                ServerboundInputInspectionRequestPacket.STREAM_CODEC,
-                ServerboundInputInspectionRequestPacket::handle
-        );
-        registrar.playToClient(
-                ClientboundInputInspectionResultsPacket.TYPE,
-                ClientboundInputInspectionResultsPacket.STREAM_CODEC,
-                ClientboundInputInspectionResultsPacket::handle
-        );
-        registrar.playToServer(
-                ServerboundOutputInspectionRequestPacket.TYPE,
-                ServerboundOutputInspectionRequestPacket.STREAM_CODEC,
-                ServerboundOutputInspectionRequestPacket::handle
-        );
-        registrar.playToClient(
-                ClientboundOutputInspectionResultsPacket.TYPE,
-                ClientboundOutputInspectionResultsPacket.STREAM_CODEC,
-                ClientboundOutputInspectionResultsPacket::handle
-        );
-        registrar.playToServer(
-                ServerboundNetworkToolUsePacket.TYPE,
-                ServerboundNetworkToolUsePacket.STREAM_CODEC,
-                ServerboundNetworkToolUsePacket::handle
-        );
-        registrar.playToServer(
-                ServerboundIfStatementInspectionRequestPacket.TYPE,
-                ServerboundIfStatementInspectionRequestPacket.STREAM_CODEC,
-                ServerboundIfStatementInspectionRequestPacket::handle
-        );
-        registrar.playToClient(
-                ClientboundIfStatementInspectionResultsPacket.TYPE,
-                ClientboundIfStatementInspectionResultsPacket.STREAM_CODEC,
-                ClientboundIfStatementInspectionResultsPacket::handle
-        );
-        registrar.playToServer(
-                ServerboundBoolExprStatementInspectionRequestPacket.TYPE,
-                ServerboundBoolExprStatementInspectionRequestPacket.STREAM_CODEC,
-                ServerboundBoolExprStatementInspectionRequestPacket::handle
-        );
-        registrar.playToClient(
-                ClientboundBoolExprStatementInspectionResultsPacket.TYPE,
-                ClientboundBoolExprStatementInspectionResultsPacket.STREAM_CODEC,
-                ClientboundBoolExprStatementInspectionResultsPacket::handle
-        );
-        registrar.playToServer(
-                ServerboundFacadePacket.TYPE,
-                ServerboundFacadePacket.STREAM_CODEC,
-                ServerboundFacadePacket::handle
-        );
+        registerPacket(registrar, new ClientboundBoolExprStatementInspectionResultsPacket.Daddy());
+        registerPacket(registrar, new ClientboundClientConfigCommandPacket.Daddy());
+        registerPacket(registrar, new ClientboundContainerExportsInspectionResultsPacket.Daddy());
+        registerPacket(registrar, new ClientboundIfStatementInspectionResultsPacket.Daddy());
+        registerPacket(registrar, new ClientboundInputInspectionResultsPacket.Daddy());
+        registerPacket(registrar, new ClientboundLabelInspectionResultsPacket.Daddy());
+        registerPacket(registrar, new ClientboundManagerGuiUpdatePacket.Daddy());
+        registerPacket(registrar, new ClientboundManagerLogLevelUpdatedPacket.Daddy());
+        registerPacket(registrar, new ClientboundManagerLogsPacket.Daddy());
+        registerPacket(registrar, new ClientboundOutputInspectionResultsPacket.Daddy());
+        registerPacket(registrar, new ClientboundServerConfigCommandPacket.Daddy());
+        registerPacket(registrar, new ClientboundShowChangelogPacket.Daddy());
+        registerPacket(registrar, new ServerboundBoolExprStatementInspectionRequestPacket.Daddy());
+        registerPacket(registrar, new ServerboundServerConfigRequestPacket.Daddy());
+        registerPacket(registrar, new ServerboundContainerExportsInspectionRequestPacket.Daddy());
+        registerPacket(registrar, new ServerboundDiskItemSetProgramPacket.Daddy());
+        registerPacket(registrar, new ServerboundFacadePacket.Daddy());
+        registerPacket(registrar, new ServerboundIfStatementInspectionRequestPacket.Daddy());
+        registerPacket(registrar, new ServerboundInputInspectionRequestPacket.Daddy());
+        registerPacket(registrar, new ServerboundLabelGunClearPacket.Daddy());
+        registerPacket(registrar, new ServerboundLabelGunPrunePacket.Daddy());
+        registerPacket(registrar, new ServerboundLabelGunToggleLabelViewPacket.Daddy());
+        registerPacket(registrar, new ServerboundLabelGunUpdatePacket.Daddy());
+        registerPacket(registrar, new ServerboundLabelGunUsePacket.Daddy());
+        registerPacket(registrar, new ServerboundLabelInspectionRequestPacket.Daddy());
+        registerPacket(registrar, new ServerboundManagerClearLogsPacket.Daddy());
+        registerPacket(registrar, new ServerboundManagerFixPacket.Daddy());
+        registerPacket(registrar, new ServerboundManagerLogDesireUpdatePacket.Daddy());
+        registerPacket(registrar, new ServerboundManagerProgramPacket.Daddy());
+        registerPacket(registrar, new ServerboundManagerRebuildPacket.Daddy());
+        registerPacket(registrar, new ServerboundManagerResetPacket.Daddy());
+        registerPacket(registrar, new ServerboundManagerSetLogLevelPacket.Daddy());
+        registerPacket(registrar, new ServerboundNetworkToolToggleOverlayPacket.Daddy());
+        registerPacket(registrar, new ServerboundNetworkToolUsePacket.Daddy());
+        registerPacket(registrar, new ServerboundOutputInspectionRequestPacket.Daddy());
+        registerPacket(registrar, new ServerboundServerConfigUpdatePacket.Daddy());
     }
 
-    public static <MENU extends AbstractContainerMenu, BE extends BlockEntity> void handleServerboundContainerPacket(
-            @Nullable IPayloadContext context,
-            Class<MENU> menuClass,
-            Class<BE> blockEntityClass,
-            BlockPos pos,
-            int containerId,
-            BiConsumer<MENU, BE> callback
+    public static void sendToServer(
+            SFMPacket packet
     ) {
-        if (context == null) return;
-        // TODO: log return cases about invalid packet received
-        {
-            if (!(context.player() instanceof ServerPlayer sender)) {
-                return;
-            }
-            if (sender.isSpectator()) return; // ignore packets from spectators
+        PacketDistributor.sendToServer(new SFMWrappedPacket<>(packet));
+    }
 
-            var menu = sender.containerMenu;
-            if (!menuClass.isInstance(menu)) return;
-            if (menu.containerId != containerId) return;
+    public static void sendToPlayer(
+            Supplier<ServerPlayer> player,
+            SFMPacket packet
+    ) {
+        PacketDistributor.sendToPlayer(player.get(), new SFMWrappedPacket<>(packet));
+    }
 
-            //noinspection resource
-            var level = sender.level();
-            //noinspection ConstantValue
-            if (level == null) return;
-            if (!level.isLoaded(pos)) return;
+    public static void sendToPlayer(
+            ServerPlayer player,
+            SFMPacket packet
+    ) {
+        PacketDistributor.sendToPlayer(player, new SFMWrappedPacket<>(packet));
+    }
 
-            var blockEntity = level.getBlockEntity(pos);
-            if (!blockEntityClass.isInstance(blockEntity)) return;
+    private static ResourceLocation getPacketId(Class<? extends SFMPacket> clazz) {
+        return ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, clazz.getSimpleName().toLowerCase());
+    }
+
+    private record SFMWrappedPacket<T extends SFMPacket>(T inner) implements CustomPacketPayload {
+        public SFMPacketDaddy<T> getDaddy() {
             //noinspection unchecked
-            callback.accept((MENU) menu, (BE) blockEntity);
+            return (SFMPacketDaddy<T>) DADDY_MAP.get(inner.getClass());
         }
+
+        @Override
+        public Type<? extends CustomPacketPayload> type() {
+            return TYPE_MAP.get(inner.getClass());
+        }
+
     }
 }

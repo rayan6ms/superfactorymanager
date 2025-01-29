@@ -1,11 +1,15 @@
 package ca.teamdman.sfm.gametest.compat.mekanism;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.gametest.SFMGameTestBase;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
+import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.gametest.SFMGameTestBase;
+import ca.teamdman.sfm.gametest.declarative.SFMDeclarativeTestBuilder;
+import ca.teamdman.sfm.gametest.declarative.SFMTestSpec;
+import ca.teamdman.sfm.gametest.declarative.TestBlockDef;
 import mekanism.api.RelativeSide;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.common.lib.transmitter.TransmissionType;
@@ -21,8 +25,8 @@ import mekanism.common.tile.base.TileEntityMekanism;
 import mekanism.common.tile.component.TileComponentConfig;
 import mekanism.common.tile.component.config.ConfigInfo;
 import mekanism.common.tile.component.config.DataType;
-import mekanism.common.tile.prefab.TileEntityConfigurableMachine;
 import mekanism.common.tile.multiblock.TileEntityInductionPort;
+import mekanism.common.tile.prefab.TileEntityConfigurableMachine;
 import mekanism.common.util.UnitDisplayUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -38,15 +42,13 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
-@SuppressWarnings({"OptionalGetWithoutIsPresent", "DuplicatedCode", "DataFlowIssue"})
+@SuppressWarnings({"DuplicatedCode", "DataFlowIssue"})
 @GameTestHolder(SFM.MOD_ID)
-@PrefixGameTestTemplate(false)
 public class SFMMekanismCompatGameTests extends SFMGameTestBase {
     private static void set_all_io(TileComponentConfig config) {
         for (TransmissionType type : TransmissionType.values()) {
@@ -101,7 +103,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .add("a", helper.absolutePos(leftPos))
                 .add("b", helper.absolutePos(rightPos))
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
 
         // ensure it can move into an empty tank
@@ -141,7 +143,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .add("a", helper.absolutePos(leftPos))
                 .add("b", helper.absolutePos(rightPos))
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
 
         // ensure it can move when there's already some in the destination
@@ -181,7 +183,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .add("a", helper.absolutePos(leftPos))
                 .add("b", helper.absolutePos(rightPos))
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         // ensure it can move into a nearly full tank
         leftTank.getChemicalTank().setStack(new ChemicalStack(MekanismChemicals.REDSTONE.get(), 2_000_000L));
@@ -230,7 +232,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .add("a", helper.absolutePos(leftPos))
                 .add("b", helper.absolutePos(rightPos))
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         left.getBinSlot().setStack(new ItemStack(Items.COAL, BinTier.ULTIMATE.getStorage()));
         right.getBinSlot().setEmpty();
@@ -271,7 +273,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .add("a", helper.absolutePos(leftPos))
                 .add("b", helper.absolutePos(rightPos))
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         left.getBinSlot().setStack(new ItemStack(Items.DIAMOND, 100));
         right.getBinSlot().setStack(new ItemStack(Items.DIAMOND, 100));
@@ -312,7 +314,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .add("a", helper.absolutePos(leftPos))
                 .add("b", helper.absolutePos(rightPos))
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         left.getBinSlot().setStack(new ItemStack(Items.STICK, BinTier.ULTIMATE.getStorage()));
         right.getBinSlot().setStack(new ItemStack(Items.STICK, BinTier.ULTIMATE.getStorage() - 32));
@@ -355,7 +357,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .add("a", helper.absolutePos(leftPos))
                 .add("b", helper.absolutePos(rightPos))
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         left.setEnergy(0, EnergyCubeTier.ULTIMATE.getMaxEnergy());
         right.setEnergy(0, 0);
@@ -394,7 +396,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .add("a", helper.absolutePos(leftPos))
                 .add("b", helper.absolutePos(rightPos))
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         left.setEnergy(0, 1_000);
         right.setEnergy(0, 1_000);
@@ -433,7 +435,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .add("a", helper.absolutePos(leftPos))
                 .add("b", helper.absolutePos(rightPos))
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         left.setEnergy(0, EnergyCubeTier.ULTIMATE.getMaxEnergy());
         right.setEnergy(0, EnergyCubeTier.ULTIMATE.getMaxEnergy() - (1_000));
@@ -477,7 +479,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .add("a", helper.absolutePos(leftPos))
                 .add("b", helper.absolutePos(rightPos))
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         left.setEnergy(0, 100);
         right.setEnergy(0, 0);
@@ -527,7 +529,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         // create the program
         var program = """
                     NAME "many inventory lag test"
-
+                
                     EVERY 20 TICKS DO
                         INPUT fluid:*:* FROM source
                         OUTPUT fluid:*:* TO dest TOP SIDE
@@ -538,7 +540,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .addAll("source", sourceBlocks.stream().map(helper::absolutePos).toList())
                 .addAll("dest", destBlocks.stream().map(helper::absolutePos).toList())
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         // load the program
         manager.setProgram(program);
@@ -601,7 +603,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
                 .add("a", helper.absolutePos(a2Pos))
                 .add("b", helper.absolutePos(b1Pos))
                 .add("b", helper.absolutePos(b2Pos))
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
             assertTrue(a1.getFluidInTank(0).isEmpty(), "a1 did not empty");
@@ -671,7 +673,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         LabelPositionHolder.empty()
                 .addAll("source", List.of(helper.absolutePos(powerCubePos)))
                 .addAll("dest", List.of(helper.absolutePos(inductionInput)))
-                .save(manager.getDisk().get());
+                .save(manager.getDisk());
 
         // we can't prefill since we can't wait a delay AND use succeedIfManagerDidThing
         // pre-fill the matrix by a little bit
@@ -696,4 +698,46 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
             );
         });
     }
+
+    @GameTest(template = "3x2x1")
+    public static void mek_cube(GameTestHelper helper) {
+        SFMTestSpec spec = new SFMTestSpec()
+                .setProgram("""
+                                        EVERY 20 TICKS DO
+                                            INPUT fe:: FROM a BOTTOM SIDE
+                                            OUTPUT fe:: TO b TOP SIDE
+                                        END
+                                    """)
+                .addBlock(TestBlockDef.<TileEntityEnergyCube>of(
+                        "a",
+                        new BlockPos(1, 0, 0),
+                        mekanism.common.registries.MekanismBlocks.BASIC_ENERGY_CUBE.getBlock(),
+                        (tileEntityCube) -> {
+                            tileEntityCube.setEnergy(0, SFMMekanismCompat.createForgeEnergy(1000));
+                            SFMMekanismCompat.configureExclusiveIO(
+                                    tileEntityCube,
+                                    TransmissionType.ENERGY,
+                                    RelativeSide.BOTTOM,
+                                    DataType.OUTPUT
+                            );
+                        }
+                ))
+                .addBlock(TestBlockDef.<TileEntityEnergyCube>of(
+                        "b",
+                        new BlockPos(-1, 0, 0),
+                        mekanism.common.registries.MekanismBlocks.BASIC_ENERGY_CUBE.getBlock(),
+                        (tileEntityCube) -> SFMMekanismCompat.configureExclusiveIO(
+                                tileEntityCube,
+                                TransmissionType.ENERGY,
+                                RelativeSide.TOP,
+                                DataType.INPUT
+                        )
+                ))
+                .preCondition("ONE a HAS EQ 1000 fe::")
+                .preCondition("ONE b HAS EQ 0 fe::")
+                .postCondition("ONE a HAS EQ 0 fe::")
+                .postCondition("ONE b HAS EQ 1000 fe::");
+        new SFMDeclarativeTestBuilder(helper, spec).run();
+    }
+
 }

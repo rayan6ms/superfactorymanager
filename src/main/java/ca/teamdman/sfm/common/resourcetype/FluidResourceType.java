@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.resourcetype;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.Mth;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.material.Fluid;
@@ -55,10 +56,18 @@ public class FluidResourceType extends ResourceType<FluidStack, Fluid, IFluidHan
     }
 
     @Override
-    public FluidStack extract(IFluidHandler handler, int slot, long amount, boolean simulate) {
-        var in          = getStackInSlot(handler, slot);
-        int finalAmount = amount > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) amount;
-        var toExtract   = new FluidStack(in.getFluid(), Math.min(in.getAmount(), finalAmount));
+    public FluidStack extract(
+            IFluidHandler handler,
+            int slot,
+            long amount_long,
+            boolean simulate
+    ) {
+        var in = getStackInSlot(handler, slot);
+        var toExtract = new FluidStack(
+                in.getFluidHolder(),
+                (int) Mth.clamp(amount_long, Integer.MIN_VALUE, Integer.MAX_VALUE),
+                in.getComponentsPatch()
+        );
         return handler.drain(
                 toExtract,
                 simulate ? IFluidHandler.FluidAction.SIMULATE : IFluidHandler.FluidAction.EXECUTE
@@ -92,11 +101,10 @@ public class FluidResourceType extends ResourceType<FluidStack, Fluid, IFluidHan
 
     @Override
     public FluidStack insert(IFluidHandler handler, int slot, FluidStack stack, boolean simulate) {
-        //todo: PR to forge to add a method that takes tank slot index
-        var x = handler.fill(stack, simulate ? IFluidHandler.FluidAction.SIMULATE : IFluidHandler.FluidAction.EXECUTE);
-
-        // convert units to find amount NOT inserted
-        return new FluidStack(stack.getFluid(), stack.getAmount() - x);
+        // fluid handlers return the amount moved, not the remainder, so we have to convert
+        var inserted = handler.fill(stack, simulate ? IFluidHandler.FluidAction.SIMULATE : IFluidHandler.FluidAction.EXECUTE);
+        int remainder = stack.getAmount() - inserted;
+        return new FluidStack(stack.getFluidHolder(), remainder, stack.getComponentsPatch());
     }
 
     @Override

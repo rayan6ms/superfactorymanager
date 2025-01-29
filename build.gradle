@@ -5,6 +5,7 @@ plugins {
     id 'maven-publish'
     id 'net.neoforged.gradle.userdev' version '7.0.145'
     id 'antlr'
+    id 'application'
 }
 
 tasks.named('wrapper', Wrapper).configure {
@@ -14,37 +15,6 @@ tasks.named('wrapper', Wrapper).configure {
     // file size for Gradle. If you do switch this to ALL, run the Gradle wrapper task twice afterwards.
     // (Verify by checking gradle/wrapper/gradle-wrapper.properties to see if distributionUrl now points to `-all`)
     distributionType = Wrapper.DistributionType.BIN
-}
-
-version = mod_version
-group = mod_group_id
-
-repositories {
-    mavenLocal()
-
-//    maven {
-//        name 'jei'
-//        url 'https://dvs1.progwml6.com/files/maven'
-//    }
-//
-    maven {
-        name 'CurseMaven'
-        url 'https://www.cursemaven.com'
-        content {
-            includeGroup 'curse.maven'
-        }
-    }
-
-    maven {
-        name 'mekanism'
-        url 'https://modmaven.dev/'
-    }
-
-//    maven {
-//        name 'thermal'
-//        url 'https://maven.covers1624.net/'
-//        // https://nexus.covers1624.net/#browse/browse:cofh-releases
-//    }
 }
 
 base {
@@ -64,11 +34,16 @@ sourceSets {
             srcDirs += "src/generated/resources"
             srcDirs += "src/main/resources"
             exclude ".cache"
-
         }
 
         java {
             exclude "ca/teamdman/sfm/client/jei/**"
+            exclude "ca/teamdman/sfm/common/resourcetype/exclude/**"
+//            exclude "ca/teamdman/sfm/common/compat/SFMMekanismCompat.java"
+        }
+        java {
+            exclude "ca/teamdman/sfm/common/capabilityprovidermapper/ae2/**"
+//            exclude "ca/teamdman/sfm/common/program/linting/MekanismSideConfigProgramLinter.java"
         }
     }
     // https://docs.gradle.org/current/userguide/java_testing.html#sec:configuring_java_integration_tests
@@ -78,10 +53,16 @@ sourceSets {
     gametest {
         java {
             srcDir "src/gametest/java"
+//            exclude "ca/teamdman/sfm/gametest/compat/**"
+            exclude "ca/teamdman/sfm/gametest/compat/industrialforegoing"
+            exclude "ca/teamdman/sfm/gametest/compat/multiple"
+            exclude "ca/teamdman/sfm/gametest/compat/thermal"
+            exclude "ca/teamdman/sfm/gametest/ai/**"
         }
         compileClasspath += main.output
         resources {
             srcDirs += "src/gametest/resources"
+            exclude "README.md"
         }
     }
     datagen {
@@ -151,6 +132,17 @@ runs {
         systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
     }
 
+    client_teamy {
+//        https://discord.com/channels/313125603924639766/1232440595738529913/1246122881516048445
+        configure('client')
+
+        modSource project.sourceSets.gametest
+        // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+
+        programArguments '--username', 'TeamDman', '--uuid', '83f1df8b-0ba3-4de0-8a26-e51a1fd74318', '--width', '1708', '--height', '960'
+    }
+
     server {
         systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         programArgument '--nogui'
@@ -175,6 +167,40 @@ runs {
 }
 
 
+repositories {
+    // Put repositories for dependencies here
+    // ForgeGradle automatically adds the Forge maven and Maven Central for you
+
+    // If you have mod jar dependencies in ./libs, you can declare them as a repository like so.
+    // See https://docs.gradle.org/current/userguide/declaring_repositories.html#sub:flat_dir_resolver
+    // flatDir {
+    //     dir 'libs'
+    // }
+
+    maven {
+        name 'jei'
+        url 'https://dvs1.progwml6.com/files/maven'
+    }
+
+    maven {
+        name 'CurseMaven'
+        url 'https://www.cursemaven.com'
+        content {
+            includeGroup 'curse.maven'
+        }
+    }
+
+    maven {
+        name 'mekanism'
+        url 'https://modmaven.dev/'
+    }
+
+    maven {
+        name 'thermal'
+        url 'https://maven.covers1624.net/'
+        // https://nexus.covers1624.net/#browse/browse:cofh-releases
+    }
+}
 
 dependencies {
     // Specify the version of Minecraft to use.
@@ -206,10 +232,16 @@ dependencies {
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-
     antlr 'org.antlr:antlr4:4.13.1'
+    testImplementation 'com.github.javaparser:javaparser-symbol-solver-core:3.26.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
+
+    // add benchmarking dependencies
+    testImplementation 'org.openjdk.jmh:jmh-core:1.37'
+    testImplementation 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
+    testImplementation 'org.openjdk.jmh:jmh-generator-bytecode:1.37'
+    testAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
 
 //    runtimeOnly "curse.maven:easy-villagers-400514:5153632" // Easy Villagers 1.20.4-1.1.4
 
@@ -226,24 +258,46 @@ dependencies {
 // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
 tasks.withType(ProcessResources).configureEach {
     var replaceProperties = [
-            minecraft_version      : minecraft_version,
+            minecraft_version   : minecraft_version,
             minecraft_version_range: minecraft_version_range,
-            neo_version            : neo_version,
-            neo_version_range      : neo_version_range,
-            loader_version_range   : loader_version_range,
-            mod_id                 : mod_id,
-            mod_name               : mod_name,
-            mod_license            : mod_license,
-            mod_version            : mod_version,
-            mod_authors            : mod_authors,
-            mod_description        : mod_description
+            neo_version         : neo_version,
+            neo_version_range: neo_version_range,
+            loader_version_range: loader_version_range,
+            mod_id              : mod_id,
+            mod_name: mod_name,
+            mod_license: mod_license,
+            mod_version: mod_version,
+            mod_authors         : mod_authors,
+            mod_description: mod_description,
+            mod_issue_tracker: mod_issue_tracker,
     ]
     inputs.properties replaceProperties
 
-    filesMatching(['META-INF/neoforge.mods.toml']) {
-        expand replaceProperties
+    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
     }
+
+    // prevent duplicate resource issues from additional sourceSets
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
+}
+
+test {
+    useJUnitPlatform()
+}
+
+// Example for how to get properties into the manifest for reading at runtime.
+jar {
+    manifest {
+        attributes([
+                "Specification-Title"     : mod_id,
+                "Specification-Vendor"    : mod_authors,
+                "Specification-Version"   : "1", // We are version 1 of ourselves
+                "Implementation-Title"    : project.name,
+                "Implementation-Version"  : project.jar.archiveVersion,
+                "Implementation-Vendor"   : mod_authors,
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
 }
 
 // Example configuration to allow publishing using the maven-publish plugin
@@ -270,10 +324,21 @@ test {
 }
 
 generateGrammarSource {
-    arguments = ["-visitor", "-package", "ca.teamdman.sfml"]
-    outputDirectory = file("${project.buildDir}/generated-src/antlr/main/ca/teamdman/sfml")
+    arguments = [
+            "-visitor",
+            "-Xexact-output-dir" // https://stackoverflow.com/a/79058733/11141271 fixes "can't find .tokens file" error for TomlParser.g4
+    ]
+    outputDirectory = file("${project.buildDir}/generated-src/antlr/main/ca/teamdman/langs")
+
+//    include 'sfml/SFML.g4'
+//    // Include the lexer first
+//    include 'toml/TomlLexer.g4'
+//    include 'toml/TomlParser.g4'
 }
-compileJava.dependsOn generateGrammarSource
+
+compileJava {
+    dependsOn generateGrammarSource
+}
 
 // IDEA no longer automatically downloads sources/javadoc jars for dependencies, so we need to explicitly enable the behavior.
 // However, this causes gradle to throw "Error getting artifact" so keep it commented out to retain your sanity
@@ -283,3 +348,33 @@ compileJava.dependsOn generateGrammarSource
 //        downloadJavadoc = true
 //    }
 //}
+
+// List of fully qualified entry point classes
+def entryPoints = [
+        'ca.teamdman.ai.ProjectTestMethodLister',
+        'ca.teamdman.ai.ProjectEverythingLister'
+        // Add more classes here as needed
+]
+entryPoints.each { className ->
+    // Extract simple class name for the task name (e.g., ProjectTestMethodLister)
+    def simpleClassName = className.substring(className.lastIndexOf('.') + 1)
+
+    // Define a task name, e.g., runProjectTestMethodLister
+    def taskName = "run${simpleClassName}"
+
+    // Create the JavaExec task
+    //noinspection ConfigurationAvoidance
+    task(taskName, type: JavaExec) {
+        group = 'Execution'
+        description = "Runs the ${className} class"
+
+        // Set the main class to run
+        mainClass.set(className)
+
+        // Set the classpath to include compiled test classes and dependencies
+        classpath = sourceSets.test.runtimeClasspath
+
+        // Optional: Set JVM arguments if needed
+        // e.g., jvmArgs = ['-Xmx1G']
+    }
+}

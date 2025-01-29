@@ -102,7 +102,7 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
         return this;
     }
 
-    public static void purge(ItemStack stack) {
+    public static void clear(ItemStack stack) {
         stack.remove(SFMDataComponents.LABEL_POSITION_HOLDER);
         CACHE.remove(stack);
     }
@@ -167,7 +167,7 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
         return rtn;
     }
 
-    public LabelPositionHolder remove(BlockPos value) {
+    public LabelPositionHolder removeAll(BlockPos value) {
         labels().values().forEach(list -> list.remove(value));
         return this;
     }
@@ -226,5 +226,16 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
 
     public LabelPositionHolder toOwned() {
         return new LabelPositionHolder(this);
+    }
+
+    public Set<String> getLabels(BlockPos pos) {
+        return labels().entrySet().stream()
+                .filter(entry -> entry.getValue().contains(pos))
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toSet());
+    }
+
+    public boolean isEmpty() {
+        return labels().isEmpty();
     }
 }

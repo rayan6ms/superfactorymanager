@@ -1,9 +1,13 @@
 package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenUtils;
 import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.item.NetworkToolItem;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
+import ca.teamdman.sfm.common.util.HelpsWithMinecraftVersionIndependence;
+import ca.teamdman.sfm.common.util.NotStored;
+import ca.teamdman.sfm.common.util.SFMDirections;
 import ca.teamdman.sfm.common.registry.SFMDataComponents;
 import com.google.common.collect.HashMultimap;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -23,6 +27,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -32,11 +38,15 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.*;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 @EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 /*
  * This class uses code from tasgon's "observable" mod, also using MPLv2
  * https://github.com/tasgon/observable/blob/master/common/src/main/kotlin/observable/client/Overlay.kt
+ * https://github.com/tasgon/observable/blob/c3c5a0d0385e0b2c758729bdd935f103122f0f85/common/src/main/kotlin/observable/client/Overlay.kt
  */
 public class ItemWorldRenderer {
     private static final int BUFFER_SIZE = 256;
@@ -71,8 +81,9 @@ public class ItemWorldRenderer {
                     .createCompositeState(true)
     );
 
-    private static final int capabilityColor = FastColor.ARGB32.color(100, 0, 255, 100);
-    private static final int cableColor = FastColor.ARGB32.color(100, 255, 0, 100);
+    private static final int capabilityColor = FastColor.ARGB32.color(100, 100, 0, 255);
+    private static final int capabilityColorLimitedView = FastColor.ARGB32.color(100, 0, 100, 255);
+    private static final int cableColor = FastColor.ARGB32.color(100, 100, 255, 0);
     private static final VBOCache vboCache = new VBOCache();
 
     @SubscribeEvent
@@ -86,13 +97,44 @@ public class ItemWorldRenderer {
         MultiBufferSource.BufferSource bufferSource = minecraft.renderBuffers().bufferSource();
 
         ItemStack held;
+        boolean rendered = false;
+        // Can render both if in main hand and off-hand
         if ((held = getHeldItemOfType(player, NetworkToolItem.class)) != null) {
             handleNetworkTool(event, poseStack, camera, bufferSource, held);
-        } else if ((held = getHeldItemOfType(player, LabelGunItem.class)) != null) {
+            rendered = true;
+        }
+        if ((held = getHeldItemOfType(player, LabelGunItem.class)) != null) {
             handleLabelGun(event, poseStack, camera, bufferSource, held);
-        } else {
+            rendered = true;
+        }
+        if (!rendered) {
             vboCache.clear();
         }
+    }
+
+    // Thanks @tigres810
+    // https://discord.com/channels/313125603924639766/983834532904042537/1009267533527928864
+    public static @Nullable BlockPos lookingAt() {
+        HitResult rt = Minecraft.getInstance().hitResult;
+        if (rt == null) return null;
+
+        double x = (rt.getLocation().x);
+        double y = (rt.getLocation().y);
+        double z = (rt.getLocation().z);
+
+        LocalPlayer player = Minecraft.getInstance().player;
+        assert player != null;
+        Vec3 lookAngle = player.getLookAngle();
+        double xla = lookAngle.x;
+        double yla = lookAngle.y;
+        double zla = lookAngle.z;
+
+        if ((x % 1 == 0) && (xla < 0)) x -= 0.01;
+        if ((y % 1 == 0) && (yla < 0)) y -= 0.01;
+        if ((z % 1 == 0) && (zla < 0)) z -= 0.01;
+
+        // @MCVersionDependentBehaviour, the double constructor doesn't exist in 1.19.4
+        return new BlockPos((int) Math.floor(x),(int) Math.floor(y),(int) Math.floor(z));
     }
 
     private static @Nullable ItemStack getHeldItemOfType(
@@ -120,20 +162,26 @@ public class ItemWorldRenderer {
             ItemStack labelGun
     ) {
         // Get labels
-        boolean onlyShowSelectedLabel = labelGun.getOrDefault(SFMDataComponents.ONLY_SHOW_ACTIVE_LABEL, false);
+        boolean onlyShowSelectedLabel = LabelGunItem.getOnlyShowActiveLabel(labelGun);
         LabelPositionHolder labelPositionHolder = LabelPositionHolder.from(labelGun);
         HashMultimap<BlockPos, String> labelsByPosition = HashMultimap.create();
         if (onlyShowSelectedLabel) {
-            String activeLabel = labelGun.getOrDefault(SFMDataComponents.ACTIVE_LABEL, "");
+            String activeLabel = LabelGunItem.getActiveLabel(labelGun);
             labelPositionHolder.forEach((label, pos1) -> {
                 if (Objects.equals(label, activeLabel)) {
                     labelsByPosition.put(pos1, label);
                 }
             });
+            BlockPos hitPos = lookingAt();
+            if (hitPos != null) {
+                labelPositionHolder.getLabels(hitPos).forEach(label -> labelsByPosition.put(hitPos, label));
+            }
         } else {
             labelPositionHolder.forEach((label, pos1) -> labelsByPosition.put(pos1, label));
         }
+
         RenderSystem.disableDepthTest();
+
 
         // Draw labels
         poseStack.pushPose();
@@ -148,7 +196,13 @@ public class ItemWorldRenderer {
         // Draw boxes
         RENDER_TYPE.setupRenderState();
         Set<BlockPos> labelledPositions = labelsByPosition.keySet();
-        drawVbo(VBOKind.LABEL_GUN_CAPABILITIES, poseStack, labelledPositions, capabilityColor, event);
+        drawVbo(
+                VBOKind.LABEL_GUN_CAPABILITIES,
+                poseStack,
+                labelledPositions,
+                onlyShowSelectedLabel ? capabilityColorLimitedView : capabilityColor,
+                event
+        );
         RENDER_TYPE.clearRenderState();
 
         bufferSource.endBatch();
@@ -159,15 +213,13 @@ public class ItemWorldRenderer {
     private static void handleNetworkTool(
             RenderLevelStageEvent event,
             PoseStack poseStack,
-            Camera camera,
+            Camera ignoredCamera,
             MultiBufferSource.BufferSource bufferSource,
             ItemStack networkTool
     ) {
-        Set<BlockPos> cablePositions = networkTool.getOrDefault(SFMDataComponents.CABLE_POSITIONS, new HashSet<>());
-        Set<BlockPos> capabilityPositions = networkTool.getOrDefault(
-                SFMDataComponents.CAPABILITY_POSITIONS,
-                new HashSet<>()
-        );
+        if (!NetworkToolItem.getOverlayEnabled(networkTool)) return;
+        Set<BlockPos> cablePositions = NetworkToolItem.getCablePositions(networkTool);
+        Set<BlockPos> capabilityPositions = NetworkToolItem.getCapabilityProviderPositions(networkTool);
 
         RenderSystem.disableDepthTest();
 
@@ -226,7 +278,7 @@ public class ItemWorldRenderer {
     private static void drawLabelsForPos(
             PoseStack poseStack,
             Camera camera,
-            BlockPos pos,
+            @NotStored BlockPos pos,
             MultiBufferSource mbs,
             Collection<String> labels
     ) {
@@ -239,22 +291,35 @@ public class ItemWorldRenderer {
         Font font = Minecraft.getInstance().font;
         poseStack.translate(0, labels.size() * (font.lineHeight + 0.1) / -2f, 0);
         for (String label : labels) {
-            font.drawInBatch(
+            SFMScreenUtils.drawInBatch(
                     label,
+                    font,
                     -font.width(label) / 2f,
                     0,
-                    -0x1,
                     false,
                     poseStack.last().pose(),
                     mbs,
-                    Font.DisplayMode.SEE_THROUGH,
-                    0,
-                    0xF000F0
+                    true
             );
             poseStack.translate(0, font.lineHeight + 0.1, 0);
 
         }
         poseStack.popPose();
+    }
+
+    @HelpsWithMinecraftVersionIndependence
+    private static void writeVertex(
+            VertexConsumer builder,
+            Matrix4f matrix4f,
+            float x,
+            float y,
+            float z,
+            int r,
+            int g,
+            int b,
+            int a
+    ) {
+        builder.addVertex(matrix4f, x, y, z).setColor(r, g, b, a);
     }
 
     private static void writeFaceVertices(
@@ -273,40 +338,40 @@ public class ItemWorldRenderer {
         a = (int) (a * scale);
         switch (direction) {
             case DOWN:
-                builder.addVertex(matrix4f, 0F, 0F, 0F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 1F, 0F, 0F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 1F, 0F, 1F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 0F, 0F, 1F).setColor(r, g, b, a);
+                writeVertex(builder, matrix4f, 0F, 0F, 0F, r, g, b, a);
+                writeVertex(builder, matrix4f, 1F, 0F, 0F, r, g, b, a);
+                writeVertex(builder, matrix4f, 1F, 0F, 1F, r, g, b, a);
+                writeVertex(builder, matrix4f, 0F, 0F, 1F, r, g, b, a);
                 break;
             case UP:
-                builder.addVertex(matrix4f, 0F, 1F, 1F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 1F, 1F, 1F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 1F, 1F, 0F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 0F, 1F, 0F).setColor(r, g, b, a);
+                writeVertex(builder, matrix4f, 0F, 1F, 1F, r, g, b, a);
+                writeVertex(builder, matrix4f, 1F, 1F, 1F, r, g, b, a);
+                writeVertex(builder, matrix4f, 1F, 1F, 0F, r, g, b, a);
+                writeVertex(builder, matrix4f, 0F, 1F, 0F, r, g, b, a);
                 break;
             case NORTH:
-                builder.addVertex(matrix4f, 0F, 0F, 0F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 0F, 1F, 0F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 1F, 1F, 0F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 1F, 0F, 0F).setColor(r, g, b, a);
+                writeVertex(builder, matrix4f, 0F, 0F, 0F, r, g, b, a);
+                writeVertex(builder, matrix4f, 0F, 1F, 0F, r, g, b, a);
+                writeVertex(builder, matrix4f, 1F, 1F, 0F, r, g, b, a);
+                writeVertex(builder, matrix4f, 1F, 0F, 0F, r, g, b, a);
                 break;
             case SOUTH:
-                builder.addVertex(matrix4f, 1F, 0F, 1F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 1F, 1F, 1F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 0F, 1F, 1F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 0F, 0F, 1F).setColor(r, g, b, a);
+                writeVertex(builder, matrix4f, 1F, 0F, 1F, r, g, b, a);
+                writeVertex(builder, matrix4f, 1F, 1F, 1F, r, g, b, a);
+                writeVertex(builder, matrix4f, 0F, 1F, 1F, r, g, b, a);
+                writeVertex(builder, matrix4f, 0F, 0F, 1F, r, g, b, a);
                 break;
             case WEST:
-                builder.addVertex(matrix4f, 0F, 0F, 1F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 0F, 1F, 1F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 0F, 1F, 0F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 0F, 0F, 0F).setColor(r, g, b, a);
+                writeVertex(builder, matrix4f, 0F, 0F, 1F, r, g, b, a);
+                writeVertex(builder, matrix4f, 0F, 1F, 1F, r, g, b, a);
+                writeVertex(builder, matrix4f, 0F, 1F, 0F, r, g, b, a);
+                writeVertex(builder, matrix4f, 0F, 0F, 0F, r, g, b, a);
                 break;
             case EAST:
-                builder.addVertex(matrix4f, 1F, 0F, 0F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 1F, 1F, 0F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 1F, 1F, 1F).setColor(r, g, b, a);
-                builder.addVertex(matrix4f, 1F, 0F, 1F).setColor(r, g, b, a);
+                writeVertex(builder, matrix4f, 1F, 0F, 0F, r, g, b, a);
+                writeVertex(builder, matrix4f, 1F, 1F, 0F, r, g, b, a);
+                writeVertex(builder, matrix4f, 1F, 1F, 1F, r, g, b, a);
+                writeVertex(builder, matrix4f, 1F, 0F, 1F, r, g, b, a);
                 break;
         }
     }
@@ -321,7 +386,8 @@ public class ItemWorldRenderer {
     // VBOCache class to handle caching of VBOs
     private static class VBOCache {
         private final EnumMap<VBOKind, VBOEntry> cache = new EnumMap<>(VBOKind.class);
-        private int lastClear = 0;
+        private int lastChangeCheck = -1;
+
         public @Nullable VertexBuffer getVBO(
                 VBOKind kind,
                 Set<BlockPos> positions,
@@ -334,14 +400,19 @@ public class ItemWorldRenderer {
             if (positions.isEmpty()) {
                 return null;
             }
-            if (event.getRenderTick() % 20 == 0 && event.getRenderTick() != lastClear) {
-                lastClear = event.getRenderTick();
-                cache.clear();
-            }
-            VBOEntry entry = cache.get(kind);
+            @Nullable VBOEntry entry = cache.get(kind);
 
-            // Check if positions have changed
-            if (entry == null || !entry.positions.equals(positions)) {
+            boolean shouldRebuild = entry == null;
+
+            // only compare the entries every second since it's mildly expensive
+            if (entry != null
+                && event.getRenderTick() != lastChangeCheck
+                && !entry.positions.equals(positions)) {
+                lastChangeCheck = event.getRenderTick();
+                shouldRebuild = true;
+            }
+
+            if (shouldRebuild) {
                 // Dispose of the old VBO if it exists
                 if (entry != null) {
                     entry.vbo.close();
@@ -366,6 +437,14 @@ public class ItemWorldRenderer {
             cache.clear();
         }
 
+        @HelpsWithMinecraftVersionIndependence
+        private BufferBuilder createBufferBuilder(int numPositions) {
+//            BufferBuilder bufferBuilder = new BufferBuilder(RENDER_TYPE.bufferSize() * numPositions);
+//            bufferBuilder.begin(RENDER_TYPE.mode(), RENDER_TYPE.format());
+            BufferBuilder bufferBuilder = Tesselator.getInstance().begin(RENDER_TYPE.mode(), RENDER_TYPE.format());
+            return bufferBuilder;
+        }
+
         private VertexBuffer createVBO(
                 Set<BlockPos> positions,
                 int r,
@@ -377,18 +456,14 @@ public class ItemWorldRenderer {
             PoseStack poseStack = new PoseStack();
             // Do not undo camera transform; create vertices in world space
 
-            BufferBuilder bufferBuilder = new BufferBuilder(
-                    new ByteBufferBuilder(RENDER_TYPE.bufferSize() * positions.size()),
-                    RENDER_TYPE.mode(),
-                    RENDER_TYPE.format()
-            );
+            BufferBuilder bufferBuilder = createBufferBuilder(positions.size());
 
             // Push vertices
             for (BlockPos blockPos : positions) {
                 poseStack.pushPose();
                 poseStack.translate(blockPos.getX(), blockPos.getY(), blockPos.getZ());
                 Matrix4f matrix4f = poseStack.last().pose();
-                for (Direction face : Direction.values()) {
+                for (Direction face : SFMDirections.DIRECTIONS) {
                     if (!positions.contains(blockPos.relative(face))) {
                         writeFaceVertices(bufferBuilder, matrix4f, face, r, g, b, a);
                     }
@@ -397,7 +472,7 @@ public class ItemWorldRenderer {
             }
 
             MeshData meshData = bufferBuilder.buildOrThrow();
-            VertexBuffer vbo = new VertexBuffer(VertexBuffer.Usage.DYNAMIC);
+            VertexBuffer vbo = new VertexBuffer(VertexBuffer.Usage.STATIC);
             vbo.bind();
             vbo.upload(meshData);
             VertexBuffer.unbind();
@@ -405,17 +480,10 @@ public class ItemWorldRenderer {
             return vbo;
         }
 
-        private static class VBOEntry {
-            Set<BlockPos> positions;
-            VertexBuffer vbo;
-
-            VBOEntry(
-                    Set<BlockPos> positions,
-                    VertexBuffer vbo
-            ) {
-                this.positions = positions;
-                this.vbo = vbo;
-            }
+        private record VBOEntry(
+                Set<BlockPos> positions,
+                VertexBuffer vbo
+        ) {
         }
     }
 }
