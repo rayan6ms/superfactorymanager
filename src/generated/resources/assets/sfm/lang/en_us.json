@@ -203,6 +203,7 @@
   "program.sfm.error.compile_failed": "Failed to compile.",
   "program.sfm.error.compile_failed_with_errors": "Failed to compile with %d errors.",
   "program.sfm.error.compile_success_with_warnings": "Successfully compiled \"%s\" with %d warnings.",
+  "program.sfm.error.disallowed_resource_type": "Program references a disallowed resource type \"%s\"",
   "program.sfm.error.literal": "%s",
   "program.sfm.error.malformed_resource_type": "Program has a malformed resource type \"%s\".\nReminder: Resource types must be literals, not wildcards.",
   "program.sfm.error.unknown_resource_type": "Program references an unknown resource type \"%s\"",
