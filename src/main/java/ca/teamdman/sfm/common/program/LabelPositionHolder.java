@@ -83,11 +83,15 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
      * This mutably borrows the cache entry.
      */
     public static LabelPositionHolder from(ItemStack stack) {
-        return CACHE.computeIfAbsent(stack,
-                                     s -> stack.getOrDefault(
-                                             SFMDataComponents.LABEL_POSITION_HOLDER,
-                                             new LabelPositionHolder()
-                                     )
+        return CACHE.computeIfAbsent(
+                stack,
+                s -> {
+                    LabelPositionHolder immutableLabelPositionHolder = stack.get(SFMDataComponents.LABEL_POSITION_HOLDER);
+                    if (immutableLabelPositionHolder == null) {
+                        return new LabelPositionHolder();
+                    }
+                    return new LabelPositionHolder(immutableLabelPositionHolder);
+                }
         );
     }
 
