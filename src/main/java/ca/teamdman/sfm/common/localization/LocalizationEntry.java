@@ -35,6 +35,17 @@ public record LocalizationEntry(
         return I18n.get(key.get(), args);
     }
 
+    /**
+     * Some messages are computed on the server side.
+     * Using this method is a poor substitute for proper localization.
+     * <p/>
+     * Sometimes that's just how it is.
+     * @return the default English localization value
+     */
+    public String getStub() {
+        return value.get();
+    }
+
     public MutableComponent getComponent() {
         return Component.translatable(key.get());
     }
