@@ -98,7 +98,7 @@ EVERY 20G+5 TICKS DO END
 -- Fix industrial foregoing ore meat fluid not moving because SFM mishandling fluid tags
 ---- Thanks @luxxiz for the report!
 -- Fix problems modifying disk label data in ServerboundManagerFixPacket (#212)
-
+-- Fix problem due to DiskItem calling client method on server when producing tooltip contents (#210)
 
 
 ---- 4.19.1 ----
