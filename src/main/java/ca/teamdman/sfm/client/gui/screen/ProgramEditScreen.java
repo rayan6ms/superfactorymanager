@@ -159,6 +159,7 @@ public class ProgramEditScreen extends Screen {
             String content = textarea.getValue();
             int cursor = textarea.getCursorPosition();
             int selectionCursor = textarea.getSelectionCursorPosition();
+            double scrollAmount = textarea.getScrollAmount();
             EditorUtils.ManipulationResult result;
             if (Screen.hasShiftDown()) { // de-indent
                 result = EditorUtils.deindent(content, cursor, selectionCursor);
@@ -168,6 +169,7 @@ public class ProgramEditScreen extends Screen {
             textarea.setValue(result.content());
             textarea.setCursorPosition(result.cursorPosition());
             textarea.setSelectionCursorPosition(result.selectionCursorPosition());
+            textarea.setScrollAmount(scrollAmount);
             return true;
         }
         if (pKeyCode == GLFW.GLFW_KEY_LEFT_CONTROL || pKeyCode == GLFW.GLFW_KEY_RIGHT_CONTROL) {
@@ -411,6 +413,15 @@ public class ProgramEditScreen extends Screen {
 
         public void setSelectionCursorPosition(int cursor) {
             this.textField.selectCursor = cursor;
+        }
+
+        public double getScrollAmount() {
+            return this.scrollAmount();
+        }
+
+        @Override
+        public void setScrollAmount(double d) {
+            super.setScrollAmount(d);
         }
 
         private void rebuild(boolean showContextActionHints) {
