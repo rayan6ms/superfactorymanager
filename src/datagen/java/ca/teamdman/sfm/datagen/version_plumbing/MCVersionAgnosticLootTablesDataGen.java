@@ -1,10 +1,11 @@
 package ca.teamdman.sfm.datagen.version_plumbing;
 
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.data.loot.LootTableSubProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
@@ -28,7 +29,7 @@ public abstract class MCVersionAgnosticLootTablesDataGen extends LootTableProvid
             GatherDataEvent event,
             String modId
     ) {
-        super(event.getGenerator().getPackOutput(), Collections.emptySet(), Collections.emptyList());
+        super(event.getGenerator().getPackOutput(), Collections.emptySet(), Collections.emptyList(), event.getLookupProvider());
     }
 
 
@@ -42,7 +43,7 @@ public abstract class MCVersionAgnosticLootTablesDataGen extends LootTableProvid
     /// Blocks present here but not involved when populating the writer will cause a validation error
     protected abstract Set<? extends Block> getExpectedBlocks();
 
-    private MyBlockLoot createBlockLoot() {
+    private MyBlockLoot createBlockLoot(HolderLookup.Provider provider) {
         BlockLootWriter writer = new BlockLootWriter();
         populate(writer);
         ArrayList<BlockLootBehaviour> behaviours = writer.finish();
@@ -83,7 +84,7 @@ public abstract class MCVersionAgnosticLootTablesDataGen extends LootTableProvid
     private interface BlockLootBehaviour {
         List<Supplier<? extends Block>> getInvolvedBlocks();
 
-        void apply(BiConsumer<ResourceLocation, LootTable.Builder> writer);
+        void apply(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> writer);
     }
 
     private record DropOtherBlockLootBehaviour(
@@ -96,7 +97,7 @@ public abstract class MCVersionAgnosticLootTablesDataGen extends LootTableProvid
         }
 
         @Override
-        public void apply(BiConsumer<ResourceLocation, LootTable.Builder> writer) {
+        public void apply(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> writer) {
             var pool = LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
                     .add(LootItem.lootTableItem(other.get()))
@@ -135,8 +136,8 @@ public abstract class MCVersionAgnosticLootTablesDataGen extends LootTableProvid
 
         @MCVersionDependentBehaviour
         @Override
-        public void generate(BiConsumer<ResourceLocation, LootTable.Builder> writer) {
-            behaviours.forEach(behaviour -> behaviour.apply(writer));
+        public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> biConsumer) {
+            behaviours.forEach(behaviours -> behaviours.apply(biConsumer));
         }
     }
 

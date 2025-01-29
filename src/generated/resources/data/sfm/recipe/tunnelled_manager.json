@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "H": {
+      "item": "minecraft:hopper"
+    },
+    "M": {
+      "item": "sfm:manager"
+    }
+  },
+  "pattern": [
+    "M  ",
+    "H  ",
+    "   "
+  ],
+  "result": {
+    "count": 1,
+    "id": "sfm:tunnelled_manager"
+  }
+}
