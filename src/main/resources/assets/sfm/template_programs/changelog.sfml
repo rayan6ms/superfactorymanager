@@ -97,6 +97,9 @@ EVERY 20G+5 TICKS DO END
 -- Fix inaccurate scrollbar
 -- Fix industrial foregoing ore meat fluid not moving because SFM mishandling fluid tags
 ---- Thanks @luxxiz for the report!
+-- Fix modifying disk label data in ServerboundManagerFixPacket failing due to immutability (#212)
+-- Fix DiskItem calling client method on server when producing tooltip contents (#210)
+-- Fix pasting large program causing packet too large error (#211)
 
 
 ---- 4.19.1 ----
