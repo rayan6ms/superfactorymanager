@@ -135,6 +135,7 @@ runs {
     }
 
     server {
+        modSource project.sourceSets.gametest
         systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         programArgument '--nogui'
     }
