@@ -7,8 +7,8 @@ import net.minecraft.world.item.ItemStack;
 
 public record ItemStackBox(ItemStack stack) {
     public static final ItemStackBox EMPTY = new ItemStackBox(ItemStack.EMPTY);
-    public static final Codec<ItemStackBox> CODEC = ItemStack.CODEC.xmap(ItemStackBox::new, ItemStackBox::stack);
-    public static final StreamCodec<? super RegistryFriendlyByteBuf, ItemStackBox> STREAM_CODEC = ItemStack.STREAM_CODEC.map(
+    public static final Codec<ItemStackBox> CODEC = ItemStack.OPTIONAL_CODEC.xmap(ItemStackBox::new, ItemStackBox::stack);
+    public static final StreamCodec<? super RegistryFriendlyByteBuf, ItemStackBox> STREAM_CODEC = ItemStack.OPTIONAL_STREAM_CODEC.map(
             ItemStackBox::new,
             ItemStackBox::stack
     );
