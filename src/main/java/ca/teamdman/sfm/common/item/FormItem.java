@@ -3,6 +3,7 @@ package ca.teamdman.sfm.common.item;
 import ca.teamdman.sfm.client.render.FormItemExtensions;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import net.minecraft.nbt.CompoundTag;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -30,6 +31,7 @@ public class FormItem extends Item {
         return ItemStack.of(stack.getOrCreateTag().getCompound("reference"));
     }
 
+    @MCVersionDependentBehaviour // 1.21 this gets replaced with RegisterClientExtensionsEvent
     @Override
     public void initializeClient(Consumer<IClientItemExtensions> consumer) {
         consumer.accept(new FormItemExtensions());
