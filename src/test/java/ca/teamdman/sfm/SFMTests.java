@@ -75,7 +75,7 @@ public class SFMTests {
 
     @Test
     public void iForgetIfICanUseResourceLocationsHere() {
-        ResourceLocation bruh = new ResourceLocation("sfm","bruh");
+        ResourceLocation bruh = ResourceLocation.fromNamespaceAndPath("sfm","bruh");
         assertEquals("sfm", bruh.getNamespace());
         assertEquals("bruh", bruh.getPath());
     }
