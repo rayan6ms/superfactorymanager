@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.common.item;
 
-import ca.teamdman.sfm.client.render.FormItemExtensions;
 import ca.teamdman.sfm.common.component.ItemStackBox;
 import ca.teamdman.sfm.common.registry.SFMDataComponents;
 import ca.teamdman.sfm.common.registry.SFMItems;
@@ -8,11 +7,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 
 import javax.annotation.Nonnull;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class FormItem extends Item {
     public FormItem() {
