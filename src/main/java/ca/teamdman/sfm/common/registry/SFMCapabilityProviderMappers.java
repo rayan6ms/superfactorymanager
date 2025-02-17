@@ -4,8 +4,6 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.capabilityprovidermapper.BlockEntityCapabilityProviderMapper;
 import ca.teamdman.sfm.common.capabilityprovidermapper.CapabilityProviderMapper;
 import ca.teamdman.sfm.common.capabilityprovidermapper.CauldronCapabilityProviderMapper;
-import ca.teamdman.sfm.common.capabilityprovidermapper.ae2.InterfaceCapabilityProviderMapper;
-import ca.teamdman.sfm.common.compat.SFMModCompat;
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -50,11 +48,11 @@ public class SFMCapabilityProviderMappers {
         MAPPERS.register(bus);
     }
 
-    static {
-        if (SFMModCompat.isAE2Loaded()) {
-            MAPPERS.register("ae2/interface", InterfaceCapabilityProviderMapper::new);
-        }
-    }
+//    static {
+//        if (SFMModCompat.isAE2Loaded()) {
+//            MAPPERS.register("ae2/interface", InterfaceCapabilityProviderMapper::new);
+//        }
+//    }
 
     /**
      * Find a {@link CapabilityProvider} as provided by the registered capability provider mappers.
