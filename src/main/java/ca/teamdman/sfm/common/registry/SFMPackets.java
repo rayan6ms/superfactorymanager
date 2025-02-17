@@ -60,7 +60,7 @@ public class SFMPackets {
         registerPacket(new ServerboundInputInspectionRequestPacket.Daddy());
         registerPacket(new ServerboundLabelGunClearPacket.Daddy());
         registerPacket(new ServerboundLabelGunPrunePacket.Daddy());
-        registerPacket(new ServerboundLabelGunToggleLabelViewPacket.Daddy());
+        registerPacket(new ServerboundLabelGunCycleViewModePacket.Daddy());
         registerPacket(new ServerboundLabelGunUpdatePacket.Daddy());
         registerPacket(new ServerboundLabelGunUsePacket.Daddy());
         registerPacket(new ServerboundLabelInspectionRequestPacket.Daddy());

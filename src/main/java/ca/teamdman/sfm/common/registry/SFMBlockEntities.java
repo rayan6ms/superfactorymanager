@@ -28,12 +28,12 @@ public final class SFMBlockEntities {
                     .of(ManagerBlockEntity::new, SFMBlocks.MANAGER_BLOCK.get())
                     .build(null)
     );
-    public static final Supplier<BlockEntityType<TunnelledManagerBlockEntity>> TUNNELLED_MANAGER_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register(
-            "tunnelled_manager",
-            () -> BlockEntityType.Builder
-                    .of(TunnelledManagerBlockEntity::new, SFMBlocks.TUNNELLED_MANAGER_BLOCK.get())
-                    .build(null)
-    );
+//    public static final Supplier<BlockEntityType<TunnelledManagerBlockEntity>> TUNNELLED_MANAGER_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register(
+//            "tunnelled_manager",
+//            () -> BlockEntityType.Builder
+//                    .of(TunnelledManagerBlockEntity::new, SFMBlocks.TUNNELLED_MANAGER_BLOCK.get())
+//                    .build(null)
+//    );
     public static final Supplier<BlockEntityType<CableFacadeBlockEntity>> CABLE_FACADE_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register(
             "cable_facade",
             () -> BlockEntityType.Builder
@@ -60,12 +60,12 @@ public final class SFMBlockEntities {
                     .build(null)
     );
 
-    public static final Supplier<BlockEntityType<BatteryBlockEntity>> BATTERY_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register(
-            "battery",
-            () -> BlockEntityType.Builder
-                    .of(BatteryBlockEntity::new, SFMBlocks.BATTERY_BLOCK.get())
-                    .build(null)
-    );
+//    public static final Supplier<BlockEntityType<BatteryBlockEntity>> BATTERY_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register(
+//            "battery",
+//            () -> BlockEntityType.Builder
+//                    .of(BatteryBlockEntity::new, SFMBlocks.BATTERY_BLOCK.get())
+//                    .build(null)
+//    );
 
     public static final Supplier<BlockEntityType<TestBarrelBlockEntity>> TEST_BARREL_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register(
             "test_barrel",
