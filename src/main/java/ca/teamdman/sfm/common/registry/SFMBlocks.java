@@ -15,10 +15,10 @@ import java.util.Set;
 public class SFMBlocks {
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, SFM.MOD_ID);
     public static final RegistryObject<ManagerBlock> MANAGER_BLOCK = BLOCKS.register("manager", ManagerBlock::new);
-    public static final RegistryObject<TunnelledManagerBlock> TUNNELLED_MANAGER_BLOCK = BLOCKS.register(
-            "tunnelled_manager",
-            TunnelledManagerBlock::new
-    );
+//    public static final RegistryObject<TunnelledManagerBlock> TUNNELLED_MANAGER_BLOCK = BLOCKS.register(
+//            "tunnelled_manager",
+//            TunnelledManagerBlock::new
+//    );
     public static final RegistryObject<PrintingPressBlock> PRINTING_PRESS_BLOCK = BLOCKS.register(
             "printing_press",
             PrintingPressBlock::new

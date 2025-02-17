@@ -859,11 +859,11 @@ public final class LocalizationKeys {
             () -> SFMBlocks.MANAGER_BLOCK.get().getDescriptionId(),
             () -> "Factory Manager"
     );
-    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
-    public static final LocalizationEntry TUNNELLED_MANAGER_BLOCK = new LocalizationEntry(
-            () -> SFMBlocks.TUNNELLED_MANAGER_BLOCK.get().getDescriptionId(),
-            () -> "Tunnelled Factory Manager"
-    );
+//    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+//    public static final LocalizationEntry TUNNELLED_MANAGER_BLOCK = new LocalizationEntry(
+//            () -> SFMBlocks.TUNNELLED_MANAGER_BLOCK.get().getDescriptionId(),
+//            () -> "Tunnelled Factory Manager"
+//    );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry TEST_BARREL_TANK_BLOCK = new LocalizationEntry(
             () -> SFMBlocks.TEST_BARREL_TANK_BLOCK.get().getDescriptionId(),

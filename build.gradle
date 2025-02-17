@@ -20,6 +20,10 @@ sourceSets {
         java {
             exclude "ca/teamdman/sfm/common/capabilityprovidermapper/ae2/**"
         }
+        java {
+            exclude "ca/teamdman/sfm/common/block/TunnelledManagerBlock.java"
+            exclude "ca/teamdman/sfm/common/blockentity/TunnelledManagerBlockEntity.java"
+        }
     }
     // https://docs.gradle.org/current/userguide/java_testing.html#sec:configuring_java_integration_tests
     test {
