@@ -1,4 +1,4 @@
-// 1.20.2	2025-01-29T17:49:38.378649	Recipes
+// 1.20.2	2025-02-17T18:17:27.8673702	Recipes
 21ddf44d8958739f46e499c9445d01a6b7965013 data/minecraft/recipes/disk_reset.json
 3e32bf9955f0a270baf5f2615e887356ea966207 data/minecraft/recipes/label_gun_reset.json
 4a8fe19050edf9a36eb1b6521d9c2a82f0f48710 data/sfm/advancements/recipes/misc/cable.json
@@ -9,7 +9,6 @@ c8627afba2dd3610f08f7801769bed56eccb0623 data/sfm/advancements/recipes/misc/disk
 12a9f9269ee710aa02eb5c94ce24a149160599d2 data/sfm/advancements/recipes/misc/manager.json
 7e7b3f111d82074cb3f8bbcaddee45903809fbd6 data/sfm/advancements/recipes/misc/network_tool.json
 ffce2d96d5dacc48d63b5c69e08ac88d272179e0 data/sfm/advancements/recipes/misc/printing_press.json
-a2237dc970f84d22b3a2dd2acc1cd6cd0306c6f9 data/sfm/advancements/recipes/misc/tunnelled_manager.json
 f53743bc7ce71cc4fa931008d17cf97e2bd3d87b data/sfm/advancements/recipes/misc/water_tank.json
 9da2b27d6464b27b8cbaf2ba4296c0fa4197c3de data/sfm/advancements/recipes/misc/xp_goop.json
 807a872a4f019c590a34aa05926538fb097ca6f3 data/sfm/recipes/cable.json
@@ -23,7 +22,6 @@ d6edefb276c274877ae41992435ff66f3e87a7c4 data/sfm/recipes/manager.json
 5132d605087fa910d832a64cee491cb206553a3f data/sfm/recipes/network_tool.json
 1de9b03f775c36402c0677e033ea0e5afe5e5b9f data/sfm/recipes/printing_press.json
 ba7da1ba1466172a0c01a861667f7aa599593002 data/sfm/recipes/program_copy.json
-8ebed86102d4b16d516c74ba73850ba0646d1353 data/sfm/recipes/tunnelled_manager.json
 2d596d9bad2f027d6f565414182f79b7d0664ce9 data/sfm/recipes/water_tank.json
 4a9fab7ad8327b3a1cfd6122f86016738542e32c data/sfm/recipes/written_book_copy.json
 0e2393c48006d18a8c006e2c45f83f56fbd8f559 data/sfm/recipes/xp_goop.json
