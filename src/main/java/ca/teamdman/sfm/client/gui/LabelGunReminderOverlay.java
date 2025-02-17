@@ -16,6 +16,7 @@ import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.client.gui.overlay.IGuiOverlay;
+import org.jetbrains.annotations.Nullable;
 
 public class LabelGunReminderOverlay implements IGuiOverlay {
 
@@ -36,12 +37,18 @@ public class LabelGunReminderOverlay implements IGuiOverlay {
         if (player == null) {
             return;
         }
-        if (!shouldRender(minecraft)) {
-            return;
-        }
+
+        LabelGunItem.LabelGunViewMode viewMode = getViewMode(minecraft);
+        if (viewMode == null) return;
+        var msg = switch(viewMode) {
+            case SHOW_ALL -> null;
+            case SHOW_ONLY_ACTIVE_LABEL_AND_TARGETED_BLOCK -> LocalizationKeys.LABEL_GUN_VIEW_MODE_SHOW_ONLY_ACTIVE_AND_TARGETED;
+            case SHOW_ONLY_TARGETED_BLOCK -> LocalizationKeys.LABEL_GUN_VIEW_MODE_SHOW_ONLY_TARGETED;
+        };
+        if (msg == null) return;
         Font font = minecraft.font;
-        var reminder = LocalizationKeys.LABEL_GUN_LABEL_VIEW_REMINDER.getComponent(
-                SFMKeyMappings.TOGGLE_LABEL_VIEW_KEY
+        var reminder = msg.getComponent(
+                SFMKeyMappings.CYCLE_LABEL_VIEW_KEY
                         .get()
                         .getTranslatedKeyMessage().plainCopy().withStyle(ChatFormatting.YELLOW)
         );
@@ -58,12 +65,12 @@ public class LabelGunReminderOverlay implements IGuiOverlay {
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    private static boolean shouldRender(Minecraft minecraft) {
+    private static @Nullable LabelGunItem.LabelGunViewMode getViewMode(Minecraft minecraft) {
         LocalPlayer player = minecraft.player;
-        if (player == null) return false;
-        if (!SFMConfig.CLIENT.showLabelGunReminderOverlay.get()) return false;
+        if (player == null) return null;
+        if (!SFMConfig.CLIENT.showLabelGunReminderOverlay.get()) return null;
         ItemStack labelGun = SFMHandUtils.getItemInEitherHand(player, SFMItems.LABEL_GUN_ITEM.get());
-        if (labelGun.isEmpty()) return false;
-        return LabelGunItem.getOnlyShowActiveLabel(labelGun);
+        if (labelGun.isEmpty()) return null;
+        return LabelGunItem.getViewMode(labelGun);
     }
 }

@@ -18,7 +18,7 @@ public class SFMLootTables extends MCVersionAgnosticLootTablesDataGen {
     @Override
     protected void populate(BlockLootWriter writer) {
         writer.dropSelf(SFMBlocks.MANAGER_BLOCK);
-        writer.dropSelf(SFMBlocks.TUNNELLED_MANAGER_BLOCK);
+//        writer.dropSelf(SFMBlocks.TUNNELLED_MANAGER_BLOCK);
         writer.dropSelf(SFMBlocks.CABLE_BLOCK);
         writer.dropOther(SFMBlocks.CABLE_FACADE_BLOCK, SFMBlocks.CABLE_BLOCK);
         writer.dropSelf(SFMBlocks.FANCY_CABLE_BLOCK);
@@ -31,8 +31,8 @@ public class SFMLootTables extends MCVersionAgnosticLootTablesDataGen {
     protected Set<? extends RegistryObject<Block>> getExpectedBlocks() {
         Set<RegistryObject<? extends Block>> exclude = Set.of(
                 SFMBlocks.TEST_BARREL_BLOCK,
-                SFMBlocks.TEST_BARREL_TANK_BLOCK,
-                SFMBlocks.BATTERY_BLOCK
+                SFMBlocks.TEST_BARREL_TANK_BLOCK
+//                SFMBlocks.BATTERY_BLOCK
         );
         Set<? extends RegistryObject<Block>> rtn = SFMBlocks.getBlocks();
         rtn.removeIf(exclude::contains);
