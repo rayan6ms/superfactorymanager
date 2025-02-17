@@ -104,7 +104,7 @@ public class LabelGunItem extends Item {
     ) {
         var level = ctx.getLevel();
         if (level.isClientSide && ctx.getPlayer() != null) {
-            boolean pickBlock = ClientKeyHelpers.isKeyDown(SFMKeyMappings.LABEL_GUN_PICK_BLOCK_MODIFIER_KEY);
+            boolean pickBlock = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_PICK_BLOCK_MODIFIER_KEY);
             SFMPackets.sendToServer(new ServerboundLabelGunUsePacket(
                     ctx.getHand(),
                     ctx.getClickedPos(),

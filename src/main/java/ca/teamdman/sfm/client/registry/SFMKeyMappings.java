@@ -19,7 +19,7 @@ import org.lwjgl.glfw.GLFW;
 public class SFMKeyMappings {
     public static final Lazy<KeyMapping> MORE_INFO_TOOLTIP_KEY = Lazy.of(() -> new KeyMapping(
             LocalizationKeys.MORE_HOVER_INFO_KEY.key().get(),
-            KeyConflictContext.GUI,
+            KeyConflictContext.UNIVERSAL,
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_LEFT_SHIFT,
             LocalizationKeys.SFM_KEY_CATEGORY.key().get()
@@ -61,7 +61,7 @@ public class SFMKeyMappings {
 
     public static final Lazy<KeyMapping> LABEL_GUN_PICK_BLOCK_MODIFIER_KEY = Lazy.of(() -> new KeyMapping(
             LocalizationKeys.LABEL_GUN_PICK_BLOCK_MODIFIER_KEY.key().get(),
-            KeyConflictContext.GUI,
+            KeyConflictContext.IN_GAME,
             KeyModifier.NONE,
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_LEFT_ALT,
