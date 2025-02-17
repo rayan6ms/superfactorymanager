@@ -31,8 +31,8 @@ public class SFMLootTables extends MCVersionAgnosticLootTablesDataGen {
     protected Set<? extends RegistryObject<Block>> getExpectedBlocks() {
         Set<RegistryObject<? extends Block>> exclude = Set.of(
                 SFMBlocks.TEST_BARREL_BLOCK,
-                SFMBlocks.TEST_BARREL_TANK_BLOCK,
-                SFMBlocks.BATTERY_BLOCK
+                SFMBlocks.TEST_BARREL_TANK_BLOCK
+//                SFMBlocks.BATTERY_BLOCK
         );
         Set<? extends RegistryObject<Block>> rtn = SFMBlocks.getBlocks();
         rtn.removeIf(exclude::contains);

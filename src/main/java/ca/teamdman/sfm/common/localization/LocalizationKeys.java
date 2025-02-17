@@ -915,11 +915,11 @@ public final class LocalizationKeys {
             () -> "Test Barrel"
     );
 
-    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
-    public static final LocalizationEntry BATTERY_BLOCK = new LocalizationEntry(
-            () -> SFMBlocks.BATTERY_BLOCK.get().getDescriptionId(),
-            () -> "Battery (WIP)"
-    );
+//    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+//    public static final LocalizationEntry BATTERY_BLOCK = new LocalizationEntry(
+//            () -> SFMBlocks.BATTERY_BLOCK.get().getDescriptionId(),
+//            () -> "Battery (WIP)"
+//    );
     public static final LocalizationEntry CONFIG_UPDATE_AND_SYNC_RESULT_SUCCESS = new LocalizationEntry(
             "chat.sfm.config_update_and_sync_result.success",
             "Successfully updated SFM config."

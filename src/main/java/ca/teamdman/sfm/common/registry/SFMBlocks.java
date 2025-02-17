@@ -40,7 +40,7 @@ public class SFMBlocks {
             "fancy_cable_facade",
             FancyCableFacadeBlock::new
     );
-    public static final RegistryObject<BatteryBlock> BATTERY_BLOCK = BLOCKS.register("battery", BatteryBlock::new);
+//    public static final RegistryObject<BatteryBlock> BATTERY_BLOCK = BLOCKS.register("battery", BatteryBlock::new);
     public static final RegistryObject<TestBarrelBlock> TEST_BARREL_BLOCK = BLOCKS.register(
             "test_barrel",
             TestBarrelBlock::new
