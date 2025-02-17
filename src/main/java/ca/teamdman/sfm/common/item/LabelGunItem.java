@@ -85,15 +85,29 @@ public class LabelGunItem extends Item {
         return labels.get(nextLabelIndex);
     }
 
-    public static boolean getOnlyShowActiveLabel(ItemStack stack) {
-        return stack.getOrCreateTag().getBoolean("sfm:only_show_active_label");
+    /**
+     * Returns the current enum mode for the label gun item.
+     */
+    public static LabelGunViewMode getViewMode(ItemStack stack) {
+        int ordinal = stack.getOrCreateTag().getInt("sfm:label_gun_view_mode");
+        // fallback if out of bounds or missing
+        if (ordinal < 0 || ordinal >= LabelGunViewMode.values().length) {
+            return LabelGunViewMode.SHOW_ALL;
+        }
+        return LabelGunViewMode.values()[ordinal];
     }
 
-    public static void setOnlyShowActiveLabel(
-            ItemStack stack,
-            boolean value
-    ) {
-        stack.getOrCreateTag().putBoolean("sfm:only_show_active_label", value);
+    /**
+     * Sets the view mode in NBT.
+     */
+    public static void setViewMode(ItemStack stack, LabelGunViewMode mode) {
+        stack.getOrCreateTag().putInt("sfm:label_gun_view_mode", mode.ordinal());
+    }
+
+    public static void cycleViewMode(ItemStack stack) {
+        LabelGunViewMode current = getViewMode(stack);
+        int nextOrdinal = (current.ordinal() + 1) % LabelGunViewMode.values().length;
+        setViewMode(stack, LabelGunViewMode.values()[nextOrdinal]);
     }
 
     @Override
@@ -103,7 +117,7 @@ public class LabelGunItem extends Item {
     ) {
         var level = ctx.getLevel();
         if (level.isClientSide && ctx.getPlayer() != null) {
-            boolean pickBlock = ClientKeyHelpers.isKeyDown(SFMKeyMappings.LABEL_GUN_PICK_BLOCK_MODIFIER_KEY);
+            boolean pickBlock = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_PICK_BLOCK_MODIFIER_KEY);
             SFMPackets.sendToServer(new ServerboundLabelGunUsePacket(
                     ctx.getHand(),
                     ctx.getClickedPos(),
@@ -151,7 +165,7 @@ public class LabelGunItem extends Item {
             );
             lines.add(
                     LocalizationKeys.LABEL_GUN_ITEM_TOOLTIP_5.getComponent(
-                            SFMKeyMappings.TOGGLE_LABEL_VIEW_KEY
+                            SFMKeyMappings.CYCLE_LABEL_VIEW_KEY
                                     .get()
                                     .getTranslatedKeyMessage()
                                     .plainCopy()
@@ -192,4 +206,9 @@ public class LabelGunItem extends Item {
         LabelGunItem.setActiveLabel(stack, null);
     }
 
+    public enum LabelGunViewMode {
+        SHOW_ALL,
+        SHOW_ONLY_ACTIVE_LABEL_AND_TARGETED_BLOCK,
+        SHOW_ONLY_TARGETED_BLOCK,
+    }
 }

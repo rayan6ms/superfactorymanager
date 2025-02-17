@@ -36,6 +36,14 @@ sourceSets {
             exclude "ca/teamdman/sfm/common/capabilityprovidermapper/ae2/**"
             exclude "ca/teamdman/sfm/common/program/linting/MekanismSideConfigProgramLinter.java"
         }
+        java {
+            exclude "ca/teamdman/sfm/common/block/TunnelledManagerBlock.java"
+            exclude "ca/teamdman/sfm/common/blockentity/TunnelledManagerBlockEntity.java"
+        }
+        java {
+            exclude "ca/teamdman/sfm/common/block/BatteryBlock.java"
+            exclude "ca/teamdman/sfm/common/blockentity/BatteryBlockEntity.java"
+        }
     }
     // https://docs.gradle.org/current/userguide/java_testing.html#sec:configuring_java_integration_tests
     test {
