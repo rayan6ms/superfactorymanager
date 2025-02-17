@@ -62,15 +62,15 @@ public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
                 .pattern("ABA")
                 .save(writer);
 
-        beginShaped(SFMBlocks.TUNNELLED_MANAGER_BLOCK.get(), 1)
-                .define('M', SFMBlocks.MANAGER_BLOCK.get())
-                .define('H', Items.HOPPER)
-                .unlockedBy("has_iron_ingot", RecipeProvider.has(Items.IRON_INGOT))
-                .unlockedBy("has_chest", RecipeProvider.has(Tags.Items.CHESTS))
-                .pattern("M  ")
-                .pattern("H  ")
-                .pattern("   ")
-                .save(writer);
+//        beginShaped(SFMBlocks.TUNNELLED_MANAGER_BLOCK.get(), 1)
+//                .define('M', SFMBlocks.MANAGER_BLOCK.get())
+//                .define('H', Items.HOPPER)
+//                .unlockedBy("has_iron_ingot", RecipeProvider.has(Items.IRON_INGOT))
+//                .unlockedBy("has_chest", RecipeProvider.has(Tags.Items.CHESTS))
+//                .pattern("M  ")
+//                .pattern("H  ")
+//                .pattern("   ")
+//                .save(writer);
 
         beginShaped(SFMItems.LABEL_GUN_ITEM.get(), 1)
                 .define('S', Tags.Items.RODS_WOODEN)

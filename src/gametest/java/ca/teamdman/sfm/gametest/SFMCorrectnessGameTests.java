@@ -26,6 +26,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
@@ -3043,46 +3044,46 @@ public class SFMCorrectnessGameTests extends SFMGameTestBase {
         });
     }
 
-    @GameTest(template = "7x3x3")
-    public static void tunnel_furnace(GameTestHelper helper) {
-        BlockPos hopperPos = new BlockPos(0, 4, 0);
-        helper.setBlock(hopperPos, Blocks.HOPPER);
-        BlockPos managerPos = new BlockPos(0, 3, 0);
-        helper.setBlock(managerPos, SFMBlocks.TUNNELLED_MANAGER_BLOCK.get());
-        BlockPos barrelPos = new BlockPos(0, 2, 0);
-        helper.setBlock(barrelPos, SFMBlocks.TEST_BARREL_BLOCK.get());
-
-        var hopper = getItemHandler(helper, hopperPos);
-        var barrel = getItemHandler(helper, barrelPos);
-
-        hopper.insertItem(0, new ItemStack(Blocks.DIRT, 1), false);
-
-        helper.runAfterDelay(8, () -> {
-            assertTrue(hopper.getStackInSlot(0).isEmpty(), "Dirt did not move");
-            assertTrue(barrel.getStackInSlot(0).getCount() == 1, "Dirt did not move");
-        });
-
-
-        ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
-        manager.setProgram("""
-                                       EVERY 20 TICKS DO
-                                           INPUT FROM barrel
-                                           OUTPUT TO hopper
-                                       END
-                                   """.stripTrailing().stripIndent());
-
-        // set the labels
-        LabelPositionHolder.empty()
-                .add("barrel", helper.absolutePos(barrelPos))
-                .add("hopper", helper.absolutePos(hopperPos))
-                .save(Objects.requireNonNull(manager.getDisk()));
-
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
-            assertTrue(hopper.getStackInSlot(0).getCount() == 1, "Dirt did not move");
-            assertTrue(barrel.getStackInSlot(0).isEmpty(), "Dirt did not move");
-        });
-    }
+//    @GameTest(template = "7x3x3")
+//    public static void tunnel_furnace(GameTestHelper helper) {
+//        BlockPos hopperPos = new BlockPos(0, 4, 0);
+//        helper.setBlock(hopperPos, Blocks.HOPPER);
+//        BlockPos managerPos = new BlockPos(0, 3, 0);
+//        helper.setBlock(managerPos, SFMBlocks.TUNNELLED_MANAGER_BLOCK.get());
+//        BlockPos barrelPos = new BlockPos(0, 2, 0);
+//        helper.setBlock(barrelPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+//
+//        var hopper = getItemHandler(helper, hopperPos);
+//        var barrel = getItemHandler(helper, barrelPos);
+//
+//        hopper.insertItem(0, new ItemStack(Blocks.DIRT, 1), false);
+//
+//        helper.runAfterDelay(8, () -> {
+//            assertTrue(hopper.getStackInSlot(0).isEmpty(), "Dirt did not move");
+//            assertTrue(barrel.getStackInSlot(0).getCount() == 1, "Dirt did not move");
+//        });
+//
+//
+//        ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
+//        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+//        manager.setProgram("""
+//                                       EVERY 20 TICKS DO
+//                                           INPUT FROM barrel
+//                                           OUTPUT TO hopper
+//                                       END
+//                                   """.stripTrailing().stripIndent());
+//
+//        // set the labels
+//        LabelPositionHolder.empty()
+//                .add("barrel", helper.absolutePos(barrelPos))
+//                .add("hopper", helper.absolutePos(hopperPos))
+//                .save(Objects.requireNonNull(manager.getDisk()));
+//
+//        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+//            assertTrue(hopper.getStackInSlot(0).getCount() == 1, "Dirt did not move");
+//            assertTrue(barrel.getStackInSlot(0).isEmpty(), "Dirt did not move");
+//        });
+//    }
 
     @GameTest(template = "1x1x1")
     public static void inv_wrapper_investigation(GameTestHelper helper) {
@@ -3146,7 +3147,7 @@ public class SFMCorrectnessGameTests extends SFMGameTestBase {
         helper
                 .getLevel()
                 .getEntitiesOfClass(ItemEntity.class, new AABB(helper.absolutePos(new BlockPos(1, 4, 1))).inflate(3))
-                .forEach(e -> e.discard());
+                .forEach(Entity::discard);
 
         for (int i = 0; i < numBooks; i++) {
             helper
@@ -3181,6 +3182,40 @@ public class SFMCorrectnessGameTests extends SFMGameTestBase {
             );
 
             falling_anvil_xp_shard_inner(helper, numBooks, configToRestore, pos, enchBook, iter);
+        });
+    }
+
+    @GameTest(template = "3x2x1")
+    public static void casing_rules(GameTestHelper helper) {
+        helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
+        BlockPos rightPos = new BlockPos(0, 2, 0);
+        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        BlockPos leftPos = new BlockPos(2, 2, 0);
+        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+
+        var rightChest = getItemHandler(helper, rightPos);
+        var leftChest = getItemHandler(helper, leftPos);
+
+        leftChest.insertItem(0, new ItemStack(Blocks.DIRT, 64), false);
+
+        ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(new BlockPos(1, 2, 0));
+        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setProgram("""
+                                       EVERY 20 TICKS DO
+                                           INPUT *DiRt* FROM a
+                                           OUTPUT TO b
+                                       END
+                                   """.stripTrailing().stripIndent());
+
+        // set the labels
+        LabelPositionHolder.empty()
+                .add("a", helper.absolutePos(leftPos))
+                .add("b", helper.absolutePos(rightPos))
+                .save(Objects.requireNonNull(manager.getDisk()));
+
+        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+            assertTrue(leftChest.getStackInSlot(0).isEmpty(), "Dirt did not move");
+            assertTrue(rightChest.getStackInSlot(0).getCount() == 64, "Dirt did not move");
         });
     }
 }
