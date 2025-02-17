@@ -2,22 +2,20 @@ package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.component.ItemStackBox;
+import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.CompressedBlockPosSet;
 import com.mojang.serialization.Codec;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.ComponentSerialization;
 import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.util.StringRepresentable;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Supplier;
 
 public class SFMDataComponents {
@@ -43,12 +41,12 @@ public class SFMDataComponents {
                     .cacheEncoding()
                     .build()
     );
-    public static final Supplier<DataComponentType<Boolean>> ONLY_SHOW_ACTIVE_LABEL = DATA_COMPONENT_TYPES.register(
-            "only_show_active_label",
+    public static final Supplier<DataComponentType<LabelGunItem.LabelGunViewMode>> LABEL_GUN_VIEW_MODE = DATA_COMPONENT_TYPES.register(
+            "label_gun_view_mode",
             () -> DataComponentType
-                    .<Boolean>builder()
-                    .persistent(Codec.BOOL)
-                    .networkSynchronized(ByteBufCodecs.BOOL)
+                    .<LabelGunItem.LabelGunViewMode>builder()
+                    .persistent(LabelGunItem.LabelGunViewMode.CODEC)
+                    .networkSynchronized(LabelGunItem.LabelGunViewMode.STREAM_CODEC)
                     .cacheEncoding()
                     .build()
     );

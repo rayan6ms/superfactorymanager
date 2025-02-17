@@ -161,23 +161,49 @@ public class ItemWorldRenderer {
             MultiBufferSource.BufferSource bufferSource,
             ItemStack labelGun
     ) {
-        // Get labels
-        boolean onlyShowSelectedLabel = LabelGunItem.getOnlyShowActiveLabel(labelGun);
+
+        LabelGunItem.LabelGunViewMode viewMode = LabelGunItem.getViewMode(labelGun);
+
+        // Gather all label -> positions from the gun:
         LabelPositionHolder labelPositionHolder = LabelPositionHolder.from(labelGun);
+
+        // We'll build up a map of pos -> labels that we want to render
+        // depending on the chosen mode.
         HashMultimap<BlockPos, String> labelsByPosition = HashMultimap.create();
-        if (onlyShowSelectedLabel) {
-            String activeLabel = LabelGunItem.getActiveLabel(labelGun);
-            labelPositionHolder.forEach((label, pos1) -> {
-                if (Objects.equals(label, activeLabel)) {
-                    labelsByPosition.put(pos1, label);
-                }
-            });
-            BlockPos hitPos = lookingAt();
-            if (hitPos != null) {
-                labelPositionHolder.getLabels(hitPos).forEach(label -> labelsByPosition.put(hitPos, label));
+
+        // Some "helper" variables:
+        String activeLabel = LabelGunItem.getActiveLabel(labelGun);
+        BlockPos lookingAtPos = ItemWorldRenderer.lookingAt();  // null if none
+
+        switch (viewMode) {
+            case SHOW_ALL -> //noinspection RedundantLabeledSwitchRuleCodeBlock
+            {
+                // Just add all labels
+                labelPositionHolder.forEach((label, pos) -> labelsByPosition.put(pos, label));
             }
-        } else {
-            labelPositionHolder.forEach((label, pos1) -> labelsByPosition.put(pos1, label));
+            case SHOW_ONLY_ACTIVE_LABEL_AND_TARGETED_BLOCK -> {
+                // 1) Show the active label for all positions
+                if (!activeLabel.isEmpty()) {
+                    labelPositionHolder.forEach((label, pos) -> {
+                        if (label.equals(activeLabel)) {
+                            labelsByPosition.put(pos, label);
+                        }
+                    });
+                }
+                // 2) Also show *any* labels for the block the player is looking at
+                if (lookingAtPos != null) {
+                    for (String lbl : labelPositionHolder.getLabels(lookingAtPos)) {
+                        labelsByPosition.put(lookingAtPos, lbl);
+                    }
+                }
+            }
+            case SHOW_ONLY_TARGETED_BLOCK -> {
+                if (lookingAtPos != null) {
+                    for (String lbl : labelPositionHolder.getLabels(lookingAtPos)) {
+                        labelsByPosition.put(lookingAtPos, lbl);
+                    }
+                }
+            }
         }
 
         RenderSystem.disableDepthTest();
@@ -200,7 +226,7 @@ public class ItemWorldRenderer {
                 VBOKind.LABEL_GUN_CAPABILITIES,
                 poseStack,
                 labelledPositions,
-                onlyShowSelectedLabel ? capabilityColorLimitedView : capabilityColor,
+                viewMode != LabelGunItem.LabelGunViewMode.SHOW_ALL ? capabilityColorLimitedView : capabilityColor,
                 event
         );
         RENDER_TYPE.clearRenderState();

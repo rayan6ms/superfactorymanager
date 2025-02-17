@@ -10,11 +10,18 @@ import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.common.registry.SFMDataComponents;
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
+import mekanism.common.content.gear.mekasuit.ModuleJetpackUnit;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.ByIdMap;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -28,6 +35,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
+import java.util.function.IntFunction;
 
 public class LabelGunItem extends Item {
     public LabelGunItem() {
@@ -86,15 +95,25 @@ public class LabelGunItem extends Item {
     ) {
         gun.remove(SFMDataComponents.ACTIVE_LABEL);
     }
-    public static boolean getOnlyShowActiveLabel(ItemStack stack) {
-        return Boolean.TRUE.equals(stack.get(SFMDataComponents.ONLY_SHOW_ACTIVE_LABEL));
+
+    /**
+     * Returns the current enum mode for the label gun item.
+     */
+    public static LabelGunViewMode getViewMode(ItemStack stack) {
+        return stack.getOrDefault(SFMDataComponents.LABEL_GUN_VIEW_MODE, LabelGunViewMode.SHOW_ALL);
     }
 
-    public static void setOnlyShowActiveLabel(
-            ItemStack stack,
-            boolean value
-    ) {
-        stack.set(SFMDataComponents.ONLY_SHOW_ACTIVE_LABEL, value);
+    /**
+     * Sets the view mode in NBT.
+     */
+    public static void setViewMode(ItemStack stack, LabelGunViewMode mode) {
+        stack.set(SFMDataComponents.LABEL_GUN_VIEW_MODE, mode);
+    }
+
+    public static void cycleViewMode(ItemStack stack) {
+        LabelGunViewMode current = getViewMode(stack);
+        int nextOrdinal = (current.ordinal() + 1) % LabelGunViewMode.values().length;
+        setViewMode(stack, LabelGunViewMode.values()[nextOrdinal]);
     }
 
     @Override
@@ -104,7 +123,7 @@ public class LabelGunItem extends Item {
     ) {
         var level = ctx.getLevel();
         if (level.isClientSide && ctx.getPlayer() != null) {
-            boolean pickBlock = ClientKeyHelpers.isKeyDown(SFMKeyMappings.LABEL_GUN_PICK_BLOCK_MODIFIER_KEY);
+            boolean pickBlock = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_PICK_BLOCK_MODIFIER_KEY);
             SFMPackets.sendToServer(new ServerboundLabelGunUsePacket(
                     ctx.getHand(),
                     ctx.getClickedPos(),
@@ -152,7 +171,7 @@ public class LabelGunItem extends Item {
             );
             lines.add(
                     LocalizationKeys.LABEL_GUN_ITEM_TOOLTIP_5.getComponent(
-                            SFMKeyMappings.TOGGLE_LABEL_VIEW_KEY
+                            SFMKeyMappings.CYCLE_LABEL_VIEW_KEY
                                     .get()
                                     .getTranslatedKeyMessage()
                                     .plainCopy()
@@ -193,4 +212,18 @@ public class LabelGunItem extends Item {
         LabelGunItem.setActiveLabel(stack, null);
     }
 
+    public enum LabelGunViewMode implements StringRepresentable {
+        SHOW_ALL,
+        SHOW_ONLY_ACTIVE_LABEL_AND_TARGETED_BLOCK,
+        SHOW_ONLY_TARGETED_BLOCK;
+
+        public static final Codec<LabelGunViewMode> CODEC = StringRepresentable.fromEnum(LabelGunViewMode::values);
+        public static final IntFunction<LabelGunViewMode> BY_ID = ByIdMap.continuous(LabelGunViewMode::ordinal, values(), ByIdMap.OutOfBoundsStrategy.WRAP);
+        public static final StreamCodec<ByteBuf, LabelGunViewMode> STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, LabelGunViewMode::ordinal);
+
+        @Override
+        public String getSerializedName() {
+            return name().toLowerCase(Locale.ROOT);
+        }
+    }
 }
