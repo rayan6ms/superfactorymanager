@@ -248,9 +248,13 @@ public final class LocalizationKeys {
             () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.5",
             () -> "Press " +  "%s to toggle label view."
     );
-    public static final LocalizationEntry LABEL_GUN_LABEL_VIEW_REMINDER = new LocalizationEntry(
-            () -> "sfm.label_gun.label_view_reminder",
-            () -> "Label view only shows the selected label. Toggle in gui or with %s"
+    public static final LocalizationEntry LABEL_GUN_VIEW_MODE_SHOW_ONLY_ACTIVE_AND_TARGETED = new LocalizationEntry(
+            () -> "sfm.label_gun.view_mode.show_only_active_and_targeted",
+            () -> "Showing blocks with active label. Cycle mode in gui or with %s"
+    );
+    public static final LocalizationEntry LABEL_GUN_VIEW_MODE_SHOW_ONLY_TARGETED = new LocalizationEntry(
+            () -> "sfm.label_gun.view_mode.show_only_targeted",
+            () -> "Showing only targeted block labels. Cycle mode in gui or with %s"
     );
     public static final LocalizationEntry NETWORK_TOOL_REMINDER_OVERLAY = new LocalizationEntry(
             () -> "sfm.network_tool.reminder_overlay",
@@ -304,9 +308,9 @@ public final class LocalizationKeys {
             "gui.sfm.label_gun.clear_button",
             "Clear"
     );
-    public static final LocalizationEntry LABEL_GUN_GUI_TOGGLE_LABEL_VIEW_BUTTON = new LocalizationEntry(
+    public static final LocalizationEntry LABEL_GUN_GUI_CYCLE_VIEW_BUTTON = new LocalizationEntry(
             "gui.sfm.label_gun.button.toggle_label_view",
-            "Toggle label view"
+            "Cycle label view"
     );
     public static final LocalizationEntry DISK_EDIT_IN_HAND_TOOLTIP = new LocalizationEntry(
             "gui.sfm.disk.tooltip.edit_in_hand",
@@ -788,9 +792,9 @@ public final class LocalizationKeys {
             "key.sfm.more_info",
             "Hold For More Info"
     );
-    public static final LocalizationEntry TOGGLE_LABEL_VIEW_KEY = new LocalizationEntry(
+    public static final LocalizationEntry CYCLE_LABEL_VIEW_KEY = new LocalizationEntry(
             "key.sfm.toggle_label_view_key",
-            "Toggle selected label view"
+            "Cycle label gun view"
     );
     public static final LocalizationEntry TOGGLE_NETWORK_TOOL_OVERLAY = new LocalizationEntry(
             "key.sfm.toggle_network_tool_overlay",

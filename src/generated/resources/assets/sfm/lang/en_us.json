@@ -53,7 +53,7 @@
   "gui.sfm.facade_confirm_clear.message": "%d different facade states across %d blocks will be wiped from the world.",
   "gui.sfm.facade_confirm_clear.title": "Are you sure you want to clear these facades?",
   "gui.sfm.item_inspector.copied_to_clipboard": "Copied {} characters to clipboard!",
-  "gui.sfm.label_gun.button.toggle_label_view": "Toggle label view",
+  "gui.sfm.label_gun.button.toggle_label_view": "Cycle label view",
   "gui.sfm.label_gun.clear_button": "Clear",
   "gui.sfm.label_gun.label_button": "%s (%d)",
   "gui.sfm.label_gun.label_edit_placeholder": "Search or enter new label",
@@ -145,7 +145,7 @@
   "key.sfm.label_gun.pick_block_modifier": "Label Gun Pick Block Modifier",
   "key.sfm.label_gun.previous_label": "Label Gun Previous Label",
   "key.sfm.more_info": "Hold For More Info",
-  "key.sfm.toggle_label_view_key": "Toggle selected label view",
+  "key.sfm.toggle_label_view_key": "Cycle label gun view",
   "key.sfm.toggle_network_tool_overlay": "Toggle network tool overlay",
   "log.sfm.cable_network.body": "%s",
   "log.sfm.cable_network.footer": "=============================",
@@ -223,6 +223,7 @@
   "program.sfm.warnings.unknown_resource_id": "Resource \"%s\" was not found.",
   "program.sfm.warnings.unused_input_label": "Statement \"%s\" at %s inputs \"%s\" from \"%s\" but no future output statement consume \"%s\".",
   "program.sfm.warnings.unused_label": "Label \"%s\" is used in code but not assigned in the world.",
-  "sfm.label_gun.label_view_reminder": "Label view only shows the selected label. Toggle in gui or with %s",
+  "sfm.label_gun.view_mode.show_only_active_and_targeted": "Showing blocks with active label. Cycle mode in gui or with %s",
+  "sfm.label_gun.view_mode.show_only_targeted": "Showing only targeted block labels. Cycle mode in gui or with %s",
   "sfm.network_tool.reminder_overlay": "Toggle network tool overlay with %s"
 }

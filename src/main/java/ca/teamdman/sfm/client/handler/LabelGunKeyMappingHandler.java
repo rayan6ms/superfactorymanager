@@ -4,7 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientKeyHelpers;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.item.LabelGunItem;
-import ca.teamdman.sfm.common.net.ServerboundLabelGunToggleLabelViewPacket;
+import ca.teamdman.sfm.common.net.ServerboundLabelGunCycleViewModePacket;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunUpdatePacket;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMPackets;
@@ -59,7 +59,7 @@ public class LabelGunKeyMappingHandler {
         if (minecraft.screen != null) return;
 
         // only do something if the key was pressed
-        boolean alt_down = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.TOGGLE_LABEL_VIEW_KEY);
+        boolean alt_down = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.CYCLE_LABEL_VIEW_KEY);
         switch (altState) {
             case Idle -> {
                 if (alt_down) {
@@ -76,7 +76,7 @@ public class LabelGunKeyMappingHandler {
                     );
                     if (hand == null) return;
                     // send packet to server to toggle mode
-                    SFMPackets.sendToServer(new ServerboundLabelGunToggleLabelViewPacket(hand));
+                    SFMPackets.sendToServer(new ServerboundLabelGunCycleViewModePacket(hand));
                 }
             }
             case PressCancelledExternally -> {
