@@ -3112,4 +3112,38 @@ public class SFMCorrectnessGameTests extends SFMGameTestBase {
             falling_anvil_xp_shard_inner(helper, numBooks, configToRestore, pos, enchBook, iter);
         });
     }
+
+    @GameTest(template = "3x2x1")
+    public static void casing_rules(GameTestHelper helper) {
+        helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
+        BlockPos rightPos = new BlockPos(0, 2, 0);
+        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        BlockPos leftPos = new BlockPos(2, 2, 0);
+        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+
+        var rightChest = getItemHandler(helper, rightPos);
+        var leftChest = getItemHandler(helper, leftPos);
+
+        leftChest.insertItem(0, new ItemStack(Blocks.DIRT, 64), false);
+
+        ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(new BlockPos(1, 2, 0));
+        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setProgram("""
+                                       EVERY 20 TICKS DO
+                                           INPUT *DiRt* FROM a
+                                           OUTPUT TO b
+                                       END
+                                   """.stripTrailing().stripIndent());
+
+        // set the labels
+        LabelPositionHolder.empty()
+                .add("a", helper.absolutePos(leftPos))
+                .add("b", helper.absolutePos(rightPos))
+                .save(Objects.requireNonNull(manager.getDisk()));
+
+        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+            assertTrue(leftChest.getStackInSlot(0).isEmpty(), "Dirt did not move");
+            assertTrue(rightChest.getStackInSlot(0).getCount() == 64, "Dirt did not move");
+        });
+    }
 }
