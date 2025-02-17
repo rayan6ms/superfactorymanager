@@ -39,6 +39,7 @@ import java.util.List;
 
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.*;
 
+@SuppressWarnings({"FieldCanBeLocal", "unused", "NotNullFieldNotInitialized"})
 public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu> {
     private static final ResourceLocation BACKGROUND_TEXTURE_LOCATION = new ResourceLocation(
             SFM.MOD_ID,
@@ -47,25 +48,15 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     private final float STATUS_DURATION = 40;
     private Component status = Component.empty();
     private float statusCountdown = 0;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button diagButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button clipboardPasteButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button clipboardCopyButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button discordButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button resetButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button editButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button examplesButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button logsButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button rebuildButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button serverConfigButton;
 
     public ManagerScreen(

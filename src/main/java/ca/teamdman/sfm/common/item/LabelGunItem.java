@@ -210,7 +210,6 @@ public class LabelGunItem extends Item {
     public enum LabelGunViewMode {
         SHOW_ALL,
         SHOW_ONLY_ACTIVE_LABEL_AND_TARGETED_BLOCK,
-        SHOW_ONLY_TARGETED_BLOCK;
-
+        SHOW_ONLY_TARGETED_BLOCK,
     }
 }

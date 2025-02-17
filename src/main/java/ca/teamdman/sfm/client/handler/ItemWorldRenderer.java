@@ -170,7 +170,8 @@ public class ItemWorldRenderer {
         BlockPos lookingAtPos = ItemWorldRenderer.lookingAt();  // null if none
 
         switch (viewMode) {
-            case SHOW_ALL -> {
+            case SHOW_ALL -> //noinspection RedundantLabeledSwitchRuleCodeBlock
+            {
                 // Just add all labels
                 labelPositionHolder.forEach((label, pos) -> labelsByPosition.put(pos, label));
             }

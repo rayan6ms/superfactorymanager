@@ -26,6 +26,7 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
@@ -3075,7 +3076,7 @@ public class SFMCorrectnessGameTests extends SFMGameTestBase {
         helper
                 .getLevel()
                 .getEntitiesOfClass(ItemEntity.class, new AABB(helper.absolutePos(new BlockPos(1, 4, 1))).inflate(3))
-                .forEach(e -> e.discard());
+                .forEach(Entity::discard);
 
         for (int i = 0; i < numBooks; i++) {
             helper
