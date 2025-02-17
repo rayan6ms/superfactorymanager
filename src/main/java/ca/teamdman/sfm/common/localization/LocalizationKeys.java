@@ -164,6 +164,31 @@ public final class LocalizationKeys {
             "program.sfm.warnings.each_without_pattern",
             "EACH used without a pattern, statement %s"
     );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry MOD_NAME = new LocalizationEntry(
+            "mod.name",
+            "Super Factory Manager"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry ITEM_GROUP = new LocalizationEntry(
+            "itemGroup.sfm",
+            "Super Factory Manager"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry CABLE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.CABLE_BLOCK.get().getDescriptionId(),
+            () -> "Inventory Cable"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry MANAGER_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.MANAGER_BLOCK.get().getDescriptionId(),
+            () -> "Factory Manager"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry PRINTING_PRESS_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.PRINTING_PRESS_BLOCK.get().getDescriptionId(),
+            () -> "Printing Press"
+    );
     public static final LocalizationEntry PRINTING_PRESS_JEI_CATEGORY_TITLE = new LocalizationEntry(
             "gui.jei.category.sfm.printing_press",
             "Printing Press"
@@ -242,11 +267,11 @@ public final class LocalizationKeys {
     );
     public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_4 = new LocalizationEntry(
             () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.4",
-            () ->  "%s + %s to pick label from block."
+            () -> "%s + %s to pick label from block."
     );
     public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_5 = new LocalizationEntry(
             () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.5",
-            () -> "Press " +  "%s to toggle label view."
+            () -> "Press " + "%s to toggle label view."
     );
     public static final LocalizationEntry LABEL_GUN_VIEW_MODE_SHOW_ONLY_ACTIVE_AND_TARGETED = new LocalizationEntry(
             () -> "sfm.label_gun.view_mode.show_only_active_and_targeted",
@@ -833,21 +858,6 @@ public final class LocalizationKeys {
             "Too many conditions for simulation, some linter warnings may be missed."
     );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
-    public static final LocalizationEntry MOD_NAME = new LocalizationEntry(
-            "mod.name",
-            "Super Factory Manager"
-    );
-    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
-    public static final LocalizationEntry ITEM_GROUP = new LocalizationEntry(
-            "itemGroup.sfm",
-            "Super Factory Manager"
-    );
-    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
-    public static final LocalizationEntry CABLE_BLOCK = new LocalizationEntry(
-            () -> SFMBlocks.CABLE_BLOCK.get().getDescriptionId(),
-            () -> "Inventory Cable"
-    );
-    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry CABLE_FACADE_BLOCK = new LocalizationEntry(
             () -> SFMBlocks.CABLE_FACADE_BLOCK.get().getDescriptionId(),
             () -> "Inventory Cable Facade"
@@ -862,12 +872,7 @@ public final class LocalizationKeys {
             () -> SFMBlocks.FANCY_CABLE_FACADE_BLOCK.get().getDescriptionId(),
             () -> "Fancy Inventory Cable Facade"
     );
-    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
-    public static final LocalizationEntry MANAGER_BLOCK = new LocalizationEntry(
-            () -> SFMBlocks.MANAGER_BLOCK.get().getDescriptionId(),
-            () -> "Factory Manager"
-    );
-//    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    //    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
 //    public static final LocalizationEntry TUNNELLED_MANAGER_BLOCK = new LocalizationEntry(
 //            () -> SFMBlocks.TUNNELLED_MANAGER_BLOCK.get().getDescriptionId(),
 //            () -> "Tunnelled Factory Manager"
@@ -876,11 +881,6 @@ public final class LocalizationKeys {
     public static final LocalizationEntry TEST_BARREL_TANK_BLOCK = new LocalizationEntry(
             () -> SFMBlocks.TEST_BARREL_TANK_BLOCK.get().getDescriptionId(),
             () -> "Test Barrel Tank"
-    );
-    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
-    public static final LocalizationEntry PRINTING_PRESS_BLOCK = new LocalizationEntry(
-            () -> SFMBlocks.PRINTING_PRESS_BLOCK.get().getDescriptionId(),
-            () -> "Printing Press"
     );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry WATER_TANK_BLOCK = new LocalizationEntry(
@@ -923,7 +923,7 @@ public final class LocalizationKeys {
             () -> "Test Barrel"
     );
 
-//    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    //    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
 //    public static final LocalizationEntry BATTERY_BLOCK = new LocalizationEntry(
 //            () -> SFMBlocks.BATTERY_BLOCK.get().getDescriptionId(),
 //            () -> "Battery (WIP)"
@@ -944,6 +944,7 @@ public final class LocalizationKeys {
             "chat.sfm.config_update_and_sync_result.internal_failure",
             "Something went wrong while updating the SFM config, I have no idea if changes were made. Check the server logs."
     );
+
     public static List<LocalizationEntry> getEntries() {
         // use reflection to get all the public static LocalizationEntry fields
         var rtn = new ArrayList<LocalizationEntry>();

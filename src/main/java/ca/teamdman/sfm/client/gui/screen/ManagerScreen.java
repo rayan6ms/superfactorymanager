@@ -147,11 +147,6 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         statusCountdown -= partialTicks;
     }
 
-    @MCVersionDependentBehaviour
-    public float getBlitOffsetGood() {
-        return (float) getBlitOffset();
-    }
-
     @Override
     protected void init() {
         super.init();
@@ -635,6 +630,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     @MCVersionDependentBehaviour
     private void enableTexture() {
         RenderSystem.enableTexture();
+    }
+
+    @MCVersionDependentBehaviour
+    public float getBlitOffsetGood() {
+        return (float) getBlitOffset();
     }
 
     @Override
