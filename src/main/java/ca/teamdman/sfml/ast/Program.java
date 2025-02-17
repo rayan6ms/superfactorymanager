@@ -120,7 +120,7 @@ public record Program(
             Program program,
             List<TranslatableContents> errors
     ) {
-        List<? extends String> disallowedResourcetypes = SFMConfig.getOrDefault(SFMConfig.SERVER.disallowedResourceTypesForTransfer);
+        List<? extends String> disallowedResourceTypes = SFMConfig.getOrDefault(SFMConfig.SERVER.disallowedResourceTypesForTransfer);
         for (ResourceIdentifier<?, ?, ?> referencedResource : program.referencedResources) {
             try {
                 ResourceType<?, ?, ?> resourceType = referencedResource.getResourceType();
@@ -129,8 +129,8 @@ public record Program(
                             referencedResource));
                 } else {
                     ResourceLocation resourceTypeId = Objects.requireNonNull(SFMResourceTypes.DEFERRED_TYPES.get().getKey(resourceType));
-                    if (disallowedResourcetypes.contains(resourceTypeId.toString())) {
-                        errors.add(LocalizationKeys.PROGRAM_ERROR_UNKNOWN_RESOURCE_TYPE.get(
+                    if (disallowedResourceTypes.contains(resourceTypeId.toString())) {
+                        errors.add(LocalizationKeys.PROGRAM_ERROR_DISALLOWED_RESOURCE_TYPE.get(
                                 referencedResource));
                     }
                 }

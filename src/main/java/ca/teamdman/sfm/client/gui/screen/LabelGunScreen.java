@@ -3,8 +3,8 @@ package ca.teamdman.sfm.client.gui.screen;
 import ca.teamdman.sfm.client.gui.ButtonBuilder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunClearPacket;
+import ca.teamdman.sfm.common.net.ServerboundLabelGunCycleViewModePacket;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunPrunePacket;
-import ca.teamdman.sfm.common.net.ServerboundLabelGunToggleLabelViewPacket;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunUpdatePacket;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMPackets;
@@ -83,9 +83,9 @@ public class LabelGunScreen extends Screen {
                 new ButtonBuilder()
                         .setSize(200, 20)
                         .setPosition(this.width / 2 - 2 - 100, this.height - 25)
-                        .setText(LocalizationKeys.LABEL_GUN_GUI_TOGGLE_LABEL_VIEW_BUTTON)
+                        .setText(LocalizationKeys.LABEL_GUN_GUI_CYCLE_VIEW_BUTTON)
                         .setOnPress((btn) -> {
-                            SFMPackets.sendToServer(new ServerboundLabelGunToggleLabelViewPacket(HAND));
+                            SFMPackets.sendToServer(new ServerboundLabelGunCycleViewModePacket(HAND));
                             onClose();
                         })
                         .build()
