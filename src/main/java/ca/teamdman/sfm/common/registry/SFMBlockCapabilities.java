@@ -37,11 +37,11 @@ public class SFMBlockCapabilities {
                 SFMBlockEntities.WATER_TANK_BLOCK_ENTITY.get(),
                 (blockEntity, direction) -> blockEntity.TANK
         );
-        event.registerBlockEntity(
-                Capabilities.EnergyStorage.BLOCK,
-                SFMBlockEntities.BATTERY_BLOCK_ENTITY.get(),
-                (blockEntity, direction) -> blockEntity.CONTAINER
-        );
+//        event.registerBlockEntity(
+//                Capabilities.EnergyStorage.BLOCK,
+//                SFMBlockEntities.BATTERY_BLOCK_ENTITY.get(),
+//                (blockEntity, direction) -> blockEntity.CONTAINER
+//        );
         event.registerBlock(
                 Capabilities.ItemHandler.BLOCK,
                 new IBlockCapabilityProvider<>() {
@@ -92,13 +92,13 @@ public class SFMBlockCapabilities {
                 Blocks.LAVA_CAULDRON,
                 Blocks.WATER_CAULDRON
         );
-        SFMResourceTypes.getCapabilities().forEach(cap -> {
-            event.registerBlock(
-                    cap,
-                    createProvider(cap),
-                    SFMBlocks.TUNNELLED_MANAGER_BLOCK.get()
-            );
-        });
+//        SFMResourceTypes.getCapabilities().forEach(cap -> {
+//            event.registerBlock(
+//                    cap,
+//                    createProvider(cap),
+//                    SFMBlocks.TUNNELLED_MANAGER_BLOCK.get()
+//            );
+//        });
     }
 
     private static <T> IBlockCapabilityProvider<T, @Nullable Direction> createProvider(BlockCapability<?, @Nullable Direction> cap) {

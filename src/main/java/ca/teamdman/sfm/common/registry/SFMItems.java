@@ -17,10 +17,10 @@ public class SFMItems {
 
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, SFM.MOD_ID);
     public static final Supplier<BlockItem> MANAGER_ITEM = register("manager", SFMBlocks.MANAGER_BLOCK);
-    public static final Supplier<BlockItem> TUNNELLED_MANAGER_ITEM = register(
-            "tunnelled_manager",
-            SFMBlocks.TUNNELLED_MANAGER_BLOCK
-    );
+//    public static final Supplier<BlockItem> TUNNELLED_MANAGER_ITEM = register(
+//            "tunnelled_manager",
+//            SFMBlocks.TUNNELLED_MANAGER_BLOCK
+//    );
     public static final Supplier<BlockItem> CABLE_ITEM = register("cable", SFMBlocks.CABLE_BLOCK);
     public static final Supplier<BlockItem> FANCY_CABLE_ITEM = register(
             "fancy_cable",

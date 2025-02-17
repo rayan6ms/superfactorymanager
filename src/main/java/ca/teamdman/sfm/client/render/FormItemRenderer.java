@@ -61,7 +61,7 @@ public class FormItemRenderer extends BlockEntityWithoutLevelRenderer {
 //            poseStack.mulPose(Vector3f.YP.rotationDegrees(-65));
         }
 
-        if (ClientKeyHelpers.isKeyDown(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY)) {
+        if (ClientKeyHelpers.isKeyDownInScreenOrWorld(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY)) {
             poseStack.pushPose();
             poseStack.translate(0, 0.5f, 0.3f);
             poseStack.scale(0.5f, 0.5f, 0.5f);

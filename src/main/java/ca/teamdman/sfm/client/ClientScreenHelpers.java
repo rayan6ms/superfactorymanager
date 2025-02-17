@@ -33,6 +33,9 @@ public class ClientScreenHelpers {
                     .pushGuiLayer(screen);
         }
     }
+    public static void popScreen() {
+        Minecraft.getInstance().popGuiLayer();
+    }
 
     public static void showLabelGunScreen(
             ItemStack stack,

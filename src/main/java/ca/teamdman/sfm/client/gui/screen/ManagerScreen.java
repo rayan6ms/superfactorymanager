@@ -16,10 +16,12 @@ import ca.teamdman.sfml.ast.Program;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -42,6 +44,7 @@ import java.util.List;
 
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.*;
 
+@SuppressWarnings({"FieldCanBeLocal", "unused", "NotNullFieldNotInitialized"})
 public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu> {
     private static final ResourceLocation BACKGROUND_TEXTURE_LOCATION = ResourceLocation.fromNamespaceAndPath(
             SFM.MOD_ID,
@@ -50,23 +53,15 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     private final float STATUS_DURATION = 40;
     private Component status = Component.empty();
     private float statusCountdown = 0;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button diagButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button clipboardPasteButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button clipboardCopyButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
+    private Button discordButton;
     private Button resetButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button editButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button examplesButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button logsButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button rebuildButton;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     private Button serverConfigButton;
 
     public ManagerScreen(
@@ -204,6 +199,17 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                                 font,
                                 MANAGER_GUI_VIEW_EXAMPLES_BUTTON_TOOLTIP
                         )
+                        .build()
+        );
+        discordButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 112
+                        )
+                        .setSize(buttonWidth, buttonHeight)
+                        .setText(MANAGER_GUI_DISCORD_BUTTON)
+                        .setOnPress(button -> this.onDiscordButtonClicked())
                         .build()
         );
         clipboardCopyButton = this.addRenderableWidget(
@@ -367,6 +373,22 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         menu.program = program;
         status = MANAGER_GUI_STATUS_LOADED_CLIPBOARD.getComponent();
         statusCountdown = STATUS_DURATION;
+    }
+
+    private void onDiscordButtonClicked() {
+        String discordUrl = "https://discord.gg/xjXYj9MmS4";
+        ClientScreenHelpers.setOrPushScreen(
+                new ConfirmLinkScreen(
+                        proceed -> {
+                            if (proceed) {
+                                Util.getPlatform().openUri(discordUrl);
+                            }
+                            ClientScreenHelpers.popScreen();
+                        },
+                        discordUrl,
+                        false
+                )
+        );
     }
 
     private void onClipboardCopyButtonClicked() {
