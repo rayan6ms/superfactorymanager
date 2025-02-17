@@ -18,9 +18,11 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import net.minecraft.ChatFormatting;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.screens.ConfirmLinkScreen;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -51,6 +53,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     private Button clipboardPasteButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
     private Button clipboardCopyButton;
+    @SuppressWarnings("NotNullFieldNotInitialized")
+    private Button discordButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
     private Button resetButton;
     @SuppressWarnings("NotNullFieldNotInitialized")
@@ -152,6 +156,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         statusCountdown -= partialTicks;
     }
 
+    @MCVersionDependentBehaviour
+    public float getBlitOffsetGood() {
+        return (float) getBlitOffset();
+    }
+
     @Override
     protected void init() {
         super.init();
@@ -199,6 +208,17 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                                 font,
                                 MANAGER_GUI_VIEW_EXAMPLES_BUTTON_TOOLTIP
                         )
+                        .build()
+        );
+        discordButton = this.addRenderableWidget(
+                new ButtonBuilder()
+                        .setPosition(
+                                (this.width - this.imageWidth) / 2 - buttonWidth,
+                                (this.height - this.imageHeight) / 2 + 112
+                        )
+                        .setSize(buttonWidth, buttonHeight)
+                        .setText(MANAGER_GUI_DISCORD_BUTTON)
+                        .setOnPress(button -> this.onDiscordButtonClicked())
                         .build()
         );
         clipboardCopyButton = this.addRenderableWidget(
@@ -362,6 +382,22 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         menu.program = program;
         status = MANAGER_GUI_STATUS_LOADED_CLIPBOARD.getComponent();
         statusCountdown = STATUS_DURATION;
+    }
+
+    private void onDiscordButtonClicked() {
+        String discordUrl = "https://discord.gg/xjXYj9MmS4";
+        ClientScreenHelpers.setOrPushScreen(
+                new ConfirmLinkScreen(
+                        proceed -> {
+                            if (proceed) {
+                                Util.getPlatform().openUri(discordUrl);
+                            }
+                            ClientScreenHelpers.popScreen();
+                        },
+                        discordUrl,
+                        false
+                )
+        );
     }
 
     private void onClipboardCopyButtonClicked() {
@@ -606,13 +642,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     @MCVersionDependentBehaviour
-    private void enableTexture(){
+    private void enableTexture() {
         RenderSystem.enableTexture();
-    }
-
-    @MCVersionDependentBehaviour
-    public float getBlitOffsetGood() {
-        return (float) getBlitOffset();
     }
 
     @Override

@@ -1,5 +1,4 @@
 {
-  "block.sfm.battery": "Battery (WIP)",
   "block.sfm.cable": "Inventory Cable",
   "block.sfm.cable_facade": "Inventory Cable Facade",
   "block.sfm.fancy_cable": "Fancy Inventory Cable",
@@ -9,7 +8,6 @@
   "block.sfm.printing_press.tooltip": "Place with an air gap below a downward facing piston. Extend the piston to use.",
   "block.sfm.test_barrel": "Test Barrel",
   "block.sfm.test_barrel_tank": "Test Barrel Tank",
-  "block.sfm.tunnelled_manager": "Tunnelled Factory Manager",
   "block.sfm.water_tank": "Water Tank",
   "block.sfm.water_tank.tooltip.1": "Requires two adjacent water sources",
   "block.sfm.water_tank.tooltip.2": "More effective when also adjacent to other active water tanks",
@@ -71,6 +69,7 @@
   "gui.sfm.logs.no_content": "Ahoy, world!\nChange the log level using the buttons at the top of this screen.\nLoud log levels will be reset after a single program execution.\nLogging can make statements take longer to execute.\nThe scrolling is wacky, I'm working on it.\nOnly a few hundred lines are drawn to reduce lag.\nUse the copy button to view in a better editor for now lol.",
   "gui.sfm.logs.title": "Logs",
   "gui.sfm.manager.button.copy_to_clipboard": "Copy to clipboard",
+  "gui.sfm.manager.button.discord": "Discord",
   "gui.sfm.manager.button.paste_clipboard": "Paste from clipboard",
   "gui.sfm.manager.button.rebuild": "Rebuild cable network",
   "gui.sfm.manager.button.reset": "Reset",

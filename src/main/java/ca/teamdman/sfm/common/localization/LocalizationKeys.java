@@ -696,6 +696,10 @@ public final class LocalizationKeys {
             "gui.sfm.manager.button.view_logs",
             "View logs"
     );
+    public static final LocalizationEntry MANAGER_GUI_DISCORD_BUTTON = new LocalizationEntry(
+            "gui.sfm.manager.button.discord",
+            "Discord"
+    );
     public static final LocalizationEntry MANAGER_GUI_REBUILD_BUTTON = new LocalizationEntry(
             "gui.sfm.manager.button.rebuild",
             "Rebuild cable network"
