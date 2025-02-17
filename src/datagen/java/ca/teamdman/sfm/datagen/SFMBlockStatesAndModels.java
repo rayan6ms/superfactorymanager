@@ -27,12 +27,12 @@ public class SFMBlockStatesAndModels extends MCVersionAgnosticBlockStatesAndMode
                 modLoc("block/manager_top")
         ).texture("particle", "#top"));
 
-        simpleBlock(SFMBlocks.TUNNELLED_MANAGER_BLOCK.get(), models().cubeBottomTop(
-                SFMBlocks.TUNNELLED_MANAGER_BLOCK.getId().getPath(),
-                modLoc("block/tunnelled_manager_side"),
-                modLoc("block/tunnelled_manager_bot"),
-                modLoc("block/tunnelled_manager_top")
-        ).texture("particle", "#top"));
+//        simpleBlock(SFMBlocks.TUNNELLED_MANAGER_BLOCK.get(), models().cubeBottomTop(
+//                SFMBlocks.TUNNELLED_MANAGER_BLOCK.getId().getPath(),
+//                modLoc("block/tunnelled_manager_side"),
+//                modLoc("block/tunnelled_manager_bot"),
+//                modLoc("block/tunnelled_manager_top")
+//        ).texture("particle", "#top"));
 
         simpleBlock(SFMBlocks.TEST_BARREL_TANK_BLOCK.get(), models().cubeAll(
                 SFMBlocks.TEST_BARREL_TANK_BLOCK.getId().getPath(),

@@ -6,7 +6,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.util.Lazy;
 
 public class ClientKeyHelpers {
-    public static boolean isKeyDown(Lazy<KeyMapping> key) {
+    public static boolean isKeyDownInScreenOrWorld(Lazy<KeyMapping> key) {
         if (key.get().getKey().equals(InputConstants.UNKNOWN)) {
             return false;
         }
@@ -17,5 +17,11 @@ public class ClientKeyHelpers {
                 handle,
                 key.get().getKey().getValue()
         );
+    }
+    public static boolean isKeyDownInWorld(Lazy<KeyMapping> key) {
+        if (key.get().getKey().equals(InputConstants.UNKNOWN)) {
+            return false;
+        }
+        return key.get().isDown();
     }
 }

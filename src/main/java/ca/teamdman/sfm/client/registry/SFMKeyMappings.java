@@ -19,14 +19,14 @@ import org.lwjgl.glfw.GLFW;
 public class SFMKeyMappings {
     public static final Lazy<KeyMapping> MORE_INFO_TOOLTIP_KEY = Lazy.of(() -> new KeyMapping(
             LocalizationKeys.MORE_HOVER_INFO_KEY.key().get(),
-            KeyConflictContext.GUI,
+            KeyConflictContext.UNIVERSAL,
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_LEFT_SHIFT,
             LocalizationKeys.SFM_KEY_CATEGORY.key().get()
     ));
 
-    public static final Lazy<KeyMapping> TOGGLE_LABEL_VIEW_KEY = Lazy.of(() -> new KeyMapping(
-            LocalizationKeys.TOGGLE_LABEL_VIEW_KEY.key().get(),
+    public static final Lazy<KeyMapping> CYCLE_LABEL_VIEW_KEY = Lazy.of(() -> new KeyMapping(
+            LocalizationKeys.CYCLE_LABEL_VIEW_KEY.key().get(),
             KeyConflictContext.IN_GAME,
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_LEFT_ALT,
@@ -61,7 +61,7 @@ public class SFMKeyMappings {
 
     public static final Lazy<KeyMapping> LABEL_GUN_PICK_BLOCK_MODIFIER_KEY = Lazy.of(() -> new KeyMapping(
             LocalizationKeys.LABEL_GUN_PICK_BLOCK_MODIFIER_KEY.key().get(),
-            KeyConflictContext.GUI,
+            KeyConflictContext.IN_GAME,
             KeyModifier.NONE,
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_LEFT_ALT,
@@ -92,7 +92,7 @@ public class SFMKeyMappings {
         event.register(MORE_INFO_TOOLTIP_KEY.get());
         event.register(CONTAINER_INSPECTOR_KEY.get());
         event.register(ITEM_INSPECTOR_KEY.get());
-        event.register(TOGGLE_LABEL_VIEW_KEY.get());
+        event.register(CYCLE_LABEL_VIEW_KEY.get());
         event.register(LABEL_GUN_PICK_BLOCK_MODIFIER_KEY.get());
         event.register(LABEL_GUN_NEXT_LABEL_KEY.get());
         event.register(LABEL_GUN_PREVIOUS_LABEL_KEY.get());
