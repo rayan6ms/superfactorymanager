@@ -642,11 +642,6 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         return 0F;
     }
 
-    @MCVersionDependentBehaviour
-    public float getBlitOffsetGood() {
-        return (float) getBlitOffset();
-    }
-
     @Override
     protected void renderTooltip(
             GuiGraphics pGuiGraphics,
