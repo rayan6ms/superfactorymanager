@@ -164,25 +164,21 @@ public final class LocalizationKeys {
             "program.sfm.warnings.each_without_pattern",
             "EACH used without a pattern, statement %s"
     );
-
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry MOD_NAME = new LocalizationEntry(
             "mod.name",
             "Super Factory Manager"
     );
-
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry ITEM_GROUP = new LocalizationEntry(
             "item_group.sfm.main",
             "Super Factory Manager"
     );
-
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry CABLE_BLOCK = new LocalizationEntry(
             () -> SFMBlocks.CABLE_BLOCK.get().getDescriptionId(),
             () -> "Inventory Cable"
     );
-
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry MANAGER_BLOCK = new LocalizationEntry(
             () -> SFMBlocks.MANAGER_BLOCK.get().getDescriptionId(),
@@ -193,7 +189,6 @@ public final class LocalizationKeys {
             () -> SFMBlocks.PRINTING_PRESS_BLOCK.get().getDescriptionId(),
             () -> "Printing Press"
     );
-
     public static final LocalizationEntry PRINTING_PRESS_JEI_CATEGORY_TITLE = new LocalizationEntry(
             "gui.jei.category.sfm.printing_press",
             "Printing Press"
@@ -862,7 +857,6 @@ public final class LocalizationKeys {
             "program.sfm.warnings.too_many_conditions",
             "Too many conditions for simulation, some linter warnings may be missed."
     );
-
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry CABLE_FACADE_BLOCK = new LocalizationEntry(
             () -> SFMBlocks.CABLE_FACADE_BLOCK.get().getDescriptionId(),
