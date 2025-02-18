@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.config;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
@@ -9,6 +10,7 @@ import com.electronwill.nightconfig.toml.TomlFormat;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.fml.Bindings;
+import net.neoforged.fml.config.ConfigFileTypeHandler;
 import net.neoforged.fml.config.IConfigEvent;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -129,21 +131,19 @@ public class SFMConfigReadWriter {
         TomlFormat.instance().createWriter().write(config, configPath, WritingMode.REPLACE);
 
         // Load the new config
-        // TODO: fix this
-        throw new NotImplementedException("bruh");
-//        final CommentedFileConfig fileConfig = modConfig.getHandler().reader(configBasePath).apply(modConfig);
-//        SFM.LOGGER.info("Setting up new server config data");
-//        if (!setConfigData(modConfig, fileConfig)) {
-//            SFM.LOGGER.warn("Failed to set new server config data");
-//            return false;
-//        }
-//
-//        SFM.LOGGER.info("Firing config changed event");
-//        if (!fireChangedEvent(modConfig)) {
-//            SFM.LOGGER.warn("Failed to fire server config changed event");
-//            return false;
-//        }
-//        return true;
+        final CommentedFileConfig fileConfig = getTomlFileTypeHandler(modConfig).reader(configBasePath).apply(modConfig);
+        SFM.LOGGER.info("Setting up new server config data");
+        if (!setConfigData(modConfig, fileConfig)) {
+            SFM.LOGGER.warn("Failed to set new server config data");
+            return false;
+        }
+
+        SFM.LOGGER.info("Firing config changed event");
+        if (!fireChangedEvent(modConfig)) {
+            SFM.LOGGER.warn("Failed to fire server config changed event");
+            return false;
+        }
+        return true;
     }
 
     private static boolean writeClientConfig(CommentedConfig config) {
@@ -179,21 +179,24 @@ public class SFMConfigReadWriter {
         TomlFormat.instance().createWriter().write(config, configPath, WritingMode.REPLACE);
 
         // Load the new config
-        // TODO: fix this
-        throw new NotImplementedException("bruh");
-//        final CommentedFileConfig fileConfig = modConfig.getHandler().reader(configBasePath).apply(modConfig);
-//        SFM.LOGGER.info("Setting up new client config data");
-//        if (!setConfigData(modConfig, fileConfig)) {
-//            SFM.LOGGER.warn("Failed to set new client config data");
-//            return false;
-//        }
-//
-//        SFM.LOGGER.info("Firing client config changed event");
-//        if (!fireChangedEvent(modConfig)) {
-//            SFM.LOGGER.warn("Failed to fire client config changed event");
-//            return false;
-//        }
-//        return true;
+        final CommentedFileConfig fileConfig = getTomlFileTypeHandler(modConfig).reader(configBasePath).apply(modConfig);
+        SFM.LOGGER.info("Setting up new client config data");
+        if (!setConfigData(modConfig, fileConfig)) {
+            SFM.LOGGER.warn("Failed to set new client config data");
+            return false;
+        }
+
+        SFM.LOGGER.info("Firing client config changed event");
+        if (!fireChangedEvent(modConfig)) {
+            SFM.LOGGER.warn("Failed to fire client config changed event");
+            return false;
+        }
+        return true;
+    }
+
+    @MCVersionDependentBehaviour
+    public static ConfigFileTypeHandler getTomlFileTypeHandler(ModConfig ignoredModConfig) {
+        return ConfigFileTypeHandler.TOML;
     }
 
     public static @Nullable CommentedConfig parseConfigToml(String configToml, ModConfigSpec configSpec) {
