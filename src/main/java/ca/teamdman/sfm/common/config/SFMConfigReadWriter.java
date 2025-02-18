@@ -133,7 +133,7 @@ public class SFMConfigReadWriter {
         TomlFormat.instance().createWriter().write(config, configPath, WritingMode.REPLACE);
 
         // Load the new config
-        final CommentedFileConfig fileConfig = modConfig.getHandler().reader(configBasePath).apply(modConfig);
+        final CommentedFileConfig fileConfig = getTomlFileTypeHandler(modConfig).reader(configBasePath).apply(modConfig);
         SFM.LOGGER.info("Setting up new server config data");
         if (!setConfigData(modConfig, fileConfig)) {
             SFM.LOGGER.warn("Failed to set new server config data");
