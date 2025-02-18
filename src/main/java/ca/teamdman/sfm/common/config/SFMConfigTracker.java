@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.config;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -25,6 +26,7 @@ public class SFMConfigTracker {
     }
 
     @SuppressWarnings({"unchecked", "UnstableApiUsage"})
+    @MCVersionDependentBehaviour
     private static Set<ModConfig> getModConfigs(ModConfig.Type modConfigType) {
         ConfigTracker configTracker = ConfigTracker.INSTANCE;
         try {
@@ -88,6 +90,7 @@ public class SFMConfigTracker {
             }
         }
 
+        @MCVersionDependentBehaviour
         private static @Nullable Path getConfigPath(IConfigSpec configSpec) {
             IConfigSpec.ILoadedConfig loadedConfig;
             try {

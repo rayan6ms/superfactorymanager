@@ -97,9 +97,11 @@ public class SFMConfigReadWriter {
         }
     }
 
+    @SuppressWarnings("unused")
     @MCVersionDependentBehaviour
     public static boolean updateActiveConfigAndFireReloadedEvent(
             ModConfig modConfig,
+            Path configBasePath,
             Path configPath,
             CommentedConfig newConfig
     ) {
@@ -192,18 +194,18 @@ public class SFMConfigReadWriter {
             return false;
         }
 
-        // ~~Close the old config~~
-        // this is commented out because it actually unwatches the whole dir instead of just our file
-        // this causes "Failed to remove config {} from tracker!" warnings vvv
+        // We do not have to close the config before changing.
+        // If you were to do so, it would break the file watching because the unload method unwatches the whole dir.
+        // This causes "Failed to remove config {} from tracker!" warnings vvv
         // java.lang.NullPointerException: Cannot read field "watchedFileCount" because "watchedDir" is null
-        // so do nothing to close the old config
-//        modConfig.getHandler().unload(configBasePath, modConfig);
+        // So, we do nothing to close the old config
+        // modConfig.getHandler().unload(configBasePath, modConfig);
 
         // Write the new config
         TomlFormat.instance().createWriter().write(config, configPath, WritingMode.REPLACE);
 
         // Load the new config
-        return updateActiveConfigAndFireReloadedEvent(modConfig, configPath, config);
+        return updateActiveConfigAndFireReloadedEvent(modConfig, configBasePath, configPath, config);
     }
 
     private static boolean writeClientConfig(CommentedConfig config) {
@@ -228,18 +230,18 @@ public class SFMConfigReadWriter {
             return false;
         }
 
-        // ~~Close the old config~~
-        // this is commented out because it actually unwatches the whole dir instead of just our file
-        // this causes "Failed to remove config {} from tracker!" warnings vvv
+        // We do not have to close the config before changing.
+        // If you were to do so, it would break the file watching because the unload method unwatches the whole dir.
+        // This causes "Failed to remove config {} from tracker!" warnings vvv
         // java.lang.NullPointerException: Cannot read field "watchedFileCount" because "watchedDir" is null
-        // so do nothing to close the old config
-//        modConfig.getHandler().unload(configBasePath, modConfig);
+        // So, we do nothing to close the old config
+        // modConfig.getHandler().unload(configBasePath, modConfig);
 
         // Write the new config
         TomlFormat.instance().createWriter().write(config, configPath, WritingMode.REPLACE);
 
         // Load the new config
-        return updateActiveConfigAndFireReloadedEvent(modConfig, configPath, config);
+        return updateActiveConfigAndFireReloadedEvent(modConfig, configBasePath, configPath, config);
     }
 
     private static boolean setConfigData(
