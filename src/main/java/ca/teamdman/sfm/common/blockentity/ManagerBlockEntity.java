@@ -43,6 +43,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     private final NonNullList<ItemStack> ITEMS = NonNullList.withSize(1, ItemStack.EMPTY);
     private final long[] tickTimeNanos = new long[TICK_TIME_HISTORY_SIZE];
     private @Nullable Program program = null;
+    private int configRevision = -1;
     private int tick = 0;
     private int unprocessedRedstonePulses = 0; // used by redstone trigger
     private boolean shouldRebuildProgram = false;
@@ -96,7 +97,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     ) {
         long start = System.nanoTime();
         manager.tick++;
-        if (manager.program != null && manager.program.configRevision() != SFMConfig.SERVER.getRevision()) {
+        if (manager.configRevision != SFMConfig.SERVER.getRevision()) {
             manager.shouldRebuildProgram = true;
         }
         if (manager.shouldRebuildProgram && !manager.shouldRebuildProgramLock) {
@@ -208,6 +209,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         } else {
             this.program = DiskItem.compileAndUpdateErrorsAndWarnings(disk, this);
         }
+        this.configRevision = SFMConfig.SERVER.getRevision();
         sendUpdatePacket();
     }
 
