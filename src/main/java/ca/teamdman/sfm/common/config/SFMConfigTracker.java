@@ -1,23 +1,20 @@
 package ca.teamdman.sfm.common.config;
 
 import ca.teamdman.sfm.SFM;
-import com.electronwill.nightconfig.core.Config;
-import com.electronwill.nightconfig.core.file.FileConfig;
 import net.minecraft.server.MinecraftServer;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ConfigTracker;
 import net.neoforged.fml.config.IConfigSpec;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.fml.event.config.ModConfigEvent;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class SFMConfigTracker {
@@ -30,11 +27,10 @@ public class SFMConfigTracker {
     @SuppressWarnings({"unchecked", "UnstableApiUsage"})
     private static Set<ModConfig> getModConfigs(ModConfig.Type modConfigType) {
         ConfigTracker configTracker = ConfigTracker.INSTANCE;
-//        return configTracker.configSets().get(ModConfig.Type.SERVER);
         try {
             Field configSetsField = configTracker.getClass().getDeclaredField("configSets");
             configSetsField.setAccessible(true);
-            HashMap<ModConfig.Type, Set<ModConfig>> configSets = (HashMap<ModConfig.Type, Set<ModConfig>>) configSetsField.get(configTracker);
+            Map<ModConfig.Type, Set<ModConfig>> configSets = (Map<ModConfig.Type, Set<ModConfig>>) configSetsField.get(configTracker);
             return configSets.get(modConfigType);
         } catch (NoSuchFieldException | IllegalAccessException e) {
             throw new RuntimeException(e);
@@ -85,33 +81,32 @@ public class SFMConfigTracker {
             ModConfig modConfig = event.getConfig();
             if (modConfig.getModId().equals(SFM.MOD_ID)) {
                 IConfigSpec spec = modConfig.getSpec();
-                FileConfig fileConfig = getFileConfig(spec);
-                if (fileConfig != null) {
-                    configPaths.put(spec, fileConfig.getNioPath());
+                Path path = getConfigPath(spec);
+                if (path != null) {
+                    configPaths.put(spec, path);
                 }
             }
         }
 
-        private static @Nullable FileConfig getFileConfig(IConfigSpec configSpec) {
-            Config config = getChildConfig(configSpec);
-            if (config instanceof FileConfig fileConfig) {
-                return fileConfig;
+        private static @Nullable Path getConfigPath(IConfigSpec configSpec) {
+            IConfigSpec.ILoadedConfig loadedConfig;
+            try {
+                Field loadedConfigField = configSpec.getClass().getDeclaredField("loadedConfig");
+                loadedConfigField.setAccessible(true);
+                loadedConfig = (IConfigSpec.ILoadedConfig) loadedConfigField.get(configSpec);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                SFM.LOGGER.error("Failed to extract loadedConfig field", e);
+                return null;
             }
-            return null;
-        }
-
-        private static @Nullable Config getChildConfig(IConfigSpec configSpec) {
-            if (configSpec instanceof ModConfigSpec forgeConfigSpec) {
-                try {
-                    Field childConfigField = forgeConfigSpec.getClass().getDeclaredField("childConfig");
-                    childConfigField.setAccessible(true);
-                    return (Config) childConfigField.get(forgeConfigSpec);
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    SFM.LOGGER.error("Failed to extract childConfig field", e);
-                    return null;
-                }
+            try {
+                Class<?> loadedConfigClass = loadedConfig.getClass();
+                Field pathField = loadedConfigClass.getDeclaredField("path");
+                pathField.setAccessible(true);
+                return (Path) pathField.get(loadedConfig);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                SFM.LOGGER.error("Failed to extract path field", e);
+                return null;
             }
-            return null;
         }
     }
 
