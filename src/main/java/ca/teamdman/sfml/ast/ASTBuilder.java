@@ -137,7 +137,6 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
 
     @Override
     public Program visitProgram(SFMLParser.ProgramContext ctx) {
-        int configRevision = SFMConfig.SERVER.getRevision();
         if (SFMConfig.getOrDefault(SFMConfig.SERVER.disableProgramExecution)) {
             throw new AssertionError("Program execution is disabled via config");
         }
@@ -152,7 +151,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
                 .stream()
                 .map(Label::name)
                 .collect(Collectors.toSet());
-        Program program = new Program(this, name.value(), triggers, labels, USED_RESOURCES, configRevision);
+        Program program = new Program(this, name.value(), triggers, labels, USED_RESOURCES);
         AST_NODE_CONTEXTS.add(new Pair<>(program, ctx));
         return program;
     }
