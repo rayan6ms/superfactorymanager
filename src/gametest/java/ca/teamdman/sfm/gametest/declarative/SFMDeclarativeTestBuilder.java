@@ -116,7 +116,7 @@ public class SFMDeclarativeTestBuilder extends SFMGameTestBase {
         if (conditions.isEmpty()) return;
         List<BoolExpr> expressions = conditions.stream().map(this::getCondition).toList();
         ProgramContext programContext = new ProgramContext(
-                new Program(new ASTBuilder(), "temp lol", List.of(), Set.of(), Set.of(), -1),
+                new Program(new ASTBuilder(), "temp lol", List.of(), Set.of(), Set.of()),
                 manager,
                 DefaultProgramBehaviour::new
         );
