@@ -98,6 +98,7 @@ public class SFMConfigReadWriter {
         }
     }
 
+    @SuppressWarnings("unused")
     @MCVersionDependentBehaviour
     public static boolean updateActiveConfigAndFireReloadedEvent(
             ModConfig modConfig,
