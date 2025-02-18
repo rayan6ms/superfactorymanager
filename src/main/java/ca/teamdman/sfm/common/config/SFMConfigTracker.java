@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.config;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.electronwill.nightconfig.core.Config;
 import com.electronwill.nightconfig.core.file.FileConfig;
 import net.minecraft.server.MinecraftServer;
@@ -27,8 +28,13 @@ public class SFMConfigTracker {
         return configPaths.get(spec);
     }
 
+    @MCVersionDependentBehaviour
+    private static Set<ModConfig> getModConfigs(ModConfig.Type modConfigType) {
+        return ConfigTracker.INSTANCE.configSets().get(modConfigType);
+    }
+
     static @Nullable ModConfig getServerModConfig() {
-        Set<ModConfig> modConfigs = ConfigTracker.INSTANCE.configSets().get(ModConfig.Type.SERVER);
+        Set<ModConfig> modConfigs = getModConfigs(ModConfig.Type.SERVER);
         for (ModConfig modConfig : modConfigs) {
             // .equals() doesn't work here
             if (modConfig.getSpec() == SFMConfig.SERVER_SPEC) {
@@ -39,7 +45,7 @@ public class SFMConfigTracker {
     }
 
     static @Nullable ModConfig getClientModConfig() {
-        Set<ModConfig> modConfigs = ConfigTracker.INSTANCE.configSets().get(ModConfig.Type.CLIENT);
+        Set<ModConfig> modConfigs = getModConfigs(ModConfig.Type.CLIENT);
         for (ModConfig modConfig : modConfigs) {
             // .equals() doesn't work here
             if (modConfig.getSpec() == SFMConfig.CLIENT_SPEC) {
@@ -71,12 +77,22 @@ public class SFMConfigTracker {
             ModConfig modConfig = event.getConfig();
             if (modConfig.getModId().equals(SFM.MOD_ID)) {
                 IConfigSpec<?> spec = modConfig.getSpec();
-                FileConfig fileConfig = getFileConfig(spec);
-                if (fileConfig != null) {
-                    configPaths.put(spec, fileConfig.getNioPath());
+                Path path = getConfigPath(spec);
+                if (path != null) {
+                    configPaths.put(spec, path);
                 }
             }
         }
+
+        @MCVersionDependentBehaviour
+        private static @Nullable Path getConfigPath(IConfigSpec<?> configSpec) {
+            FileConfig fileConfig = getFileConfig(configSpec);
+            if (fileConfig != null) {
+                return fileConfig.getNioPath();
+            }
+            return null;
+        }
+
 
         private static @Nullable FileConfig getFileConfig(IConfigSpec<?> configSpec) {
             Config config = getChildConfig(configSpec);
