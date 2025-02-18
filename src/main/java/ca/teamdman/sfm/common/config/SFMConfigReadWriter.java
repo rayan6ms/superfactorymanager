@@ -11,7 +11,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.Bindings;
-import net.minecraftforge.fml.config.ConfigFileTypeHandler;
 import net.minecraftforge.fml.config.IConfigEvent;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.network.ConfigSync;
@@ -100,6 +99,60 @@ public class SFMConfigReadWriter {
         }
     }
 
+    @MCVersionDependentBehaviour
+    public static boolean updateActiveConfigAndFireReloadedEvent(
+            ModConfig modConfig,
+            Path configBasePath,
+            Path configPath,
+            CommentedConfig newConfig
+    ) {
+        final CommentedFileConfig fileConfig = modConfig.getHandler()
+                .reader(configBasePath)
+                .apply(modConfig);
+        SFM.LOGGER.info("Setting up new config data for {}", modConfig.getFileName());
+        if (!setConfigData(modConfig, fileConfig)) {
+            SFM.LOGGER.warn("Failed to set new config data for {}", modConfig.getFileName());
+            return false;
+        }
+
+        SFM.LOGGER.info("Firing config changed event for {}", modConfig.getFileName());
+        try {
+            Method fireEvent = ModConfig.class.getDeclaredMethod("fireEvent", IConfigEvent.class);
+            fireEvent.setAccessible(true);
+            IConfigEvent event = Bindings.getConfigConfiguration().get().reloading().apply(modConfig);
+            fireEvent.invoke(modConfig, event);
+        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
+            SFM.LOGGER.warn("Failed to fire changed event for {}", modConfig.getFileName(), e);
+            return false;
+        }
+        return true;
+    }
+
+    public static @Nullable CommentedConfig parseConfigToml(
+            String configToml,
+            ForgeConfigSpec configSpec
+    ) {
+        CommentedConfig config = TomlFormat.instance().createParser().parse(configToml);
+        if (!configSpec.isCorrect(config)) {
+            return null;
+        }
+        return config;
+    }
+
+    public static @Nullable String getConfigToml(ForgeConfigSpec configSpec) {
+        Path configPath = SFMConfigTracker.getPathForConfig(configSpec);
+        if (configPath == null) {
+            SFM.LOGGER.error("Failed to get config path when trying to get config TOML contents");
+            return null;
+        }
+        try {
+            return Files.readString(configPath, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            SFM.LOGGER.error("Failed reading config contents", e);
+            return null;
+        }
+    }
+
     private static boolean writeServerConfig(CommentedConfig config) {
         // Get the config base path
         Path configBasePath = getConfigBasePath();
@@ -122,30 +175,18 @@ public class SFMConfigReadWriter {
             return false;
         }
 
-        // ~~Close the old config~~
-        // this is commented out because it actually unwatches the whole dir instead of just our file
-        // this causes "Failed to remove config {} from tracker!" warnings vvv
+        // We do not have to close the config before changing.
+        // If you were to do so, it would break the file watching because the unload method unwatches the whole dir.
+        // This causes "Failed to remove config {} from tracker!" warnings vvv
         // java.lang.NullPointerException: Cannot read field "watchedFileCount" because "watchedDir" is null
-        // so do nothing to close the old config
-//        modConfig.getHandler().unload(configBasePath, modConfig);
+        // So, we do nothing to close the old config
+        // modConfig.getHandler().unload(configBasePath, modConfig);
 
         // Write the new config
         TomlFormat.instance().createWriter().write(config, configPath, WritingMode.REPLACE);
 
         // Load the new config
-        final CommentedFileConfig fileConfig = getTomlFileTypeHandler(modConfig).reader(configBasePath).apply(modConfig);
-        SFM.LOGGER.info("Setting up new server config data");
-        if (!setConfigData(modConfig, fileConfig)) {
-            SFM.LOGGER.warn("Failed to set new server config data");
-            return false;
-        }
-
-        SFM.LOGGER.info("Firing config changed event");
-        if (!fireChangedEvent(modConfig)) {
-            SFM.LOGGER.warn("Failed to fire server config changed event");
-            return false;
-        }
-        return true;
+        return updateActiveConfigAndFireReloadedEvent(modConfig, configBasePath, configPath, config);
     }
 
     private static boolean writeClientConfig(CommentedConfig config) {
@@ -170,69 +211,18 @@ public class SFMConfigReadWriter {
             return false;
         }
 
-        // ~~Close the old config~~
-        // this is commented out because it actually unwatches the whole dir instead of just our file
-        // this causes "Failed to remove config {} from tracker!" warnings vvv
+        // We do not have to close the config before changing.
+        // If you were to do so, it would break the file watching because the unload method unwatches the whole dir.
+        // This causes "Failed to remove config {} from tracker!" warnings vvv
         // java.lang.NullPointerException: Cannot read field "watchedFileCount" because "watchedDir" is null
-        // so do nothing to close the old config
-//        modConfig.getHandler().unload(configBasePath, modConfig);
+        // So, we do nothing to close the old config
+        // modConfig.getHandler().unload(configBasePath, modConfig);
 
         // Write the new config
         TomlFormat.instance().createWriter().write(config, configPath, WritingMode.REPLACE);
 
         // Load the new config
-        final CommentedFileConfig fileConfig = getTomlFileTypeHandler(modConfig).reader(configBasePath).apply(modConfig);
-        SFM.LOGGER.info("Setting up new client config data");
-        if (!setConfigData(modConfig, fileConfig)) {
-            SFM.LOGGER.warn("Failed to set new client config data");
-            return false;
-        }
-
-        SFM.LOGGER.info("Firing client config changed event");
-        if (!fireChangedEvent(modConfig)) {
-            SFM.LOGGER.warn("Failed to fire client config changed event");
-            return false;
-        }
-        return true;
-    }
-
-    @MCVersionDependentBehaviour
-    public static ConfigFileTypeHandler getTomlFileTypeHandler(ModConfig modConfig) {
-        return modConfig.getHandler();
-    }
-
-    public static @Nullable CommentedConfig parseConfigToml(String configToml, ForgeConfigSpec configSpec) {
-        CommentedConfig config = TomlFormat.instance().createParser().parse(configToml);
-        if (!configSpec.isCorrect(config)) {
-            return null;
-        }
-        return config;
-    }
-
-    public static @Nullable String getConfigToml(ForgeConfigSpec configSpec) {
-        Path configPath = SFMConfigTracker.getPathForConfig(configSpec);
-        if (configPath == null) {
-            return null;
-        }
-        try {
-            return Files.readString(configPath, StandardCharsets.UTF_8);
-        } catch (IOException e) {
-            SFM.LOGGER.error("Failed reading config contents", e);
-            return null;
-        }
-    }
-
-    private static boolean fireChangedEvent(ModConfig modConfig) {
-        try {
-            Method fireEvent = ModConfig.class.getDeclaredMethod("fireEvent", IConfigEvent.class);
-            fireEvent.setAccessible(true);
-            IConfigEvent event = Bindings.getConfigConfiguration().get().reloading().apply(modConfig);
-            fireEvent.invoke(modConfig, event);
-        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            SFM.LOGGER.warn("Failed to fire changed event", e);
-            return false;
-        }
-        return true;
+        return updateActiveConfigAndFireReloadedEvent(modConfig, configBasePath, configPath, config);
     }
 
     private static boolean setConfigData(
