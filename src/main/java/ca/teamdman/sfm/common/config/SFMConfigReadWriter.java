@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.config;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.electronwill.nightconfig.core.CommentedConfig;
 import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
@@ -10,6 +11,7 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.fml.Bindings;
+import net.minecraftforge.fml.config.ConfigFileTypeHandler;
 import net.minecraftforge.fml.config.IConfigEvent;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.network.ConfigSync;
@@ -131,7 +133,7 @@ public class SFMConfigReadWriter {
         TomlFormat.instance().createWriter().write(config, configPath, WritingMode.REPLACE);
 
         // Load the new config
-        final CommentedFileConfig fileConfig = modConfig.getHandler().reader(configBasePath).apply(modConfig);
+        final CommentedFileConfig fileConfig = getTomlFileTypeHandler(modConfig).reader(configBasePath).apply(modConfig);
         SFM.LOGGER.info("Setting up new server config data");
         if (!setConfigData(modConfig, fileConfig)) {
             SFM.LOGGER.warn("Failed to set new server config data");
@@ -179,7 +181,7 @@ public class SFMConfigReadWriter {
         TomlFormat.instance().createWriter().write(config, configPath, WritingMode.REPLACE);
 
         // Load the new config
-        final CommentedFileConfig fileConfig = modConfig.getHandler().reader(configBasePath).apply(modConfig);
+        final CommentedFileConfig fileConfig = getTomlFileTypeHandler(modConfig).reader(configBasePath).apply(modConfig);
         SFM.LOGGER.info("Setting up new client config data");
         if (!setConfigData(modConfig, fileConfig)) {
             SFM.LOGGER.warn("Failed to set new client config data");
@@ -192,6 +194,11 @@ public class SFMConfigReadWriter {
             return false;
         }
         return true;
+    }
+
+    @MCVersionDependentBehaviour
+    public static ConfigFileTypeHandler getTomlFileTypeHandler(ModConfig modConfig) {
+        return modConfig.getHandler();
     }
 
     public static @Nullable CommentedConfig parseConfigToml(String configToml, ForgeConfigSpec configSpec) {
