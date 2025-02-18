@@ -109,10 +109,7 @@ public class CodegenTests {
                         )))
                 )),
                 Collections.emptySet(),
-                // not needed for codegen
-                Collections.emptySet(),
-                // not needed for codegen
-                0
+                Collections.emptySet()
         );
         System.out.println(program);
         /* outputs:
