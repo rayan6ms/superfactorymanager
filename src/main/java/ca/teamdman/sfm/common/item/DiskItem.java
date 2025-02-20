@@ -51,10 +51,18 @@ public class DiskItem extends Item {
     }
 
     public static void setProgram(ItemStack stack, String program) {
+        program = program.replaceAll("\r", "");
         stack
                 .getOrCreateTag()
-                .putString("sfm:program", program.replaceAll("\r", ""));
+                .putString("sfm:program", program);
+    }
 
+    public static void pruneIfDefault(ItemStack stack) {
+        if (getProgram(stack).isBlank() && LabelPositionHolder.from(stack).isEmpty()) {
+            for (String key : stack.getOrCreateTag().getAllKeys().toArray(String[]::new)) {
+                stack.removeTagKey(key);
+            }
+        }
     }
 
     public static @Nullable Program compileAndUpdateErrorsAndWarnings(ItemStack stack, @Nullable ManagerBlockEntity manager) {
@@ -190,29 +198,27 @@ public class DiskItem extends Item {
     public void appendHoverText(
             ItemStack stack, @Nullable Level level, List<Component> lines, TooltipFlag detail
     ) {
-        if (stack.hasTag()) {
-            if (SFMItemUtils.isClientAndMoreInfoKeyPressed()) {
-                // show the program
-                var program = getProgram(stack);
-                if (!program.isEmpty()) {
-                    lines.add(SFMItemUtils.getRainbow(getName(stack).getString().length()));
-                    lines.addAll(ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(program, false));
-                }
-            } else {
-                lines.addAll(LabelPositionHolder.from(stack).asHoverText());
-                getErrors(stack)
-                        .stream()
-                        .map(MutableComponent::create)
-                        .map(line -> line.withStyle(ChatFormatting.RED))
-                        .forEach(lines::add);
-                getWarnings(stack)
-                        .stream()
-                        .map(MutableComponent::create)
-                        .map(line -> line.withStyle(ChatFormatting.YELLOW))
-                        .forEach(lines::add);
+        var program = getProgram(stack);
+        if (SFMItemUtils.isClientAndMoreInfoKeyPressed() && !program.isEmpty()) {
+            lines.add(SFMItemUtils.getRainbow(getName(stack).getString().length()));
+            lines.addAll(ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(program, false));
+        } else {
+            lines.addAll(LabelPositionHolder.from(stack).asHoverText());
+            getErrors(stack)
+                    .stream()
+                    .map(MutableComponent::create)
+                    .map(line -> line.withStyle(ChatFormatting.RED))
+                    .forEach(lines::add);
+            getWarnings(stack)
+                    .stream()
+                    .map(MutableComponent::create)
+                    .map(line -> line.withStyle(ChatFormatting.YELLOW))
+                    .forEach(lines::add);
+            if (!program.isEmpty()) {
                 SFMItemUtils.appendMoreInfoKeyReminderTextIfOnClient(lines);
             }
-        } else {
+        }
+        if (program.isEmpty()) {
             lines.add(LocalizationKeys.DISK_EDIT_IN_HAND_TOOLTIP.getComponent().withStyle(ChatFormatting.GRAY));
         }
     }
