@@ -22,12 +22,12 @@ public record FacadeData(
     }
 
     public static @Nullable FacadeData load(
-            Level level,
+            @SuppressWarnings("unused") @Nullable Level level,
             CompoundTag tag
     ) {
         if (tag.contains("sfm:facade", CompoundTag.TAG_COMPOUND)) {
             CompoundTag facadeTag = tag.getCompound("sfm:facade");
-            BlockState facadeState = readBlockState(facadeTag.getCompound("block_state"), level);
+            BlockState facadeState = readBlockState(facadeTag.getCompound("block_state"));
             Direction facadeDirection = Direction.byName(facadeTag.getString("direction"));
             FacadeTextureMode facadeTextureMode = FacadeTextureMode.byName(facadeTag.getString("texture_mode"));
             if (facadeTextureMode != null && facadeDirection != null) {
@@ -36,8 +36,9 @@ public record FacadeData(
         }
         return null;
     }
+
     @MCVersionDependentBehaviour
-    private static BlockState readBlockState(CompoundTag tag, Level level) {
+    private static BlockState readBlockState(CompoundTag tag) {
         return NbtUtils.readBlockState(tag);
     }
 }
