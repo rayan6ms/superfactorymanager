@@ -49,7 +49,6 @@ public abstract class CommonFacadeBlockEntity extends BlockEntity implements IFa
     @Override
     public void load(CompoundTag pTag) {
         super.load(pTag);
-        assert level != null;
         FacadeData tried = FacadeData.load(level, pTag);
         if (tried != null) {
             this.facadeData = tried;
