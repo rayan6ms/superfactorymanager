@@ -39,6 +39,9 @@ public record FacadeData(
     }
 
     @MCVersionDependentBehaviour
+    /**
+     * See {@link net.minecraft.world.level.block.piston.MovingPistonBlock::load}
+     */
     private static BlockState readBlockState(CompoundTag tag) {
         return NbtUtils.readBlockState(tag);
     }
