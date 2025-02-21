@@ -37,10 +37,10 @@ public record FacadeData(
         return null;
     }
 
-    @MCVersionDependentBehaviour
     /**
      * See {@link net.minecraft.world.level.block.piston.MovingPistonBlock::load}
      */
+    @MCVersionDependentBehaviour
     private static BlockState readBlockState(CompoundTag tag) {
         return NbtUtils.readBlockState(tag);
     }
