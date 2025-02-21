@@ -25,7 +25,6 @@ public record FacadeData(
         tag.put("sfm:facade", facadeTag);
     }
 
-    @MCVersionDependentBehaviour
     public static @Nullable FacadeData load(
             @Nullable Level level,
             CompoundTag tag
@@ -43,6 +42,9 @@ public record FacadeData(
     }
 
     @MCVersionDependentBehaviour
+    /**
+     * See {@link net.minecraft.world.level.block.piston.MovingPistonBlock::load}
+     */
     private static BlockState readBlockState(
             CompoundTag tag,
             @Nullable Level level
