@@ -25,6 +25,7 @@ public record FacadeData(
         tag.put("sfm:facade", facadeTag);
     }
 
+    @MCVersionDependentBehaviour
     public static @Nullable FacadeData load(
             @Nullable Level level,
             CompoundTag tag
