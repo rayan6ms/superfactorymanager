@@ -15,7 +15,7 @@ public class SFMLIntellisenseTests {
                 """.stripTrailing().stripIndent();
         List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(new IntellisenseContext(program, 0, 0));
         for (IntellisenseAction suggestion : suggestions) {
-            System.out.printf("Suggestion: %s (%s)\n", suggestion.getDisplayText(), suggestion);
+            System.out.printf("Suggestion: %s\n", suggestion.getDisplayText());
         }
     }
 }

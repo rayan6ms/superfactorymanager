@@ -25,6 +25,7 @@ public class SFMLIntellisense {
         String[] ruleNames = parser.getRuleNames();
         candidates.rules.forEach((a, b) -> {
             StringBuilder display = new StringBuilder();
+            display.append("(rule) ");
             display.append(ruleNames[a]);
             display.append(" <- ");
             b.forEach((c) -> {
@@ -46,9 +47,13 @@ public class SFMLIntellisense {
         });
         candidates.tokens.forEach((a,b) -> {
             StringBuilder display = new StringBuilder();
+            display.append("(token) ");
             display.append(vocabulary.getSymbolicName(a));
             display.append(" <- ");
-            display.append(b);
+            b.forEach((c) -> {
+                display.append(vocabulary.getSymbolicName(c));
+                display.append(" ");
+            });
             String finalDisplay = display.toString();
             rtn.add(new IntellisenseAction() {
                 @Override

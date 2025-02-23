@@ -26,6 +26,7 @@ import java.util.logging.Logger;
  * editors with ANTLR generated parsers, independent of the actual
  * language/grammar used for the generation.
  */
+@SuppressWarnings("ALL")
 public class CodeCompletionCore {
 
     public final static Logger logger = Logger.getLogger(CodeCompletionCore.class.getName());
