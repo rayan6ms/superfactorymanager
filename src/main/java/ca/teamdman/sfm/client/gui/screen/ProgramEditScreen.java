@@ -8,6 +8,9 @@ import ca.teamdman.sfm.client.gui.EditorUtils;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfml.intellisense.IntellisenseAction;
+import ca.teamdman.sfml.intellisense.IntellisenseContext;
+import ca.teamdman.sfml.intellisense.SFMLIntellisense;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
@@ -324,6 +327,16 @@ public class ProgramEditScreen extends Screen {
                     Component.literal(""),
                     Component.literal("")
             );
+            this.textField.setValueListener(this::onTextValueChanged);
+        }
+
+        private void onTextValueChanged(String newValue) {
+            int cursorPosition = getCursorPosition();
+            IntellisenseContext context = new IntellisenseContext(newValue, cursorPosition, getSelectionCursorPosition());
+            List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(context);
+            for (IntellisenseAction suggestion : suggestions) {
+                SFM.LOGGER.info("Suggestion: {} ({})", suggestion.getDisplayText(), suggestion.toString());
+            }
         }
 
         public void scrollToTop() {
@@ -405,6 +418,12 @@ public class ProgramEditScreen extends Screen {
             super.setScrollAmount(d);
         }
 
+        /**
+         * Rebuilds the syntax-highlighted program text.
+         * This runs more frequently than when the value is changed.
+         *
+         * @param showContextActionHints Should underline words that have context actions
+         */
         private void rebuild(boolean showContextActionHints) {
             lastProgram = this.textField.value();
             lastProgramWithSyntaxHighlighting = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(
