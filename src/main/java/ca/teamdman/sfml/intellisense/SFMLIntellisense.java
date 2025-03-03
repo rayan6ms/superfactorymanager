@@ -15,11 +15,13 @@ public class SFMLIntellisense {
             IntellisenseContext context
     ) {
         SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(context.program()));
+        lexer.removeErrorListeners();
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         SFMLParser parser = new SFMLParser(tokens);
+        parser.removeErrorListeners();
 //        parser.getATN()
         CodeCompletionCore core = new CodeCompletionCore(parser, null, null);
-        CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(0, parser.program());
+        CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(context.cursorPosition(), parser.program());
         List<IntellisenseAction> rtn = new ArrayList<>();
         Vocabulary vocabulary = parser.getVocabulary();
         String[] ruleNames = parser.getRuleNames();
@@ -27,7 +29,6 @@ public class SFMLIntellisense {
             StringBuilder display = new StringBuilder();
             display.append("(rule) ");
             display.append(ruleNames[a]);
-            display.append(" <- ");
             b.forEach((c) -> {
                 display.append(vocabulary.getSymbolicName(c));
                 display.append(" ");
@@ -49,7 +50,6 @@ public class SFMLIntellisense {
             StringBuilder display = new StringBuilder();
             display.append("(token) ");
             display.append(vocabulary.getSymbolicName(a));
-            display.append(" <- ");
             b.forEach((c) -> {
                 display.append(vocabulary.getSymbolicName(c));
                 display.append(" ");

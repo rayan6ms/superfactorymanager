@@ -65,7 +65,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     public StringHolder visitName(@Nullable SFMLParser.NameContext ctx) {
         if (ctx == null) return new StringHolder("");
         StringHolder name = visitString(ctx.string());
-        AST_NODE_CONTEXTS.add(new Pair<>(name, ctx));
+        AST_NODE_CONTEXTS.add(new Pair<>(new ProgramName(name), ctx));
         return name;
     }
 
