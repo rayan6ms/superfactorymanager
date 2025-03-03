@@ -8,6 +8,8 @@ import ca.teamdman.sfm.client.gui.EditorUtils;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfm.common.util.SFMDisplayUtils;
+import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
 import ca.teamdman.sfml.intellisense.IntellisenseContext;
 import ca.teamdman.sfml.intellisense.SFMLIntellisense;
@@ -32,7 +34,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP;
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP;
@@ -327,16 +331,8 @@ public class ProgramEditScreen extends Screen {
                     Component.literal(""),
                     Component.literal("")
             );
-            this.textField.setValueListener(this::onTextValueChanged);
-        }
-
-        private void onTextValueChanged(String newValue) {
-            int cursorPosition = getCursorPosition();
-            IntellisenseContext context = new IntellisenseContext(newValue, cursorPosition, getSelectionCursorPosition());
-            List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(context);
-            for (IntellisenseAction suggestion : suggestions) {
-                SFM.LOGGER.info("Suggestion: {} ({})", suggestion.getDisplayText(), suggestion.toString());
-            }
+            this.textField.setValueListener(this::onValueOrCursorChanged);
+            this.textField.setCursorListener(() -> this.onValueOrCursorChanged(this.textField.value()));
         }
 
         public void scrollToTop() {
@@ -416,6 +412,47 @@ public class ProgramEditScreen extends Screen {
         @Override
         public void setScrollAmount(double d) {
             super.setScrollAmount(d);
+        }
+
+        private void onValueOrCursorChanged(String programString) {
+            int cursorPosition = getCursorPosition();
+
+            List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(new IntellisenseContext(
+                    programString,
+                    cursorPosition,
+                    getSelectionCursorPosition()
+            ));
+            String suggestionsDisplay = suggestions
+                    .stream()
+                    .map(IntellisenseAction::getDisplayText)
+                    .collect(Collectors.joining(", "));
+
+            // Build the program
+            AtomicReference<Program> programBox = new AtomicReference<>();
+            Program.compile(
+                    programString,
+                    programBox::set,
+                    failure -> {}
+//                    failure -> failure.forEach(error -> SFM.LOGGER.warn(
+//                            "Failure compiling program, are you still typing? {}",
+//                            error.toString()
+//                    ))
+            );
+
+            String cursorDisplay = SFMDisplayUtils.getCursorDisplay(programString, cursorPosition);
+            Program program = programBox.get();
+            String tokenHierarchyDisplay;
+            if (program == null) {
+                tokenHierarchyDisplay = "<INVALID PROGRAM>";
+            } else {
+                tokenHierarchyDisplay = SFMDisplayUtils.getTokenHierarchyDisplay(program, cursorPosition);
+            }
+            SFM.LOGGER.info(
+                    "PROGRAM OR CURSOR CHANGE! {}   {}  |||  {}",
+                    cursorDisplay,
+                    tokenHierarchyDisplay,
+                    suggestionsDisplay
+            );
         }
 
         /**

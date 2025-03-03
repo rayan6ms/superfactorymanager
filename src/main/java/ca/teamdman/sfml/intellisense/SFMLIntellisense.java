@@ -19,7 +19,6 @@ public class SFMLIntellisense {
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         SFMLParser parser = new SFMLParser(tokens);
         parser.removeErrorListeners();
-//        parser.getATN()
         CodeCompletionCore core = new CodeCompletionCore(parser, null, null);
         CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(context.cursorPosition(), parser.program());
         List<IntellisenseAction> rtn = new ArrayList<>();

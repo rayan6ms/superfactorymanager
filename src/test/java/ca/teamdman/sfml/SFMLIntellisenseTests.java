@@ -1,6 +1,7 @@
 package ca.teamdman.sfml;
 
 import ca.teamdman.langs.SFMLLexer;
+import ca.teamdman.sfm.common.util.SFMDisplayUtils;
 import ca.teamdman.sfml.ast.ASTNode;
 import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
@@ -94,7 +95,7 @@ public class SFMLIntellisenseTests {
 
         // Put each cursor position as a new line in the stdout
         for (int cursorPos = 0; cursorPos < programString.length(); cursorPos++) {
-            System.out.print(getCursorDisplay(programString, cursorPos));
+            System.out.print(SFMDisplayUtils.getCursorDisplay(programString, cursorPos));
 
             // print the tokens under the cursor
 //            System.out.print(" [");
@@ -123,11 +124,11 @@ public class SFMLIntellisenseTests {
         Program program = programBox.get();
         for (int cursorPos = 0; cursorPos < programString.length(); cursorPos++) {
             System.out.print("||| ");
-            System.out.printf("%s", getCursorDisplay(programString, cursorPos));
+            System.out.printf("%s", SFMDisplayUtils.getCursorDisplay(programString, cursorPos));
             System.out.print(" ||| ");
-            System.out.printf("%s", getTokenHierarchyDisplay(program, cursorPos));
+            System.out.printf("%s", SFMDisplayUtils.getTokenHierarchyDisplay(program, cursorPos));
             System.out.print(" ||| ");
-            System.out.printf("%s", getSuggestionsDisplay(programString, cursorPos));
+            System.out.printf("%s", SFMDisplayUtils.getSuggestionsDisplay(programString, cursorPos));
             System.out.print(" |||");
             System.out.println();
         }
@@ -142,65 +143,4 @@ public class SFMLIntellisenseTests {
         return tokens.size();
     }
 
-    private static String getCursorDisplay(
-            String programString,
-            int cursorPos
-    ) {
-        StringBuilder rtn = new StringBuilder();
-        rtn.append(" [");
-        // print the 10-closest characters before the cursor
-        int start = Math.max(0, cursorPos - 10);
-        int end = cursorPos;
-        rtn.append(String.format("%20s", programString.substring(start, end).replaceAll("\n", "\\\\n")));
-
-        // print |
-        rtn.append("|");
-
-        // print the 10 characters after the cursor
-        start = cursorPos;
-        end = Math.min(programString.length(), cursorPos + 10);
-        rtn.append(String.format("%-20s", programString.substring(start, end).replaceAll("\n", "\\\\n")));
-        rtn.append(" ] ");
-        return rtn.toString();
-    }
-
-    private static String getTokenHierarchyDisplay(
-            Program program,
-            int cursorPos
-    ) {
-        StringBuilder rtn = new StringBuilder();
-        List<Pair<ASTNode, ParserRuleContext>> nodesUnderCursor = program.builder().getNodesUnderCursor(cursorPos);
-
-        var iter = nodesUnderCursor.listIterator(nodesUnderCursor.size());
-        while (iter.hasPrevious()) {
-            Pair<ASTNode, ParserRuleContext> pair = iter.previous();
-            ASTNode node = pair.getFirst();
-            rtn.append(node.getClass().getSimpleName());
-            if (iter.hasPrevious()) {
-                rtn.append(" -> ");
-            }
-        }
-        return rtn.toString();
-    }
-
-    private static String getSuggestionsDisplay(
-            String programString,
-            int cursorPos
-    ) {
-        StringBuilder rtn = new StringBuilder();
-        List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(new IntellisenseContext(
-                programString,
-                cursorPos,
-                0
-        ));
-        rtn.append('[');
-        for (int i = 0; i < suggestions.size(); i++) {
-            rtn.append(suggestions.get(i).getDisplayText().replaceAll("\n", "\\\\n"));
-            if (i != suggestions.size() - 1) {
-                rtn.append(", ");
-            }
-        }
-        rtn.append(']');
-        return rtn.toString();
-    }
 }
