@@ -6,7 +6,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.client.gui.widget.ExtendedButton;
 import org.jetbrains.annotations.Nullable;
 
 public class ButtonBuilder {
@@ -82,7 +81,7 @@ public class ButtonBuilder {
             throw new IllegalArgumentException("OnPress must be set");
         }
         if (tooltip != null) {
-            return new ExtendedButtonWithTooltip(
+            return new SFMExtendedButtonWithTooltip(
                     x,
                     y,
                     width,
@@ -92,7 +91,7 @@ public class ButtonBuilder {
                     tooltip
             );
         } else {
-            return new ExtendedButton(
+            return new SFMExtendedButton(
                     x,
                     y,
                     width,

@@ -4,6 +4,10 @@ NAME "Changelog"
 -- Official SFM Donation Page:
 -- https://ko-fi.com/teamdman
 
+---- vNext ----
+-- (WIP) Intellisense
+-- (WIP) Fix missing focus highlight from tab-navigation of buttons in manager screen
+
 ---- 4.20.0 ----
 -- Fix disks having no name when program has no name for 1.21+
 -- VSCode extension updates, thanks @Titop54 for the help <3

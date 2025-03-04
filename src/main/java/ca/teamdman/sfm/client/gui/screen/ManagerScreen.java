@@ -4,7 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientDiagnosticInfo;
 import ca.teamdman.sfm.client.ClientScreenHelpers;
 import ca.teamdman.sfm.client.gui.ButtonBuilder;
-import ca.teamdman.sfm.client.gui.ExtendedButtonWithTooltip;
+import ca.teamdman.sfm.client.gui.SFMExtendedButtonWithTooltip;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.item.DiskItem;
@@ -666,8 +666,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         // 1.19.2: manually render button tooltips
         this.renderables
                 .stream()
-                .filter(ExtendedButtonWithTooltip.class::isInstance)
-                .map(ExtendedButtonWithTooltip.class::cast)
+                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
+                .map(SFMExtendedButtonWithTooltip.class::cast)
                 .forEach(x -> x.renderToolTip(pose, mx, my));
     }
 

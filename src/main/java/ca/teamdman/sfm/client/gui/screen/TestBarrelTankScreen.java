@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.gui.ExtendedButtonWithTooltip;
+import ca.teamdman.sfm.client.gui.SFMExtendedButtonWithTooltip;
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -106,8 +106,8 @@ public class TestBarrelTankScreen extends AbstractContainerScreen<TestBarrelTank
         // 1.19.2: manually render button tooltips
         this.renderables
                 .stream()
-                .filter(ExtendedButtonWithTooltip.class::isInstance)
-                .map(ExtendedButtonWithTooltip.class::cast)
+                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
+                .map(SFMExtendedButtonWithTooltip.class::cast)
                 .forEach(x -> x.renderToolTip(pose, mx, my));
     }
 

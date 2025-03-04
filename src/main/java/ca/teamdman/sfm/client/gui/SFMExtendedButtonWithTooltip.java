@@ -3,13 +3,12 @@ package ca.teamdman.sfm.client.gui;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.client.gui.widget.ExtendedButton;
 
-public class ExtendedButtonWithTooltip extends ExtendedButton {
+public class SFMExtendedButtonWithTooltip extends SFMExtendedButton {
     private final OnTooltip TOOLTIP;
 
     @MCVersionDependentBehaviour
-    public ExtendedButtonWithTooltip(
+    public SFMExtendedButtonWithTooltip(
             int xPos,
             int yPos,
             int width,
