@@ -13,6 +13,8 @@ import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
 import ca.teamdman.sfml.intellisense.IntellisenseContext;
 import ca.teamdman.sfml.intellisense.SFMLIntellisense;
+import ca.teamdman.sfml.program_builder.ProgramBuildResult;
+import ca.teamdman.sfml.program_builder.ProgramBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
@@ -28,13 +30,13 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -47,7 +49,8 @@ public class ProgramEditScreen extends Screen {
     @SuppressWarnings("NotNullFieldNotInitialized")
     protected MyMultiLineEditBox textarea;
     protected String lastProgram = "";
-    protected List<MutableComponent> lastProgramWithSyntaxHighlighting = Collections.emptyList();
+    protected List<MutableComponent> lastProgramWithSyntaxHighlighting = new ArrayList<>();
+    protected List<IntellisenseAction> suggestedActions = new ArrayList<>();
 
     public ProgramEditScreen(
             String initialContent,
@@ -417,39 +420,37 @@ public class ProgramEditScreen extends Screen {
         private void onValueOrCursorChanged(String programString) {
             int cursorPosition = getCursorPosition();
 
-            List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(new IntellisenseContext(
-                    programString,
-                    cursorPosition,
-                    getSelectionCursorPosition()
-            ));
-            String suggestionsDisplay = suggestions
-                    .stream()
-                    .map(IntellisenseAction::getDisplayText)
-                    .collect(Collectors.joining(", "));
+            String cursorPositionDisplay = SFMDisplayUtils.getCursorPositionDisplay(programString, cursorPosition);
 
             // Build the program
-            AtomicReference<Program> programBox = new AtomicReference<>();
-            Program.compile(
-                    programString,
-                    programBox::set,
-                    failure -> {}
-//                    failure -> failure.forEach(error -> SFM.LOGGER.warn(
-//                            "Failure compiling program, are you still typing? {}",
-//                            error.toString()
-//                    ))
-            );
+            ProgramBuildResult buildResult = ProgramBuilder.build(programString);
+            @Nullable Program program = buildResult.program();
 
-            String cursorDisplay = SFMDisplayUtils.getCursorDisplay(programString, cursorPosition);
-            Program program = programBox.get();
+            String cursorTokenDisplay = SFMDisplayUtils.getCursorTokenDisplay(buildResult, cursorPosition);
+
             String tokenHierarchyDisplay;
             if (program == null) {
                 tokenHierarchyDisplay = "<INVALID PROGRAM>";
             } else {
                 tokenHierarchyDisplay = SFMDisplayUtils.getTokenHierarchyDisplay(program, cursorPosition);
             }
+
+            IntellisenseContext intellisenseContext = new IntellisenseContext(
+                    buildResult,
+                    cursorPosition,
+                    getSelectionCursorPosition()
+            );
+            List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(intellisenseContext);
+            String suggestionsDisplay = suggestions
+                    .stream()
+                    .map(IntellisenseAction::getDisplayText)
+                    .collect(Collectors.joining(", "));
+            ProgramEditScreen.this.suggestedActions = suggestions;
+
             SFM.LOGGER.info(
-                    "PROGRAM OR CURSOR CHANGE! {}   {}  |||  {}",
-                    cursorDisplay,
+                    "PROGRAM OR CURSOR CHANGE! {}   {}   {}  |||  {}",
+                    cursorPositionDisplay,
+                    cursorTokenDisplay,
                     tokenHierarchyDisplay,
                     suggestionsDisplay
             );

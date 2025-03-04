@@ -293,7 +293,7 @@ public record ServerboundOutputInspectionRequestPacket(
         ) {
             context.compileAndThen(
                     msg.programString,
-                    (program, player, managerBlockEntity) -> program.builder()
+                    (program, player, managerBlockEntity) -> program.astBuilder()
                             .getNodeAtIndex(msg.outputNodeIndex)
                             .filter(OutputStatement.class::isInstance)
                             .map(OutputStatement.class::cast)

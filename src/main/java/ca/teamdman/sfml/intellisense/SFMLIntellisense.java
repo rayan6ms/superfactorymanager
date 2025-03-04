@@ -1,10 +1,7 @@
 package ca.teamdman.sfml.intellisense;
 
-import ca.teamdman.langs.SFMLLexer;
 import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfml.ext_antlr4c3.CodeCompletionCore;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.Vocabulary;
 
 import java.util.ArrayList;
@@ -14,13 +11,14 @@ public class SFMLIntellisense {
     public static List<IntellisenseAction> getSuggestions(
             IntellisenseContext context
     ) {
-        SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(context.program()));
-        lexer.removeErrorListeners();
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        SFMLParser parser = new SFMLParser(tokens);
-        parser.removeErrorListeners();
+        SFMLParser parser = context.programBuildResult().metadata().parser();
+
+        // Create code completion core
         CodeCompletionCore core = new CodeCompletionCore(parser, null, null);
-        CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(context.cursorPosition(), parser.program());
+
+        int caretTokenIndex = context.programBuildResult().getTokenIndexAtCursorPosition(context.cursorPosition());
+
+        CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(caretTokenIndex, null);
         List<IntellisenseAction> rtn = new ArrayList<>();
         Vocabulary vocabulary = parser.getVocabulary();
         String[] ruleNames = parser.getRuleNames();

@@ -5,13 +5,15 @@ import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
 import ca.teamdman.sfml.intellisense.IntellisenseContext;
 import ca.teamdman.sfml.intellisense.SFMLIntellisense;
+import ca.teamdman.sfml.program_builder.ProgramBuildResult;
 import com.mojang.datafixers.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.Token;
 
 import java.util.List;
 
 public class SFMDisplayUtils {
-    public static String getCursorDisplay(
+    public static String getCursorPositionDisplay(
             String programString,
             int cursorPos
     ) {
@@ -33,12 +35,37 @@ public class SFMDisplayUtils {
         return rtn.toString();
     }
 
+    public static String getCursorTokenDisplay(
+            ProgramBuildResult buildResult,
+            int cursorPos
+    ) {
+       var tokens = buildResult.metadata().tokens().getTokens();
+       var displayTokens = tokens.stream().filter(token -> token.getStartIndex() - 10 <= cursorPos && token.getStopIndex() + 10 >= cursorPos).toList();
+        int tokenIndexAtCursorPosition = buildResult.getTokenIndexAtCursorPosition(cursorPos);
+        if (tokenIndexAtCursorPosition == -1) {
+            return "[ COULDN'T FIND CURSOR TOKEN ]";
+        }
+        var activeToken = tokens.get(tokenIndexAtCursorPosition);
+         StringBuilder inner = new StringBuilder();
+        for (Token displayToken : displayTokens) {
+            if (displayToken == activeToken) {
+                inner.append(">");
+            }
+            inner.append(displayToken.getText().replaceAll("\n", "\\\\n"));
+            if (displayToken == activeToken) {
+                inner.append("<");
+            }
+            inner.append(" ");
+        }
+        return String.format("[%20s]", inner);
+    }
+
     public static String getTokenHierarchyDisplay(
             Program program,
             int cursorPos
     ) {
         StringBuilder rtn = new StringBuilder();
-        List<Pair<ASTNode, ParserRuleContext>> nodesUnderCursor = program.builder().getNodesUnderCursor(cursorPos);
+        List<Pair<ASTNode, ParserRuleContext>> nodesUnderCursor = program.astBuilder().getNodesUnderCursor(cursorPos);
 
         var iter = nodesUnderCursor.listIterator(nodesUnderCursor.size());
         while (iter.hasPrevious()) {
@@ -53,12 +80,12 @@ public class SFMDisplayUtils {
     }
 
     public static String getSuggestionsDisplay(
-            String programString,
+            ProgramBuildResult programBuildResult,
             int cursorPos
     ) {
         StringBuilder rtn = new StringBuilder();
         List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(new IntellisenseContext(
-                programString,
+                programBuildResult,
                 cursorPos,
                 0
         ));

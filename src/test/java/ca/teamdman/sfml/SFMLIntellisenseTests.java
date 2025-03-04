@@ -7,6 +7,8 @@ import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
 import ca.teamdman.sfml.intellisense.IntellisenseContext;
 import ca.teamdman.sfml.intellisense.SFMLIntellisense;
+import ca.teamdman.sfml.program_builder.ProgramBuildResult;
+import ca.teamdman.sfml.program_builder.ProgramBuilder;
 import com.mojang.datafixers.util.Pair;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -15,6 +17,7 @@ import org.antlr.v4.runtime.Token;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -54,14 +57,15 @@ public class SFMLIntellisenseTests {
 
     @Test
     public void itWorksTest() {
-        String program = """
+        String programString = """
                 NAME "hi"
                 EVERY 20
                 """.stripTrailing().stripIndent();
-        for (int cursorPosition = 0; cursorPosition < countTokens(program); cursorPosition++) {
+        for (int cursorPosition = 0; cursorPosition < countTokens(programString); cursorPosition++) {
             StringBuilder display = new StringBuilder();
+            ProgramBuildResult buildResult = ProgramBuilder.build(programString);
             List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(new IntellisenseContext(
-                    program,
+                    buildResult,
                     cursorPosition,
                     0
             ));
@@ -95,11 +99,11 @@ public class SFMLIntellisenseTests {
 
         // Put each cursor position as a new line in the stdout
         for (int cursorPos = 0; cursorPos < programString.length(); cursorPos++) {
-            System.out.print(SFMDisplayUtils.getCursorDisplay(programString, cursorPos));
+            System.out.print(SFMDisplayUtils.getCursorPositionDisplay(programString, cursorPos));
 
             // print the tokens under the cursor
 //            System.out.print(" [");
-            for (Pair<ASTNode, ParserRuleContext> pair : program.get().builder().getNodesUnderCursor(cursorPos)) {
+            for (Pair<ASTNode, ParserRuleContext> pair : program.get().astBuilder().getNodesUnderCursor(cursorPos)) {
                 ASTNode node = pair.getFirst();
                 ParserRuleContext nodeContext = pair.getSecond();
                 System.out.printf("%s(%s) ", node.getClass().getSimpleName(), nodeContext.getText());
@@ -112,23 +116,18 @@ public class SFMLIntellisenseTests {
     @Test
     public void combinedTest() {
         String programString = SIMPLE_PROGRAM_STRING;
-        AtomicReference<Program> programBox = new AtomicReference<>();
-        Program.compile(
-                programString,
-                programBox::set,
-                failure -> {
-                    failure.forEach(error -> System.out.println(error.toString()));
-                    throw new RuntimeException("Failed to compile program");
-                }
-        );
-        Program program = programBox.get();
+        ProgramBuildResult buildResult = ProgramBuilder.build(programString).caseFailure(failure -> {
+            failure.metadata().errors().forEach(error -> System.out.println(error.toString()));
+            throw new RuntimeException("Failed to compile program");
+        });
+        Program program = Objects.requireNonNull(buildResult.program());
         for (int cursorPos = 0; cursorPos < programString.length(); cursorPos++) {
             System.out.print("||| ");
-            System.out.printf("%s", SFMDisplayUtils.getCursorDisplay(programString, cursorPos));
+            System.out.printf("%s", SFMDisplayUtils.getCursorPositionDisplay(programString, cursorPos));
             System.out.print(" ||| ");
             System.out.printf("%s", SFMDisplayUtils.getTokenHierarchyDisplay(program, cursorPos));
             System.out.print(" ||| ");
-            System.out.printf("%s", SFMDisplayUtils.getSuggestionsDisplay(programString, cursorPos));
+            System.out.printf("%s", SFMDisplayUtils.getSuggestionsDisplay(buildResult, cursorPos));
             System.out.print(" |||");
             System.out.println();
         }

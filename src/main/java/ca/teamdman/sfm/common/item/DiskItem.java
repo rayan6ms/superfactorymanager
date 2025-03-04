@@ -97,8 +97,7 @@ public class DiskItem extends Item {
 
                     // Log to disk
                     if (manager != null) {
-                        manager.logger.error(x -> x.accept(LocalizationKeys.PROGRAM_COMPILE_FAILED_WITH_ERRORS.get(
-                                errors.size())));
+                        manager.logger.error(x -> x.accept(LocalizationKeys.PROGRAM_COMPILE_FAILED_WITH_ERRORS.get(errors.size())));
                         manager.logger.error(errors::forEach);
                     }
 
