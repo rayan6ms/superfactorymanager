@@ -37,6 +37,7 @@ package org.simmetrics.metrics.functions;
  *      - Smith–Waterman algorithm</a>
  *
  */
+@SuppressWarnings("ALL")
 public interface Substitution {
 	/**
 	 * Rates the substitution of character <code>a.getChar(aIndex)</code>

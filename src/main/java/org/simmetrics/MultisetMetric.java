@@ -53,6 +53,7 @@ import com.google.common.collect.Multisets;
  *            the type of elements contained in the sets
  *
  */
+@SuppressWarnings("ALL")
 public interface MultisetMetric<T> extends Metric<Multiset<T>> {
 	/**
 	 * Measures the similarity between multisets a and b. The measurement

@@ -52,6 +52,7 @@ import static org.simmetrics.builders.StringDistances.*;
  * <p>
  * For usage examples see the simmetrics-example module.
  */
+@SuppressWarnings("ALL")
 public final class StringDistanceBuilder {
 
 	private StringDistanceBuilder() {

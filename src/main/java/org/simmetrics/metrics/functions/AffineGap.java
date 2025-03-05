@@ -34,6 +34,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  *      Penalty</a>
  *
  */
+@SuppressWarnings("ALL")
 public final class AffineGap implements Gap {
 
 	private final float startValue;

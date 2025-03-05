@@ -34,6 +34,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @deprecated will be removed due to a lack of a good use case
  */
 @Deprecated
+@SuppressWarnings("ALL")
 public final class Nysiis implements Simplifier {
 
 	private final org.apache.commons.codec.language.Nysiis simplifier;

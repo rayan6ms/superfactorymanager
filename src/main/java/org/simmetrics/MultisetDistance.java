@@ -53,6 +53,7 @@ import com.google.common.collect.Multisets;
  * @param <E>
  *            the type of elements contained in the lists
  */
+@SuppressWarnings("ALL")
 public interface MultisetDistance<E> extends Distance<Multiset<E>> {
 
 	/**

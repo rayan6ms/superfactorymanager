@@ -37,6 +37,7 @@ package org.simmetrics;
  * 
  */
 
+@SuppressWarnings("ALL")
 public interface StringMetric extends Metric<String> {
 	/**
 	 * Measures the similarity between strings a and b. The measurement results

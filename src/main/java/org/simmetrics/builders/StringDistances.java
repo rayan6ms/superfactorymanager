@@ -32,6 +32,7 @@ import java.util.Set;
 import static com.google.common.base.Preconditions.checkNotNull;
 import static org.simmetrics.simplifiers.Simplifiers.chain;
 
+@SuppressWarnings("ALL")
 final class StringDistances {
 
 	public static StringDistance create(Distance<String> distance) {

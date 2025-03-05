@@ -37,6 +37,7 @@ package org.simmetrics.metrics.functions;
  *      Penalty</a>
  *
  */
+@SuppressWarnings("ALL")
 public interface Gap {
 
 	/**

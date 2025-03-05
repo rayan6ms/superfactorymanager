@@ -35,6 +35,7 @@ import static org.simmetrics.tokenizers.Tokenizers.*;
  * <p>
  * The created distance metrics are immutable and thread-safe.
  */
+@SuppressWarnings("ALL")
 public final class StringDistances {
 	
 	/**

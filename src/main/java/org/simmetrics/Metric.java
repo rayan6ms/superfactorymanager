@@ -51,6 +51,7 @@ package org.simmetrics;
  * 
  */
 
+@SuppressWarnings("ALL")
 public interface Metric<T> {
 	/**
 	 * Measures the similarity between a and b. The measurement results in a

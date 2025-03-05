@@ -49,6 +49,7 @@ import static java.lang.Math.min;
  * 
  * 
  */
+@SuppressWarnings("ALL")
 public final class JaroWinkler implements StringMetric, StringDistance {
 
 	private final Jaro jaro = new Jaro();

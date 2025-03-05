@@ -39,6 +39,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  *      Hamming distance</a>
  * 
  */
+@SuppressWarnings("ALL")
 public final class HammingDistance {
 	
 	private HammingDistance() {

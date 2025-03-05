@@ -49,6 +49,7 @@ import static java.util.Collections.singletonList;
  * The created tokenizers are immutable and thread-safe provided all their
  * components are also immutable and thread-safe.
  */
+@SuppressWarnings("ALL")
 public final class Tokenizers {
 
 	/**

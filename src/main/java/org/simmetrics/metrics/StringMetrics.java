@@ -46,6 +46,7 @@ import static org.simmetrics.tokenizers.Tokenizers.*;
  * The created similarity metrics are immutable and thread-safe provided all their
  * components are also immutable and thread-safe.
  */
+@SuppressWarnings("ALL")
 public final class StringMetrics {
 
 	/**

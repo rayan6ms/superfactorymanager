@@ -53,6 +53,7 @@ import java.util.Set;
  *            the type of elements contained in the sets
  *
  */
+@SuppressWarnings("ALL")
 public interface SetMetric<T> extends Metric<Set<T>> {
 	/**
 	 * Measures the similarity between sets a and b. The measurement results in

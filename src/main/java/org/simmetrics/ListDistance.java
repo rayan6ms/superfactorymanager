@@ -48,6 +48,7 @@ import java.util.List;
  * @param <E>
  *            the type of elements contained in the lists
  */
+@SuppressWarnings("ALL")
 public interface ListDistance<E> extends Distance<List<E>> {
 
 	/**

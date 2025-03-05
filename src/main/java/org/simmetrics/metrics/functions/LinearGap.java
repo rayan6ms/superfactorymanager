@@ -33,6 +33,7 @@ import static com.google.common.base.Preconditions.checkArgument;
  * @see <a href="https://en.wikipedia.org/wiki/Gap_penalty">Wikipedia - Gap
  *      Penalty</a>
  */
+@SuppressWarnings("ALL")
 public final class LinearGap implements Gap {
 
 	private final float gapValue;

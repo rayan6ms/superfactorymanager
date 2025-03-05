@@ -52,6 +52,7 @@ import static org.simmetrics.builders.StringMetrics.*;
  * <p>
  * For usage examples see the simmetrics-example module.
  */
+@SuppressWarnings("ALL")
 public final class StringMetricBuilder {
 
 	private StringMetricBuilder() {

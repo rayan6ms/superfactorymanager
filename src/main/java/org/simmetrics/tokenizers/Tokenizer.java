@@ -33,6 +33,7 @@ import java.util.Set;
  * It is recommend that implementations extend {@link AbstractTokenizer}
  * rather then implement this interface.
  */
+@SuppressWarnings("ALL")
 public interface Tokenizer {
 
 	/**

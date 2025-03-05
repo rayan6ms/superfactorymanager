@@ -47,6 +47,7 @@ import static org.simmetrics.metrics.Math.max;
  *      - Smith-Waterman algorithm</a>
  *
  */
+@SuppressWarnings("ALL")
 public final class SmithWatermanGotoh implements StringMetric {
 
 	private static final Substitution MATCH_1_MISMATCH_MINUS_2 = new MatchMismatch(

@@ -27,6 +27,7 @@ import com.google.common.collect.Sets;
 
 import java.util.Set;
 
+@SuppressWarnings("ALL")
 final class Math {
 
 	private Math() {

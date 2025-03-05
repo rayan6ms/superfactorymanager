@@ -48,6 +48,7 @@ import java.util.Set;
  * @param <E>
  *            the type of elements contained in the lists
  */
+@SuppressWarnings("ALL")
 public interface SetDistance<E> extends Distance<Set<E>> {
 
 	/**

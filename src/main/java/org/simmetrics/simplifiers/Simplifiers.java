@@ -43,6 +43,7 @@ import static com.google.common.collect.Lists.asList;
  * The created simplifiers are immutable and thread-safe provided all their
  * components are also immutable and thread-safe.
  */
+@SuppressWarnings("ALL")
 public final class Simplifiers {
 
 	static final class ChainSimplifier implements Simplifier {

@@ -35,6 +35,7 @@ import static com.google.common.base.Preconditions.checkNotNull;
  * @deprecated will be removed due to a lack of a good use case
  */
 @Deprecated
+@SuppressWarnings("ALL")
 public final class Metaphone implements Simplifier {
 	private static final int DEFAULT_CODE_LENGTH = 4;
 	private final org.apache.commons.codec.language.Metaphone simplifier;

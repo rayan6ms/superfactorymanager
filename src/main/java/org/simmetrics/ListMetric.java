@@ -51,6 +51,7 @@ import java.util.List;
  *            the type of elements contained in the lists
  *
  */
+@SuppressWarnings("ALL")
 public interface ListMetric<T> extends Metric<List<T>> {
 	/**
 	 * Measures the similarity between lists a and b. The measurement results in
