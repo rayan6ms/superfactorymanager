@@ -40,7 +40,7 @@ public record ProgramBuildResult(
 
     public @Nullable Token getTokenAtCursorPosition(int cursorPos) {
         for (Token token : metadata().tokens().getTokens()) {
-            if (token.getStartIndex() <= cursorPos && token.getStopIndex() >= cursorPos) {
+            if (token.getStartIndex() <= cursorPos && token.getStopIndex()+1 >= cursorPos) {
                 return token;
             }
         }

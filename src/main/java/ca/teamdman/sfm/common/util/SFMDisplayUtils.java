@@ -41,11 +41,10 @@ public class SFMDisplayUtils {
     ) {
        var tokens = buildResult.metadata().tokens().getTokens();
        var displayTokens = tokens.stream().filter(token -> token.getStartIndex() - 10 <= cursorPos && token.getStopIndex() + 10 >= cursorPos).toList();
-        int tokenIndexAtCursorPosition = buildResult.getTokenIndexAtCursorPosition(cursorPos);
-        if (tokenIndexAtCursorPosition == -1) {
+        var activeToken = buildResult.getTokenAtCursorPosition(cursorPos);
+        if (activeToken == null) {
             return "[ COULDN'T FIND CURSOR TOKEN ]";
         }
-        var activeToken = tokens.get(tokenIndexAtCursorPosition);
          StringBuilder inner = new StringBuilder();
         for (Token displayToken : displayTokens) {
             if (displayToken == activeToken) {
