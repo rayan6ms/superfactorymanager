@@ -1,12 +1,9 @@
 package ca.teamdman.sfml.program_builder;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfml.ast.Program;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.antlr.v4.runtime.Token;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -34,19 +31,35 @@ public record ProgramBuildResult(
     }
 
     public int getTokenIndexAtCursorPosition(int cursorPos) {
-        ArrayList<Token> found = new ArrayList<>();
+        Token tokenAtCursorPosition = getTokenAtCursorPosition(cursorPos);
+        if (tokenAtCursorPosition != null) {
+            return tokenAtCursorPosition.getTokenIndex();
+        }
+        return -1;
+    }
+
+    public @Nullable Token getTokenAtCursorPosition(int cursorPos) {
         for (Token token : metadata().tokens().getTokens()) {
             if (token.getStartIndex() <= cursorPos && token.getStopIndex() >= cursorPos) {
-                found.add(token);
+                return token;
             }
         }
+        return null;
+    }
 
-        if (found.isEmpty()) {
-            return -1;
+    /**
+     * @param cursorPos The cursor position
+     * @return The sequence of non-whitespace characters to the left of the cursor
+     */
+    public String getWordAtCursorPosition(int cursorPos) {
+        StringBuilder word = new StringBuilder();
+        for (int i = cursorPos - 1; i >= 0; i--) {
+            char c = this.metadata().programString().charAt(i);
+            if (Character.isWhitespace(c)) {
+                break;
+            }
+            word.insert(0, c);
         }
-        if (found.size() != 1 && !FMLEnvironment.production) {
-            SFM.LOGGER.warn("Found interesting token count: {}", found.size());
-        }
-        return found.get(found.size() - 1).getTokenIndex();
+        return word.toString();
     }
 }

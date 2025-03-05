@@ -6,6 +6,7 @@ import org.antlr.v4.runtime.Vocabulary;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class SFMLIntellisense {
     public static List<IntellisenseAction> getSuggestions(
@@ -14,7 +15,8 @@ public class SFMLIntellisense {
         SFMLParser parser = context.programBuildResult().metadata().parser();
 
         // Create code completion core
-        CodeCompletionCore core = new CodeCompletionCore(parser, null, null);
+        Set<Integer> ignoredTokens = Set.of(SFMLParser.WS, SFMLParser.EOF);
+        CodeCompletionCore core = new CodeCompletionCore(parser, null, ignoredTokens);
 
         int caretTokenIndex = context.programBuildResult().getTokenIndexAtCursorPosition(context.cursorPosition());
 
@@ -45,7 +47,7 @@ public class SFMLIntellisense {
         });
         candidates.tokens.forEach((a,b) -> {
             StringBuilder display = new StringBuilder();
-            display.append("(token) ");
+//            display.append("(token) ");
             display.append(vocabulary.getSymbolicName(a));
             b.forEach((c) -> {
                 display.append(vocabulary.getSymbolicName(c));

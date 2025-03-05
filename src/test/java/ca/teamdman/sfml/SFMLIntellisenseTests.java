@@ -15,11 +15,13 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.junit.jupiter.api.Test;
+import org.simmetrics.StringDistance;
+import org.simmetrics.metrics.StringDistances;
 
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 public class SFMLIntellisenseTests {
@@ -142,4 +144,28 @@ public class SFMLIntellisenseTests {
         return tokens.size();
     }
 
+    @Test
+    public void shouldRankNameFirst() {
+        // The user typed "NAME"
+        String typed = "NAME";
+
+        // The intellisense suggestions we want to rank
+        List<String> suggestions = Arrays.asList("EOF", "NAME", "EVERY");
+
+        // We'll use the Levenshtein distance from simmetrics
+        StringDistance distance = StringDistances.levenshtein();
+
+        // Make a copy of suggestions so we can sort them
+        List<String> sorted = new ArrayList<>(suggestions);
+
+        // Sort ascending by distance to the typed string
+        sorted.sort(Comparator.comparing(s -> distance.distance(s, typed)));
+
+        // Now "NAME" should be first because distance("NAME","NAME") = 0
+        assertEquals("NAME", sorted.get(0));
+
+        // Optional: Check the sorted order, just as an example
+        // Not strictly necessary for a real test, but useful for demonstration
+        System.out.println("Typed: " + typed + " => Sorted suggestions: " + sorted);
+    }
 }

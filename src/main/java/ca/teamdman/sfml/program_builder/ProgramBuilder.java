@@ -81,6 +81,7 @@ public class ProgramBuilder {
         }
 
         ProgramMetadata metadata = new ProgramMetadata(
+                programString,
                 lexer,
                 tokens,
                 parser,

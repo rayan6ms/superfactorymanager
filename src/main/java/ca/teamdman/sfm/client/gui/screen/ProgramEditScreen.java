@@ -5,6 +5,7 @@ import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
 import ca.teamdman.sfm.client.gui.ButtonBuilder;
 import ca.teamdman.sfm.client.gui.EditorUtils;
+import ca.teamdman.sfm.client.gui.widgets.PickList;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
@@ -43,14 +44,14 @@ import java.util.stream.Collectors;
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP;
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP;
 
+@SuppressWarnings("NotNullFieldNotInitialized")
 public class ProgramEditScreen extends Screen {
     protected final String INITIAL_CONTENT;
     protected final Consumer<String> SAVE_CALLBACK;
-    @SuppressWarnings("NotNullFieldNotInitialized")
     protected MyMultiLineEditBox textarea;
     protected String lastProgram = "";
     protected List<MutableComponent> lastProgramWithSyntaxHighlighting = new ArrayList<>();
-    protected List<IntellisenseAction> suggestedActions = new ArrayList<>();
+    protected PickList suggestedActions;
 
     public ProgramEditScreen(
             String initialContent,
@@ -246,10 +247,18 @@ public class ProgramEditScreen extends Screen {
         super.init();
         assert this.minecraft != null;
         SFMScreenUtils.enableKeyRepeating();
-        this.textarea = this.addRenderableWidget(new MyMultiLineEditBox());
-        textarea.setValue(INITIAL_CONTENT);
-        this.setInitialFocus(textarea);
 
+        this.textarea = this.addRenderableWidget(new MyMultiLineEditBox());
+
+        this.suggestedActions = this.addRenderableWidget(new PickList(
+                this.font,
+                0,
+                0,
+                100,
+                this.font.lineHeight * 6,
+                LocalizationKeys.INTELLISENSE_PICK_LIST_GUI_TITLE.getComponent(),
+                new ArrayList<>()
+        ));
 
         this.addRenderableWidget(
                 new ButtonBuilder()
@@ -277,6 +286,10 @@ public class ProgramEditScreen extends Screen {
                         .setOnPress((button) -> this.onClose())
                         .build()
         );
+
+
+        textarea.setValue(INITIAL_CONTENT);
+        this.setInitialFocus(textarea);
     }
 
     private void onToggleLineNumbersButtonClicked() {
@@ -435,23 +448,35 @@ public class ProgramEditScreen extends Screen {
                 tokenHierarchyDisplay = SFMDisplayUtils.getTokenHierarchyDisplay(program, cursorPosition);
             }
 
+            // Update the intellisense picklist
             IntellisenseContext intellisenseContext = new IntellisenseContext(
                     buildResult,
                     cursorPosition,
                     getSelectionCursorPosition()
             );
             List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(intellisenseContext);
-            String suggestionsDisplay = suggestions
+            ProgramEditScreen.this.suggestedActions.setChoices(
+                    suggestions
+                            .stream()
+                            .map(x -> Component.literal(x.getDisplayText()))
+                            .collect(Collectors.toList())
+            );
+            String suggestionsDisplay = suggestedActions.getChoices()
                     .stream()
-                    .map(IntellisenseAction::getDisplayText)
+                    .map(Component::getString)
                     .collect(Collectors.joining(", "));
-            ProgramEditScreen.this.suggestedActions = suggestions;
+
+
+            // Update the intellisense picklist query used to sort the suggestions
+            String cursorWord = buildResult.getWordAtCursorPosition(cursorPosition);
+            ProgramEditScreen.this.suggestedActions.setQuery(Component.literal(cursorWord));
 
             SFM.LOGGER.info(
-                    "PROGRAM OR CURSOR CHANGE! {}   {}   {}  |||  {}",
+                    "PROGRAM OR CURSOR CHANGE! {}   {}   {}  |||  {} ||| {}",
                     cursorPositionDisplay,
                     cursorTokenDisplay,
                     tokenHierarchyDisplay,
+                    cursorWord,
                     suggestionsDisplay
             );
         }
@@ -533,6 +558,7 @@ public class ProgramEditScreen extends Screen {
                             matrix4f,
                             buffer
                     ) - 1;
+                    ProgramEditScreen.this.suggestedActions.setXY(cursorX + 10, cursorY);
                     // draw text after cursor
                     SFMScreenUtils.drawInBatch(
                             substring(componentColoured, cursorIndex - charCount, lineLength),

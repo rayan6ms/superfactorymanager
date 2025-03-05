@@ -313,6 +313,10 @@ public final class LocalizationKeys {
             "gui.sfm.title.program_template_picker",
             "Program Template Picker"
     );
+    public static final LocalizationEntry INTELLISENSE_PICK_LIST_GUI_TITLE = new LocalizationEntry(
+            "gui.sfm.title.intellisense_pick_list",
+            "Intellisense Pick List"
+    );
     public static final LocalizationEntry LABEL_GUN_GUI_LABEL_PLACEHOLDER = new LocalizationEntry(
             "gui.sfm.label_gun.placeholder",
             "Label"
