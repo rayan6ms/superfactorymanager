@@ -7,6 +7,7 @@ NAME "Changelog"
 ---- vNext ----
 -- (WIP) Intellisense
 -- (WIP) Fix missing focus highlight from tab-navigation of buttons in manager screen
+-- Fix syntax highlighting for "SECOND"
 
 ---- 4.20.0 ----
 -- Fix disks having no name when program has no name for 1.21+
