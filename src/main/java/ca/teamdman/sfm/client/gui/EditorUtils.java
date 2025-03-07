@@ -6,14 +6,14 @@ public class EditorUtils {
      * If the cursor is within a word that is a prefix of the suggestion, the word is replaced with the suggestion.
      * @param content The text editor content
      * @param cursor The index within the string of the cursor
-     * @param selectionCursor The index within the string of the selection cursor. If equal to cursorPosition, no selection is present.
+     * @param ignoredSelectionCursor The index within the string of the selection cursor. If equal to cursorPosition, no selection is present.
      * @param suggestion The suggestion to be inserted
      * @return The modified content, and the new cursor and selection cursor positions
      */
     public static ManipulationResult insertSuggestion(
             String content,
             int cursor,
-            int selectionCursor,
+            int ignoredSelectionCursor,
             String suggestion
     ) {
         StringBuilder sb = new StringBuilder(content);
