@@ -41,7 +41,7 @@ public record ServerboundFacadePacket(
         ) {
             buf.writeBlockHitResult(msg.hitResult);
             buf.writeEnum(msg.spreadLogic);
-            ItemStack.STREAM_CODEC.encode(buf, msg.paintStack);
+            ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, msg.paintStack);
             buf.writeEnum(msg.paintHand);
         }
 
@@ -50,7 +50,7 @@ public record ServerboundFacadePacket(
             return new ServerboundFacadePacket(
                     buf.readBlockHitResult(),
                     buf.readEnum(FacadeSpreadLogic.class),
-                    ItemStack.STREAM_CODEC.decode(buf),
+                    ItemStack.OPTIONAL_STREAM_CODEC.decode(buf),
                     buf.readEnum(InteractionHand.class)
             );
         }
