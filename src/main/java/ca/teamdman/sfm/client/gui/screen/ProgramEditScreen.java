@@ -165,24 +165,40 @@ public class ProgramEditScreen extends Screen {
             return true;
         }
         if (pKeyCode == GLFW.GLFW_KEY_TAB) {
-            // if tab pressed with no selection and not holding shift => insert 4 spaces
-            // if tab pressed with no selection and holding shift => de-indent current line
-            // if tab pressed with selection and not holding shift => de-indent lines containing selection 4 spaces
-            // if tab pressed with selection and holding shift => indent lines containing selection 4 spaces
-            String content = textarea.getValue();
-            int cursor = textarea.getCursorPosition();
-            int selectionCursor = textarea.getSelectionCursorPosition();
-            double scrollAmount = textarea.getScrollAmount();
-            EditorUtils.ManipulationResult result;
-            if (Screen.hasShiftDown()) { // de-indent
-                result = EditorUtils.deindent(content, cursor, selectionCursor);
-            } else { // indent
-                result = EditorUtils.indent(content, cursor, selectionCursor);
+            if (suggestedActions.getChoices().isEmpty()) {
+                // if tab pressed with no selection and not holding shift => insert 4 spaces
+                // if tab pressed with no selection and holding shift => de-indent current line
+                // if tab pressed with selection and not holding shift => de-indent lines containing selection 4 spaces
+                // if tab pressed with selection and holding shift => indent lines containing selection 4 spaces
+                String content = textarea.getValue();
+                int cursor = textarea.getCursorPosition();
+                int selectionCursor = textarea.getSelectionCursorPosition();
+                double scrollAmount = textarea.getScrollAmount();
+                EditorUtils.ManipulationResult result;
+                if (Screen.hasShiftDown()) { // de-indent
+                    result = EditorUtils.deindent(content, cursor, selectionCursor);
+                } else { // indent
+                    result = EditorUtils.indent(content, cursor, selectionCursor);
+                }
+                textarea.setValue(result.content());
+                textarea.setCursorPosition(result.cursorPosition());
+                textarea.setSelectionCursorPosition(result.selectionCursorPosition());
+                textarea.setScrollAmount(scrollAmount);
+            } else {
+                var suggestionComponent = suggestedActions.getSelected();
+                assert suggestionComponent != null;
+                String suggestionString = suggestionComponent.getString() + " ";
+                String content = textarea.getValue();
+                int cursor = textarea.getCursorPosition();
+                int selectionCursor = textarea.getSelectionCursorPosition();
+                EditorUtils.ManipulationResult result = EditorUtils.insertSuggestion(content, cursor, selectionCursor, suggestionString);
+                double scrollAmount = textarea.getScrollAmount();
+                textarea.setValue(result.content());
+                textarea.setCursorPosition(result.cursorPosition());
+                textarea.setSelectionCursorPosition(result.selectionCursorPosition());
+                textarea.setScrollAmount(scrollAmount);
             }
-            textarea.setValue(result.content());
-            textarea.setCursorPosition(result.cursorPosition());
-            textarea.setSelectionCursorPosition(result.selectionCursorPosition());
-            textarea.setScrollAmount(scrollAmount);
+
             return true;
         }
         if (pKeyCode == GLFW.GLFW_KEY_LEFT_CONTROL || pKeyCode == GLFW.GLFW_KEY_RIGHT_CONTROL) {
