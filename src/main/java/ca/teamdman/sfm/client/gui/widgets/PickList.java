@@ -10,11 +10,16 @@ import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
+import org.jetbrains.annotations.Nullable;
 import org.simmetrics.StringDistance;
-import org.simmetrics.metrics.StringDistances;
+import org.simmetrics.builders.StringDistanceBuilder;
+import org.simmetrics.metrics.BlockDistance;
+import org.simmetrics.simplifiers.Simplifiers;
 
 import java.util.Comparator;
 import java.util.List;
+
+import static org.simmetrics.tokenizers.Tokenizers.qGramWithPadding;
 
 public class PickList extends AbstractScrollWidget {
     protected final Font font;
@@ -43,17 +48,20 @@ public class PickList extends AbstractScrollWidget {
         this.choices = choices;
     }
 
+    public @Nullable Component getSelected() {
+        if (choices.isEmpty()) return null;
+        return getChoices().get(0);
+    }
+
     public void setQuery(Component query) {
         this.query = query;
         sortChoices();
     }
 
-    private void sortChoices() {
-        StringDistance distance = StringDistances.levenshtein();
-        choices.sort(Comparator.comparing(s -> distance.distance(s.getString(), query.getString())));
-    }
-
-    public void setXY(int x, int y) {
+    public void setXY(
+            int x,
+            int y
+    ) {
         this.x = x;
         this.y = y;
     }
@@ -70,7 +78,17 @@ public class PickList extends AbstractScrollWidget {
             int pMouseY,
             float pPartialTick
     ) {
+        if (choices.isEmpty()) return;
         super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+    }
+
+    private void sortChoices() {
+        StringDistance distance = StringDistanceBuilder
+                .with(new BlockDistance<>())
+                .simplify(Simplifiers.toLowerCase())
+                .tokenize(qGramWithPadding(2))
+                .build();
+        choices.sort(Comparator.comparing(s -> distance.distance(s.getString(), query.getString())));
     }
 
     @Override
@@ -101,7 +119,6 @@ public class PickList extends AbstractScrollWidget {
             int my,
             float partialTick
     ) {
-        if (choices.isEmpty()) return;
         Matrix4f matrix4f = poseStack.last().pose();
         var buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
         int lineX = SFMScreenUtils.getX(this) + this.innerPadding();
