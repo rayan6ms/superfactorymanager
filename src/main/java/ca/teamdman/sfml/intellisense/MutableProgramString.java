@@ -2,8 +2,8 @@ package ca.teamdman.sfml.intellisense;
 
 public class MutableProgramString {
     private StringBuilder content;
-    private int cursorPosition = 0;
-    private int selectionCursorPosition = 0;
+    private int cursorPosition;
+    private int selectionCursorPosition;
 
     public MutableProgramString(
             String content,
@@ -30,6 +30,7 @@ public class MutableProgramString {
         }
         return end;
     }
+
     public String getWord() {
         return content.substring(getWordBeginning(), getWordEnd());
     }
@@ -58,17 +59,10 @@ public class MutableProgramString {
         return cursorPosition;
     }
 
-    public void setCursorPosition(int cursorPosition) {
-        this.cursorPosition = cursorPosition;
-    }
-
     public int getSelectionCursorPosition() {
         return selectionCursorPosition;
     }
 
-    public void setSelectionCursorPosition(int selectionCursorPosition) {
-        this.selectionCursorPosition = selectionCursorPosition;
-    }
     public void offsetCursors(int offset) {
         cursorPosition += offset;
         selectionCursorPosition += offset;

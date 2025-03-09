@@ -284,7 +284,7 @@ public class ProgramEditScreen extends Screen {
 
         this.textarea = this.addRenderableWidget(new MyMultiLineEditBox());
 
-        this.suggestedActions = this.addRenderableWidget(new PickList(
+        this.suggestedActions = this.addRenderableWidget(new PickList<>(
                 this.font,
                 0,
                 0,

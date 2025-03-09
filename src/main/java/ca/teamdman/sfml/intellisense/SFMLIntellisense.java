@@ -22,11 +22,9 @@ public class SFMLIntellisense {
 
         int caretTokenIndex = context.programBuildResult().getTokenIndexAtCursorPosition(context.cursorPosition());
 
-//        CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(caretTokenIndex, parser.program());
         CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(caretTokenIndex, null);
         List<IntellisenseAction> rtn = new ArrayList<>();
         Vocabulary vocabulary = parser.getVocabulary();
-        String[] ruleNames = parser.getRuleNames();
         if (!candidates.rules.isEmpty()) {
             SFM.LOGGER.warn("Expected no rule intellisense results, found {}.", candidates.rules.size());
         }

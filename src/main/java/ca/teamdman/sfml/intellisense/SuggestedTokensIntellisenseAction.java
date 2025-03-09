@@ -59,9 +59,7 @@ public record SuggestedTokensIntellisenseAction(
                     programStringMut.offsetCursors(1);
                 }
             }
-            default -> {
-                programStringMut.replaceWordAndMoveCursorsToEnd(getDisplay() + " ");
-            }
+            default -> programStringMut.replaceWordAndMoveCursorsToEnd(getDisplay() + " ");
         }
         return new ManipulationResult(
                 programStringMut.getContent(),
