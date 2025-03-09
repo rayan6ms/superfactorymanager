@@ -100,7 +100,8 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     @Override
     public StringHolder visitString(SFMLParser.StringContext ctx) {
         var content = ctx.getText();
-        StringHolder str = new StringHolder(content.substring(1, content.length() - 1));
+        String innerContent = content.substring(1, content.length() - 1).replaceAll("\\\\\"", "\"");
+        StringHolder str = new StringHolder(innerContent);
         AST_NODE_CONTEXTS.add(new Pair<>(str, ctx));
         return str;
     }

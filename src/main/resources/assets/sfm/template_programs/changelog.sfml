@@ -8,6 +8,7 @@ NAME "Changelog"
 -- (WIP) Intellisense
 -- (WIP) Fix missing focus highlight from tab-navigation of buttons in manager screen
 -- Fix syntax highlighting for "SECOND"
+-- Fix escaped quotes in strings containing the escaping backslash
 
 ---- 4.20.0 ----
 -- Fix disks having no name when program has no name for 1.21+
