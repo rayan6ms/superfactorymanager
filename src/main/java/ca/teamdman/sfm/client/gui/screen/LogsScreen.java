@@ -4,7 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientDiagnosticInfo;
 import ca.teamdman.sfm.client.ClientTranslationHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
-import ca.teamdman.sfm.client.gui.widget.ButtonBuilder;
+import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.logging.TranslatableLogEvent;
@@ -182,7 +182,7 @@ public class LogsScreen extends Screen {
 
         this.levelButtons = new HashMap<>();
         for (var level : buttons) {
-            Button levelButton = new ButtonBuilder()
+            Button levelButton = new SFMButtonBuilder()
                     .setSize(buttonWidth, buttonHeight)
                     .setPosition(
                             startX + (buttonWidth + spacing) * buttonIndex,
@@ -208,7 +208,7 @@ public class LogsScreen extends Screen {
 
 
         this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(this.width / 2 - 200, this.height / 2 - 100 + 195)
                         .setSize(80, 20)
                         .setText(LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON)
@@ -217,7 +217,7 @@ public class LogsScreen extends Screen {
                         .build()
         );
         this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(this.width / 2 - 2 - 100, this.height / 2 - 100 + 195)
                         .setSize(200, 20)
                         .setText(CommonComponents.GUI_DONE)
@@ -227,7 +227,7 @@ public class LogsScreen extends Screen {
         );
         if (!isReadOnly()) {
             this.addRenderableWidget(
-                    new ButtonBuilder()
+                    new SFMButtonBuilder()
                             .setPosition(this.width / 2 - 2 + 115, this.height / 2 - 100 + 195)
                             .setSize(80, 20)
                             .setText(LocalizationKeys.LOGS_GUI_CLEAR_LOGS_BUTTON)

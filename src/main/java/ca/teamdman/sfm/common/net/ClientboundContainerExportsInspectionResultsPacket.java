@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.common.net;
 
-import ca.teamdman.sfm.client.ClientScreenHelpers;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenHelpers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
@@ -47,7 +47,7 @@ public record ClientboundContainerExportsInspectionResultsPacket(
             if (player == null) return;
             var container = player.containerMenu;
             if (container.containerId != msg.windowId) return;
-            ClientScreenHelpers.showProgramEditScreen(msg.results);
+            SFMScreenHelpers.showProgramEditScreen(msg.results);
         }
     }
 

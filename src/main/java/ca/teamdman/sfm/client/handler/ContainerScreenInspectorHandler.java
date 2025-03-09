@@ -2,8 +2,8 @@ package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientRaycastHelpers;
-import ca.teamdman.sfm.client.ClientScreenHelpers;
-import ca.teamdman.sfm.client.gui.widget.ButtonBuilder;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenHelpers;
+import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundContainerExportsInspectionRequestPacket;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 public class ContainerScreenInspectorHandler {
     private static boolean visible = false;
     private static @Nullable AbstractContainerScreen<?> lastScreen = null;
-    private static final Button exportInspectorButton = new ButtonBuilder()
+    private static final Button exportInspectorButton = new SFMButtonBuilder()
             .setSize(100, 20)
             .setPosition(5, 50)
             .setText(LocalizationKeys.CONTAINER_INSPECTOR_SHOW_EXPORTS_BUTTON)
@@ -152,7 +152,7 @@ public class ContainerScreenInspectorHandler {
                 if (hoveredSlot != null) {
                     ItemStack hoveredStack = hoveredSlot.getItem();
                     if (!hoveredStack.isEmpty()) {
-                        ClientScreenHelpers.showItemInspectorScreen(hoveredStack);
+                        SFMScreenHelpers.showItemInspectorScreen(hoveredStack);
                     }
                 }
             }

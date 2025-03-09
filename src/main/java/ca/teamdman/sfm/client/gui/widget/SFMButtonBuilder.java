@@ -8,7 +8,7 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
 
-public class ButtonBuilder {
+public class SFMButtonBuilder {
     private @Nullable Component text = null;
     private int x = 0;
     private int y = 0;
@@ -17,16 +17,16 @@ public class ButtonBuilder {
     private @Nullable Button.OnPress onPress = null;
     private @MCVersionDependentBehaviour @Nullable Button.OnTooltip tooltip = null;
 
-    public ButtonBuilder setText(LocalizationEntry text) {
+    public SFMButtonBuilder setText(LocalizationEntry text) {
         return setText(text.getComponent());
     }
 
-    public ButtonBuilder setText(Component text) {
+    public SFMButtonBuilder setText(Component text) {
         this.text = text;
         return this;
     }
 
-    public ButtonBuilder setSize(
+    public SFMButtonBuilder setSize(
             int width,
             int height
     ) {
@@ -35,7 +35,7 @@ public class ButtonBuilder {
         return this;
     }
 
-    public ButtonBuilder setPosition(
+    public SFMButtonBuilder setPosition(
             int x,
             int y
     ) {
@@ -44,12 +44,12 @@ public class ButtonBuilder {
         return this;
     }
 
-    public ButtonBuilder setOnPress(Button.OnPress onPress) {
+    public SFMButtonBuilder setOnPress(Button.OnPress onPress) {
         this.onPress = onPress;
         return this;
     }
 
-    public ButtonBuilder setTooltip(
+    public SFMButtonBuilder setTooltip(
             Screen screen,
             Font font,
             LocalizationEntry tooltip
@@ -58,7 +58,7 @@ public class ButtonBuilder {
     }
 
     @MCVersionDependentBehaviour
-    public ButtonBuilder setTooltip(
+    public SFMButtonBuilder setTooltip(
             Screen screen,
             Font font,
             Component tooltip

@@ -1,7 +1,6 @@
-package ca.teamdman.sfm.client;
+package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.gui.screen.*;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundManagerLogDesireUpdatePacket;
@@ -20,7 +19,7 @@ import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public class ClientScreenHelpers {
+public class SFMScreenHelpers {
     public static void setOrPushScreen(Screen screen) {
         if (Minecraft.getInstance().screen == null) {
             Minecraft

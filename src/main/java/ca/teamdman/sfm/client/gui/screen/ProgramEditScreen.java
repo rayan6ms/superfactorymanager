@@ -3,9 +3,9 @@ package ca.teamdman.sfm.client.gui.screen;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
-import ca.teamdman.sfm.client.gui.widget.ButtonBuilder;
 import ca.teamdman.sfm.client.gui.widget.PickList;
 import ca.teamdman.sfm.client.gui.widget.PickListItem;
+import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
@@ -295,7 +295,7 @@ public class ProgramEditScreen extends Screen {
         ));
 
         this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(this.width / 2 - 200, this.height / 2 - 100 + 195)
                         .setSize(16, 20)
                         .setText(Component.literal("#"))
@@ -304,7 +304,7 @@ public class ProgramEditScreen extends Screen {
                         .build()
         );
         this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(this.width / 2 - 2 - 150, this.height / 2 - 100 + 195)
                         .setSize(200, 20)
                         .setText(CommonComponents.GUI_DONE)
@@ -313,7 +313,7 @@ public class ProgramEditScreen extends Screen {
                         .build()
         );
         this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(this.width / 2 - 2 + 100, this.height / 2 - 100 + 195)
                         .setSize(100, 20)
                         .setText(CommonComponents.GUI_CANCEL)
