@@ -3,7 +3,7 @@ package ca.teamdman.sfm.client.handler;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientRaycastHelpers;
 import ca.teamdman.sfm.client.ClientScreenHelpers;
-import ca.teamdman.sfm.client.gui.ButtonBuilder;
+import ca.teamdman.sfm.client.gui.widget.ButtonBuilder;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundContainerExportsInspectionRequestPacket;

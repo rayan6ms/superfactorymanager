@@ -3,9 +3,9 @@ package ca.teamdman.sfm.client.gui.screen;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
-import ca.teamdman.sfm.client.gui.ButtonBuilder;
-import ca.teamdman.sfm.client.gui.widgets.PickList;
-import ca.teamdman.sfm.client.gui.widgets.PickListItem;
+import ca.teamdman.sfm.client.gui.widget.ButtonBuilder;
+import ca.teamdman.sfm.client.gui.widget.PickList;
+import ca.teamdman.sfm.client.gui.widget.PickListItem;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
@@ -230,6 +230,20 @@ public class ProgramEditScreen extends Screen {
 
             // disable the underline since it doesn't refresh when the context action closes
             textarea.rebuild(false);
+            return true;
+        }
+        if (
+                (
+                        pKeyCode == GLFW.GLFW_KEY_UP
+                        || pKeyCode == GLFW.GLFW_KEY_DOWN
+                )
+                && !suggestedActions.getItems().isEmpty()
+        ) {
+            if (pKeyCode == GLFW.GLFW_KEY_UP) {
+                suggestedActions.selectPreviousWrapping();
+            } else {
+                suggestedActions.selectNextWrapping();
+            }
             return true;
         }
         return super.keyPressed(pKeyCode, pScanCode, pModifiers);

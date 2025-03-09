@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.client.gui.widgets;
+package ca.teamdman.sfm.client.gui.widget;
 
 import net.minecraft.network.chat.Component;
 

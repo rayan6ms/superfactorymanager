@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.client.gui.widgets;
+package ca.teamdman.sfm.client.gui.widget;
 
 import ca.teamdman.sfm.client.gui.screen.SFMScreenUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -24,6 +24,7 @@ import static org.simmetrics.tokenizers.Tokenizers.qGramWithPadding;
 public class PickList<T extends PickListItem> extends AbstractScrollWidget {
     protected final Font font;
     protected List<T> items;
+    protected int selectionIndex = -1;
     protected Component query = Component.empty();
 
     public PickList(
@@ -50,6 +51,8 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
 
     public @Nullable T getSelected() {
         if (items.isEmpty()) return null;
+        if (selectionIndex < 0) return null;
+        if (selectionIndex >= items.size()) return null;
         return getItems().get(0);
     }
 
@@ -80,6 +83,22 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
     ) {
         if (items.isEmpty()) return;
         super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+    }
+
+    public void selectPreviousWrapping() {
+        if (this.selectionIndex == -1) {
+            this.selectionIndex = this.items.size() - 1;
+            return;
+        }
+        this.selectionIndex = (this.selectionIndex - 1 + this.items.size()) % this.items.size();
+    }
+
+    public void selectNextWrapping() {
+        if (this.selectionIndex == -1) {
+            this.selectionIndex = 0;
+            return;
+        }
+        this.selectionIndex = (this.selectionIndex + 1) % this.items.size();
     }
 
     private void sortItems() {

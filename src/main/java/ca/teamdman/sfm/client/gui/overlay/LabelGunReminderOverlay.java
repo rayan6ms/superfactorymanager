@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.client.gui;
+package ca.teamdman.sfm.client.gui.overlay;
 
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.config.SFMConfig;
