@@ -622,7 +622,7 @@ public class ProgramEditScreen extends Screen {
                     int highlightStartX = this.font.width(substring(componentColoured, 0, lineSelectionStart));
                     int highlightEndX = this.font.width(substring(componentColoured, 0, lineSelectionEnd));
 
-                    this.renderHighlight(
+                    SFMScreenHelpers.renderHighlight(
                             poseStack,
                             lineX + highlightStartX,
                             lineY,

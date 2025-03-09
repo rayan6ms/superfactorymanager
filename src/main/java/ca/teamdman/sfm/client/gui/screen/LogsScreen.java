@@ -422,7 +422,7 @@ public class LogsScreen extends Screen {
                             lineSelectionEnd
                     ));
 
-                    this.renderHighlight(
+                    SFMScreenHelpers.renderHighlight(
                             poseStack,
                             lineX + highlightStartX,
                             lineY,
