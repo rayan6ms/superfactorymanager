@@ -1,34 +1,6 @@
-package ca.teamdman.sfm.client.gui;
+package ca.teamdman.sfml.manipulation;
 
-public class EditorUtils {
-    /**
-     * Inserts a suggestion into the content at the cursor position.
-     * If the cursor is within a word that is a prefix of the suggestion, the word is replaced with the suggestion.
-     * @param content The text editor content
-     * @param cursor The index within the string of the cursor
-     * @param ignoredSelectionCursor The index within the string of the selection cursor. If equal to cursorPosition, no selection is present.
-     * @param suggestion The suggestion to be inserted
-     * @return The modified content, and the new cursor and selection cursor positions
-     */
-    public static ManipulationResult insertSuggestion(
-            String content,
-            int cursor,
-            int ignoredSelectionCursor,
-            String suggestion
-    ) {
-        StringBuilder sb = new StringBuilder(content);
-        int start = cursor;
-        while (start > 0 && !Character.isWhitespace(sb.charAt(start - 1))) {
-            start--;
-        }
-        int end = cursor;
-        while (end < sb.length() && !Character.isWhitespace(sb.charAt(end))) {
-            end++;
-        }
-        sb.replace(start, end, suggestion);
-        return new ManipulationResult(sb.toString(), start + suggestion.length(), start + suggestion.length());
-    }
-
+public class ProgramStringManipulationUtils {
     private static int findLineStart(String content, int cursorPos) {
         while (cursorPos > 0 && content.charAt(cursorPos - 1) != '\n') {
             cursorPos--;
@@ -161,12 +133,5 @@ public class EditorUtils {
             }
         }
         return new ManipulationResult(sb.toString(), cursorPos, selectionCursorPos);
-    }
-
-    public record ManipulationResult(
-            String content,
-            int cursorPosition,
-            int selectionCursorPosition
-    ) {
     }
 }

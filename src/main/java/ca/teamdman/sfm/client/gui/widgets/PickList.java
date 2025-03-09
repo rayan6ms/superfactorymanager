@@ -21,9 +21,9 @@ import java.util.List;
 
 import static org.simmetrics.tokenizers.Tokenizers.qGramWithPadding;
 
-public class PickList extends AbstractScrollWidget {
+public class PickList<T extends PickListItem> extends AbstractScrollWidget {
     protected final Font font;
-    protected List<Component> choices;
+    protected List<T> items;
     protected Component query = Component.empty();
 
     public PickList(
@@ -33,29 +33,29 @@ public class PickList extends AbstractScrollWidget {
             int pWidth,
             int pHeight,
             Component title,
-            List<Component> choices
+            List<T> items
     ) {
         super(pX, pY, pWidth, pHeight, title);
         this.font = font;
-        this.choices = choices;
+        this.items = items;
     }
 
-    public List<Component> getChoices() {
-        return choices;
+    public List<T> getItems() {
+        return items;
     }
 
-    public void setChoices(List<Component> choices) {
-        this.choices = choices;
+    public void setItems(List<T> items) {
+        this.items = items;
     }
 
-    public @Nullable Component getSelected() {
-        if (choices.isEmpty()) return null;
-        return getChoices().get(0);
+    public @Nullable T getSelected() {
+        if (items.isEmpty()) return null;
+        return getItems().get(0);
     }
 
     public void setQuery(Component query) {
         this.query = query;
-        sortChoices();
+        sortItems();
     }
 
     public void setXY(
@@ -78,27 +78,30 @@ public class PickList extends AbstractScrollWidget {
             int pMouseY,
             float pPartialTick
     ) {
-        if (choices.isEmpty()) return;
+        if (items.isEmpty()) return;
         super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
     }
 
-    private void sortChoices() {
+    private void sortItems() {
         StringDistance distance = StringDistanceBuilder
                 .with(new BlockDistance<>())
                 .simplify(Simplifiers.toLowerCase())
                 .tokenize(qGramWithPadding(2))
                 .build();
-        choices.sort(Comparator.comparing(s -> distance.distance(s.getString(), query.getString())));
+        items.sort(Comparator.comparing(item -> distance.distance(
+                item.getComponent().getString(),
+                query.getString()
+        )));
     }
 
     @Override
     protected int getInnerHeight() {
-        return font.lineHeight * choices.size();
+        return font.lineHeight * items.size();
     }
 
     @Override
     protected boolean scrollbarVisible() {
-        return this.choices.size() > this.getDisplayableLineCount();
+        return this.items.size() > this.getDisplayableLineCount();
     }
 
 
@@ -123,9 +126,9 @@ public class PickList extends AbstractScrollWidget {
         var buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
         int lineX = SFMScreenUtils.getX(this) + this.innerPadding();
         int lineY = SFMScreenUtils.getY(this) + this.innerPadding();
-        for (Component choice : choices) {
+        for (PickListItem item : items) {
             SFMScreenUtils.drawInBatch(
-                    choice,
+                    item.getComponent(),
                     this.font,
                     lineX,
                     lineY,

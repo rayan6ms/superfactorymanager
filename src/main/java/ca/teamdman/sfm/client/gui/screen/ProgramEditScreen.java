@@ -4,8 +4,8 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
 import ca.teamdman.sfm.client.gui.ButtonBuilder;
-import ca.teamdman.sfm.client.gui.EditorUtils;
 import ca.teamdman.sfm.client.gui.widgets.PickList;
+import ca.teamdman.sfm.client.gui.widgets.PickListItem;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
@@ -14,6 +14,8 @@ import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
 import ca.teamdman.sfml.intellisense.IntellisenseContext;
 import ca.teamdman.sfml.intellisense.SFMLIntellisense;
+import ca.teamdman.sfml.manipulation.ManipulationResult;
+import ca.teamdman.sfml.manipulation.ProgramStringManipulationUtils;
 import ca.teamdman.sfml.program_builder.ProgramBuildResult;
 import ca.teamdman.sfml.program_builder.ProgramBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -51,7 +53,7 @@ public class ProgramEditScreen extends Screen {
     protected MyMultiLineEditBox textarea;
     protected String lastProgram = "";
     protected List<MutableComponent> lastProgramWithSyntaxHighlighting = new ArrayList<>();
-    protected PickList suggestedActions;
+    protected PickList<IntellisenseAction> suggestedActions;
 
     public ProgramEditScreen(
             String initialContent,
@@ -165,7 +167,7 @@ public class ProgramEditScreen extends Screen {
             return true;
         }
         if (pKeyCode == GLFW.GLFW_KEY_TAB) {
-            if (suggestedActions.getChoices().isEmpty()) {
+            if (suggestedActions.getItems().isEmpty()) {
                 // if tab pressed with no selection and not holding shift => insert 4 spaces
                 // if tab pressed with no selection and holding shift => de-indent current line
                 // if tab pressed with selection and not holding shift => de-indent lines containing selection 4 spaces
@@ -174,24 +176,26 @@ public class ProgramEditScreen extends Screen {
                 int cursor = textarea.getCursorPosition();
                 int selectionCursor = textarea.getSelectionCursorPosition();
                 double scrollAmount = textarea.getScrollAmount();
-                EditorUtils.ManipulationResult result;
+                ManipulationResult result;
                 if (Screen.hasShiftDown()) { // de-indent
-                    result = EditorUtils.deindent(content, cursor, selectionCursor);
+                    result = ProgramStringManipulationUtils.deindent(content, cursor, selectionCursor);
                 } else { // indent
-                    result = EditorUtils.indent(content, cursor, selectionCursor);
+                    result = ProgramStringManipulationUtils.indent(content, cursor, selectionCursor);
                 }
                 textarea.setValue(result.content());
                 textarea.setCursorPosition(result.cursorPosition());
                 textarea.setSelectionCursorPosition(result.selectionCursorPosition());
                 textarea.setScrollAmount(scrollAmount);
             } else {
-                var suggestionComponent = suggestedActions.getSelected();
-                assert suggestionComponent != null;
-                String suggestionString = suggestionComponent.getString() + " ";
-                String content = textarea.getValue();
-                int cursor = textarea.getCursorPosition();
-                int selectionCursor = textarea.getSelectionCursorPosition();
-                EditorUtils.ManipulationResult result = EditorUtils.insertSuggestion(content, cursor, selectionCursor, suggestionString);
+                IntellisenseAction action = suggestedActions.getSelected();
+                assert action != null;
+                ManipulationResult result = action.perform(
+                        new IntellisenseContext(
+                                ProgramBuilder.build(textarea.getValue()),
+                                textarea.getCursorPosition(),
+                                textarea.getSelectionCursorPosition()
+                        )
+                );
                 double scrollAmount = textarea.getScrollAmount();
                 textarea.setValue(result.content());
                 textarea.setCursorPosition(result.cursorPosition());
@@ -211,7 +215,7 @@ public class ProgramEditScreen extends Screen {
             String content = textarea.getValue();
             int cursor = textarea.getCursorPosition();
             int selectionCursor = textarea.getSelectionCursorPosition();
-            EditorUtils.ManipulationResult result = EditorUtils.toggleComments(content, cursor, selectionCursor);
+            ManipulationResult result = ProgramStringManipulationUtils.toggleComments(content, cursor, selectionCursor);
             textarea.setValue(result.content());
             textarea.setCursorPosition(result.cursorPosition());
             textarea.setSelectionCursorPosition(result.selectionCursorPosition());
@@ -471,14 +475,10 @@ public class ProgramEditScreen extends Screen {
                     getSelectionCursorPosition()
             );
             List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(intellisenseContext);
-            ProgramEditScreen.this.suggestedActions.setChoices(
-                    suggestions
-                            .stream()
-                            .map(x -> Component.literal(x.getDisplayText()))
-                            .collect(Collectors.toList())
-            );
-            String suggestionsDisplay = suggestedActions.getChoices()
+            ProgramEditScreen.this.suggestedActions.setItems(suggestions);
+            String suggestionsDisplay = suggestedActions.getItems()
                     .stream()
+                    .map(PickListItem::getComponent)
                     .map(Component::getString)
                     .collect(Collectors.joining(", "));
 

@@ -73,7 +73,7 @@ public class SFMLIntellisenseTests {
             ));
             for (IntellisenseAction suggestion : suggestions) {
                 display.append("Suggestion: ");
-                display.append(suggestion.getDisplayText());
+                display.append(suggestion.getComponent().getString());
                 display.append('\n');
             }
             display.append('\n');
