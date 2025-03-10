@@ -246,6 +246,10 @@ public class ProgramEditScreen extends Screen {
             }
             return true;
         }
+        if (pKeyCode == GLFW.GLFW_KEY_ESCAPE && !suggestedActions.isEmpty()) {
+            suggestedActions.clear();
+            return true;
+        }
         return super.keyPressed(pKeyCode, pScanCode, pModifiers);
     }
 

@@ -17,6 +17,9 @@ public record SuggestedTokensIntellisenseAction(
         return Component.literal(getDisplay());
     }
 
+    // If previous line ends with THEN or DO, let x be that lines indent. Suggest x + 4 spaces
+    // Circle spinner: after 5 seconds of inactivity, the document will be auto-formatted.
+    // Add suggestions for each label in the program
 
     /*
     - If suggesting NAME nextTokenType and NAME already present, jump cursor to inside of existing string nextTokenType followingTokenTypes existing NAME nextTokenType
@@ -72,8 +75,8 @@ public record SuggestedTokensIntellisenseAction(
         StringBuilder display = new StringBuilder();
         display.append(vocabulary.getSymbolicName(nextTokenType));
         for (Integer type : followingTokenTypes) {
-            display.append(vocabulary.getSymbolicName(type));
             display.append(" ");
+            display.append(vocabulary.getSymbolicName(type));
         }
         return display.toString();
     }

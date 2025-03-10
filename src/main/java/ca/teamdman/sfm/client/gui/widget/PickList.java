@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.client.gui.widget;
 
+import ca.teamdman.sfm.client.gui.screen.SFMScreenHelpers;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -9,7 +10,9 @@ import net.minecraft.client.gui.components.AbstractScrollWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import org.simmetrics.StringDistance;
 import org.simmetrics.builders.StringDistanceBuilder;
@@ -39,6 +42,7 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
         super(pX, pY, pWidth, pHeight, title);
         this.font = font;
         this.items = items;
+        this.clampOrUnsetSelectionIndex();
     }
 
     public List<T> getItems() {
@@ -47,18 +51,26 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
 
     public void setItems(List<T> items) {
         this.items = items;
+        this.clampOrUnsetSelectionIndex();
+    }
+
+    public int getItemHeight() {
+        return font.lineHeight;
     }
 
     public @Nullable T getSelected() {
         if (items.isEmpty()) return null;
         if (selectionIndex < 0) return null;
         if (selectionIndex >= items.size()) return null;
-        return getItems().get(0);
+        return getItems().get(selectionIndex);
     }
 
     public void setQuery(Component query) {
         this.query = query;
         sortItems();
+        scrollSelectedIntoView();
+        selectionIndex = 0;
+        clampOrUnsetSelectionIndex();
     }
 
     public void setXY(
@@ -91,6 +103,7 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
             return;
         }
         this.selectionIndex = (this.selectionIndex - 1 + this.items.size()) % this.items.size();
+        scrollSelectedIntoView();
     }
 
     public void selectNextWrapping() {
@@ -99,6 +112,31 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
             return;
         }
         this.selectionIndex = (this.selectionIndex + 1) % this.items.size();
+        scrollSelectedIntoView();
+    }
+
+    public boolean isEmpty() {
+        return this.items.isEmpty();
+    }
+
+    public void clear() {
+        this.items.clear();
+        this.selectionIndex = -1;
+    }
+
+    private void clampOrUnsetSelectionIndex() {
+        if (this.items.isEmpty()) {
+            this.selectionIndex = -1;
+        } else {
+            this.selectionIndex = Mth.clamp(this.selectionIndex, 0, this.items.size() - 1);
+        }
+    }
+
+    private void scrollSelectedIntoView() {
+        this.setScrollAmount(
+                this.selectionIndex * this.getItemHeight()
+                - this.getInnerHeight() / (double) this.getItemHeight()
+        );
     }
 
     private void sortItems() {
@@ -115,23 +153,22 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
 
     @Override
     protected int getInnerHeight() {
-        return font.lineHeight * items.size();
+        return getItemHeight() * items.size();
     }
 
     @Override
     protected boolean scrollbarVisible() {
-        return this.items.size() > this.getDisplayableLineCount();
+        return this.items.size() > this.getDisplayableItemCount();
     }
 
-
-    private double getDisplayableLineCount() {
-        return (double) (this.height - this.totalInnerPadding()) / (double) font.lineHeight;
+    private double getDisplayableItemCount() {
+        return (double) (this.height - this.totalInnerPadding()) / (double) getItemHeight();
     }
 
 
     @Override
     protected double scrollRate() {
-        return font.lineHeight / 2.0d;
+        return this.getItemHeight() / 2.0d;
     }
 
     @Override
@@ -145,6 +182,9 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
         var buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
         int lineX = SFMScreenUtils.getX(this) + this.innerPadding();
         int lineY = SFMScreenUtils.getY(this) + this.innerPadding();
+        Rect2i highlight = null;
+        int i = 0;
+        int itemHeight = getItemHeight();
         for (PickListItem item : items) {
             SFMScreenUtils.drawInBatch(
                     item.getComponent(),
@@ -156,8 +196,28 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
                     matrix4f,
                     buffer
             );
-            lineY += font.lineHeight;
+            if (i == this.selectionIndex) {
+                highlight = new Rect2i(
+                        lineX,
+                        lineY,
+                        this.width,
+                        itemHeight
+                );
+            }
+            lineY += itemHeight;
+            i++;
+
         }
         buffer.endBatch();
+
+        if (highlight != null) {
+            SFMScreenHelpers.renderHighlight(
+                    poseStack,
+                    highlight.getX(),
+                    highlight.getY(),
+                    highlight.getX() + highlight.getWidth(),
+                    highlight.getY() + highlight.getHeight()
+            );
+        }
     }
 }
