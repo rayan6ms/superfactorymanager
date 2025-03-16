@@ -25,6 +25,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.components.MultilineTextField;
+import net.minecraft.client.gui.components.Whence;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
@@ -198,8 +199,8 @@ public class ProgramEditScreen extends Screen {
                 );
                 double scrollAmount = textarea.getScrollAmount();
                 textarea.setValue(result.content());
-                textarea.setCursorPosition(result.cursorPosition());
                 textarea.setSelectionCursorPosition(result.selectionCursorPosition());
+                textarea.setCursorPosition(result.cursorPosition());
                 textarea.setScrollAmount(scrollAmount);
             }
 
@@ -398,7 +399,7 @@ public class ProgramEditScreen extends Screen {
         }
 
         public void setCursorPosition(int cursor) {
-            this.textField.cursor = cursor;
+            this.textField.seekCursor(Whence.ABSOLUTE, cursor);
         }
 
         public int getLineNumberWidth() {
