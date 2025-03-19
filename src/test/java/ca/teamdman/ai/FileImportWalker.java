@@ -36,13 +36,29 @@ public class FileImportWalker {
     // Add the path where Gradle expands source jars
     private static final File EXPANDED_ARCHIVES_ROOT = new File("build/tmp/expandedArchives");
 
+    public static String getReferenceFromClipboard() {
+        String reference = getClipboardContents();
+        System.out.println("[INFO] Found clipboard reference: " + reference);
+        if (reference.contains("/")) {
+            reference = reference.replaceAll("/",".");
+            System.out.println("[INFO] Replaced '/' with '.', yielding: " + reference);
+        }
+        if (reference.contains(":")) {
+            reference = reference.split(":")[0];
+            System.out.println("[INFO] Removed : and everything after, yielding: " + reference);
+        }
+        if (reference.endsWith(".java")) {
+            reference = reference.substring(0, reference.length() - 5);
+            System.out.println("[INFO] Removed .java extension, yielding: " + reference);
+        }
+        return reference;
+    }
+
     public static void main(String[] args) {
         System.out.println("=== FileImportWalker starting ===");
 
         // Grab the reference from clipboard
-        String reference = getClipboardContents();
-        System.out.println("[INFO] Found clipboard reference: " + reference);
-
+        String reference = getReferenceFromClipboard();
         // Create a combined type solver
         CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
 
