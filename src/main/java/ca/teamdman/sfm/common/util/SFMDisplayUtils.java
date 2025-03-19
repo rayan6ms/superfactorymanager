@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.util;
 
+import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfml.ast.ASTNode;
 import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
@@ -86,7 +87,8 @@ public class SFMDisplayUtils {
         List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(new IntellisenseContext(
                 programBuildResult,
                 cursorPos,
-                0
+                0,
+                LabelPositionHolder.empty()
         ));
         rtn.append('[');
         for (int i = 0; i < suggestions.size(); i++) {

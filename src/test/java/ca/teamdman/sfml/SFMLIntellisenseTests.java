@@ -1,28 +1,29 @@
 package ca.teamdman.sfml;
 
 import ca.teamdman.langs.SFMLLexer;
+import ca.teamdman.langs.SFMLParser;
+import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.SFMDisplayUtils;
 import ca.teamdman.sfml.ast.ASTNode;
 import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ext_antlr4c3.CodeCompletionCore;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
 import ca.teamdman.sfml.intellisense.IntellisenseContext;
 import ca.teamdman.sfml.intellisense.SFMLIntellisense;
 import ca.teamdman.sfml.program_builder.ProgramBuildResult;
 import ca.teamdman.sfml.program_builder.ProgramBuilder;
 import com.mojang.datafixers.util.Pair;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.*;
 import org.junit.jupiter.api.Test;
 import org.simmetrics.StringDistance;
 import org.simmetrics.metrics.StringDistances;
 
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class SFMLIntellisenseTests {
 
@@ -69,7 +70,8 @@ public class SFMLIntellisenseTests {
             List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(new IntellisenseContext(
                     buildResult,
                     cursorPosition,
-                    0
+                    0,
+                    LabelPositionHolder.empty()
             ));
             for (IntellisenseAction suggestion : suggestions) {
                 display.append("Suggestion: ");
@@ -135,15 +137,6 @@ public class SFMLIntellisenseTests {
         }
     }
 
-    private static int countTokens(String program) {
-        SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(program));
-        lexer.removeErrorListeners();
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        tokens.fill();
-
-        return tokens.size();
-    }
-
     @Test
     public void shouldRankNameFirst() {
         // The user typed "NAME"
@@ -167,5 +160,298 @@ public class SFMLIntellisenseTests {
         // Optional: Check the sorted order, just as an example
         // Not strictly necessary for a real test, but useful for demonstration
         System.out.println("Typed: " + typed + " => Sorted suggestions: " + sorted);
+    }
+
+    @Test
+    public void getRulesTest1() {
+//        String outerProgramString = """
+//                EVERY
+//                """.stripTrailing().stripIndent();
+        String outerProgramString = SIMPLE_PROGRAM_STRING;
+        boolean someRulesWereFound = false;
+
+//        for (int chop = 0; chop < outerProgramString.length(); chop++) {
+        for (int chop = outerProgramString.length()-1; chop < outerProgramString.length(); chop++) {
+            String programString = outerProgramString.substring(0, chop);
+            ProgramBuildResult buildResult = ProgramBuilder.build(programString);
+            SFMLParser parser = buildResult.metadata().parser();
+            var contexts = new ParserRuleContext[]{
+                    parser.program(),
+                    parser.inputStatement(),
+                    parser.inputResourceLimits(),
+                    parser.resourceLimitList(),
+                    parser.resourceIdDisjunction(),
+                    parser.resourceId()
+            };
+            CodeCompletionCore core = new CodeCompletionCore(
+                    parser,
+//                    IntStream.range(0, SFMLParser.ruleNames.length).boxed().collect(Collectors.toSet()),
+                    Set.of(
+                            SFMLParser.RULE_program,
+                            SFMLParser.RULE_inputStatement,
+                            SFMLParser.RULE_inputResourceLimits,
+                            SFMLParser.RULE_resourceLimitList,
+                            SFMLParser.RULE_resourceIdDisjunction,
+                            SFMLParser.RULE_resourceId
+                    ),
+                    null
+//                    Set.of(SFMLLexer.WS, SFMLLexer.EOF)
+            );
+            CommonTokenStream tokens = buildResult.metadata().tokens();
+            for (ParserRuleContext context : contexts) {
+                System.out.printf("Context: %s\n", context.getClass().getSimpleName());
+                for (int caretTokenIndex = 0; caretTokenIndex < tokens.size(); caretTokenIndex++) {
+                    System.out.printf(
+                            "%s",
+                            SFMDisplayUtils.getCursorPositionDisplay(
+                                    programString,
+                                    tokens.get(caretTokenIndex).getStartIndex()
+                            )
+                    );
+                    CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(
+                            caretTokenIndex,
+                            context
+                    );
+                    Vocabulary vocabulary = parser.getVocabulary();
+                    candidates.tokens.forEach((key, value) -> {
+                        System.out.printf("\"%s\" ", Stream.concat(Stream.of(key), value.stream())
+                                .map(vocabulary::getSymbolicName)
+                                .collect(Collectors.joining(", ", "[", "]")));
+                    });
+                    System.out.print(" ||| ");
+                    candidates.rules.forEach((head, tail) -> {
+                        System.out.printf("\"%s\" ", Stream.concat(Stream.of(head), tail.stream())
+                                .map(x -> SFMLParser.ruleNames[x])
+                                .collect(Collectors.joining(", ", "[", "]")));
+                    });
+                    System.out.println();
+                    if (!candidates.rules.isEmpty()) {
+                        someRulesWereFound = true;
+                    }
+                }
+            }
+        }
+        assertTrue(someRulesWereFound);
+    }
+
+    @Test
+    public void getRulesTest2() {
+        String programString = """
+                EVERY 20 TICKS DO
+                  INPUT stone FROM chest
+                END
+                """.stripTrailing().stripIndent();
+        ProgramBuildResult buildResult = ProgramBuilder.build(programString);
+        SFMLParser parser = buildResult.metadata().parser();
+        CodeCompletionCore core = new CodeCompletionCore(
+                parser,
+                Set.of(
+                        SFMLParser.RULE_identifier,
+                        SFMLParser.RULE_string,
+                        SFMLParser.RULE_number
+//                        SFMLParser.RULE_label,
+//                        SFMLParser.RULE_resourceId
+                ),
+//                Collections.emptySet(),
+                Set.of(SFMLLexer.WS, SFMLLexer.EOF)
+        );
+        String needle = "stone";
+        Token caretToken = buildResult.getTokenAtCursorPosition(programString.indexOf(needle) + needle.length()/2);
+        assert caretToken != null;
+        int caretTokenIndex = caretToken.getTokenIndex();
+        System.out.printf("%s\n", SFMDisplayUtils.getCursorTokenDisplay(buildResult, caretToken.getStartIndex()+1));
+//        int caretTokenIndex = 1;
+        CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(
+                caretTokenIndex,
+//                parser.program()
+                null
+        );
+        Vocabulary vocabulary = parser.getVocabulary();
+        String[] ruleNames = parser.getRuleNames();
+        candidates.tokens.forEach((key, value) -> {
+            System.out.print("(TOKENS) ");
+            System.out.print(vocabulary.getSymbolicName(key) + ": ");
+            System.out.print("[");
+            for (int i : value) {
+                System.out.print(vocabulary.getSymbolicName(i) + " ");
+            }
+            System.out.print("]");
+            System.out.println();
+        });
+        candidates.rules.forEach((head, tail) -> {
+            System.out.print("(RULES) ");
+            System.out.print(ruleNames[head] + ": ");
+            System.out.print("[");
+            for (int i : tail) {
+                System.out.print(ruleNames[i] + " ");
+            }
+            System.out.print("]");
+            System.out.println();
+        });
+        assertFalse(candidates.rules.isEmpty());
+    }
+
+    @Test
+    public void getRulesTest3() {
+        String programString = """
+                EVERY 20 TICKS DO
+                  INPUT stone FROM chest
+                END
+                """.stripTrailing().stripIndent();
+        ProgramBuildResult buildResult = ProgramBuilder.build(programString);
+        SFMLParser parser = buildResult.metadata().parser();
+        CodeCompletionCore core = new CodeCompletionCore(
+                parser,
+                Set.of(
+//                        SFMLParser.RULE_identifier,
+//                        SFMLParser.RULE_string,
+//                        SFMLParser.RULE_number,
+                        SFMLParser.RULE_label,
+                        SFMLParser.RULE_resourceId
+                ),
+//                Collections.emptySet(),
+                Set.of(SFMLLexer.WS, SFMLLexer.EOF)
+        );
+        String needle = "chest";
+        Token caretToken = buildResult.getTokenAtCursorPosition(programString.indexOf(needle) + needle.length()/2);
+        assert caretToken != null;
+        int caretTokenIndex = caretToken.getTokenIndex();
+        System.out.printf("%s\n", SFMDisplayUtils.getCursorTokenDisplay(buildResult, caretToken.getStartIndex()+1));
+
+//        int caretTokenIndex = 1;
+        CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(
+                caretTokenIndex,
+//                parser.program()
+                null
+        );
+        Vocabulary vocabulary = parser.getVocabulary();
+        String[] ruleNames = parser.getRuleNames();
+        candidates.tokens.forEach((key, value) -> {
+            System.out.print("(TOKENS) ");
+            System.out.print(vocabulary.getSymbolicName(key) + ": ");
+            System.out.print("[");
+            for (int i : value) {
+                System.out.print(vocabulary.getSymbolicName(i) + " ");
+            }
+            System.out.print("]");
+            System.out.println();
+        });
+        candidates.rules.forEach((head, tail) -> {
+            System.out.print("(RULES) ");
+            System.out.print(ruleNames[head] + ": ");
+            System.out.print("[");
+            for (int i : tail) {
+                System.out.print(ruleNames[i] + " ");
+            }
+            System.out.print("]");
+            System.out.println();
+        });
+        assertFalse(candidates.rules.isEmpty());
+    }
+
+    private static int countTokens(String program) {
+        SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(program));
+        lexer.removeErrorListeners();
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        tokens.fill();
+
+        return tokens.size();
+    }
+
+
+
+
+
+    /**
+     * A small snippet of code where we have "INPUT 64 IRON_INGOT FROM Minecart"
+     * The 'IRON_INGOT' portion is recognized by the grammar as resourceId,
+     * and 'Minecart' is recognized as a label.
+     */
+    private static final String PROGRAM_SNIPPET = """
+    EVERY 20 TICKS DO
+      INPUT 64 iron_ingot FROM my_chest
+    END
+    """;
+
+    /**
+     * Demonstrates that the caret inside "IRON_INGOT" is recognized
+     * by the grammar as resourceId context (RULE_resourceId).
+     */
+    @Test
+    public void testCursorInsideResourceId() {
+        // 1) Build the snippet into a ProgramBuildResult
+        ProgramBuildResult buildResult = ProgramBuilder.build(PROGRAM_SNIPPET);
+        assertTrue(buildResult.isBuildSuccessful(), "Snippet must parse successfully");
+
+        // 2) Find a cursor position somewhere in IRON_INGOT
+        int resourceCaret = PROGRAM_SNIPPET.indexOf("iron_ingot") + 4;
+
+        // 3) Find the Token covering that caret position
+        Token caretToken = buildResult.getTokenAtCursorPosition(resourceCaret);
+        assertNotNull(caretToken, "Should find a token around IRON_INGOT");
+        int caretTokenIndex = caretToken.getTokenIndex();
+
+        // 4) Create the code completion engine, specifying resourceId & label as preferred
+        SFMLParser parser = buildResult.metadata().parser();
+        Set<Integer> preferredRules = Set.of(
+                SFMLParser.RULE_resourceId,
+                SFMLParser.RULE_label
+        );
+        Set<Integer> ignoredTokens = Set.of(SFMLLexer.WS, SFMLLexer.EOF);
+        CodeCompletionCore core = new CodeCompletionCore(parser, preferredRules, ignoredTokens);
+
+        // 5) Collect candidates from the top-level context, or from parser.program()
+        CodeCompletionCore.CandidatesCollection candidates =
+                core.collectCandidates(caretTokenIndex, parser.program());
+
+        // 6) Check which rules show up in candidates
+        //    The candidates.rules map: key=ruleIndex, value=some path
+        assertTrue(
+                candidates.rules.containsKey(SFMLParser.RULE_resourceId),
+                "Should contain resourceId in the rule candidates"
+        );
+        assertFalse(
+                candidates.rules.containsKey(SFMLParser.RULE_label),
+                "Should NOT contain label here, because we are in resourceId"
+        );
+    }
+
+    /**
+     * Demonstrates that the caret inside "Minecart" is recognized
+     * by the grammar as label context (RULE_label).
+     */
+    @Test
+    public void testCursorInsideLabel() {
+        // Use the same snippet, but put the cursor in the label area
+        ProgramBuildResult buildResult = ProgramBuilder.build(PROGRAM_SNIPPET);
+        assertTrue(buildResult.isBuildSuccessful(), "Snippet must parse successfully");
+
+        // Cursor in "Minecart"
+        int labelCaret    = PROGRAM_SNIPPET.indexOf("my_chest") + 3;
+
+        Token caretToken = buildResult.getTokenAtCursorPosition(labelCaret);
+        assertNotNull(caretToken, "Should find a token around Minecart");
+        int caretTokenIndex = caretToken.getTokenIndex();
+
+        SFMLParser parser = buildResult.metadata().parser();
+        Set<Integer> preferredRules = Set.of(
+                SFMLParser.RULE_resourceId,
+                SFMLParser.RULE_label
+        );
+        Set<Integer> ignoredTokens = Set.of(SFMLLexer.WS, SFMLLexer.EOF);
+
+        CodeCompletionCore core = new CodeCompletionCore(parser, preferredRules, ignoredTokens);
+        CodeCompletionCore.CandidatesCollection candidates =
+                core.collectCandidates(caretTokenIndex, parser.program());
+
+        // Now we expect label, not resourceId
+        assertFalse(
+                candidates.rules.containsKey(SFMLParser.RULE_resourceId),
+                "Should NOT contain resourceId for 'Minecart' location"
+        );
+        assertTrue(
+                candidates.rules.containsKey(SFMLParser.RULE_label),
+                "Should contain label in the rule candidates"
+        );
     }
 }

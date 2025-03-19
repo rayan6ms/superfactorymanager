@@ -30,14 +30,6 @@ public record ProgramBuildResult(
         return this;
     }
 
-    public int getTokenIndexAtCursorPosition(int cursorPos) {
-        Token tokenAtCursorPosition = getTokenAtCursorPosition(cursorPos);
-        if (tokenAtCursorPosition != null) {
-            return tokenAtCursorPosition.getTokenIndex();
-        }
-        return -1;
-    }
-
     public @Nullable Token getTokenAtCursorPosition(int cursorPos) {
         for (Token token : metadata().tokens().getTokens()) {
             if (token.getStartIndex() <= cursorPos && token.getStopIndex()+1 >= cursorPos) {

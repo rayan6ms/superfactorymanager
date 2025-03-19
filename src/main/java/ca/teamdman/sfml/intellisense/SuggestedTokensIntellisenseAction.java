@@ -40,8 +40,14 @@ public record SuggestedTokensIntellisenseAction(
             }
             case SFMLLexer.STRING -> {
                 if (word.equals("\"\"")) {
-                    // move the cursor to the right of the last double quote
-                    programStringMut.offsetCursors(1);
+                    if (cursorInWord != 2) {
+                        // move the cursor to the right of the last double quote
+                        programStringMut.offsetCursors(1);
+                    } else {
+                        // cursor already at the end of the double quote, insert new line
+                        programStringMut.insertTextWithoutMovingCursors("\n");
+                        programStringMut.offsetCursors(1);
+                    }
                 } else if (word.isBlank()) {
                     // insert double quote pair
                     programStringMut.replaceWordAndMoveCursorsToEnd("\"\"");
@@ -61,6 +67,10 @@ public record SuggestedTokensIntellisenseAction(
                     programStringMut.insertTextWithoutMovingCursors("\"");
                     programStringMut.offsetCursors(1);
                 }
+            }
+            case SFMLLexer.DO -> {
+                programStringMut.replaceWordAndMoveCursorsToEnd("DO\n    \nEND");
+                programStringMut.offsetCursors(-4);
             }
             default -> programStringMut.replaceWordAndMoveCursorsToEnd(getDisplay() + " ");
         }
