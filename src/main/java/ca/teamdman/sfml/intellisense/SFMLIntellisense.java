@@ -103,9 +103,9 @@ public class SFMLIntellisense {
                     resourceType,
                     item
             );
-            if (suggestion.getComponent().getString().contains(word)) {
+//            if (suggestion.getComponent().getString().contains(word)) {
                 results.accept(suggestion);
-            }
+//            }
         }
     }
 }
