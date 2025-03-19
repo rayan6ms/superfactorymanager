@@ -51,7 +51,10 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
 
     public void setItems(List<T> items) {
         this.items = items;
-        this.clampOrUnsetSelectionIndex();
+        sortItems();
+        selectionIndex = 0;
+        clampOrUnsetSelectionIndex();
+        scrollSelectedIntoView();
     }
 
     public int getItemHeight() {
@@ -68,9 +71,9 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
     public void setQuery(Component query) {
         this.query = query;
         sortItems();
-        scrollSelectedIntoView();
         selectionIndex = 0;
         clampOrUnsetSelectionIndex();
+        scrollSelectedIntoView();
     }
 
     public void setXY(
@@ -133,10 +136,14 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
     }
 
     private void scrollSelectedIntoView() {
-        this.setScrollAmount(
-                this.selectionIndex * this.getItemHeight()
-                - this.getInnerHeight() / (double) this.getItemHeight()
-        );
+        if (this.isEmpty()) {
+            this.setScrollAmount(0);
+        } else {
+            this.setScrollAmount(
+                    this.selectionIndex * this.getItemHeight()
+                    - this.getInnerHeight() / (double) this.getItemHeight()
+            );
+        }
     }
 
     private void sortItems() {
@@ -145,10 +152,31 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
                 .simplify(Simplifiers.toLowerCase())
                 .tokenize(qGramWithPadding(2))
                 .build();
-        items.sort(Comparator.comparing(item -> distance.distance(
-                item.getComponent().getString(),
-                query.getString()
-        )));
+        String queryString = query.getString();
+        if (queryString.isBlank()) {
+            var preferredOrder = new String[]{
+                    "TICKS",
+                    "INPUT",
+                    "OUTPUT",
+                    "FORGET",
+                    "FROM",
+                    "TO"
+            };
+            items.sort(Comparator.comparing(item -> {
+                String itemString = item.getComponent().getString();
+                for (int i = 0; i < preferredOrder.length; i++) {
+                    if (itemString.contains(preferredOrder[i])) {
+                        return i;
+                    }
+                }
+                return preferredOrder.length;
+            }));
+        } else {
+            items.sort(Comparator.comparing(item -> distance.distance(
+                    item.getComponent().getString(),
+                    queryString
+            )));
+        }
     }
 
     @Override
