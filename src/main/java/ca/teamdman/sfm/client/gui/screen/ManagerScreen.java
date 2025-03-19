@@ -332,8 +332,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         }
         ConfirmScreen confirmScreen = new ConfirmScreen(
                 proceed -> {
-                    assert this.minecraft != null;
-                    this.minecraft.popGuiLayer(); // Close confirm screen
+                    SFMScreenChangeHelpers.popScreen(); // Close confirm screen
                     if (proceed) {
                         performReset();
                     }
@@ -445,8 +444,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
         ConfirmScreen confirmScreen = new ConfirmScreen(
                 proceed -> {
-                    assert this.minecraft != null;
-                    this.minecraft.popGuiLayer(); // Close confirm screen
+                    SFMScreenChangeHelpers.popScreen(); // Close confirm screen
                     if (proceed) {
                         sendProgram(clipboardContents);
                     }

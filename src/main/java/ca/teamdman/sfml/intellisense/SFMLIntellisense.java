@@ -10,53 +10,50 @@ import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.Vocabulary;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.function.Consumer;
 
 public class SFMLIntellisense {
     public static List<IntellisenseAction> getSuggestions(
             IntellisenseContext context
     ) {
-        SFMLParser parser = context.programBuildResult().metadata().parser();
+        List<IntellisenseAction> rtn = new ArrayList<>();
+        // Short circuit if disabled
+        if (context.intellisenseLevel().isDisabled()) {
+            return rtn;
+        }
 
         // Create code completion core
-        Set<Integer> preferredRules = new HashSet<>(List.of(
+        SFMLParser parser = context.programBuildResult().metadata().parser();
+        Set<Integer> preferredRules = Set.of(
                 SFMLParser.RULE_resourceId,
                 SFMLParser.RULE_label
-//                SFMLParser.RULE_identifier
-        ));
-//        preferredRules.clear();
-        Set<Integer> ignoredTokens = Set.of(SFMLParser.WS, SFMLParser.EOF);
+        );
+        Set<Integer> ignoredTokens = Set.of(
+                SFMLParser.WS,
+                SFMLParser.EOF
+        );
         CodeCompletionCore core = new CodeCompletionCore(parser, preferredRules, ignoredTokens);
 
+        // Identify caret position
         @Nullable Token caretToken = context.programBuildResult().getTokenAtCursorPosition(context.cursorPosition());
         if (caretToken == null) return new ArrayList<>();
         int caretTokenIndex = caretToken.getTokenIndex();
 
+        // Get candidates
         CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(caretTokenIndex, null);
-        List<IntellisenseAction> rtn = new ArrayList<>();
         Vocabulary vocabulary = parser.getVocabulary();
-//        if (!candidates.rules.isEmpty()) {
-//            SFM.LOGGER.warn("Expected no rule intellisense results, found {}.", candidates.rules.size());
-//        }
 
-//        System.out.printf("(RULES) %d\n", candidates.rules.size());
-//        candidates.rules.forEach((a, b) -> {
-//            StringBuilder display = new StringBuilder();
-//            display.append("(rule) ");
-//            display.append(ruleNames[a]);
-//            b.forEach((c) -> {
-//                display.append(" ");
-//                display.append(ruleNames[c]);
-//            });
-//            String finalDisplay = display.toString();
-//            System.out.printf("(RULE) %s\n", finalDisplay);
-//        });
-
+        // Process rules
         candidates.rules.forEach((head, tail) -> {
             switch (head) {
                 case SFMLParser.RULE_resourceId -> {
-                    if (SFMEnvironmentUtils.isGameLoaded()) {
+                    if (SFMEnvironmentUtils.isGameLoaded() && context
+                            .intellisenseLevel()
+                            .isResourceIntellisenseEnabled()) {
                         for (ResourceType<?, ?, ?> resourceType : SFMResourceTypes.DEFERRED_TYPES.get().getValues()) {
                             gatherIntellisenseActions(context, resourceType, rtn::add);
                         }
@@ -81,6 +78,7 @@ public class SFMLIntellisense {
             }
         });
 
+        // Process tokens
         for (Map.Entry<Integer, List<Integer>> entry : candidates.tokens.entrySet()) {
             rtn.add(new SuggestedTokensIntellisenseAction(
                     entry.getKey(),
@@ -104,7 +102,7 @@ public class SFMLIntellisense {
                     item
             );
 //            if (suggestion.getComponent().getString().contains(word)) {
-                results.accept(suggestion);
+            results.accept(suggestion);
 //            }
         }
     }

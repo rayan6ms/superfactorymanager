@@ -75,6 +75,16 @@ public class SFMConfig {
             return configValue.getDefault();
         }
     }
+    /**
+     * Get a config value in a way that doesn't fail when running tests
+     */
+    public static <T> T getOrFallback(ForgeConfigSpec.ConfigValue<T> configValue, T fallback) {
+        try {
+            return configValue.get();
+        } catch (Exception e) {
+            return fallback;
+        }
+    }
 
     public static void register(ModLoadingContext context) {
         context.registerConfig(ModConfig.Type.SERVER, SFMConfig.SERVER_SPEC);

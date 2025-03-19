@@ -1,5 +1,7 @@
 package ca.teamdman.sfm.common.util;
 
+import ca.teamdman.sfm.common.config.SFMClientProgramEditorConfig;
+import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfml.ast.ASTNode;
 import ca.teamdman.sfml.ast.Program;
@@ -40,13 +42,16 @@ public class SFMDisplayUtils {
             ProgramBuildResult buildResult,
             int cursorPos
     ) {
-       var tokens = buildResult.metadata().tokens().getTokens();
-       var displayTokens = tokens.stream().filter(token -> token.getStartIndex() - 10 <= cursorPos && token.getStopIndex() + 10 >= cursorPos).toList();
+        var tokens = buildResult.metadata().tokens().getTokens();
+        var displayTokens = tokens
+                .stream()
+                .filter(token -> token.getStartIndex() - 10 <= cursorPos && token.getStopIndex() + 10 >= cursorPos)
+                .toList();
         var activeToken = buildResult.getTokenAtCursorPosition(cursorPos);
         if (activeToken == null) {
             return "[ COULDN'T FIND CURSOR TOKEN ]";
         }
-         StringBuilder inner = new StringBuilder();
+        StringBuilder inner = new StringBuilder();
         for (Token displayToken : displayTokens) {
             if (displayToken == activeToken) {
                 inner.append(">");
@@ -88,7 +93,11 @@ public class SFMDisplayUtils {
                 programBuildResult,
                 cursorPos,
                 0,
-                LabelPositionHolder.empty()
+                LabelPositionHolder.empty(),
+                SFMConfig.getOrFallback(
+                        SFMConfig.CLIENT_PROGRAM_EDITOR.intellisenseLevel,
+                        SFMClientProgramEditorConfig.IntellisenseLevel.BASIC
+                )
         ));
         rtn.append('[');
         for (int i = 0; i < suggestions.size(); i++) {

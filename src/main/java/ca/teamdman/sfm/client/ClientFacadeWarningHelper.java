@@ -36,7 +36,7 @@ public class ClientFacadeWarningHelper {
         } else {
             ConfirmScreen confirmScreen = new ConfirmScreen(
                     (confirmed) -> {
-                        minecraft.popGuiLayer(); // Close confirm screen
+                        SFMScreenChangeHelpers.popScreen(); // Close confirm screen
                         if (confirmed) {
                             // Send packet
                             SFMPackets.sendToServer(msg);

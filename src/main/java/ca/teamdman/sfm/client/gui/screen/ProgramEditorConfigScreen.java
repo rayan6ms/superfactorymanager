@@ -13,6 +13,7 @@ import org.jetbrains.annotations.NotNull;
 public class ProgramEditorConfigScreen extends Screen {
     private final SFMClientProgramEditorConfig config;
     private final ProgramEditorScreen parent;
+    private final Runnable closeCallback;
     private Button lineNumbersOnButton;
     private Button lineNumbersOffButton;
     private Button intellisenseOffButton;
@@ -21,18 +22,19 @@ public class ProgramEditorConfigScreen extends Screen {
 
     public ProgramEditorConfigScreen(
             ProgramEditorScreen parent,
-            SFMClientProgramEditorConfig config
+            SFMClientProgramEditorConfig config,
+            Runnable closeCallback
     ) {
         super(LocalizationKeys.PROGRAM_EDITOR_CONFIG_SCREEN_TITLE.getComponent());
         this.config = config;
         this.parent = parent;
+        this.closeCallback = closeCallback;
     }
 
     @Override
     public void onClose() {
-        assert this.minecraft != null;
-        this.minecraft.popGuiLayer();
-        parent.resize(minecraft, width, height);
+        SFMScreenChangeHelpers.popScreen();
+        closeCallback.run();
     }
 
     @Override
@@ -153,6 +155,7 @@ public class ProgramEditorConfigScreen extends Screen {
     private void setIntellisenseLevel(SFMClientProgramEditorConfig.IntellisenseLevel level) {
         config.intellisenseLevel.set(level);
         updateButtonStates();
+        parent.onIntellisensePreferenceChanged();
     }
 
     private void updateButtonStates() {

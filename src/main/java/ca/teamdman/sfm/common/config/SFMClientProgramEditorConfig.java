@@ -8,12 +8,21 @@ public class SFMClientProgramEditorConfig {
 
     SFMClientProgramEditorConfig(ForgeConfigSpec.Builder builder) {
         showLineNumbers = builder.define("showLineNumbers", false);
-        intellisenseLevel = builder.defineEnum("intellisenseLevel", IntellisenseLevel.BASIC);
+        intellisenseLevel = builder.defineEnum("intellisenseLevel", IntellisenseLevel.ADVANCED);
     }
 
     public enum IntellisenseLevel {
         OFF,
         BASIC,
         ADVANCED,
+        ;
+
+        public boolean isResourceIntellisenseEnabled() {
+            return this == ADVANCED;
+        }
+
+        public boolean isDisabled() {
+            return this == OFF;
+        }
     }
 }

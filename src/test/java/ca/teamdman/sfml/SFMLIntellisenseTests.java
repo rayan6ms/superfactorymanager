@@ -2,6 +2,7 @@ package ca.teamdman.sfml;
 
 import ca.teamdman.langs.SFMLLexer;
 import ca.teamdman.langs.SFMLParser;
+import ca.teamdman.sfm.common.config.SFMClientProgramEditorConfig;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.SFMDisplayUtils;
 import ca.teamdman.sfml.ast.ASTNode;
@@ -81,7 +82,8 @@ public class SFMLIntellisenseTests {
                     buildResult,
                     cursorPosition,
                     0,
-                    LabelPositionHolder.empty()
+                    LabelPositionHolder.empty(),
+                    SFMClientProgramEditorConfig.IntellisenseLevel.BASIC
             ));
             for (IntellisenseAction suggestion : suggestions) {
                 display.append("Suggestion: ");

@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.client.gui.widget;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenRenderUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -169,7 +168,7 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
                 return preferredOrder.length;
             }));
         } else {
-            SFM.LOGGER.debug("Sorting by distance using query: {}", queryString);
+//            SFM.LOGGER.debug("Sorting by distance using query: {}", queryString);
             items.sort(Comparator.comparing(item -> distance.distance(
                     item.getComponent().getString(),
                     queryString

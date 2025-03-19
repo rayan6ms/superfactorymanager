@@ -95,14 +95,15 @@ public class ProgramEditorScreen extends Screen {
      */
     public void saveAndClose() {
         openContext.saveCallback().accept(textarea.getValue());
-
-        assert this.minecraft != null;
-        this.minecraft.popGuiLayer();
+        SFMScreenChangeHelpers.popScreen();
     }
 
     public void closeWithoutSaving() {
-        assert this.minecraft != null;
-        this.minecraft.popGuiLayer();
+        SFMScreenChangeHelpers.popScreen();
+    }
+
+    public void onIntellisensePreferenceChanged() {
+        textarea.rebuildIntellisense();
     }
 
     /**
@@ -195,7 +196,8 @@ public class ProgramEditorScreen extends Screen {
                             ProgramBuilder.build(textarea.getValue()),
                             textarea.getCursorPosition(),
                             textarea.getSelectionCursorPosition(),
-                            openContext.labelPositionHolder()
+                            openContext.labelPositionHolder(),
+                            SFMConfig.CLIENT_PROGRAM_EDITOR.intellisenseLevel.get()
                     )
             );
             double scrollAmount = textarea.getScrollAmount();
@@ -303,9 +305,21 @@ public class ProgramEditorScreen extends Screen {
                         .setPosition(this.width / 2 - 200, this.height / 2 - 100 + 195)
                         .setSize(16, 20)
                         .setText(Component.literal("#"))
-                        .setOnPress((button) -> SFMScreenChangeHelpers.setOrPushScreen(
-                                new ProgramEditorConfigScreen(this, SFMConfig.CLIENT_PROGRAM_EDITOR)
-                        ))
+                        .setOnPress((button) -> {
+                            int cursorPos = textarea.getCursorPosition();
+                            int selectionCursorPos = textarea.getSelectionCursorPosition();
+                            SFMScreenChangeHelpers.setOrPushScreen(
+                                    new ProgramEditorConfigScreen(
+                                            this,
+                                            SFMConfig.CLIENT_PROGRAM_EDITOR,
+                                            () -> {
+                                                this.setInitialFocus(textarea);
+                                                textarea.setCursorPosition(cursorPos);
+                                                textarea.setSelectionCursorPosition(selectionCursorPos);
+                                            }
+                                    )
+                            );
+                        })
                         .setTooltip(this, font, PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP)
                         .build()
         );
@@ -334,8 +348,7 @@ public class ProgramEditorScreen extends Screen {
     protected @NotNull ConfirmScreen getSaveConfirmScreen(Runnable onConfirm) {
         return new ConfirmScreen(
                 doSave -> {
-                    assert this.minecraft != null;
-                    this.minecraft.popGuiLayer(); // Close confirm screen
+                    SFMScreenChangeHelpers.popScreen(); // Close confirm screen
 
                     //noinspection StatementWithEmptyBody
                     if (doSave) {
@@ -354,14 +367,11 @@ public class ProgramEditorScreen extends Screen {
     protected @NotNull ConfirmScreen getExitWithoutSavingConfirmScreen() {
         return new ConfirmScreen(
                 doSave -> {
-                    assert this.minecraft != null;
-                    this.minecraft.popGuiLayer(); // Close confirm screen
-
-                    //noinspection StatementWithEmptyBody
+                    // Close confirm screen
+                    SFMScreenChangeHelpers.popScreen();
+                    // Only close editor if user confirms
                     if (doSave) {
                         closeWithoutSaving();
-                    } else {
-                        // do nothing; continue editing
                     }
                 },
                 LocalizationKeys.EXIT_WITHOUT_SAVING_CONFIRM_SCREEN_TITLE.getComponent(),
@@ -488,7 +498,8 @@ public class ProgramEditorScreen extends Screen {
                     buildResult,
                     cursorPosition,
                     getSelectionCursorPosition(),
-                    openContext.labelPositionHolder()
+                    openContext.labelPositionHolder(),
+                    SFMConfig.CLIENT_PROGRAM_EDITOR.intellisenseLevel.get()
             );
             List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(intellisenseContext);
             ProgramEditorScreen.this.suggestedActions.setItems(suggestions);
@@ -503,14 +514,18 @@ public class ProgramEditorScreen extends Screen {
             String cursorWord = buildResult.getWordAtCursorPosition(cursorPosition);
             ProgramEditorScreen.this.suggestedActions.setQuery(Component.literal(cursorWord));
 
-            SFM.LOGGER.info(
-                    "PROGRAM OR CURSOR CHANGE! {}   {}   {}  |||  {} ||| {}",
-                    cursorPositionDisplay,
-                    cursorTokenDisplay,
-                    tokenHierarchyDisplay,
-                    cursorWord,
-                    suggestionsDisplay
-            );
+//            SFM.LOGGER.info(
+//                    "PROGRAM OR CURSOR CHANGE! {}   {}   {}  |||  {} ||| {}",
+//                    cursorPositionDisplay,
+//                    cursorTokenDisplay,
+//                    tokenHierarchyDisplay,
+//                    cursorWord,
+//                    suggestionsDisplay
+//            );
+        }
+
+        private void rebuildIntellisense() {
+            onValueOrCursorChanged(getValue());
         }
 
         /**
