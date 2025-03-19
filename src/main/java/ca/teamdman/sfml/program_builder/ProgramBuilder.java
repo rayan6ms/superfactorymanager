@@ -7,6 +7,7 @@ import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
+import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfm.common.util.SFMTranslationUtils;
 import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.Program;
@@ -96,6 +97,9 @@ public class ProgramBuilder {
             Program program,
             List<TranslatableContents> errors
     ) {
+        if (!SFMEnvironmentUtils.isGameLoaded()) {
+            return;
+        }
         List<? extends String> disallowedResourceTypes = SFMConfig.getOrDefault(SFMConfig.SERVER.disallowedResourceTypesForTransfer);
         for (ResourceIdentifier<?, ?, ?> referencedResource : program.referencedResources()) {
             try {

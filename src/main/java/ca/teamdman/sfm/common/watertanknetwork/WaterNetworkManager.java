@@ -74,7 +74,7 @@ public class WaterNetworkManager {
         } else {
             removeMember(level, pos);
         }
-//        if (!FMLEnvironment.production) {
+//        if (SFMEnvironment.isInIDE()) {
 //            Long2ObjectMap<WaterNetwork> levelNetworks = NETWORKS.get(level);
 //            if (levelNetworks == null) return;
 //            List<WaterNetwork> logNetworks = levelNetworks.values().stream().distinct().toList();
