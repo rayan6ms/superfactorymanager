@@ -293,7 +293,7 @@ public class ProgramEditScreen extends Screen {
                 this.font,
                 0,
                 0,
-                100,
+                180,
                 this.font.lineHeight * 6,
                 LocalizationKeys.INTELLISENSE_PICK_LIST_GUI_TITLE.getComponent(),
                 new ArrayList<>()

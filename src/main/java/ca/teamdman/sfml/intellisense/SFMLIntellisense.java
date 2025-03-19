@@ -58,7 +58,7 @@ public class SFMLIntellisense {
                 case SFMLParser.RULE_resourceId -> {
                     if (SFMEnvironmentUtils.isGameLoaded()) {
                         for (ResourceType<?, ?, ?> resourceType : SFMResourceTypes.DEFERRED_TYPES.get().getValues()) {
-                            gatherIntellisenseActions(resourceType, rtn::add);
+                            gatherIntellisenseActions(context, resourceType, rtn::add);
                         }
                     }
                 }
@@ -93,11 +93,23 @@ public class SFMLIntellisense {
     }
 
     private static <STACK, ITEM, CAP> void gatherIntellisenseActions(
+            IntellisenseContext context,
             ResourceType<STACK, ITEM, CAP> resourceType,
             Consumer<IntellisenseAction> results
     ) {
+        String word = context.createMutableProgramString().getWord();
+        int count = 0;
         for (ITEM item : resourceType.getItems()) {
-            results.accept(new SuggestedResourceIntellisenseAction<>(resourceType, item));
+            var suggestion = new SuggestedResourceIntellisenseAction<>(
+                    resourceType,
+                    item
+            );
+            if (suggestion.getComponent().getString().contains(word)) {
+                results.accept(suggestion);
+                if (count++ >= 10) {
+                    break;
+                }
+            }
         }
     }
 }
