@@ -179,7 +179,7 @@ public class OutputStatement implements IOStatement {
                 .getLogger()
                 .info(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_END.get(
                         moved,
-                        destination.type.getRegistryKey(
+                        destination.type.getRegistryKeyForStack(
                                 extracted),
                         source,
                         destination

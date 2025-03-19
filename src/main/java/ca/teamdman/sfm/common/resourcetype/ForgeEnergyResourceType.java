@@ -98,7 +98,7 @@ public class ForgeEnergyResourceType extends ResourceType<Integer, Class<Integer
     }
 
     @Override
-    public ResourceLocation getRegistryKey(Integer stack) {
+    public ResourceLocation getRegistryKeyForStack(Integer stack) {
         return REGISTRY_KEY;
     }
 

@@ -179,12 +179,12 @@ public class SFMThermalCompatGameTests extends SFMGameTestBase {
                     Items.MELON_SEEDS,
                     Items.PUMPKIN_SEEDS,
                     Items.WHEAT_SEEDS,
-                    SFMResourceTypes.ITEM.get().getRegistry().getValue(new ResourceLocation("thermal", "phytogro")),
-                    SFMResourceTypes.ITEM.get().getRegistry().getValue(new ResourceLocation("thermal", "phytogro")),
-                    SFMResourceTypes.ITEM.get().getRegistry().getValue(new ResourceLocation("thermal", "phytogro")),
-                    SFMResourceTypes.ITEM.get().getRegistry().getValue(new ResourceLocation("thermal", "phytogro")),
-                    SFMResourceTypes.ITEM.get().getRegistry().getValue(new ResourceLocation("thermal", "phytogro")),
-            };
+                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(new ResourceLocation("thermal", "phytogro")),
+                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(new ResourceLocation("thermal", "phytogro")),
+                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(new ResourceLocation("thermal", "phytogro")),
+                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(new ResourceLocation("thermal", "phytogro")),
+                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(new ResourceLocation("thermal", "phytogro")),
+                    };
             int slot = 0;
             for (Item item : items) {
                 getItemHandler(helper, pos).insertItem(slot++, new ItemStack(item, 64), false);

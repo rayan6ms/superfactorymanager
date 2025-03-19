@@ -109,7 +109,7 @@ public class MekanismEnergyResourceType extends ResourceType<FloatingLong, Class
     }
 
     @Override
-    public ResourceLocation getRegistryKey(FloatingLong stack) {
+    public ResourceLocation getRegistryKeyForStack(FloatingLong stack) {
         return REGISTRY_KEY;
     }
 

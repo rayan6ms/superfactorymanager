@@ -250,12 +250,10 @@ public record ServerboundOutputInspectionRequestPacket(
                 new ResourceQuantity(new Number(amount), ResourceQuantity.IdExpansionBehaviour.NO_EXPAND),
                 ResourceQuantity.MAX_QUANTITY
         );
-        ResourceLocation stackId = resourceType.getRegistryKey(stack);
+        ResourceLocation stackId = resourceType.getRegistryKeyForStack(stack);
         ResourceIdentifier<STACK, ITEM, CAP> resourceIdentifier = new ResourceIdentifier<>(
-                resourceTypeResourceKey.location().getNamespace(),
-                resourceTypeResourceKey.location().getPath(),
-                stackId.getNamespace(),
-                stackId.getPath()
+                resourceTypeResourceKey,
+                stackId
         );
         return new ResourceLimit(
                 new ResourceIdSet(List.of(resourceIdentifier)),

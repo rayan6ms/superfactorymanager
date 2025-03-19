@@ -14,11 +14,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.registries.IForgeRegistry;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
@@ -100,7 +98,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
         if (!matchesStackType(stack)) return false;
         @SuppressWarnings("unchecked") STACK stack_ = (STACK) stack;
         if (isEmpty(stack_)) return false;
-        var stackId = getRegistryKey(stack_);
+        var stackId = getRegistryKeyForStack(stack_);
         return resourceId.matchesResourceLocation(stackId);
     }
 
@@ -191,8 +189,12 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
         return getRegistry().containsKey(location);
     }
 
-    public ResourceLocation getRegistryKey(STACK stack) {
+    public ResourceLocation getRegistryKeyForStack(STACK stack) {
         ITEM item = getItem(stack);
+        return getRegistryKeyForItem(item);
+    }
+
+    public ResourceLocation getRegistryKeyForItem(ITEM item) {
         var found = registryKeyCache.get(item);
         if (found != null) return found;
         found = getRegistry().getKey(item);
@@ -201,6 +203,18 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
         }
         registryKeyCache.put(item, found);
         return found;
+    }
+
+    public @Nullable ITEM getItemFromRegistryKey(ResourceLocation location) {
+        return getRegistry().getValue(location);
+    }
+
+    public Set<ResourceLocation> getRegistryKeys() {
+        return getRegistry().getKeys();
+    }
+
+    public Collection<ITEM> getItems() {
+        return getRegistry().getValues();
     }
 
     public abstract IForgeRegistry<ITEM> getRegistry();
