@@ -16,7 +16,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A utility that:
@@ -172,7 +174,7 @@ public class FileImportWalker {
         List<File> sourceRoots = new ArrayList<>();
 
         // Add main source directories
-        for (File subdir : SOURCE_ROOT.listFiles(File::isDirectory)) {
+        for (File subdir : Objects.requireNonNull(SOURCE_ROOT.listFiles(File::isDirectory))) {
             File[] javaSubDirs = subdir.listFiles(x -> x.isDirectory() && x.getName().equals("java"));
             if (javaSubDirs != null && javaSubDirs.length > 0) {
                 sourceRoots.add(javaSubDirs[0]);
@@ -183,9 +185,7 @@ public class FileImportWalker {
         if (EXPANDED_ARCHIVES_ROOT.exists() && EXPANDED_ARCHIVES_ROOT.isDirectory()) {
             File[] expandedDirs = EXPANDED_ARCHIVES_ROOT.listFiles(File::isDirectory);
             if (expandedDirs != null) {
-                for (File dir : expandedDirs) {
-                    sourceRoots.add(dir);
-                }
+                sourceRoots.addAll(Arrays.asList(expandedDirs));
             }
         }
 
@@ -196,9 +196,7 @@ public class FileImportWalker {
             if (packageDir.exists() && packageDir.isDirectory()) {
                 File[] files = packageDir.listFiles((dir, name) -> name.endsWith(".java"));
                 if (files != null) {
-                    for (File file : files) {
-                        javaFiles.add(file);
-                    }
+                    javaFiles.addAll(Arrays.asList(files));
                 }
             }
         }

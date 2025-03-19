@@ -478,20 +478,8 @@ public class ProgramEditorScreen extends Screen {
         private void onValueOrCursorChanged(String programString) {
             int cursorPosition = getCursorPosition();
 
-            String cursorPositionDisplay = SFMDisplayUtils.getCursorPositionDisplay(programString, cursorPosition);
-
             // Build the program
             ProgramBuildResult buildResult = ProgramBuilder.build(programString);
-            @Nullable Program program = buildResult.program();
-
-            String cursorTokenDisplay = SFMDisplayUtils.getCursorTokenDisplay(buildResult, cursorPosition);
-
-            String tokenHierarchyDisplay;
-            if (program == null) {
-                tokenHierarchyDisplay = "<INVALID PROGRAM>";
-            } else {
-                tokenHierarchyDisplay = SFMDisplayUtils.getTokenHierarchyDisplay(program, cursorPosition);
-            }
 
             // Update the intellisense picklist
             IntellisenseContext intellisenseContext = new IntellisenseContext(
@@ -503,25 +491,40 @@ public class ProgramEditorScreen extends Screen {
             );
             List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(intellisenseContext);
             ProgramEditorScreen.this.suggestedActions.setItems(suggestions);
-            String suggestionsDisplay = suggestedActions.getItems()
-                    .stream()
-                    .map(PickListItem::getComponent)
-                    .map(Component::getString)
-                    .collect(Collectors.joining(", "));
 
 
             // Update the intellisense picklist query used to sort the suggestions
             String cursorWord = buildResult.getWordAtCursorPosition(cursorPosition);
             ProgramEditorScreen.this.suggestedActions.setQuery(Component.literal(cursorWord));
 
-//            SFM.LOGGER.info(
-//                    "PROGRAM OR CURSOR CHANGE! {}   {}   {}  |||  {} ||| {}",
-//                    cursorPositionDisplay,
-//                    cursorTokenDisplay,
-//                    tokenHierarchyDisplay,
-//                    cursorWord,
-//                    suggestionsDisplay
-//            );
+            boolean shouldPrint = false;
+            //noinspection ConstantValue
+            if (shouldPrint) {
+                String cursorPositionDisplay = SFMDisplayUtils.getCursorPositionDisplay(programString, cursorPosition);
+                String cursorTokenDisplay = SFMDisplayUtils.getCursorTokenDisplay(buildResult, cursorPosition);
+                String tokenHierarchyDisplay;
+                @Nullable Program program = buildResult.program();
+                if (program == null) {
+                    tokenHierarchyDisplay = "<INVALID PROGRAM>";
+                } else {
+                    tokenHierarchyDisplay = SFMDisplayUtils.getTokenHierarchyDisplay(program, cursorPosition);
+                }
+
+                String suggestionsDisplay = suggestedActions.getItems()
+                        .stream()
+                        .map(PickListItem::getComponent)
+                        .map(Component::getString)
+                        .collect(Collectors.joining(", "));
+
+                SFM.LOGGER.info(
+                        "PROGRAM OR CURSOR CHANGE! {}   {}   {}  |||  {} ||| {}",
+                        cursorPositionDisplay,
+                        cursorTokenDisplay,
+                        tokenHierarchyDisplay,
+                        cursorWord,
+                        suggestionsDisplay
+                );
+            }
         }
 
         private void rebuildIntellisense() {

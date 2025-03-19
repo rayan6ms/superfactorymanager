@@ -91,11 +91,11 @@ public class SFMLIntellisense {
     }
 
     private static <STACK, ITEM, CAP> void gatherIntellisenseActions(
-            IntellisenseContext context,
+            IntellisenseContext ignoredContext,
             ResourceType<STACK, ITEM, CAP> resourceType,
             Consumer<IntellisenseAction> results
     ) {
-        String word = context.createMutableProgramString().getWord();
+//        String word = context.createMutableProgramString().getWord();
         for (ITEM item : resourceType.getItems()) {
             var suggestion = new SuggestedResourceIntellisenseAction<>(
                     resourceType,
