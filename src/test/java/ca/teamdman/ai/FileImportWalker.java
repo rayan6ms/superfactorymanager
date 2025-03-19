@@ -1,13 +1,10 @@
 package ca.teamdman.ai;
 
-import com.github.javaparser.JavaParser;
-import com.github.javaparser.ParserConfiguration;
 import com.github.javaparser.ast.CompilationUnit;
 import com.github.javaparser.ast.ImportDeclaration;
 import com.github.javaparser.resolution.UnsolvedSymbolException;
 import com.github.javaparser.resolution.declarations.ResolvedReferenceTypeDeclaration;
 import com.github.javaparser.resolution.model.SymbolReference;
-import com.github.javaparser.symbolsolver.JavaSymbolSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ClassLoaderTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.CombinedTypeSolver;
 import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeSolver;
@@ -21,14 +18,14 @@ import java.nio.file.Files;
 
 /**
  * A utility that:
- *  1. Reads a fully qualified class reference from the clipboard.
- *  2. Uses JavaParser's symbol solver to find the .java source file (if available).
- *  3. Prints out that file (in a code fence) plus any directly imported classes (also in code fences).
- *  4. Places the result back on the system clipboard.
- *
- *  If classes are from libraries / jars but we've extracted their sources
- *  into build/tmp/expandedArchives, we should be able to find them.
- *  Otherwise, we show a loud error message.
+ * 1. Reads a fully qualified class reference from the clipboard.
+ * 2. Uses JavaParser's symbol solver to find the .java source file (if available).
+ * 3. Prints out that file (in a code fence) plus any directly imported classes (also in code fences).
+ * 4. Places the result back on the system clipboard.
+ * <p>
+ * If classes are from libraries / jars, but we've extracted their sources
+ * into build/tmp/expandedArchives, we should be able to find them.
+ * Otherwise, we show a loud error message.
  */
 public class FileImportWalker {
 
@@ -59,12 +56,6 @@ public class FileImportWalker {
         // ClassLoader solver as fallback (so we don't crash on unsolved external references)
         combinedTypeSolver.add(new ClassLoaderTypeSolver(FileImportWalker.class.getClassLoader()));
 
-        // Build a JavaSymbolSolver
-        JavaSymbolSolver symbolSolver = new JavaSymbolSolver(combinedTypeSolver);
-        ParserConfiguration config = new ParserConfiguration()
-                .setSymbolResolver(symbolSolver);
-        JavaParser parser = new JavaParser(config);
-
         // Attempt to resolve the reference
         SymbolReference<ResolvedReferenceTypeDeclaration> symbolRef =
                 combinedTypeSolver.tryToSolveType(reference);
@@ -80,7 +71,7 @@ public class FileImportWalker {
         // Convert to AST, then go up to the top-level CompilationUnit
         //noinspection unchecked
         resolvedType.toAst()
-                .flatMap(typeDecl -> typeDecl.findAncestor(CompilationUnit.class))
+                .flatMap(typeDeclaration -> typeDeclaration.findAncestor(CompilationUnit.class))
                 .ifPresentOrElse(cu -> {
                     try {
                         processCompilationUnit(reference, cu, combinedTypeSolver);
@@ -100,27 +91,31 @@ public class FileImportWalker {
      * Scans src\*\java for subdirectories (each containing a module's source),
      */
     @SuppressWarnings("SameParameterValue")
-    private static void addModuleTypeSolvers(CombinedTypeSolver combinedSolver, File srcDir) {
+    private static void addModuleTypeSolvers(
+            CombinedTypeSolver combinedSolver,
+            File srcDir
+    ) {
         if (!srcDir.exists() || !srcDir.isDirectory()) {
             System.out.println("[WARN] " + srcDir + " is not a directory. Not adding module solvers.");
             return;
         }
 
-        File[] subdirs = srcDir.listFiles(File::isDirectory);
-        if (subdirs == null || subdirs.length == 0) {
+        File[] subDirs = srcDir.listFiles(File::isDirectory);
+        if (subDirs == null || subDirs.length == 0) {
             System.out.println("[WARN] No subdirectories found under " + srcDir + ".");
             return;
         }
 
-        for (File subdir : subdirs) {
-            File[] subsubdirs = subdir.listFiles(x -> x.isDirectory() && x.getName().equals("java"));
-            if (subsubdirs == null || subsubdirs.length == 0) {
+        for (File subdir : subDirs) {
+            File[] subSubDirs = subdir.listFiles(x -> x.isDirectory() && x.getName().equals("java"));
+            if (subSubDirs == null || subSubDirs.length == 0) {
                 System.out.println("[WARN] No src/module/main subdirectory found under " + subdir + ".");
                 continue;
             }
-            for (File subsubdir : subsubdirs) {
-                System.out.println("[INFO] Adding JavaParserTypeSolver for src/module/main dir: " + subsubdir.getAbsolutePath());
-                combinedSolver.add(new JavaParserTypeSolver(subsubdir));
+            for (File subSubDir : subSubDirs) {
+                System.out.println("[INFO] Adding JavaParserTypeSolver for src/module/main dir: "
+                                   + subSubDir.getAbsolutePath());
+                combinedSolver.add(new JavaParserTypeSolver(subSubDir));
             }
         }
     }
@@ -130,32 +125,38 @@ public class FileImportWalker {
      * extracted source from a jar), and adds them as a JavaParserTypeSolver.
      */
     @SuppressWarnings("SameParameterValue")
-    private static void addExpandedArchiveTypeSolvers(CombinedTypeSolver combinedSolver, File rootDir) {
+    private static void addExpandedArchiveTypeSolvers(
+            CombinedTypeSolver combinedSolver,
+            File rootDir
+    ) {
         if (!rootDir.exists() || !rootDir.isDirectory()) {
             System.out.println("[WARN] " + rootDir + " is not a directory. Not adding expanded archives solvers.");
             return;
         }
 
-        File[] subdirs = rootDir.listFiles(File::isDirectory);
-        if (subdirs == null || subdirs.length == 0) {
+        File[] subDirs = rootDir.listFiles(File::isDirectory);
+        if (subDirs == null || subDirs.length == 0) {
             System.out.println("[WARN] No subdirectories found under " + rootDir + ".");
             return;
         }
 
-        for (File subdir : subdirs) {
-            System.out.println("[INFO] Adding JavaParserTypeSolver for expanded source dir: " + subdir.getAbsolutePath());
+        for (File subdir : subDirs) {
+            System.out.println("[INFO] Adding JavaParserTypeSolver for expanded source dir: "
+                               + subdir.getAbsolutePath());
             combinedSolver.add(new JavaParserTypeSolver(subdir));
         }
     }
 
     /**
      * Processes the main CompilationUnit (the top-level file that holds your reference class),
-     * gathers its imports, fetches each imported file if available, and concatenates all of the contents
+     * gathers its imports, fetches each imported file if available, and concatenates all the contents
      * into a single output that is set to the clipboard.
      */
-    private static void processCompilationUnit(String reference,
-                                               @NotNull CompilationUnit cu,
-                                               CombinedTypeSolver combinedTypeSolver) throws IOException {
+    private static void processCompilationUnit(
+            String reference,
+            @NotNull CompilationUnit cu,
+            CombinedTypeSolver combinedTypeSolver
+    ) throws IOException {
 
         StringBuilder sb = new StringBuilder();
 
@@ -192,17 +193,16 @@ public class FileImportWalker {
                 ResolvedReferenceTypeDeclaration resolvedImport = importRef.getCorrespondingDeclaration();
                 //noinspection unchecked
                 resolvedImport.toAst()
-                        .flatMap(typeDecl -> typeDecl.findAncestor(CompilationUnit.class))
-                        .ifPresentOrElse(importCU -> {
-                            sb.append("Imported: `")
-                                    .append(importFqn)
-                                    .append("`\n```java\n")
-                                    .append(readRawFileContents(importCU))
-                                    .append("\n```\n\n");
-                        }, () -> {
-                            System.err.println("[ERROR] We resolved " + importFqn
-                                               + " but can't find a CompilationUnit (no .java?).");
-                        });
+                        .flatMap(typeDeclaration -> typeDeclaration.findAncestor(CompilationUnit.class))
+                        .ifPresentOrElse(
+                                importCU -> sb.append("Imported: `")
+                                        .append(importFqn)
+                                        .append("`\n```java\n")
+                                        .append(readRawFileContents(importCU))
+                                        .append("\n```\n\n"),
+                                () -> System.err.println("[ERROR] We resolved " + importFqn
+                                                         + " but can't find a CompilationUnit (no .java?).")
+                        );
             } catch (UnsolvedSymbolException use) {
                 // That means something is definitely missing
                 System.err.println("[ERROR] UnsolvedSymbol for " + importFqn
@@ -220,8 +220,8 @@ public class FileImportWalker {
     /**
      * Read the raw file contents that back a CompilationUnit, preserving
      * the original formatting, comments, etc.
-     *
-     * If no storage path is found, we fallback to cu.toString().
+     * <p>
+     * If no storage path is found, we fall back to cu.toString().
      */
     private static String readRawFileContents(CompilationUnit cu) {
         return cu.getStorage()

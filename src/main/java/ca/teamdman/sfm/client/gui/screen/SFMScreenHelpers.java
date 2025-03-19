@@ -161,6 +161,7 @@ public class SFMScreenHelpers {
      * <p/>
      * See also: {@link net.minecraft.client.gui.components.MultiLineEditBox#renderHighlight(PoseStack, int, int, int, int)}
      */
+    @SuppressWarnings("JavadocReference")
     @MCVersionDependentBehaviour
     public static void renderHighlight(
             PoseStack poseStack,

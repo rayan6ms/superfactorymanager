@@ -34,6 +34,16 @@ public class SFMLIntellisenseTests {
               OUTPUT TO b
             END
              """.stripTrailing().stripIndent();
+    /**
+     * A small snippet of code where we have "INPUT 64 IRON_INGOT FROM Minecart"
+     * The 'IRON_INGOT' portion is recognized by the grammar as resourceId,
+     * and 'Minecart' is recognized as a label.
+     */
+    private static final String PROGRAM_SNIPPET = """
+            EVERY 20 TICKS DO
+              INPUT 64 iron_ingot FROM my_chest
+            END
+            """;
 
     @Test
     public void displayTokens() {
@@ -171,7 +181,7 @@ public class SFMLIntellisenseTests {
         boolean someRulesWereFound = false;
 
 //        for (int chop = 0; chop < outerProgramString.length(); chop++) {
-        for (int chop = outerProgramString.length()-1; chop < outerProgramString.length(); chop++) {
+        for (int chop = outerProgramString.length() - 1; chop < outerProgramString.length(); chop++) {
             String programString = outerProgramString.substring(0, chop);
             ProgramBuildResult buildResult = ProgramBuilder.build(programString);
             SFMLParser parser = buildResult.metadata().parser();
@@ -213,17 +223,35 @@ public class SFMLIntellisenseTests {
                             context
                     );
                     Vocabulary vocabulary = parser.getVocabulary();
-                    candidates.tokens.forEach((key, value) -> {
-                        System.out.printf("\"%s\" ", Stream.concat(Stream.of(key), value.stream())
-                                .map(vocabulary::getSymbolicName)
-                                .collect(Collectors.joining(", ", "[", "]")));
-                    });
+                    candidates.tokens.forEach((key, value) -> System.out.printf(
+                            "\"%s\" ",
+                            Stream
+                                    .concat(
+                                            Stream.of(key),
+                                            value.stream()
+                                    )
+                                    .map(vocabulary::getSymbolicName)
+                                    .collect(Collectors.joining(
+                                            ", ",
+                                            "[",
+                                            "]"
+                                    ))
+                    ));
                     System.out.print(" ||| ");
-                    candidates.rules.forEach((head, tail) -> {
-                        System.out.printf("\"%s\" ", Stream.concat(Stream.of(head), tail.stream())
-                                .map(x -> SFMLParser.ruleNames[x])
-                                .collect(Collectors.joining(", ", "[", "]")));
-                    });
+                    candidates.rules.forEach((head, tail) -> System.out.printf(
+                            "\"%s\" ",
+                            Stream
+                                    .concat(
+                                            Stream.of(head),
+                                            tail.stream()
+                                    )
+                                    .map(x -> SFMLParser.ruleNames[x])
+                                    .collect(Collectors.joining(
+                                            ", ",
+                                            "[",
+                                            "]"
+                                    ))
+                    ));
                     System.out.println();
                     if (!candidates.rules.isEmpty()) {
                         someRulesWereFound = true;
@@ -256,10 +284,10 @@ public class SFMLIntellisenseTests {
                 Set.of(SFMLLexer.WS, SFMLLexer.EOF)
         );
         String needle = "stone";
-        Token caretToken = buildResult.getTokenAtCursorPosition(programString.indexOf(needle) + needle.length()/2);
+        Token caretToken = buildResult.getTokenAtCursorPosition(programString.indexOf(needle) + needle.length() / 2);
         assert caretToken != null;
         int caretTokenIndex = caretToken.getTokenIndex();
-        System.out.printf("%s\n", SFMDisplayUtils.getCursorTokenDisplay(buildResult, caretToken.getStartIndex()+1));
+        System.out.printf("%s\n", SFMDisplayUtils.getCursorTokenDisplay(buildResult, caretToken.getStartIndex() + 1));
 //        int caretTokenIndex = 1;
         CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(
                 caretTokenIndex,
@@ -313,10 +341,10 @@ public class SFMLIntellisenseTests {
                 Set.of(SFMLLexer.WS, SFMLLexer.EOF)
         );
         String needle = "chest";
-        Token caretToken = buildResult.getTokenAtCursorPosition(programString.indexOf(needle) + needle.length()/2);
+        Token caretToken = buildResult.getTokenAtCursorPosition(programString.indexOf(needle) + needle.length() / 2);
         assert caretToken != null;
         int caretTokenIndex = caretToken.getTokenIndex();
-        System.out.printf("%s\n", SFMDisplayUtils.getCursorTokenDisplay(buildResult, caretToken.getStartIndex()+1));
+        System.out.printf("%s\n", SFMDisplayUtils.getCursorTokenDisplay(buildResult, caretToken.getStartIndex() + 1));
 
 //        int caretTokenIndex = 1;
         CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(
@@ -348,30 +376,6 @@ public class SFMLIntellisenseTests {
         });
         assertFalse(candidates.rules.isEmpty());
     }
-
-    private static int countTokens(String program) {
-        SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(program));
-        lexer.removeErrorListeners();
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        tokens.fill();
-
-        return tokens.size();
-    }
-
-
-
-
-
-    /**
-     * A small snippet of code where we have "INPUT 64 IRON_INGOT FROM Minecart"
-     * The 'IRON_INGOT' portion is recognized by the grammar as resourceId,
-     * and 'Minecart' is recognized as a label.
-     */
-    private static final String PROGRAM_SNIPPET = """
-    EVERY 20 TICKS DO
-      INPUT 64 iron_ingot FROM my_chest
-    END
-    """;
 
     /**
      * Demonstrates that the caret inside "IRON_INGOT" is recognized
@@ -427,7 +431,7 @@ public class SFMLIntellisenseTests {
         assertTrue(buildResult.isBuildSuccessful(), "Snippet must parse successfully");
 
         // Cursor in "Minecart"
-        int labelCaret    = PROGRAM_SNIPPET.indexOf("my_chest") + 3;
+        int labelCaret = PROGRAM_SNIPPET.indexOf("my_chest") + 3;
 
         Token caretToken = buildResult.getTokenAtCursorPosition(labelCaret);
         assertNotNull(caretToken, "Should find a token around Minecart");
@@ -453,5 +457,14 @@ public class SFMLIntellisenseTests {
                 candidates.rules.containsKey(SFMLParser.RULE_label),
                 "Should contain label in the rule candidates"
         );
+    }
+
+    private static int countTokens(String program) {
+        SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(program));
+        lexer.removeErrorListeners();
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        tokens.fill();
+
+        return tokens.size();
     }
 }
