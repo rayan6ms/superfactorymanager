@@ -3,7 +3,7 @@ package ca.teamdman.sfm.client;
 import ca.teamdman.langs.SFMLLexer;
 import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.gui.screen.SFMScreenHelpers;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.common.net.*;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfml.ast.*;
@@ -42,8 +42,8 @@ public class ProgramTokenContextActions {
                     .map(Optional::get)
                     .findFirst();
         } catch (Throwable t) {
-            return Optional.of(() -> SFMScreenHelpers.showProgramEditScreen("-- Encountered error, program parse failed:\n--"
-                                                                            + t.getMessage()));
+            return Optional.of(() -> SFMScreenChangeHelpers.showProgramEditScreen("-- Encountered error, program parse failed:\n--"
+                                                                                  + t.getMessage()));
         }
     }
 
@@ -77,7 +77,7 @@ public class ProgramTokenContextActions {
                         .stream()
                         .map(ResourceIdentifier::toStringCondensed)
                         .collect(Collectors.joining(",\n"));
-                SFMScreenHelpers.showProgramEditScreen(expansion);
+                SFMScreenChangeHelpers.showProgramEditScreen(expansion);
             });
         } else if (node instanceof Label label) {
             SFM.LOGGER.info("Found context action for label node");

@@ -949,6 +949,35 @@ public final class LocalizationKeys {
             "Something went wrong while updating the SFM config, I have no idea if changes were made. Check the server logs."
     );
 
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_SCREEN_TITLE = new LocalizationEntry(
+            "gui.sfm.program_editor_config.title",
+            "Program Editor Config"
+    );
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_LINE_NUMBERS = new LocalizationEntry(
+            "gui.sfm.program_editor_config.line_numbers",
+            "Line Numbers"
+    );
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_INTELLISENSE = new LocalizationEntry(
+            "gui.sfm.program_editor_config.intellisense",
+            "Intellisense"
+    );
+    public static final LocalizationEntry
+            PROGRAM_EDITOR_CONFIG_INTELLISENSE_OFF = new LocalizationEntry(
+            "gui.sfm.program_editor_config.intellisense.off",
+            "Off"
+    );
+    public static final LocalizationEntry
+            PROGRAM_EDITOR_CONFIG_INTELLISENSE_BASIC = new LocalizationEntry(
+            "gui.sfm.program_editor_config.intellisense.basic",
+            "Basic"
+    );
+    public static final LocalizationEntry
+            PROGRAM_EDITOR_CONFIG_INTELLISENSE_ADVANCED = new LocalizationEntry(
+            "gui.sfm.program_editor_config.intellisense.advanced",
+            "Advanced"
+    );
+
+
     public static List<LocalizationEntry> getEntries() {
         // use reflection to get all the public static LocalizationEntry fields
         var rtn = new ArrayList<LocalizationEntry>();

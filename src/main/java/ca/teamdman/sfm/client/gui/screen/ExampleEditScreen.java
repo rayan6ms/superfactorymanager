@@ -2,7 +2,7 @@ package ca.teamdman.sfm.client.gui.screen;
 
 import net.minecraft.client.gui.screens.ConfirmScreen;
 
-public class ExampleEditScreen extends ProgramEditScreen {
+public class ExampleEditScreen extends ProgramEditorScreen {
     private final ExampleEditScreenOpenContext openContext;
 
     public ExampleEditScreen(
@@ -22,9 +22,8 @@ public class ExampleEditScreen extends ProgramEditScreen {
             super.saveAndClose();
         } else {
             // The disk contains non-template code, ask before overwriting
-            assert this.minecraft != null;
             ConfirmScreen saveConfirmScreen = getSaveConfirmScreen(super::saveAndClose);
-            this.minecraft.pushGuiLayer(saveConfirmScreen);
+            SFMScreenChangeHelpers.setOrPushScreen(saveConfirmScreen);
             saveConfirmScreen.setDelay(20);
         }
     }
@@ -34,9 +33,8 @@ public class ExampleEditScreen extends ProgramEditScreen {
         // The user has requested to close the screen
         // If the content has changed, ask to save before discarding
         if (!openContext.equalsAnyTemplate(textarea.getValue())) {
-            assert this.minecraft != null;
             ConfirmScreen exitWithoutSavingConfirmScreen = getExitWithoutSavingConfirmScreen();
-            this.minecraft.pushGuiLayer(exitWithoutSavingConfirmScreen);
+            SFMScreenChangeHelpers.setOrPushScreen(exitWithoutSavingConfirmScreen);
             exitWithoutSavingConfirmScreen.setDelay(20);
         } else {
             super.onClose();

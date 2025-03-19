@@ -350,8 +350,8 @@ public class LogsScreen extends Screen {
             boolean isCursorVisible = this.isFocused() && this.frame / 6 % 2 == 0;
             boolean isCursorAtEndOfLine = false;
             int cursorIndex = textField.cursor();
-            int lineX = SFMScreenUtils.getX(this) + this.innerPadding();
-            int lineY = SFMScreenUtils.getY(this) + this.innerPadding();
+            int lineX = SFMScreenRenderUtils.getX(this) + this.innerPadding();
+            int lineY = SFMScreenRenderUtils.getY(this) + this.innerPadding();
             int charCount = 0;
             int cursorX = 0;
             int cursorY = 0;
@@ -375,8 +375,8 @@ public class LogsScreen extends Screen {
                     cursorY = lineY;
                     // we draw the raw before coloured in case of token recognition errors
                     // draw before cursor
-                    cursorX = SFMScreenUtils.drawInBatch(
-                            ProgramEditScreen.substring(componentColoured, 0, cursorIndex - charCount),
+                    cursorX = SFMScreenRenderUtils.drawInBatch(
+                            ProgramEditorScreen.substring(componentColoured, 0, cursorIndex - charCount),
                             font,
                             lineX,
                             lineY,
@@ -384,8 +384,8 @@ public class LogsScreen extends Screen {
                             false,
                             matrix4f,
                             buffer) - 1;
-                    SFMScreenUtils.drawInBatch(
-                            ProgramEditScreen.substring(componentColoured, cursorIndex - charCount, lineLength),
+                    SFMScreenRenderUtils.drawInBatch(
+                            ProgramEditorScreen.substring(componentColoured, cursorIndex - charCount, lineLength),
                             font,
                             cursorX,
                             lineY,
@@ -394,7 +394,7 @@ public class LogsScreen extends Screen {
                             matrix4f,
                             buffer);
                 } else {
-                    SFMScreenUtils.drawInBatch(
+                    SFMScreenRenderUtils.drawInBatch(
                             componentColoured,
                             font,
                             lineX,
@@ -411,18 +411,18 @@ public class LogsScreen extends Screen {
                     int lineSelectionStart = Math.max(selectionStart - charCount, 0);
                     int lineSelectionEnd = Math.min(selectionEnd - charCount, lineLength);
 
-                    int highlightStartX = this.font.width(ProgramEditScreen.substring(
+                    int highlightStartX = this.font.width(ProgramEditorScreen.substring(
                             componentColoured,
                             0,
                             lineSelectionStart
                     ));
-                    int highlightEndX = this.font.width(ProgramEditScreen.substring(
+                    int highlightEndX = this.font.width(ProgramEditorScreen.substring(
                             componentColoured,
                             0,
                             lineSelectionEnd
                     ));
 
-                    SFMScreenHelpers.renderHighlight(
+                    SFMScreenRenderUtils.renderHighlight(
                             poseStack,
                             lineX + highlightStartX,
                             lineY,

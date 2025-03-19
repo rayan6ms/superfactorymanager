@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.common.net;
 
-import ca.teamdman.sfm.client.gui.screen.SFMScreenHelpers;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import net.minecraft.network.FriendlyByteBuf;
 
 public record ClientboundOutputInspectionResultsPacket(
@@ -33,7 +33,7 @@ public record ClientboundOutputInspectionResultsPacket(
                 ClientboundOutputInspectionResultsPacket msg,
                 SFMPacketHandlingContext context
         ) {
-            SFMScreenHelpers.showProgramEditScreen(msg.results);
+            SFMScreenChangeHelpers.showProgramEditScreen(msg.results);
         }
 
         @Override

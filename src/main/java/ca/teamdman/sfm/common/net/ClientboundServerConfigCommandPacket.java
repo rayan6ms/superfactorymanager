@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.common.net;
 
-import ca.teamdman.sfm.client.gui.screen.SFMScreenHelpers;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.gui.screen.TomlEditScreenOpenContext;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.registry.SFMPackets;
@@ -43,12 +43,12 @@ public record ClientboundServerConfigCommandPacket(
             String configTomlString = msg.configToml();
             configTomlString = configTomlString.replaceAll("\r", "");
             switch (msg.requestingEditMode()) {
-                case SHOW -> SFMScreenHelpers.showTomlEditScreen(new TomlEditScreenOpenContext(
+                case SHOW -> SFMScreenChangeHelpers.showTomlEditScreen(new TomlEditScreenOpenContext(
                         configTomlString,
                         $ -> {
                         }
                 ));
-                case EDIT -> SFMScreenHelpers.showTomlEditScreen(new TomlEditScreenOpenContext(
+                case EDIT -> SFMScreenChangeHelpers.showTomlEditScreen(new TomlEditScreenOpenContext(
                         configTomlString,
                         (newContent) -> SFMPackets.sendToServer(new ServerboundServerConfigUpdatePacket(newContent))
                 ));

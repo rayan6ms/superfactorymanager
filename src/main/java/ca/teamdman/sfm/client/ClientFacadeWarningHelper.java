@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.client;
 
-import ca.teamdman.sfm.client.gui.screen.SFMScreenHelpers;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.common.facade.FacadePlanWarning;
 import ca.teamdman.sfm.common.facade.FacadePlanner;
 import ca.teamdman.sfm.common.facade.IFacadePlan;
@@ -49,7 +49,7 @@ public class ClientFacadeWarningHelper {
                     warning.confirmYes(),
                     warning.confirmNo()
             );
-            SFMScreenHelpers.setOrPushScreen(confirmScreen);
+            SFMScreenChangeHelpers.setOrPushScreen(confirmScreen);
             confirmScreen.setDelay(10);
         }
     }

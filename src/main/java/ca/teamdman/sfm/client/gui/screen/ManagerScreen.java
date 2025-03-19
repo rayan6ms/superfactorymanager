@@ -297,8 +297,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     private void onEditButtonClicked() {
-//        SFMScreenHelpers.showProgramEditScreen(getProgram(), this::sendProgram);
-        SFMScreenHelpers.showProgramEditScreen(new ProgramEditScreenOpenContext(
+        SFMScreenChangeHelpers.showProgramEditScreen(new ProgramEditScreenOpenContext(
                 getProgram(),
                 LabelPositionHolder.from(menu.getDisk()),
                 this::sendProgram
@@ -306,7 +305,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     private void onExamplesButtonClicked() {
-        SFMScreenHelpers.showExampleListScreen(
+        SFMScreenChangeHelpers.showExampleListScreen(
                 getProgram(),
                 LabelPositionHolder.from(menu.getDisk()),
                 this::sendProgram
@@ -314,7 +313,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     private void onLogsButtonClicked() {
-        SFMScreenHelpers.showLogsScreen(menu);
+        SFMScreenChangeHelpers.showLogsScreen(menu);
     }
 
     private void performReset() {
@@ -344,8 +343,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                 LocalizationKeys.MANAGER_RESET_CONFIRM_SCREEN_YES_BUTTON.getComponent(),
                 LocalizationKeys.MANAGER_RESET_CONFIRM_SCREEN_NO_BUTTON.getComponent()
         );
-        assert this.minecraft != null;
-        this.minecraft.pushGuiLayer(confirmScreen);
+        SFMScreenChangeHelpers.setOrPushScreen(confirmScreen);
         confirmScreen.setDelay(20);
     }
 
@@ -385,13 +383,13 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
     private void onDiscordButtonClicked() {
         String discordUrl = "https://discord.gg/xjXYj9MmS4";
-        SFMScreenHelpers.setOrPushScreen(
+        SFMScreenChangeHelpers.setOrPushScreen(
                 new ConfirmLinkScreen(
                         proceed -> {
                             if (proceed) {
                                 Util.getPlatform().openUri(discordUrl);
                             }
-                            SFMScreenHelpers.popScreen();
+                            SFMScreenChangeHelpers.popScreen();
                         },
                         discordUrl,
                         false
@@ -458,8 +456,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                 LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_YES_BUTTON.getComponent(),
                 LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_NO_BUTTON.getComponent()
         );
-        assert this.minecraft != null;
-        this.minecraft.pushGuiLayer(confirmScreen);
+        SFMScreenChangeHelpers.setOrPushScreen(confirmScreen);
         confirmScreen.setDelay(20);
     }
 

@@ -1,8 +1,7 @@
 package ca.teamdman.sfm.client.gui.widget;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.gui.screen.SFMScreenHelpers;
-import ca.teamdman.sfm.client.gui.screen.SFMScreenUtils;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenRenderUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
@@ -217,16 +216,16 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
         // Only render the visible items
         Matrix4f matrix4f = poseStack.last().pose();
         var buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-        int lineX = SFMScreenUtils.getX(this) + this.innerPadding();
+        int lineX = SFMScreenRenderUtils.getX(this) + this.innerPadding();
         Rect2i highlight = null;
 
         // Render only the visible subset of items
         for (int i = startIndex; i < endIndex; i++) {
             PickListItem item = items.get(i);
             // Calculate the y position based on the item's position in the full list
-            int lineY = SFMScreenUtils.getY(this) + this.innerPadding() + (i * itemHeight);
+            int lineY = SFMScreenRenderUtils.getY(this) + this.innerPadding() + (i * itemHeight);
 
-            SFMScreenUtils.drawInBatch(
+            SFMScreenRenderUtils.drawInBatch(
                     item.getComponent(),
                     this.font,
                     lineX,
@@ -250,7 +249,7 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
         buffer.endBatch();
 
         if (highlight != null) {
-            SFMScreenHelpers.renderHighlight(
+            SFMScreenRenderUtils.renderHighlight(
                     poseStack,
                     highlight.getX(),
                     highlight.getY(),

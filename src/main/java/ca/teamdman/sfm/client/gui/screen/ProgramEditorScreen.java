@@ -47,14 +47,14 @@ import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP;
 
 @SuppressWarnings("NotNullFieldNotInitialized")
-public class ProgramEditScreen extends Screen {
+public class ProgramEditorScreen extends Screen {
     private final ProgramEditScreenOpenContext openContext;
     protected MyMultiLineEditBox textarea;
     protected String lastProgram = "";
     protected List<MutableComponent> lastProgramWithSyntaxHighlighting = new ArrayList<>();
     protected PickList<IntellisenseAction> suggestedActions;
 
-    public ProgramEditScreen(
+    public ProgramEditorScreen(
             ProgramEditScreenOpenContext openContext
     ) {
         super(LocalizationKeys.PROGRAM_EDIT_SCREEN_TITLE.getComponent());
@@ -112,9 +112,8 @@ public class ProgramEditScreen extends Screen {
     public void onClose() {
         // If the content is different, ask to save
         if (!openContext.programString().equals(textarea.getValue())) {
-            assert this.minecraft != null;
             ConfirmScreen exitWithoutSavingConfirmScreen = getExitWithoutSavingConfirmScreen();
-            this.minecraft.pushGuiLayer(exitWithoutSavingConfirmScreen);
+            SFMScreenChangeHelpers.setOrPushScreen(exitWithoutSavingConfirmScreen);
             exitWithoutSavingConfirmScreen.setDelay(20);
         } else {
             super.onClose();
@@ -278,14 +277,14 @@ public class ProgramEditScreen extends Screen {
     }
 
     private static boolean shouldShowLineNumbers() {
-        return SFMConfig.getOrDefault(SFMConfig.CLIENT.showLineNumbers);
+        return SFMConfig.getOrDefault(SFMConfig.CLIENT_PROGRAM_EDITOR.showLineNumbers);
     }
 
     @Override
     protected void init() {
         super.init();
         assert this.minecraft != null;
-        SFMScreenUtils.enableKeyRepeating();
+        SFMScreenRenderUtils.enableKeyRepeating();
 
         this.textarea = this.addRenderableWidget(new MyMultiLineEditBox());
 
@@ -304,7 +303,9 @@ public class ProgramEditScreen extends Screen {
                         .setPosition(this.width / 2 - 200, this.height / 2 - 100 + 195)
                         .setSize(16, 20)
                         .setText(Component.literal("#"))
-                        .setOnPress((button) -> this.onToggleLineNumbersButtonClicked())
+                        .setOnPress((button) -> SFMScreenChangeHelpers.setOrPushScreen(
+                                new ProgramEditorConfigScreen(this, SFMConfig.CLIENT_PROGRAM_EDITOR)
+                        ))
                         .setTooltip(this, font, PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP)
                         .build()
         );
@@ -328,10 +329,6 @@ public class ProgramEditScreen extends Screen {
 
         textarea.setValue(openContext.programString());
         this.setInitialFocus(textarea);
-    }
-
-    private void onToggleLineNumbersButtonClicked() {
-        SFMConfig.CLIENT.showLineNumbers.set(!shouldShowLineNumbers());
     }
 
     protected @NotNull ConfirmScreen getSaveConfirmScreen(Runnable onConfirm) {
@@ -377,9 +374,9 @@ public class ProgramEditScreen extends Screen {
     protected class MyMultiLineEditBox extends MultiLineEditBox {
         public MyMultiLineEditBox() {
             super(
-                    ProgramEditScreen.this.font,
-                    ProgramEditScreen.this.width / 2 - 200,
-                    ProgramEditScreen.this.height / 2 - 110,
+                    ProgramEditorScreen.this.font,
+                    ProgramEditorScreen.this.width / 2 - 200,
+                    ProgramEditorScreen.this.height / 2 - 110,
                     400,
                     200,
                     Component.literal(""),
@@ -423,7 +420,7 @@ public class ProgramEditScreen extends Screen {
                 }
                 return super.mouseClicked(mx, my, button);
             } catch (Exception e) {
-                SFM.LOGGER.error("Error in ProgramEditScreen.MyMultiLineEditBox.mouseClicked", e);
+                SFM.LOGGER.error("Error in ProgramEditorScreen.MyMultiLineEditBox.mouseClicked", e);
                 return false;
             }
         }
@@ -444,7 +441,7 @@ public class ProgramEditScreen extends Screen {
                 double dy
         ) {
             // if mouse in bounds, translate to accommodate line numbers
-            int thisX = SFMScreenUtils.getX(this);
+            int thisX = SFMScreenRenderUtils.getX(this);
             if (mx >= thisX + 1 && mx <= thisX + this.width - 1) {
                 mx -= getLineNumberWidth();
             }
@@ -494,7 +491,7 @@ public class ProgramEditScreen extends Screen {
                     openContext.labelPositionHolder()
             );
             List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(intellisenseContext);
-            ProgramEditScreen.this.suggestedActions.setItems(suggestions);
+            ProgramEditorScreen.this.suggestedActions.setItems(suggestions);
             String suggestionsDisplay = suggestedActions.getItems()
                     .stream()
                     .map(PickListItem::getComponent)
@@ -504,7 +501,7 @@ public class ProgramEditScreen extends Screen {
 
             // Update the intellisense picklist query used to sort the suggestions
             String cursorWord = buildResult.getWordAtCursorPosition(cursorPosition);
-            ProgramEditScreen.this.suggestedActions.setQuery(Component.literal(cursorWord));
+            ProgramEditorScreen.this.suggestedActions.setQuery(Component.literal(cursorWord));
 
             SFM.LOGGER.info(
                     "PROGRAM OR CURSOR CHANGE! {}   {}   {}  |||  {} ||| {}",
@@ -545,8 +542,8 @@ public class ProgramEditScreen extends Screen {
             boolean isCursorVisible = this.isFocused() && this.frame / 6 % 2 == 0;
             boolean isCursorAtEndOfLine = false;
             int cursorIndex = textField.cursor();
-            int lineX = SFMScreenUtils.getX(this) + this.innerPadding() + getLineNumberWidth();
-            int lineY = SFMScreenUtils.getY(this) + this.innerPadding();
+            int lineX = SFMScreenRenderUtils.getX(this) + this.innerPadding() + getLineNumberWidth();
+            int lineY = SFMScreenRenderUtils.getY(this) + this.innerPadding();
             int charCount = 0;
             int cursorX = 0;
             int cursorY = 0;
@@ -567,7 +564,7 @@ public class ProgramEditScreen extends Screen {
                 if (shouldShowLineNumbers()) {
                     // Draw line number
                     String lineNumber = String.valueOf(line + 1);
-                    SFMScreenUtils.drawInBatch(
+                    SFMScreenRenderUtils.drawInBatch(
                             lineNumber,
                             this.font,
                             lineX - 2 - this.font.width(lineNumber),
@@ -583,7 +580,7 @@ public class ProgramEditScreen extends Screen {
                     isCursorAtEndOfLine = cursorIndex == charCount + lineLength;
                     cursorY = lineY;
                     // draw text before cursor
-                    cursorX = SFMScreenUtils.drawInBatch(
+                    cursorX = SFMScreenRenderUtils.drawInBatch(
                             substring(componentColoured, 0, cursorIndex - charCount),
                             font,
                             lineX,
@@ -593,9 +590,9 @@ public class ProgramEditScreen extends Screen {
                             matrix4f,
                             buffer
                     ) - 1;
-                    ProgramEditScreen.this.suggestedActions.setXY(cursorX + 10, cursorY);
+                    ProgramEditorScreen.this.suggestedActions.setXY(cursorX + 10, cursorY);
                     // draw text after cursor
-                    SFMScreenUtils.drawInBatch(
+                    SFMScreenRenderUtils.drawInBatch(
                             substring(componentColoured, cursorIndex - charCount, lineLength),
                             font,
                             cursorX,
@@ -606,7 +603,7 @@ public class ProgramEditScreen extends Screen {
                             buffer
                     );
                 } else {
-                    SFMScreenUtils.drawInBatch(
+                    SFMScreenRenderUtils.drawInBatch(
                             componentColoured,
                             font,
                             lineX,
@@ -627,7 +624,7 @@ public class ProgramEditScreen extends Screen {
                     int highlightStartX = this.font.width(substring(componentColoured, 0, lineSelectionStart));
                     int highlightEndX = this.font.width(substring(componentColoured, 0, lineSelectionEnd));
 
-                    SFMScreenHelpers.renderHighlight(
+                    SFMScreenRenderUtils.renderHighlight(
                             poseStack,
                             lineX + highlightStartX,
                             lineY,

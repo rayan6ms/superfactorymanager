@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.common.net;
 
-import ca.teamdman.sfm.client.gui.screen.SFMScreenHelpers;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import net.minecraft.network.FriendlyByteBuf;
 
 public record ClientboundShowChangelogPacket(
@@ -29,7 +29,7 @@ public record ClientboundShowChangelogPacket(
                 ClientboundShowChangelogPacket msg,
                 SFMPacketHandlingContext context
         ) {
-            SFMScreenHelpers.showChangelog();
+            SFMScreenChangeHelpers.showChangelog();
         }
 
         @Override
