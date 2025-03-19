@@ -405,8 +405,7 @@ public class SFMLIntellisenseTests {
         CodeCompletionCore core = new CodeCompletionCore(parser, preferredRules, ignoredTokens);
 
         // 5) Collect candidates from the top-level context, or from parser.program()
-        CodeCompletionCore.CandidatesCollection candidates =
-                core.collectCandidates(caretTokenIndex, parser.program());
+        CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(caretTokenIndex, null);
 
         // 6) Check which rules show up in candidates
         //    The candidates.rules map: key=ruleIndex, value=some path
@@ -445,8 +444,7 @@ public class SFMLIntellisenseTests {
         Set<Integer> ignoredTokens = Set.of(SFMLLexer.WS, SFMLLexer.EOF);
 
         CodeCompletionCore core = new CodeCompletionCore(parser, preferredRules, ignoredTokens);
-        CodeCompletionCore.CandidatesCollection candidates =
-                core.collectCandidates(caretTokenIndex, parser.program());
+        CodeCompletionCore.CandidatesCollection candidates = core.collectCandidates(caretTokenIndex, null);
 
         // Now we expect label, not resourceId
         assertFalse(
