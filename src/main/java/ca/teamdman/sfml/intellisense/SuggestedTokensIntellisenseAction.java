@@ -22,15 +22,12 @@ public record SuggestedTokensIntellisenseAction(
     // Add suggestions for each label in the program
 
     /*
-    - If suggesting NAME nextTokenType and NAME already present, jump cursor to inside of existing string nextTokenType followingTokenTypes existing NAME nextTokenType
+    - If suggesting NAME nextTokenType and NAME already present, jump cursor to inside existing string nextTokenType followingTokenTypes existing NAME nextTokenType
     - If suggesting NAME nextTokenType and NAME already present but STRING followingTokenTypes name missing, insert string and place cursor inside
      */
     @Override
     public ManipulationResult perform(IntellisenseContext context) {
-        String programString = context.programBuildResult().metadata().programString();
-        int cursor = context.cursorPosition();
-        int selectionCursor = context.selectionCursorPosition();
-        MutableProgramString programStringMut = new MutableProgramString(programString, cursor, selectionCursor);
+        MutableProgramString programStringMut = context.createMutableProgramString();
         String word = programStringMut.getWord();
         int cursorInWord = programStringMut.cursorInWord();
         switch (nextTokenType) {

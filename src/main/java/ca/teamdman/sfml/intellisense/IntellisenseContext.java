@@ -9,11 +9,11 @@ public record IntellisenseContext(
         int selectionCursorPosition,
         LabelPositionHolder labelPositionHolder
 ) {
-//    public static Intellisensecontext buildContext(
-//            String program,
-//            int cursorPosition,
-//            int selectionCursorPosition
-//    ) {
-//        return new IntellisenseContext(program, cursorPosition, selectionCursorPosition);
-//    }
+    public MutableProgramString createMutableProgramString() {
+        return new MutableProgramString(
+                programBuildResult.metadata().programString(),
+                cursorPosition,
+                selectionCursorPosition
+        );
+    }
 }

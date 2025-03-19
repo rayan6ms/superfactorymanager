@@ -14,16 +14,8 @@ public record SuggestedLabelIntellisenseAction(
 
     @Override
     public ManipulationResult perform(IntellisenseContext context) {
-        String programString = context.programBuildResult().metadata().programString();
-        int cursor = context.cursorPosition();
-        int selectionCursor = context.selectionCursorPosition();
-        MutableProgramString programStringMut = new MutableProgramString(programString, cursor, selectionCursor);
-        programStringMut.replaceWordAndMoveCursorsToEnd("%s ".formatted(label));
-        return new ManipulationResult(
-                programStringMut.getContent(),
-                programStringMut.getCursorPosition(),
-                programStringMut.getSelectionCursorPosition()
-        );
+        return context.createMutableProgramString()
+                .replaceWordAndMoveCursorsToEnd("%s ".formatted(label))
+                .intoResult();
     }
-
 }

@@ -1,5 +1,8 @@
 package ca.teamdman.sfml.intellisense;
 
+import ca.teamdman.sfml.manipulation.ManipulationResult;
+
+@SuppressWarnings("UnusedReturnValue")
 public class MutableProgramString {
     private StringBuilder content;
     private int cursorPosition;
@@ -35,24 +38,27 @@ public class MutableProgramString {
         return content.substring(getWordBeginning(), getWordEnd());
     }
 
-    public void replaceWordAndMoveCursorsToEnd(String suggestion) {
+    public MutableProgramString replaceWordAndMoveCursorsToEnd(String suggestion) {
         int start = getWordBeginning();
         int end = getWordEnd();
         content.replace(start, end, suggestion);
         cursorPosition = start + suggestion.length();
         selectionCursorPosition = start + suggestion.length();
+        return this;
     }
 
-    public void insertTextWithoutMovingCursors(String text) {
+    public MutableProgramString insertTextWithoutMovingCursors(String text) {
         content.insert(cursorPosition, text);
+        return this;
     }
 
     public String getContent() {
         return content.toString();
     }
 
-    public void setContent(StringBuilder content) {
+    public MutableProgramString setContent(StringBuilder content) {
         this.content = content;
+        return this;
     }
 
     public int getCursorPosition() {
@@ -63,12 +69,21 @@ public class MutableProgramString {
         return selectionCursorPosition;
     }
 
-    public void offsetCursors(int offset) {
+    public MutableProgramString offsetCursors(int offset) {
         cursorPosition += offset;
         selectionCursorPosition += offset;
+        return this;
     }
 
     public int cursorInWord() {
         return cursorPosition - getWordBeginning();
+    }
+
+    public ManipulationResult intoResult() {
+        return new ManipulationResult(
+                getContent(),
+                getCursorPosition(),
+                getSelectionCursorPosition()
+        );
     }
 }

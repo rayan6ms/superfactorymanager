@@ -36,15 +36,9 @@ public record SuggestedResourceIntellisenseAction<STACK, ITEM, CAP>(
 
     @Override
     public ManipulationResult perform(IntellisenseContext context) {
-        String programString = context.programBuildResult().metadata().programString();
-        int cursor = context.cursorPosition();
-        int selectionCursor = context.selectionCursorPosition();
-        MutableProgramString programStringMut = new MutableProgramString(programString, cursor, selectionCursor);
-        programStringMut.replaceWordAndMoveCursorsToEnd("%s ".formatted(display().getString()));
-        return new ManipulationResult(
-                programStringMut.getContent(),
-                programStringMut.getCursorPosition(),
-                programStringMut.getSelectionCursorPosition()
-        );
+        return context
+                .createMutableProgramString()
+                .replaceWordAndMoveCursorsToEnd("%s ".formatted(display().getString()))
+                .intoResult();
     }
 }
