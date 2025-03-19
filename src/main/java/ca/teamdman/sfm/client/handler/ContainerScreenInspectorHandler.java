@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.ClientRaycastHelpers;
+import ca.teamdman.sfm.client.ClientRayCastHelpers;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenHelpers;
 import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
@@ -36,7 +36,7 @@ public class ContainerScreenInspectorHandler {
             .setPosition(5, 50)
             .setText(LocalizationKeys.CONTAINER_INSPECTOR_SHOW_EXPORTS_BUTTON)
             .setOnPress((button) -> {
-                BlockEntity lookBlockEntity = ClientRaycastHelpers.getLookBlockEntity();
+                BlockEntity lookBlockEntity = ClientRayCastHelpers.getLookBlockEntity();
                 if (lastScreen != null && lookBlockEntity != null) {
                     SFMPackets.sendToServer(new ServerboundContainerExportsInspectionRequestPacket(
                             lastScreen.getMenu().containerId,

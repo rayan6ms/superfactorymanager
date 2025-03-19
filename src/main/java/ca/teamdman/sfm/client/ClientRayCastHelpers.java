@@ -1,16 +1,16 @@
 package ca.teamdman.sfm.client;
 
+import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.Nullable;
 
-public class ClientRaycastHelpers {
+public class ClientRayCastHelpers {
     public static @Nullable BlockEntity getLookBlockEntity() {
-        if (!FMLEnvironment.dist.isClient()) {
+        if (!SFMEnvironmentUtils.isClient()) {
             throw new IllegalCallerException("getLookBlockEntity must be called on client");
         }
         ClientLevel level = Minecraft.getInstance().level;
