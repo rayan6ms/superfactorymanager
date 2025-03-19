@@ -70,7 +70,6 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             int slot
     );
 
-
     /**
      * @return the remainder, what was not inserted
      */
@@ -219,5 +218,4 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             STACK stack,
             long amount
     );
-
 }

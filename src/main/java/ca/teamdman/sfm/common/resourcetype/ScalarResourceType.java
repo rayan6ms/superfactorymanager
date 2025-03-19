@@ -2,84 +2,40 @@ package ca.teamdman.sfm.common.resourcetype;
 
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.stream.Stream;
 
-public abstract class ScalarResourceType extends ResourceType<Integer, Class<Integer>, IEnergyStorage> {
+public abstract class ScalarResourceType<STACK, CAP> extends ResourceType<STACK, Class<STACK>, CAP> {
     public final ResourceLocation registryKey;
+    public final Class<STACK> item;
 
     public ScalarResourceType(
-            Capability<IEnergyStorage> CAPABILITY_KIND,
-            ResourceLocation registryKey
+            Capability<CAP> capability,
+            ResourceLocation registryKey,
+            Class<STACK> item
     ) {
-        super(CAPABILITY_KIND);
+        super(capability);
         this.registryKey = registryKey;
+        this.item = item;
     }
 
     @Override
-    public long getAmount(Integer integer) {
-        return integer;
-    }
-
-    @Override
-    public Integer getStackInSlot(
-            IEnergyStorage iEnergyStorage,
-            int slot
-    ) {
-        return iEnergyStorage.getEnergyStored();
-    }
-
-    @Override
-    public Stream<ResourceLocation> getTagsForStack(Integer integer) {
-        return Stream.empty();
-    }
-
-    @Override
-    public long getMaxStackSize(Integer integer) {
-        return Long.MAX_VALUE;
-    }
-
-    @Override
-    public long getMaxStackSizeForSlot(
-            IEnergyStorage iEnergyStorage,
-            int slot
-    ) {
-        int maxStackSize = iEnergyStorage.getMaxEnergyStored();
-        if (maxStackSize == Integer.MAX_VALUE) {
-            return Long.MAX_VALUE;
-        }
-        return maxStackSize;
-    }
-
-    @Override
-    public boolean isEmpty(Integer stack) {
-        return stack == 0;
-    }
-
-    @Override
-    public Integer getEmptyStack() {
-        return 0;
-    }
-
-    @Override
-    public ResourceLocation getRegistryKeyForStack(Integer stack) {
+    public ResourceLocation getRegistryKeyForStack(STACK stack) {
         return registryKey;
     }
 
     @Override
-    public ResourceLocation getRegistryKeyForItem(Class<Integer> item) {
+    public ResourceLocation getRegistryKeyForItem(Class<STACK> item) {
         return registryKey;
     }
 
     @Override
-    public @Nullable Class<Integer> getItemFromRegistryKey(ResourceLocation location) {
+    public @Nullable Class<STACK> getItemFromRegistryKey(ResourceLocation location) {
         if (location.equals(registryKey)) {
-            return Integer.class;
+            return item;
         }
         return null;
     }
@@ -90,8 +46,8 @@ public abstract class ScalarResourceType extends ResourceType<Integer, Class<Int
     }
 
     @Override
-    public Collection<Class<Integer>> getItems() {
-        return List.of(Integer.class);
+    public Collection<Class<STACK>> getItems() {
+        return List.of(item);
     }
 
     @Override
@@ -100,25 +56,12 @@ public abstract class ScalarResourceType extends ResourceType<Integer, Class<Int
     }
 
     @Override
-    public Class<Integer> getItem(Integer stack) {
-        return Integer.class;
-    }
-
-    @Override
-    public Integer copy(Integer stack) {
-        return stack;
+    public Class<STACK> getItem(STACK stack) {
+        return item;
     }
 
     @Override
     public boolean matchesStackType(Object o) {
-        return o instanceof Integer;
-    }
-
-    @Override
-    protected Integer setCount(
-            Integer stack,
-            long amount
-    ) {
-        return amount > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) amount;
+        return item.isInstance(o);
     }
 }

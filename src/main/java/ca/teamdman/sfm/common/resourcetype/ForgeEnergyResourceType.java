@@ -4,8 +4,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.energy.IEnergyStorage;
 
-public class ForgeEnergyResourceType extends ScalarResourceType {
-
+public class ForgeEnergyResourceType extends IntegerResourceType<IEnergyStorage> {
     public ForgeEnergyResourceType() {
         super(ForgeCapabilities.ENERGY, new ResourceLocation("forge", "energy"));
     }
@@ -40,5 +39,25 @@ public class ForgeEnergyResourceType extends ScalarResourceType {
     @Override
     public boolean matchesCapabilityType(Object o) {
         return o instanceof IEnergyStorage;
+    }
+
+    @Override
+    public long getMaxStackSizeForSlot(
+            IEnergyStorage iEnergyStorage,
+            int slot
+    ) {
+        int maxStackSize = iEnergyStorage.getMaxEnergyStored();
+        if (maxStackSize == Integer.MAX_VALUE) {
+            return Long.MAX_VALUE;
+        }
+        return maxStackSize;
+    }
+
+    @Override
+    public Integer getStackInSlot(
+            IEnergyStorage iEnergyStorage,
+            int slot
+    ) {
+        return iEnergyStorage.getEnergyStored();
     }
 }
