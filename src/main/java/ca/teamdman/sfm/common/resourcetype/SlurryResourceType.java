@@ -14,7 +14,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.stream.Stream;
 
-public class SlurryResourceType extends ResourceType<SlurryStack, Slurry, ISlurryHandler> {
+public class SlurryResourceType extends RegistryBackedResourceType<SlurryStack, Slurry, ISlurryHandler> {
     public static final Capability<ISlurryHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
     });
 

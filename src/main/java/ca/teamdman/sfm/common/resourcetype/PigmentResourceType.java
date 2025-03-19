@@ -14,7 +14,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.stream.Stream;
 
-public class PigmentResourceType extends ResourceType<PigmentStack, Pigment, IPigmentHandler> {
+public class PigmentResourceType extends RegistryBackedResourceType<PigmentStack, Pigment, IPigmentHandler> {
     public static final Capability<IPigmentHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
     });
 

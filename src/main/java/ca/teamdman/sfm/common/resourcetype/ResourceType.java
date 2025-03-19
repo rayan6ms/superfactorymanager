@@ -8,12 +8,10 @@ import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.Stored;
 import ca.teamdman.sfml.ast.*;
 import com.mojang.datafixers.util.Pair;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -22,7 +20,6 @@ import java.util.stream.Stream;
 
 public abstract class ResourceType<STACK, ITEM, CAP> {
     public final Capability<CAP> CAPABILITY_KIND;
-    private final Map<ITEM, ResourceLocation> registryKeyCache = new Object2ObjectOpenHashMap<>();
 
     public ResourceType(Capability<CAP> CAPABILITY_KIND) {
         this.CAPABILITY_KIND = CAPABILITY_KIND;
@@ -185,39 +182,17 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean registryKeyExists(ResourceLocation location) {
-        return getRegistry().containsKey(location);
-    }
+    public abstract boolean registryKeyExists(ResourceLocation location);
 
-    public ResourceLocation getRegistryKeyForStack(STACK stack) {
-        ITEM item = getItem(stack);
-        return getRegistryKeyForItem(item);
-    }
+    public abstract ResourceLocation getRegistryKeyForStack(STACK stack);
 
-    public ResourceLocation getRegistryKeyForItem(ITEM item) {
-        var found = registryKeyCache.get(item);
-        if (found != null) return found;
-        found = getRegistry().getKey(item);
-        if (found == null) {
-            throw new NullPointerException("Registry key not found for item: " + item);
-        }
-        registryKeyCache.put(item, found);
-        return found;
-    }
+    public abstract ResourceLocation getRegistryKeyForItem(ITEM item);
 
-    public @Nullable ITEM getItemFromRegistryKey(ResourceLocation location) {
-        return getRegistry().getValue(location);
-    }
+    public abstract @Nullable ITEM getItemFromRegistryKey(ResourceLocation location);
 
-    public Set<ResourceLocation> getRegistryKeys() {
-        return getRegistry().getKeys();
-    }
+    public abstract Set<ResourceLocation> getRegistryKeys();
 
-    public Collection<ITEM> getItems() {
-        return getRegistry().getValues();
-    }
-
-    public abstract IForgeRegistry<ITEM> getRegistry();
+    public abstract Collection<ITEM> getItems();
 
     public abstract ITEM getItem(STACK stack);
 

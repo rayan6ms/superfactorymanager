@@ -12,7 +12,7 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.stream.Stream;
 
-public class MekanismEnergyResourceType extends ResourceType<FloatingLong, Class<FloatingLong>, IStrictEnergyHandler> {
+public class MekanismEnergyResourceType extends RegistryBackedResourceType<FloatingLong, Class<FloatingLong>, IStrictEnergyHandler> {
     public static final Capability<IStrictEnergyHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
     });
     public static final ResourceLocation REGISTRY_KEY = new ResourceLocation("mekanism", "energy");
