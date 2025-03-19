@@ -98,7 +98,6 @@ public class SFMLIntellisense {
             Consumer<IntellisenseAction> results
     ) {
         String word = context.createMutableProgramString().getWord();
-        int count = 0;
         for (ITEM item : resourceType.getItems()) {
             var suggestion = new SuggestedResourceIntellisenseAction<>(
                     resourceType,
@@ -106,9 +105,6 @@ public class SFMLIntellisense {
             );
             if (suggestion.getComponent().getString().contains(word)) {
                 results.accept(suggestion);
-                if (count++ >= 10) {
-                    break;
-                }
             }
         }
     }
