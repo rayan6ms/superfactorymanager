@@ -141,7 +141,7 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
         } else {
             this.setScrollAmount(
                     this.selectionIndex * this.getItemHeight()
-                    - this.getInnerHeight() / (double) this.getItemHeight()
+                    - this.height / 2.0f + this.getItemHeight()
             );
         }
     }
