@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.client.gui.widget;
 
+import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenHelpers;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
@@ -16,13 +17,11 @@ import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import org.simmetrics.StringDistance;
 import org.simmetrics.builders.StringDistanceBuilder;
-import org.simmetrics.metrics.BlockDistance;
+import org.simmetrics.metrics.StringDistances;
 import org.simmetrics.simplifiers.Simplifiers;
 
 import java.util.Comparator;
 import java.util.List;
-
-import static org.simmetrics.tokenizers.Tokenizers.qGramWithPadding;
 
 public class PickList<T extends PickListItem> extends AbstractScrollWidget {
     protected final Font font;
@@ -148,9 +147,8 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
 
     private void sortItems() {
         StringDistance distance = StringDistanceBuilder
-                .with(new BlockDistance<>())
+                .with(StringDistances.jaroWinkler())
                 .simplify(Simplifiers.toLowerCase())
-                .tokenize(qGramWithPadding(2))
                 .build();
         String queryString = query.getString();
         if (queryString.isBlank()) {
@@ -172,6 +170,7 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
                 return preferredOrder.length;
             }));
         } else {
+            SFM.LOGGER.debug("Sorting by distance using query: {}", queryString);
             items.sort(Comparator.comparing(item -> distance.distance(
                     item.getComponent().getString(),
                     queryString

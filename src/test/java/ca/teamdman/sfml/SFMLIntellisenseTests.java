@@ -173,6 +173,86 @@ public class SFMLIntellisenseTests {
     }
 
     @Test
+    public void lavaSearch() {
+        String typed = "lava";
+        List<String> suggestions = Arrays.asList(
+                "TO",
+                "WITH",
+                "EXCEPT",
+                "NUMBER",
+                "RETAIN",
+                "WITHOUT",
+                "fluid:minecraft:lava",
+                "botania:lava_pendant",
+                "ars_nouveau:lava_lily",
+                "minecraft:lava_bucket",
+                "fluid:minecraft:flowing_lava",
+                "botania:super_lava_pendant"
+        );
+
+        StringDistance[] distances = new StringDistance[]{
+                StringDistances.blockDistance(),
+                StringDistances.cosineSimilarity(),
+                StringDistances.damerauLevenshtein(),
+                StringDistances.dice(),
+                StringDistances.euclideanDistance(),
+                StringDistances.generalizedJaccard(),
+                StringDistances.hammingDistance(),
+                StringDistances.identity(),
+                StringDistances.jaccard(),
+                StringDistances.jaro(),
+                StringDistances.jaroWinkler(),
+                StringDistances.levenshtein(),
+                StringDistances.longestCommonSubsequence(),
+                StringDistances.longestCommonSubstring(),
+                StringDistances.overlapCoefficient(),
+                StringDistances.qGramsDistance(),
+                StringDistances.simonWhite(),
+        };
+        String[] distanceNames = new String[]{
+                "blockDistance",
+                "cosineSimilarity",
+                "damerauLevenshtein",
+                "dice",
+                "euclideanDistance",
+                "generalizedJaccard",
+                "hammingDistance",
+                "identity",
+                "jaccard",
+                "jaro",
+                "jaroWinkler",
+                "levenshtein",
+                "longestCommonSubsequence",
+                "longestCommonSubstring",
+                "overlapCoefficient",
+                "qGramsDistance",
+                "simonWhite",
+        };
+        List<String> sorted = new ArrayList<>(suggestions);
+        for (int i = 0; i < distances.length; i++) {
+            try {
+
+                StringDistance distance = distances[i];
+                String distanceName = distanceNames[i];
+                System.out.printf("Using distance metric: %s and query %s\n", distanceName, typed);
+                long startTime = System.nanoTime();
+                sorted.sort(Comparator.comparing(s -> distance.distance(s, typed)));
+                long endTime = System.nanoTime();
+                System.out.println("Typed: " + typed + " => Sorted suggestions: " + sorted);
+                for (String s : sorted) {
+                    System.out.printf("Distance: %.2f %.2f, suggestion: %s\n", distance.distance(s, typed), distance.distance(typed, s), s);
+                }
+                System.out.printf("Time taken: %d ns\n", (endTime - startTime));
+                System.out.println();
+            } catch (IllegalArgumentException t) {
+                //noinspection CallToPrintStackTrace
+                t.printStackTrace();
+            }
+        }
+        assertTrue(sorted.get(0).contains("lava"));
+    }
+
+    @Test
     public void getRulesTest1() {
 //        String outerProgramString = """
 //                EVERY
