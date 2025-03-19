@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenHelpers;
+import ca.teamdman.sfm.client.gui.screen.TomlEditScreenOpenContext;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.config.SFMConfigReadWriter;
@@ -45,11 +46,15 @@ public record ClientboundClientConfigCommandPacket(
             }
             configTomlString = configTomlString.replaceAll("\r", "");
             switch (msg.requestingEditMode()) {
-                case SHOW -> SFMScreenHelpers.showProgramEditScreen(configTomlString);
-                case EDIT -> SFMScreenHelpers.showProgramEditScreen(
+                case SHOW -> SFMScreenHelpers.showTomlEditScreen(new TomlEditScreenOpenContext(
+                        configTomlString,
+                        $ -> {
+                        }
+                ));
+                case EDIT -> SFMScreenHelpers.showTomlEditScreen(new TomlEditScreenOpenContext(
                         configTomlString,
                         Daddy::handleNewClientConfig
-                );
+                ));
             }
         }
 

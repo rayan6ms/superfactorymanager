@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.item;
 
 import ca.teamdman.sfm.client.ClientKeyHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
+import ca.teamdman.sfm.client.gui.screen.ProgramEditScreenOpenContext;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenHelpers;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
@@ -49,7 +50,10 @@ public class DiskItem extends Item {
                 .getString("sfm:program");
     }
 
-    public static void setProgram(ItemStack stack, String program) {
+    public static void setProgram(
+            ItemStack stack,
+            String program
+    ) {
         program = program.replaceAll("\r", "");
         stack
                 .getOrCreateTag()
@@ -64,7 +68,10 @@ public class DiskItem extends Item {
         }
     }
 
-    public static @Nullable Program compileAndUpdateErrorsAndWarnings(ItemStack stack, @Nullable ManagerBlockEntity manager) {
+    public static @Nullable Program compileAndUpdateErrorsAndWarnings(
+            ItemStack stack,
+            @Nullable ManagerBlockEntity manager
+    ) {
         if (manager != null) {
             manager.logger.info(x -> x.accept(LocalizationKeys.PROGRAM_COMPILE_FROM_DISK_BEGIN.get()));
         }
@@ -72,7 +79,11 @@ public class DiskItem extends Item {
         Program.compile(
                 getProgram(stack),
                 successProgram -> {
-                    ArrayList<TranslatableContents> warnings = ProgramLinter.gatherWarnings(successProgram, LabelPositionHolder.from(stack), manager);
+                    ArrayList<TranslatableContents> warnings = ProgramLinter.gatherWarnings(
+                            successProgram,
+                            LabelPositionHolder.from(stack),
+                            manager
+                    );
 
                     // Log to disk
                     if (manager != null) {
@@ -96,7 +107,8 @@ public class DiskItem extends Item {
 
                     // Log to disk
                     if (manager != null) {
-                        manager.logger.error(x -> x.accept(LocalizationKeys.PROGRAM_COMPILE_FAILED_WITH_ERRORS.get(errors.size())));
+                        manager.logger.error(x -> x.accept(LocalizationKeys.PROGRAM_COMPILE_FAILED_WITH_ERRORS.get(
+                                errors.size())));
                         manager.logger.error(errors::forEach);
                     }
 
@@ -118,7 +130,10 @@ public class DiskItem extends Item {
                 .toList();
     }
 
-    public static void setErrors(ItemStack stack, List<TranslatableContents> errors) {
+    public static void setErrors(
+            ItemStack stack,
+            List<TranslatableContents> errors
+    ) {
         stack
                 .getOrCreateTag()
                 .put(
@@ -141,7 +156,10 @@ public class DiskItem extends Item {
                         Collectors.toList());
     }
 
-    public static void setWarnings(ItemStack stack, List<TranslatableContents> warnings) {
+    public static void setWarnings(
+            ItemStack stack,
+            List<TranslatableContents> warnings
+    ) {
         stack
                 .getOrCreateTag()
                 .put(
@@ -159,7 +177,10 @@ public class DiskItem extends Item {
                 .getString("sfm:name");
     }
 
-    public static void setProgramName(ItemStack stack, String name) {
+    public static void setProgramName(
+            ItemStack stack,
+            String name
+    ) {
         if (stack.getItem() instanceof DiskItem) {
             stack
                     .getOrCreateTag()
@@ -168,16 +189,21 @@ public class DiskItem extends Item {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(
+            Level pLevel,
+            Player pPlayer,
+            InteractionHand pUsedHand
+    ) {
         var stack = pPlayer.getItemInHand(pUsedHand);
         if (pLevel.isClientSide) {
-            SFMScreenHelpers.showProgramEditScreen(
+            SFMScreenHelpers.showProgramEditScreen(new ProgramEditScreenOpenContext(
                     getProgram(stack),
-                    programString -> SFMPackets.sendToServer(new ServerboundDiskItemSetProgramPacket(
-                                programString,
-                                pUsedHand
-                        ))
-            );
+                    LabelPositionHolder.from(stack),
+                    newProgramString -> SFMPackets.sendToServer(new ServerboundDiskItemSetProgramPacket(
+                            newProgramString,
+                            pUsedHand
+                    ))
+            ));
         }
         return InteractionResultHolder.sidedSuccess(stack, pLevel.isClientSide());
     }
@@ -195,7 +221,10 @@ public class DiskItem extends Item {
 
     @Override
     public void appendHoverText(
-            ItemStack stack, @Nullable Level level, List<Component> lines, TooltipFlag detail
+            ItemStack stack,
+            @Nullable Level level,
+            List<Component> lines,
+            TooltipFlag detail
     ) {
         var program = getProgram(stack);
         if (SFMItemUtils.isClientAndMoreInfoKeyPressed() && !program.isEmpty()) {

@@ -146,6 +146,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         statusCountdown -= partialTicks;
     }
 
+    @MCVersionDependentBehaviour
+    public float getBlitOffsetGood() {
+        return (float) getBlitOffset();
+    }
+
     @Override
     protected void init() {
         super.init();
@@ -292,11 +297,20 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     private void onEditButtonClicked() {
-        SFMScreenHelpers.showProgramEditScreen(getProgram(), this::sendProgram);
+//        SFMScreenHelpers.showProgramEditScreen(getProgram(), this::sendProgram);
+        SFMScreenHelpers.showProgramEditScreen(new ProgramEditScreenOpenContext(
+                getProgram(),
+                LabelPositionHolder.from(menu.getDisk()),
+                this::sendProgram
+        ));
     }
 
     private void onExamplesButtonClicked() {
-        SFMScreenHelpers.showExampleListScreen(getProgram(), this::sendProgram);
+        SFMScreenHelpers.showExampleListScreen(
+                getProgram(),
+                LabelPositionHolder.from(menu.getDisk()),
+                this::sendProgram
+        );
     }
 
     private void onLogsButtonClicked() {
@@ -629,11 +643,6 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     @MCVersionDependentBehaviour
     private void enableTexture() {
         RenderSystem.enableTexture();
-    }
-
-    @MCVersionDependentBehaviour
-    public float getBlitOffsetGood() {
-        return (float) getBlitOffset();
     }
 
     @Override

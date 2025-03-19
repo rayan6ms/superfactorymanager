@@ -41,7 +41,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP;
@@ -49,20 +48,17 @@ import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_
 
 @SuppressWarnings("NotNullFieldNotInitialized")
 public class ProgramEditScreen extends Screen {
-    protected final String INITIAL_CONTENT;
-    protected final Consumer<String> SAVE_CALLBACK;
+    private final ProgramEditScreenOpenContext openContext;
     protected MyMultiLineEditBox textarea;
     protected String lastProgram = "";
     protected List<MutableComponent> lastProgramWithSyntaxHighlighting = new ArrayList<>();
     protected PickList<IntellisenseAction> suggestedActions;
 
     public ProgramEditScreen(
-            String initialContent,
-            Consumer<String> saveCallback
+            ProgramEditScreenOpenContext openContext
     ) {
         super(LocalizationKeys.PROGRAM_EDIT_SCREEN_TITLE.getComponent());
-        this.INITIAL_CONTENT = initialContent;
-        this.SAVE_CALLBACK = saveCallback;
+        this.openContext = openContext;
     }
 
     public static MutableComponent substring(
@@ -98,7 +94,7 @@ public class ProgramEditScreen extends Screen {
      * The user has indicated to save by hitting Shift+Enter or by pressing the Done button
      */
     public void saveAndClose() {
-        SAVE_CALLBACK.accept(textarea.getValue());
+        openContext.saveCallback().accept(textarea.getValue());
 
         assert this.minecraft != null;
         this.minecraft.popGuiLayer();
@@ -115,7 +111,7 @@ public class ProgramEditScreen extends Screen {
     @Override
     public void onClose() {
         // If the content is different, ask to save
-        if (!INITIAL_CONTENT.equals(textarea.getValue())) {
+        if (!openContext.programString().equals(textarea.getValue())) {
             assert this.minecraft != null;
             ConfirmScreen exitWithoutSavingConfirmScreen = getExitWithoutSavingConfirmScreen();
             this.minecraft.pushGuiLayer(exitWithoutSavingConfirmScreen);
@@ -145,6 +141,10 @@ public class ProgramEditScreen extends Screen {
             int pModifiers
     ) {
         if (Screen.hasControlDown() && pCodePoint == ' ') {
+            return true;
+        }
+        if (!suggestedActions.isEmpty() && pCodePoint == '\\') {
+            // prevent intellisense-accept hotkey from being typed
             return true;
         }
         return super.charTyped(pCodePoint, pModifiers);
@@ -204,6 +204,7 @@ public class ProgramEditScreen extends Screen {
                 textarea.setScrollAmount(scrollAmount);
             }
 
+                            openContext.labelPositionHolder()
             return true;
         }
         if (pKeyCode == GLFW.GLFW_KEY_LEFT_CONTROL || pKeyCode == GLFW.GLFW_KEY_RIGHT_CONTROL) {
@@ -326,8 +327,7 @@ public class ProgramEditScreen extends Screen {
                         .build()
         );
 
-
-        textarea.setValue(INITIAL_CONTENT);
+        textarea.setValue(openContext.programString());
         this.setInitialFocus(textarea);
     }
 
@@ -491,7 +491,8 @@ public class ProgramEditScreen extends Screen {
             IntellisenseContext intellisenseContext = new IntellisenseContext(
                     buildResult,
                     cursorPosition,
-                    getSelectionCursorPosition()
+                    getSelectionCursorPosition(),
+                    openContext.labelPositionHolder()
             );
             List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(intellisenseContext);
             ProgramEditScreen.this.suggestedActions.setItems(suggestions);

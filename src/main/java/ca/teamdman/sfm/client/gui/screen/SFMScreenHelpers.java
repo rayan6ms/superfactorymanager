@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundManagerLogDesireUpdatePacket;
+import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -37,6 +38,7 @@ public class SFMScreenHelpers {
                     .pushGuiLayer(screen);
         }
     }
+
     public static void popScreen() {
         Minecraft.getInstance().popGuiLayer();
     }
@@ -49,40 +51,47 @@ public class SFMScreenHelpers {
     }
 
     public static void showProgramEditScreen(
-            String initialContent,
-            Consumer<String> saveCallback
+            ProgramEditScreenOpenContext context
     ) {
-        ProgramEditScreen screen = new ProgramEditScreen(initialContent, saveCallback);
+        ProgramEditScreen screen = new ProgramEditScreen(context);
+        setOrPushScreen(screen);
+        screen.scrollToTop();
+    }
+
+    public static void showTomlEditScreen(
+            TomlEditScreenOpenContext context
+    ) {
+        ProgramEditScreen screen = new TomlEditScreen(context);
         setOrPushScreen(screen);
         screen.scrollToTop();
     }
 
     public static void showProgramEditScreen(String initialContent) {
-        showProgramEditScreen(initialContent, (x) -> {
-        });
+        ProgramEditScreenOpenContext openContext = new ProgramEditScreenOpenContext(
+                initialContent,
+                LabelPositionHolder.empty(),
+                (x) -> {
+                }
+        );
+        showProgramEditScreen(openContext);
     }
 
     public static void showExampleListScreen(
-            String program,
+            String diskProgramString,
+            LabelPositionHolder labelPositionHolder,
             Consumer<String> saveCallback
     ) {
-        setOrPushScreen(new ExamplesScreen((chosenTemplate, templates) -> showExampleEditScreen(
-                program,
-                chosenTemplate,
-                templates,
-                saveCallback
-        )));
-    }
-
-    public static void showExampleEditScreen(
-            String program,
-            String chosenTemplate,
-            Map<String, String> templates,
-            Consumer<String> saveCallback
-    ) {
-        ProgramEditScreen screen = new ExampleEditScreen(program, chosenTemplate, templates, saveCallback);
-        setOrPushScreen(screen);
-        screen.scrollToTop();
+        setOrPushScreen(new ExamplesScreen((chosenTemplate, templates) -> {
+            ProgramEditScreen screen = new ExampleEditScreen(new ExampleEditScreenOpenContext(
+                    chosenTemplate,
+                    diskProgramString,
+                    templates,
+                    labelPositionHolder,
+                    saveCallback
+            ));
+            setOrPushScreen(screen);
+            screen.scrollToTop();
+        }));
     }
 
     public static void showLogsScreen(ManagerContainerMenu menu) {
@@ -135,13 +144,14 @@ public class SFMScreenHelpers {
             SFM.LOGGER.error("Failed to find changelog");
             return;
         }
-        ProgramEditScreen screen = new ExampleEditScreen(
+        ProgramEditScreen screen = new ExampleEditScreen(new ExampleEditScreenOpenContext(
                 changelog,
                 changelog,
                 Map.of("changelog.sfml", changelog),
-                $ -> {
+                LabelPositionHolder.empty(),
+                newContent -> {
                 }
-        );
+        ));
         setOrPushScreen(screen);
         screen.scrollToTop();
     }
@@ -152,7 +162,13 @@ public class SFMScreenHelpers {
      * See also: {@link net.minecraft.client.gui.components.MultiLineEditBox#renderHighlight(PoseStack, int, int, int, int)}
      */
     @MCVersionDependentBehaviour
-    public static void renderHighlight(PoseStack poseStack, int startX, int startY, int endX, int endY) {
+    public static void renderHighlight(
+            PoseStack poseStack,
+            int startX,
+            int startY,
+            int endX,
+            int endY
+    ) {
         Matrix4f matrix4f = poseStack.last().pose();
         Tesselator tesselator = Tesselator.getInstance();
         BufferBuilder bufferbuilder = tesselator.getBuilder();
@@ -162,10 +178,10 @@ public class SFMScreenHelpers {
         RenderSystem.enableColorLogicOp();
         RenderSystem.logicOp(GlStateManager.LogicOp.OR_REVERSE);
         bufferbuilder.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION);
-        bufferbuilder.vertex(matrix4f, (float)startX, (float)endY, 0.0F).endVertex();
-        bufferbuilder.vertex(matrix4f, (float)endX, (float)endY, 0.0F).endVertex();
-        bufferbuilder.vertex(matrix4f, (float)endX, (float)startY, 0.0F).endVertex();
-        bufferbuilder.vertex(matrix4f, (float)startX, (float)startY, 0.0F).endVertex();
+        bufferbuilder.vertex(matrix4f, (float) startX, (float) endY, 0.0F).endVertex();
+        bufferbuilder.vertex(matrix4f, (float) endX, (float) endY, 0.0F).endVertex();
+        bufferbuilder.vertex(matrix4f, (float) endX, (float) startY, 0.0F).endVertex();
+        bufferbuilder.vertex(matrix4f, (float) startX, (float) startY, 0.0F).endVertex();
         tesselator.end();
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.disableColorLogicOp();

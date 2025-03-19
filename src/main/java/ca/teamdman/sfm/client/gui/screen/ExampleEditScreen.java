@@ -2,33 +2,23 @@ package ca.teamdman.sfm.client.gui.screen;
 
 import net.minecraft.client.gui.screens.ConfirmScreen;
 
-import java.util.Map;
-import java.util.function.Consumer;
-
 public class ExampleEditScreen extends ProgramEditScreen {
-    private final Map<String, String> templates;
-    private final String program;
+    private final ExampleEditScreenOpenContext openContext;
 
     public ExampleEditScreen(
-            String program,
-            String initialContent,
-            Map<String, String> templates,
-            Consumer<String> saveCallback
+            ExampleEditScreenOpenContext openContext
     ) {
-        super(initialContent, saveCallback);
-        this.program = program;
-        this.templates = templates;
-    }
-
-    public boolean equalsAnyTemplate(String content) {
-        return templates.values().stream().anyMatch(content::equals);
+        super(new ProgramEditScreenOpenContext(
+                openContext.exampleProgrmaString(),
+                openContext.labelPositionHolder(),
+                openContext.saveCallback()
+        ));
+        this.openContext = openContext;
     }
 
     @Override
     public void saveAndClose() {
-        // The user is attempting to apply a code change to the disk
-        if (program.isBlank() || equalsAnyTemplate(program)) {
-            // The disk contains template code, safe to overwrite
+        if (openContext.isSafeToOverwriteDisk()) {
             super.saveAndClose();
         } else {
             // The disk contains non-template code, ask before overwriting
@@ -43,7 +33,7 @@ public class ExampleEditScreen extends ProgramEditScreen {
     public void onClose() {
         // The user has requested to close the screen
         // If the content has changed, ask to save before discarding
-        if (!equalsAnyTemplate(textarea.getValue())) {
+        if (!openContext.equalsAnyTemplate(textarea.getValue())) {
             assert this.minecraft != null;
             ConfirmScreen exitWithoutSavingConfirmScreen = getExitWithoutSavingConfirmScreen();
             this.minecraft.pushGuiLayer(exitWithoutSavingConfirmScreen);
