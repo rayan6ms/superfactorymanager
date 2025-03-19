@@ -15,12 +15,14 @@ import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A utility that:
- * 1. Reads a fully qualified class reference from the clipboard.
- * 2. Uses JavaParser's symbol solver to find the .java source file (if available).
- * 3. Prints out that file (in a code fence) plus any directly imported classes (also in code fences).
+ * 1. Reads fully qualified class or package references from the clipboard.
+ * 2. Uses JavaParser's symbol solver to find the .java source files (if available).
+ * 3. Prints out those files (in code fences) plus any directly imported classes (also in code fences).
  * 4. Places the result back on the system clipboard.
  * <p>
  * If classes are from libraries / jars, but we've extracted their sources
@@ -36,29 +38,89 @@ public class FileImportWalker {
     // Add the path where Gradle expands source jars
     private static final File EXPANDED_ARCHIVES_ROOT = new File("build/tmp/expandedArchives");
 
-    public static String getReferenceFromClipboard() {
-        String reference = getClipboardContents();
-        System.out.println("[INFO] Found clipboard reference: " + reference);
-        if (reference.contains("/")) {
-            reference = reference.replaceAll("/",".");
-            System.out.println("[INFO] Replaced '/' with '.', yielding: " + reference);
+    /**
+     * Represents a reference to be processed, with its import depth.
+     */
+    private static class Reference {
+        String fqn;
+        int depth;
+        boolean isPackage;
+
+        public Reference(String fqn, int depth, boolean isPackage) {
+            this.fqn = fqn;
+            this.depth = depth;
+            this.isPackage = isPackage;
         }
-        if (reference.contains(":")) {
-            reference = reference.split(":")[0];
-            System.out.println("[INFO] Removed : and everything after, yielding: " + reference);
+
+        @Override
+        public String toString() {
+            return "Reference{" +
+                   "fqn='" + fqn + '\'' +
+                   ", depth=" + depth +
+                   ", isPackage=" + isPackage +
+                   '}';
         }
-        if (reference.endsWith(".java")) {
-            reference = reference.substring(0, reference.length() - 5);
-            System.out.println("[INFO] Removed .java extension, yielding: " + reference);
+    }
+
+    private static List<Reference> getReferencesFromClipboard() {
+        String clipboardContent = getClipboardContents();
+        System.out.println("[INFO] Found clipboard content:\n" + clipboardContent);
+
+        List<Reference> references = new ArrayList<>();
+        String[] lines = clipboardContent.split("\n");
+
+        for (String line : lines) {
+            line = line.trim();
+            if (line.isEmpty()) continue;
+
+            int depth = 0;
+            String reference = line;
+
+            // Check if line starts with a number and a space (depth indicator)
+            if (line.matches("^\\d+\\s+.*")) {
+                String[] parts = line.split("\\s+", 2);
+                depth = Integer.parseInt(parts[0]);
+                reference = parts[1].trim();
+            }
+
+            // Normalize reference
+            if (reference.contains("/")) {
+                reference = reference.replaceAll("/", ".");
+                System.out.println("[INFO] Replaced '/' with '.', yielding: " + reference);
+            }
+            if (reference.contains(":")) {
+                reference = reference.split(":")[0];
+                System.out.println("[INFO] Removed : and everything after, yielding: " + reference);
+            }
+            if (reference.contains("#")) {
+                reference = reference.split("#")[0];
+                System.out.println("[INFO] Removed # and everything after, yielding: " + reference);
+            }
+            if (reference.endsWith(".java")) {
+                reference = reference.substring(0, reference.length() - 5);
+                System.out.println("[INFO] Removed .java extension, yielding: " + reference);
+            }
+
+            // Determine if this is a package or class reference
+            boolean isPackage = !reference.matches(".*[A-Z].*$");
+
+            // For a single class reference with unspecified depth, default to 1
+            if (lines.length == 1 && !isPackage && depth == 0) {
+                depth = 1;
+            }
+
+            references.add(new Reference(reference, depth, isPackage));
         }
-        return reference;
+
+        return references;
     }
 
     public static void main(String[] args) {
         System.out.println("=== FileImportWalker starting ===");
 
-        // Grab the reference from clipboard
-        String reference = getReferenceFromClipboard();
+        // Grab references from clipboard
+        List<Reference> references = getReferencesFromClipboard();
+
         // Create a combined type solver
         CombinedTypeSolver combinedTypeSolver = new CombinedTypeSolver();
 
@@ -72,35 +134,138 @@ public class FileImportWalker {
         // ClassLoader solver as fallback (so we don't crash on unsolved external references)
         combinedTypeSolver.add(new ClassLoaderTypeSolver(FileImportWalker.class.getClassLoader()));
 
-        // Attempt to resolve the reference
-        SymbolReference<ResolvedReferenceTypeDeclaration> symbolRef =
-                combinedTypeSolver.tryToSolveType(reference);
+        StringBuilder resultBuilder = new StringBuilder();
+        resultBuilder.append("===\n");
 
-        if (!symbolRef.isSolved()) {
-            System.err.println("[ERROR] Could not resolve type: " + reference);
-            System.err.println("        Perhaps it's not in local src or expandedArchives. Aborting.");
+        for (Reference ref : references) {
+            System.out.println("[INFO] Processing reference: " + ref);
+
+            if (ref.isPackage) {
+                processPackage(ref, combinedTypeSolver, resultBuilder);
+            } else {
+                processClass(ref, combinedTypeSolver, resultBuilder);
+            }
+        }
+
+        resultBuilder.append("===\n");
+
+        // Place the final chunk on the clipboard
+        setClipboardContents(resultBuilder.toString());
+        System.out.println("[INFO] Final concatenated content set to clipboard.");
+
+        System.out.println("=== FileImportWalker finished ===");
+    }
+
+    /**
+     * Process a package reference by finding all classes within the package
+     * and processing each one.
+     */
+    private static void processPackage(
+            Reference packageRef,
+            CombinedTypeSolver combinedTypeSolver,
+            StringBuilder resultBuilder
+    ) {
+        System.out.println("[INFO] Processing package: " + packageRef.fqn);
+
+        // Convert package to path format for file searches
+        String packagePath = packageRef.fqn.replace('.', '/');
+        List<File> sourceRoots = new ArrayList<>();
+
+        // Add main source directories
+        for (File subdir : SOURCE_ROOT.listFiles(File::isDirectory)) {
+            File[] javaSubDirs = subdir.listFiles(x -> x.isDirectory() && x.getName().equals("java"));
+            if (javaSubDirs != null && javaSubDirs.length > 0) {
+                sourceRoots.add(javaSubDirs[0]);
+            }
+        }
+
+        // Add expanded archives
+        if (EXPANDED_ARCHIVES_ROOT.exists() && EXPANDED_ARCHIVES_ROOT.isDirectory()) {
+            File[] expandedDirs = EXPANDED_ARCHIVES_ROOT.listFiles(File::isDirectory);
+            if (expandedDirs != null) {
+                for (File dir : expandedDirs) {
+                    sourceRoots.add(dir);
+                }
+            }
+        }
+
+        // Find all .java files in the specified package across all source roots
+        List<File> javaFiles = new ArrayList<>();
+        for (File sourceRoot : sourceRoots) {
+            File packageDir = new File(sourceRoot, packagePath);
+            if (packageDir.exists() && packageDir.isDirectory()) {
+                File[] files = packageDir.listFiles((dir, name) -> name.endsWith(".java"));
+                if (files != null) {
+                    for (File file : files) {
+                        javaFiles.add(file);
+                    }
+                }
+            }
+        }
+
+        if (javaFiles.isEmpty()) {
+            resultBuilder.append("Package: `").append(packageRef.fqn).append("` - No classes found\n\n");
             return;
         }
 
-        ResolvedReferenceTypeDeclaration resolvedType = symbolRef.getCorrespondingDeclaration();
+        resultBuilder.append("Package: `").append(packageRef.fqn).append("` - ")
+                .append(javaFiles.size()).append(" classes found\n\n");
 
-        // Convert to AST, then go up to the top-level CompilationUnit
-        //noinspection unchecked
-        resolvedType.toAst()
-                .flatMap(typeDeclaration -> typeDeclaration.findAncestor(CompilationUnit.class))
-                .ifPresentOrElse(cu -> {
-                    try {
-                        processCompilationUnit(reference, cu, combinedTypeSolver);
-                    } catch (IOException e) {
-                        throw new RuntimeException(e);
-                    }
-                }, () -> {
-                    // If no CU found, that means it's in a jar w/o source or some unresolved location
-                    System.err.println("[ERROR] No CompilationUnit for " + reference
-                                       + ", possibly no .java in expanded archives. Aborting.");
-                });
+        // Process each class in the package
+        for (File file : javaFiles) {
+            String className = file.getName().replace(".java", "");
+            String fullClassName = packageRef.fqn + "." + className;
 
-        System.out.println("=== FileImportWalker finished ===");
+            Reference classRef = new Reference(fullClassName, packageRef.depth, false);
+            processClass(classRef, combinedTypeSolver, resultBuilder);
+        }
+    }
+
+    /**
+     * Process a class reference by finding the source file and processing its imports
+     * based on the specified depth.
+     */
+    private static void processClass(
+            Reference classRef,
+            CombinedTypeSolver combinedTypeSolver,
+            StringBuilder resultBuilder
+    ) {
+        try {
+            SymbolReference<ResolvedReferenceTypeDeclaration> symbolRef =
+                    combinedTypeSolver.tryToSolveType(classRef.fqn);
+
+            if (!symbolRef.isSolved()) {
+                resultBuilder.append("Class: `").append(classRef.fqn)
+                        .append("` - Could not resolve type\n\n");
+                System.err.println("[ERROR] Could not resolve type: " + classRef.fqn);
+                System.err.println("        Perhaps it's not in local src or expandedArchives.");
+                return;
+            }
+
+            ResolvedReferenceTypeDeclaration resolvedType = symbolRef.getCorrespondingDeclaration();
+
+            // Convert to AST, then go up to the top-level CompilationUnit
+            //noinspection unchecked
+            resolvedType.toAst()
+                    .flatMap(typeDeclaration -> typeDeclaration.findAncestor(CompilationUnit.class))
+                    .ifPresentOrElse(cu -> {
+                        try {
+                            processCompilationUnit(classRef, cu, combinedTypeSolver, resultBuilder);
+                        } catch (IOException e) {
+                            throw new RuntimeException(e);
+                        }
+                    }, () -> {
+                        // If no CU found, that means it's in a jar w/o source or some unresolved location
+//                        resultBuilder.append("Class: `").append(classRef.fqn)
+//                                .append("` - No CompilationUnit found\n\n");
+                        System.err.println("[ERROR] No CompilationUnit for " + classRef.fqn
+                                           + ", possibly no .java in expanded archives.");
+                    });
+        } catch (Exception e) {
+            resultBuilder.append("Class: `").append(classRef.fqn)
+                    .append("` - Error: ").append(e.getMessage()).append("\n\n");
+            System.err.println("[ERROR] Exception processing " + classRef.fqn + ": " + e.getMessage());
+        }
     }
 
     /**
@@ -166,22 +331,24 @@ public class FileImportWalker {
     /**
      * Processes the main CompilationUnit (the top-level file that holds your reference class),
      * gathers its imports, fetches each imported file if available, and concatenates all the contents
-     * into a single output that is set to the clipboard.
+     * into a single output.
      */
     private static void processCompilationUnit(
-            String reference,
+            Reference reference,
             @NotNull CompilationUnit cu,
-            CombinedTypeSolver combinedTypeSolver
+            CombinedTypeSolver combinedTypeSolver,
+            StringBuilder resultBuilder
     ) throws IOException {
-
-        StringBuilder sb = new StringBuilder();
-
         // Mark the start
-        sb.append("===\n")
-                .append("Start: `").append(reference).append("`\n")
+        resultBuilder.append("Class: `").append(reference.fqn).append("`\n")
                 .append("```java\n")
                 .append(readRawFileContents(cu))
                 .append("\n```\n\n");
+
+        // If depth is 0, don't process imports
+        if (reference.depth <= 0) {
+            return;
+        }
 
         // For each import, see if we can find its local .java
         for (ImportDeclaration imp : cu.getImports()) {
@@ -198,39 +365,17 @@ public class FileImportWalker {
             System.out.println("[INFO] Attempting to resolve import: " + importFqn);
 
             try {
-                SymbolReference<ResolvedReferenceTypeDeclaration> importRef =
-                        combinedTypeSolver.tryToSolveType(importFqn);
-                if (!importRef.isSolved()) {
-                    System.err.println("[ERROR] Could NOT resolve " + importFqn
-                                       + " in local or expandedArchives. Possibly external or missing sources.");
-                    continue;
-                }
-
-                ResolvedReferenceTypeDeclaration resolvedImport = importRef.getCorrespondingDeclaration();
-                //noinspection unchecked
-                resolvedImport.toAst()
-                        .flatMap(typeDeclaration -> typeDeclaration.findAncestor(CompilationUnit.class))
-                        .ifPresentOrElse(
-                                importCU -> sb.append("Imported: `")
-                                        .append(importFqn)
-                                        .append("`\n```java\n")
-                                        .append(readRawFileContents(importCU))
-                                        .append("\n```\n\n"),
-                                () -> System.err.println("[ERROR] We resolved " + importFqn
-                                                         + " but can't find a CompilationUnit (no .java?).")
-                        );
+                // Process the import with depth-1
+                Reference importRef = new Reference(importFqn, reference.depth - 1, false);
+                processClass(importRef, combinedTypeSolver, resultBuilder);
             } catch (UnsolvedSymbolException use) {
                 // That means something is definitely missing
+                resultBuilder.append("Import: `").append(importFqn)
+                        .append("` - UnsolvedSymbolException: ").append(use.getMessage()).append("\n\n");
                 System.err.println("[ERROR] UnsolvedSymbol for " + importFqn
                                    + " => " + use.getMessage());
             }
         }
-
-        sb.append("===\n");
-
-        // Place the final chunk on the clipboard
-        setClipboardContents(sb.toString());
-        System.out.println("[INFO] Final concatenated content set to clipboard.");
     }
 
     /**
