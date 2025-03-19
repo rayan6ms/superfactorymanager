@@ -198,6 +198,7 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
         return this.getItemHeight() / 2.0d;
     }
 
+
     @Override
     protected void renderContents(
             PoseStack poseStack,
@@ -205,14 +206,26 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
             int my,
             float partialTick
     ) {
+        if (items.isEmpty()) return;
+
+        // Calculate which items are visible in the current viewport
+        int itemHeight = getItemHeight();
+        int startIndex = (int)(scrollAmount() / itemHeight);
+        int visibleCount = (int)Math.ceil((double)height / itemHeight) + 1;
+        int endIndex = Math.min(items.size(), startIndex + visibleCount);
+
+        // Only render the visible items
         Matrix4f matrix4f = poseStack.last().pose();
         var buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
         int lineX = SFMScreenUtils.getX(this) + this.innerPadding();
-        int lineY = SFMScreenUtils.getY(this) + this.innerPadding();
         Rect2i highlight = null;
-        int i = 0;
-        int itemHeight = getItemHeight();
-        for (PickListItem item : items) {
+
+        // Render only the visible subset of items
+        for (int i = startIndex; i < endIndex; i++) {
+            PickListItem item = items.get(i);
+            // Calculate the y position based on the item's position in the full list
+            int lineY = SFMScreenUtils.getY(this) + this.innerPadding() + (i * itemHeight);
+
             SFMScreenUtils.drawInBatch(
                     item.getComponent(),
                     this.font,
@@ -223,6 +236,7 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
                     matrix4f,
                     buffer
             );
+
             if (i == this.selectionIndex) {
                 highlight = new Rect2i(
                         lineX,
@@ -231,10 +245,8 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
                         itemHeight
                 );
             }
-            lineY += itemHeight;
-            i++;
-
         }
+
         buffer.endBatch();
 
         if (highlight != null) {
@@ -247,4 +259,5 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
             );
         }
     }
+
 }
