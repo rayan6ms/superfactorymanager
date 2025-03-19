@@ -6,6 +6,7 @@ import ca.teamdman.sfm.client.ProgramTokenContextActions;
 import ca.teamdman.sfm.client.gui.widget.PickList;
 import ca.teamdman.sfm.client.gui.widget.PickListItem;
 import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
+import ca.teamdman.sfm.client.gui.widget.SFMExtendedButtonWithTooltip;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
@@ -23,6 +24,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.components.MultilineTextField;
 import net.minecraft.client.gui.components.Whence;
@@ -43,8 +45,8 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_SCREEN_CONFIG_BUTTON_TOOLTIP;
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP;
-import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP;
 
 @SuppressWarnings("NotNullFieldNotInitialized")
 public class ProgramEditorScreen extends Screen {
@@ -276,6 +278,38 @@ public class ProgramEditorScreen extends Screen {
     ) {
         this.renderBackground(poseStack);
         super.render(poseStack, mx, my, partialTicks);
+        this.renderTooltip(poseStack, mx, my);
+    }
+
+    protected void renderTooltip(
+            PoseStack pose,
+            int mx,
+            int my
+    ) {
+        if (Minecraft.getInstance().screen != this) {
+            // this should fix the annoying Ctrl+E popup when editing
+            this.renderables
+                    .stream()
+                    .filter(AbstractWidget.class::isInstance)
+                    .map(AbstractWidget.class::cast)
+                    .forEach(w -> w.setFocused(false));
+            return;
+        }
+        drawChildTooltips(pose, mx, my);
+    }
+
+    @MCVersionDependentBehaviour
+    private void drawChildTooltips(
+            PoseStack pose,
+            int mx,
+            int my
+    ) {
+        // 1.19.2: manually render button tooltips
+        this.renderables
+                .stream()
+                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
+                .map(SFMExtendedButtonWithTooltip.class::cast)
+                .forEach(x -> x.renderToolTip(pose, mx, my));
     }
 
     private static boolean shouldShowLineNumbers() {
@@ -320,7 +354,7 @@ public class ProgramEditorScreen extends Screen {
                                     )
                             );
                         })
-                        .setTooltip(this, font, PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP)
+                        .setTooltip(this, font, PROGRAM_EDIT_SCREEN_CONFIG_BUTTON_TOOLTIP)
                         .build()
         );
         this.addRenderableWidget(
