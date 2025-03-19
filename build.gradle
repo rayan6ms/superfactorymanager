@@ -509,7 +509,8 @@ compileJava {
 // List of fully qualified entry point classes
 def entryPoints = [
         'ca.teamdman.ai.ProjectTestMethodLister',
-        'ca.teamdman.ai.ProjectEverythingLister'
+        'ca.teamdman.ai.ProjectEverythingLister',
+        'ca.teamdman.ai.FileImportWalker'
         // Add more classes here as needed
 ]
 entryPoints.each { className ->
