@@ -5,8 +5,10 @@ NAME "Changelog"
 -- https://ko-fi.com/teamdman
 
 ---- vNext ----
--- (WIP) Intellisense
--- (WIP) Fix missing focus highlight from tab-navigation of buttons in manager screen
+-- Add intellisense
+-- Changed line numbers button to config button in program edit screen
+-- Add editor config to disable intellisense
+-- Fix missing focus highlight from tab-navigation of buttons in manager screen
 -- Fix syntax highlighting for "SECOND"
 -- Fix escaped quotes in strings containing the escaping backslash
 
