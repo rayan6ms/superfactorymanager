@@ -16,6 +16,10 @@ import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
 
+/**
+ * https://neuroning.com/post/implementing-code-completion-for-vscode-with-antlr/
+ * https://soft-gems.net/universal-code-completion-using-antlr3/
+ */
 public class SFMLIntellisense {
     public static List<IntellisenseAction> getSuggestions(
             IntellisenseContext context
