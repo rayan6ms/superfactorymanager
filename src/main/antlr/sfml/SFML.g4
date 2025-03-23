@@ -250,7 +250,7 @@ RPAREN  : ')';
 
 NUMBER_WITH_G_SUFFIX    : [0-9]+[gG] ;
 NUMBER                  : [0-9]+ ;
-IDENTIFIER              : [a-zA-Z_][a-zA-Z0-9_]* | '*';
+IDENTIFIER              : [a-zA-Z_*][a-zA-Z0-9_*]* | '*'; // Note that the * in the square brackets is a literl
 
 STRING : '"' (~'"'|'\\"')* '"' ;
 
