@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.client.gui.widget;
 
 import ca.teamdman.sfm.client.gui.screen.SFMScreenRenderUtils;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
@@ -73,6 +74,7 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
         scrollSelectedIntoView();
     }
 
+    @MCVersionDependentBehaviour
     public void setXY(
             int x,
             int y
@@ -82,6 +84,7 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
     }
 
     @Override
+    @MCVersionDependentBehaviour
     public void updateNarration(NarrationElementOutput narration) {
         narration.add(NarratedElementType.TITLE, getMessage());
     }
