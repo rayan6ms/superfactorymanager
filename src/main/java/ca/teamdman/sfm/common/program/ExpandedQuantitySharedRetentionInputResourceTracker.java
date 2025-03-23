@@ -37,7 +37,7 @@ public class ExpandedQuantitySharedRetentionInputResourceTracker implements IInp
         long transferred_for_item = 0;
         var transferred_for_resource_type = transferred_by_item.get(type);
         if (transferred_for_resource_type != null) {
-            ResourceLocation item_id = type.getRegistryKey(stack);
+            ResourceLocation item_id = type.getRegistryKeyForStack(stack);
             transferred_for_item = transferred_for_resource_type.getLong(item_id);
         }
         return transferred_for_item >= can_transfer;
@@ -98,7 +98,7 @@ public class ExpandedQuantitySharedRetentionInputResourceTracker implements IInp
         long transferred_for_item = 0;
         var transferred_for_resource_type = transferred_by_item.get(resourceType);
         if (transferred_for_resource_type != null) {
-            ResourceLocation item_id = resourceType.getRegistryKey(stack);
+            ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
             transferred_for_item = transferred_for_resource_type.getLong(item_id);
         }
         return max_transfer - transferred_for_item;
@@ -110,7 +110,7 @@ public class ExpandedQuantitySharedRetentionInputResourceTracker implements IInp
             STACK stack,
             long amount
     ) {
-        ResourceLocation item_id = resourceType.getRegistryKey(stack);
+        ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
         transferred_by_item.computeIfAbsent(resourceType, k -> new Object2LongOpenHashMap<>())
                 .addTo(item_id, amount);
     }

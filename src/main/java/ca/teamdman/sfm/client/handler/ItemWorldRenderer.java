@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.gui.screen.SFMScreenUtils;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenRenderUtils;
 import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.item.NetworkToolItem;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
@@ -311,7 +311,7 @@ public class ItemWorldRenderer {
         Font font = Minecraft.getInstance().font;
         poseStack.translate(0, labels.size() * (font.lineHeight + 0.1) / -2f, 0);
         for (String label : labels) {
-            SFMScreenUtils.drawInBatch(
+            SFMScreenRenderUtils.drawInBatch(
                     label,
                     font,
                     -font.width(label) / 2f,

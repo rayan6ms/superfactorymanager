@@ -2,8 +2,7 @@ package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientDiagnosticInfo;
-import ca.teamdman.sfm.client.ClientScreenHelpers;
-import ca.teamdman.sfm.client.gui.ButtonBuilder;
+import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.item.DiskItem;
@@ -152,7 +151,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         int buttonWidth = 120;
         int buttonHeight = 16;
         clipboardPasteButton = this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16
@@ -168,7 +167,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                         .build()
         );
         editButton = this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 + 50
@@ -180,7 +179,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                         .build()
         );
         examplesButton = this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 * 2 + 50
@@ -196,7 +195,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                         .build()
         );
         discordButton = this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 112
@@ -207,7 +206,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                         .build()
         );
         clipboardCopyButton = this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 128
@@ -218,7 +217,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                         .build()
         );
         logsButton = this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 * 9
@@ -229,7 +228,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                         .build()
         );
         rebuildButton = this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 * 10
@@ -240,7 +239,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                         .build()
         );
         serverConfigButton = this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(
                                 (this.width - this.imageWidth) / 2 - buttonWidth,
                                 (this.height - this.imageHeight) / 2 + 16 * 11
@@ -251,7 +250,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                         .build()
         );
         resetButton = this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(
                                 (this.width - this.imageWidth) / 2 + 120,
                                 (this.height - this.imageHeight) / 2 + 10
@@ -263,7 +262,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                         .build()
         );
         diagButton = this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(
                                 (this.width - this.imageWidth) / 2 + 35,
                                 (this.height - this.imageHeight) / 2 + 48
@@ -292,15 +291,23 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     private void onEditButtonClicked() {
-        ClientScreenHelpers.showProgramEditScreen(getProgram(), this::sendProgram);
+        SFMScreenChangeHelpers.showProgramEditScreen(new ProgramEditScreenOpenContext(
+                getProgram(),
+                LabelPositionHolder.from(menu.getDisk()),
+                this::sendProgram
+        ));
     }
 
     private void onExamplesButtonClicked() {
-        ClientScreenHelpers.showExampleListScreen(getProgram(), this::sendProgram);
+        SFMScreenChangeHelpers.showExampleListScreen(
+                getProgram(),
+                LabelPositionHolder.from(menu.getDisk()),
+                this::sendProgram
+        );
     }
 
     private void onLogsButtonClicked() {
-        ClientScreenHelpers.showLogsScreen(menu);
+        SFMScreenChangeHelpers.showLogsScreen(menu);
     }
 
     private void performReset() {
@@ -319,8 +326,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         }
         ConfirmScreen confirmScreen = new ConfirmScreen(
                 proceed -> {
-                    assert this.minecraft != null;
-                    this.minecraft.popGuiLayer(); // Close confirm screen
+                    SFMScreenChangeHelpers.popScreen(); // Close confirm screen
                     if (proceed) {
                         performReset();
                     }
@@ -330,8 +336,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                 LocalizationKeys.MANAGER_RESET_CONFIRM_SCREEN_YES_BUTTON.getComponent(),
                 LocalizationKeys.MANAGER_RESET_CONFIRM_SCREEN_NO_BUTTON.getComponent()
         );
-        assert this.minecraft != null;
-        this.minecraft.pushGuiLayer(confirmScreen);
+        SFMScreenChangeHelpers.setOrPushScreen(confirmScreen);
         confirmScreen.setDelay(20);
     }
 
@@ -371,13 +376,13 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
     private void onDiscordButtonClicked() {
         String discordUrl = "https://discord.gg/xjXYj9MmS4";
-        ClientScreenHelpers.setOrPushScreen(
+        SFMScreenChangeHelpers.setOrPushScreen(
                 new ConfirmLinkScreen(
                         proceed -> {
                             if (proceed) {
                                 Util.getPlatform().openUri(discordUrl);
                             }
-                            ClientScreenHelpers.popScreen();
+                            SFMScreenChangeHelpers.popScreen();
                         },
                         discordUrl,
                         false
@@ -433,8 +438,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
         ConfirmScreen confirmScreen = new ConfirmScreen(
                 proceed -> {
-                    assert this.minecraft != null;
-                    this.minecraft.popGuiLayer(); // Close confirm screen
+                    SFMScreenChangeHelpers.popScreen(); // Close confirm screen
                     if (proceed) {
                         sendProgram(clipboardContents);
                     }
@@ -444,8 +448,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                 LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_YES_BUTTON.getComponent(),
                 LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_NO_BUTTON.getComponent()
         );
-        assert this.minecraft != null;
-        this.minecraft.pushGuiLayer(confirmScreen);
+        SFMScreenChangeHelpers.setOrPushScreen(confirmScreen);
         confirmScreen.setDelay(20);
     }
 
@@ -666,8 +669,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         // 1.19.2: manually render button tooltips
 //        this.renderables
 //                .stream()
-//                .filter(ExtendedButtonWithTooltip.class::isInstance)
-//                .map(ExtendedButtonWithTooltip.class::cast)
+//                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
+//                .map(SFMExtendedButtonWithTooltip.class::cast)
 //                .forEach(x -> x.renderToolTip(pose, mx, my));
     }
 
