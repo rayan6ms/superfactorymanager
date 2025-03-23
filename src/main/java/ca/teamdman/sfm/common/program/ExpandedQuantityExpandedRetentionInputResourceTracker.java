@@ -39,7 +39,7 @@ public class ExpandedQuantityExpandedRetentionInputResourceTracker implements II
         long transferred_for_item = 0;
         var transferred_for_resource_type = transferred_by_item.get(type);
         if (transferred_for_resource_type != null) {
-            ResourceLocation item_id = type.getRegistryKey(stack);
+            ResourceLocation item_id = type.getRegistryKeyForStack(stack);
             transferred_for_item = transferred_for_resource_type.getLong(item_id);
         }
         return transferred_for_item >= can_transfer;
@@ -66,7 +66,7 @@ public class ExpandedQuantityExpandedRetentionInputResourceTracker implements II
         if (posEntry != null) {
             var resourceTypeEntry = posEntry.get(slot);
             if (resourceTypeEntry != null) {
-                ResourceLocation item_id = resourceType.getRegistryKey(stack);
+                ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
                 var itemEntry = resourceTypeEntry.get(resourceType);
                 if (itemEntry != null) {
                     return itemEntry.getLong(item_id);
@@ -86,7 +86,7 @@ public class ExpandedQuantityExpandedRetentionInputResourceTracker implements II
         // don't use getOrDefault to avoid allocations
         var retained_for_resource_type = retention_obligations_by_item.get(resourceType);
         if (retained_for_resource_type != null) {
-            ResourceLocation item_id = resourceType.getRegistryKey(stack);
+            ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
             if (retained_for_resource_type.containsKey(item_id)) {
                 retained_for_item = retained_for_resource_type.getLong(item_id);
             }
@@ -103,7 +103,7 @@ public class ExpandedQuantityExpandedRetentionInputResourceTracker implements II
             @NotStored BlockPos pos,
             long promise
     ) {
-        ResourceLocation item_id = resourceType.getRegistryKey(stack);
+        ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
         retention_obligations_by_item.computeIfAbsent(resourceType, k -> new Object2LongOpenHashMap<>())
                 .addTo(item_id, promise);
         retention_obligations_by_pos_by_slot_by_item
@@ -122,7 +122,7 @@ public class ExpandedQuantityExpandedRetentionInputResourceTracker implements II
         long transferred_for_item = 0;
         var transferred_for_resource_type = transferred_by_item.get(resourceType);
         if (transferred_for_resource_type != null) {
-            ResourceLocation item_id = resourceType.getRegistryKey(stack);
+            ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
             transferred_for_item = transferred_for_resource_type.getLong(item_id);
         }
         return max_transfer - transferred_for_item;
@@ -134,7 +134,7 @@ public class ExpandedQuantityExpandedRetentionInputResourceTracker implements II
             STACK stack,
             long amount
     ) {
-        ResourceLocation item_id = resourceType.getRegistryKey(stack);
+        ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
         transferred_by_item.computeIfAbsent(resourceType, k -> new Object2LongOpenHashMap<>())
                 .addTo(item_id, amount);
     }

@@ -110,8 +110,8 @@ public class TestBarrelTankScreen extends AbstractContainerScreen<TestBarrelTank
         // 1.19.2: manually render button tooltips
 //        this.renderables
 //                .stream()
-//                .filter(ExtendedButtonWithTooltip.class::isInstance)
-//                .map(ExtendedButtonWithTooltip.class::cast)
+//                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
+//                .map(SFMExtendedButtonWithTooltip.class::cast)
 //                .forEach(x -> x.renderToolTip(pose, mx, my));
     }
 

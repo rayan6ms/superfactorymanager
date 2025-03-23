@@ -3,9 +3,11 @@ package ca.teamdman.sfm.client;
 import ca.teamdman.langs.SFMLLexer;
 import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.common.net.*;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfml.ast.*;
+import com.mojang.datafixers.util.Pair;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -28,14 +30,7 @@ public class ProgramTokenContextActions {
         try {
             builder.visitProgram(parser.program());
             SFM.LOGGER.info("Gathering context actions for cursor position {}", cursorPosition);
-            return Stream.concat(
-                            builder
-                                    .getNodesUnderCursor(cursorPosition)
-                                    .stream(),
-                            builder
-                                    .getNodesUnderCursor(cursorPosition - 1)
-                                    .stream()
-                    )
+            return getElementsAroundCursor(cursorPosition, builder)
                     .map(pair -> getContextAction(
                             programString,
                             builder,
@@ -47,9 +42,23 @@ public class ProgramTokenContextActions {
                     .map(Optional::get)
                     .findFirst();
         } catch (Throwable t) {
-            return Optional.of(() -> ClientScreenHelpers.showProgramEditScreen("-- Encountered error, program parse failed:\n--"
-                                                                               + t.getMessage()));
+            return Optional.of(() -> SFMScreenChangeHelpers.showProgramEditScreen("-- Encountered error, program parse failed:\n--"
+                                                                                  + t.getMessage()));
         }
+    }
+
+    public static Stream<Pair<ASTNode, ParserRuleContext>> getElementsAroundCursor(
+            int cursorPosition,
+            ASTBuilder builder
+    ) {
+        return Stream.concat(
+                builder
+                        .getNodesUnderCursor(cursorPosition)
+                        .stream(),
+                builder
+                        .getNodesUnderCursor(cursorPosition - 1)
+                        .stream()
+        );
     }
 
     public static Optional<Runnable> getContextAction(
@@ -68,7 +77,7 @@ public class ProgramTokenContextActions {
                         .stream()
                         .map(ResourceIdentifier::toStringCondensed)
                         .collect(Collectors.joining(",\n"));
-                ClientScreenHelpers.showProgramEditScreen(expansion);
+                SFMScreenChangeHelpers.showProgramEditScreen(expansion);
             });
         } else if (node instanceof Label label) {
             SFM.LOGGER.info("Found context action for label node");

@@ -33,7 +33,7 @@ public record ForgetStatement(
                     oldInputStatement.resourceLimits(),
                     oldInputStatement.each()
             );
-            context.getProgram().builder().setLocationFromOtherNode(newInputStatement, oldInputStatement);
+            context.getProgram().astBuilder().setLocationFromOtherNode(newInputStatement, oldInputStatement);
             if (context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
                 simulation.onInputStatementForgetTransform(context, oldInputStatement, newInputStatement);
             }
