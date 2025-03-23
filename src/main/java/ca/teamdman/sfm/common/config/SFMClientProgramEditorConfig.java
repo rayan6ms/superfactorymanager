@@ -7,8 +7,8 @@ public class SFMClientProgramEditorConfig {
     public final ForgeConfigSpec.EnumValue<IntellisenseLevel> intellisenseLevel;
 
     SFMClientProgramEditorConfig(ForgeConfigSpec.Builder builder) {
-        showLineNumbers = builder.define("showLineNumbers", false);
-        intellisenseLevel = builder.defineEnum("intellisenseLevel", IntellisenseLevel.ADVANCED);
+        showLineNumbers = builder.define("showLineNumbers", true);
+        intellisenseLevel = builder.defineEnum("intellisenseLevel", IntellisenseLevel.OFF);
     }
 
     public enum IntellisenseLevel {
