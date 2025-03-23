@@ -1,5 +1,6 @@
 package ca.teamdman.sfml.intellisense;
 
+import ca.teamdman.sfml.ast.Label;
 import ca.teamdman.sfml.manipulation.ManipulationResult;
 import net.minecraft.network.chat.Component;
 
@@ -14,8 +15,14 @@ public record SuggestedLabelIntellisenseAction(
 
     @Override
     public ManipulationResult perform(IntellisenseContext context) {
-        return context.createMutableProgramString()
-                .replaceWordAndMoveCursorsToEnd("%s ".formatted(label))
-                .intoResult();
+        if (Label.needsQuotes(label)) {
+            return context.createMutableProgramString()
+                    .replaceWordAndMoveCursorsToEnd("\"%s\" ".formatted(label))
+                    .intoResult();
+        } else {
+            return context.createMutableProgramString()
+                    .replaceWordAndMoveCursorsToEnd("%s ".formatted(label))
+                    .intoResult();
+        }
     }
 }
