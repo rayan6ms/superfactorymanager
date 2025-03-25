@@ -2,18 +2,18 @@ package ca.teamdman.sfm.common.registry;
 
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.ClientRaycastHelpers;
+import ca.teamdman.sfm.client.ClientRayCastHelpers;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.blockentity.TestBarrelTankBlockEntity;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
+import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.network.IContainerFactory;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -25,11 +25,6 @@ public class SFMMenus {
             BuiltInRegistries.MENU,
             SFM.MOD_ID
     );
-
-    public static void register(IEventBus bus) {
-        MENU_TYPES.register(bus);
-    }
-
     public static final Supplier<MenuType<ManagerContainerMenu>> MANAGER_MENU = MENU_TYPES.register(
             "manager",
             () -> IMenuTypeExtension.create(
@@ -52,8 +47,8 @@ public class SFMMenus {
                                 int windowId,
                                 Inventory inv
                         ) {
-                            if (FMLEnvironment.dist.isClient()) {
-                                BlockEntity be = ClientRaycastHelpers.getLookBlockEntity();
+                            if (SFMEnvironmentUtils.isClient()) {
+                                BlockEntity be = ClientRayCastHelpers.getLookBlockEntity();
                                 if (!(be instanceof ManagerBlockEntity mbe)) {
                                     return IContainerFactory.super.create(windowId, inv);
                                 }
@@ -67,7 +62,6 @@ public class SFMMenus {
                         }
                     })
     );
-
     public static final Supplier<MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK_MENU = MENU_TYPES.register(
             "test_barrel_tank",
             () -> IMenuTypeExtension.create(
@@ -90,8 +84,8 @@ public class SFMMenus {
                                 int windowId,
                                 Inventory inv
                         ) {
-                            if (FMLEnvironment.dist.isClient()) {
-                                BlockEntity be = ClientRaycastHelpers.getLookBlockEntity();
+                            if (SFMEnvironmentUtils.isClient()) {
+                                BlockEntity be = ClientRayCastHelpers.getLookBlockEntity();
                                 if (!(be instanceof TestBarrelTankBlockEntity blockEntity)) {
                                     return IContainerFactory.super.create(windowId, inv);
                                 }
@@ -105,6 +99,10 @@ public class SFMMenus {
                         }
                     })
     );
+
+    public static void register(IEventBus bus) {
+        MENU_TYPES.register(bus);
+    }
 
 
 }

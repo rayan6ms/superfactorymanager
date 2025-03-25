@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.common.resourcetype.exclude;
 
-import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import mekanism.api.Action;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.api.math.FloatingLong;
@@ -9,17 +8,15 @@ import net.neoforged.common.capabilities.Capability;
 import net.neoforged.common.capabilities.CapabilityManager;
 import net.neoforged.common.capabilities.CapabilityToken;
 import net.neoforged.registries.IForgeRegistry;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.stream.Stream;
 
-public class MekanismEnergyResourceType extends ResourceType<FloatingLong, Class<FloatingLong>, IStrictEnergyHandler> {
+public class MekanismEnergyResourceType extends ScalarResourceType<FloatingLong, IStrictEnergyHandler> {
     public static final Capability<IStrictEnergyHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
     });
-    public static final ResourceLocation REGISTRY_KEY = new ResourceLocation("mekanism", "energy");
 
     public MekanismEnergyResourceType() {
-        super(CAP);
+        super(CAP, new ResourceLocation("mekanism", "energy"), FloatingLong.class);
     }
 
     @Override
@@ -90,11 +87,6 @@ public class MekanismEnergyResourceType extends ResourceType<FloatingLong, Class
     }
 
     @Override
-    public boolean matchesStackType(Object o) {
-        return o instanceof FloatingLong;
-    }
-
-    @Override
     public boolean matchesCapabilityType(Object o) {
         return o instanceof IStrictEnergyHandler;
     }
@@ -110,26 +102,6 @@ public class MekanismEnergyResourceType extends ResourceType<FloatingLong, Class
     }
 
     @Override
-    public ResourceLocation getRegistryKey(FloatingLong stack) {
-        return REGISTRY_KEY;
-    }
-
-    @Override
-    public IForgeRegistry<Class<FloatingLong>> getRegistry() {
-        throw new NotImplementedException();
-    }
-
-    @Override
-    public boolean registryKeyExists(ResourceLocation location) {
-        return location.equals(REGISTRY_KEY);
-    }
-
-    @Override
-    public Class<FloatingLong> getItem(FloatingLong stack) {
-        return FloatingLong.class;
-    }
-
-    @Override
     public FloatingLong copy(FloatingLong stack) {
         return stack;
     }
@@ -140,5 +112,13 @@ public class MekanismEnergyResourceType extends ResourceType<FloatingLong, Class
             long amount
     ) {
         return FloatingLong.create(amount);
+    }
+
+    @Override
+    public FloatingLong withCount(
+            FloatingLong floatingLong,
+            long count
+    ) {
+        return FloatingLong.create(count);
     }
 }

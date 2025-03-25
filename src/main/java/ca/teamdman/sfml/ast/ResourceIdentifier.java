@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.ResourceLocationException;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
@@ -56,15 +57,58 @@ public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode, ToStringCo
         this.resourceNamePredicate = RegexCache.buildPredicate(resourceName);
     }
 
+    public ResourceIdentifier(
+            ResourceLocation resourceTypeKey,
+            ResourceLocation resourceKey
+    ) {
+        this(
+                resourceTypeKey.getNamespace(),
+                resourceTypeKey.getPath(),
+                resourceKey.getNamespace(),
+                resourceKey.getPath()
+        );
+    }
+
+    public ResourceIdentifier(
+            ResourceKey<ResourceType<STACK,ITEM,CAP>> resourceTypeKey,
+            ResourceLocation resourceKey
+    ) {
+        this(
+                resourceTypeKey.location().getNamespace(),
+                resourceTypeKey.location().getPath(),
+                resourceKey.getNamespace(),
+                resourceKey.getPath()
+        );
+    }
+
+    public ResourceIdentifier(
+            ResourceKey<ResourceType<STACK,ITEM,CAP>> resourceTypeKey,
+            ResourceKey<?> resourceKey
+    ) {
+        this(
+                resourceTypeKey.location().getNamespace(),
+                resourceTypeKey.location().getPath(),
+                resourceKey.location().getNamespace(),
+                resourceKey.location().getPath()
+        );
+    }
+
     public ResourceIdentifier(String value) {
         this(SFM.MOD_ID, "item", ".*", value);
     }
 
-    public ResourceIdentifier(String namespace, String value) {
+    public ResourceIdentifier(
+            String namespace,
+            String value
+    ) {
         this(SFM.MOD_ID, "item", namespace, value);
     }
 
-    public ResourceIdentifier(String typeName, String resourceNamespace, String resourceName) {
+    public ResourceIdentifier(
+            String typeName,
+            String resourceNamespace,
+            String resourceName
+    ) {
         this(SFM.MOD_ID, typeName, resourceNamespace, resourceName);
     }
 
@@ -134,14 +178,14 @@ public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode, ToStringCo
                 // user may be using inspection on a resource type that doesn't exist
                 return List.of(this);
             }
-            List<ResourceIdentifier<STACK, ITEM, CAP>> rtn = resourceType.getRegistry().keySet()
-                .stream()
+            List<ResourceIdentifier<STACK, ITEM, CAP>> rtn = resourceType.getRegistryKeys()
+                    .stream()
                     .filter(this::matchesResourceLocation)
-                    .map(key -> new ResourceIdentifier<STACK, ITEM, CAP>(
+                    .map(e -> new ResourceIdentifier<STACK, ITEM, CAP>(
                             resourceTypeNamespace,
                             resourceTypeName,
-                            key.getNamespace(),
-                            key.getPath()
+                            e.getNamespace(),
+                            e.getPath()
                     )).toList();
             //noinspection unchecked,rawtypes
             expansionCache.put(this, (List) rtn);

@@ -14,7 +14,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.stream.Stream;
 
-public class ItemResourceType extends ResourceType<ItemStack, Item, IItemHandler> {
+public class ItemResourceType extends RegistryBackedResourceType<ItemStack, Item, IItemHandler> {
     public ItemResourceType() {
         super(Capabilities.ItemHandler.BLOCK);
     }

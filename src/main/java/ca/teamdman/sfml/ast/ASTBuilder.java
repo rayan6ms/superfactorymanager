@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     private final Set<Label> USED_LABELS = new HashSet<>();
     private final Set<ResourceIdentifier<?, ?, ?>> USED_RESOURCES = new HashSet<>();
-    private final List<Pair<ASTNode, ParserRuleContext>> AST_NODE_CONTEXTS = new LinkedList<>();
+    private final List<Pair<ASTNode, ParserRuleContext>> AST_NODE_CONTEXTS = new LinkedList<>(); // TODO: optimize this using a tree or something.
 
     public List<Pair<ASTNode, ParserRuleContext>> getNodesUnderCursor(int cursorPos) {
         return AST_NODE_CONTEXTS
@@ -65,7 +65,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     public StringHolder visitName(@Nullable SFMLParser.NameContext ctx) {
         if (ctx == null) return new StringHolder("");
         StringHolder name = visitString(ctx.string());
-        AST_NODE_CONTEXTS.add(new Pair<>(name, ctx));
+        AST_NODE_CONTEXTS.add(new Pair<>(new ProgramName(name), ctx));
         return name;
     }
 
@@ -100,7 +100,8 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     @Override
     public StringHolder visitString(SFMLParser.StringContext ctx) {
         var content = ctx.getText();
-        StringHolder str = new StringHolder(content.substring(1, content.length() - 1));
+        String innerContent = content.substring(1, content.length() - 1).replaceAll("\\\\\"", "\"");
+        StringHolder str = new StringHolder(innerContent);
         AST_NODE_CONTEXTS.add(new Pair<>(str, ctx));
         return str;
     }

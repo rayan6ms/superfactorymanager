@@ -44,6 +44,17 @@ sourceSets {
             exclude "ca/teamdman/sfm/common/block/BatteryBlock.java"
             exclude "ca/teamdman/sfm/common/blockentity/BatteryBlockEntity.java"
         }
+        //// @MCVersionDependentBehaviour
+//        java {
+//            exclude "ca/teamdman/sfm/common/compat/SFMMekanismCompat.java"
+//        }
+//        java {
+//            exclude "ca/teamdman/sfm/common/resourcetype/GasResourceType.java"
+//            exclude "ca/teamdman/sfm/common/resourcetype/InfuseResourceType.java"
+//            exclude "ca/teamdman/sfm/common/resourcetype/MekanismEnergyResourceType.java"
+//            exclude "ca/teamdman/sfm/common/resourcetype/PigmentResourceType.java"
+//            exclude "ca/teamdman/sfm/common/resourcetype/SlurryResourceType.java"
+//        }
     }
     // https://docs.gradle.org/current/userguide/java_testing.html#sec:configuring_java_integration_tests
     test {
@@ -342,7 +353,8 @@ compileJava {
 // List of fully qualified entry point classes
 def entryPoints = [
         'ca.teamdman.ai.ProjectTestMethodLister',
-        'ca.teamdman.ai.ProjectEverythingLister'
+        'ca.teamdman.ai.ProjectEverythingLister',
+        'ca.teamdman.ai.FileImportWalker'
         // Add more classes here as needed
 ]
 entryPoints.each { className ->

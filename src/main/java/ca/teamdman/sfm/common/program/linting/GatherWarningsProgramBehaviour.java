@@ -97,7 +97,7 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
                         getLatestPathElement(),
                         PROGRAM_WARNING_OUTPUT_RESOURCE_TYPE_NOT_FOUND_IN_INPUTS.get(
                                 outputStatement,
-                                context.getProgram().builder().getLineColumnForNode(outputStatement),
+                                context.getProgram().astBuilder().getLineColumnForNode(outputStatement),
                                 resourceType.displayAsCode()
                         )
                 ));
@@ -242,7 +242,7 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
                             offendingNode,
                             PROGRAM_WARNING_UNUSED_INPUT_LABEL.get(
                                     old,
-                                    context.getProgram().builder().getLineColumnForNode(old),
+                                    context.getProgram().astBuilder().getLineColumnForNode(old),
                                     resourceType.displayAsCode(),
                                     label,
                                     resourceType.displayAsCode()

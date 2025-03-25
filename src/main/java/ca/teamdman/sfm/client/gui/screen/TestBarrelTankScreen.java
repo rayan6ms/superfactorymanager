@@ -3,12 +3,9 @@ package ca.teamdman.sfm.client.gui.screen;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import ca.teamdman.sfm.common.localization.LocalizationEntry;
-import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
@@ -36,7 +33,7 @@ public class TestBarrelTankScreen extends AbstractContainerScreen<TestBarrelTank
         super(menu, inv, title);
     }
 
-    @SuppressWarnings({"deprecation", "resource"})
+    @SuppressWarnings({"deprecation"})
     @Override
     public void render(
             GuiGraphics graphics,
@@ -110,8 +107,8 @@ public class TestBarrelTankScreen extends AbstractContainerScreen<TestBarrelTank
         // 1.19.2: manually render button tooltips
 //        this.renderables
 //                .stream()
-//                .filter(ExtendedButtonWithTooltip.class::isInstance)
-//                .map(ExtendedButtonWithTooltip.class::cast)
+//                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
+//                .map(SFMExtendedButtonWithTooltip.class::cast)
 //                .forEach(x -> x.renderToolTip(pose, mx, my));
     }
 

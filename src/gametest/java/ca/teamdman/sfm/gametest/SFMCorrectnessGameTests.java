@@ -6,7 +6,7 @@ import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
 import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import ca.teamdman.sfm.common.config.SFMConfig;
-import ca.teamdman.sfm.common.config.SFMConfig.SFMServerConfig.LevelsToShards;
+import ca.teamdman.sfm.common.config.SFMServerConfig.LevelsToShards;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
@@ -43,7 +43,6 @@ import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import org.apache.logging.log4j.Level;
 import net.neoforged.neoforge.gametest.GameTestHolder;
-import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.Iterator;
