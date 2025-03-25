@@ -4,12 +4,8 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.*;
-import ca.teamdman.sfm.common.registry.SFMResourceTypes;
-import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfml.program_builder.ProgramBuilder;
-import net.minecraft.ResourceLocationException;
 import net.minecraft.network.chat.contents.TranslatableContents;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.level.Level;
@@ -20,7 +16,10 @@ import org.antlr.v4.runtime.Recognizer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 import static ca.teamdman.sfm.common.blockentity.ManagerBlockEntity.TICK_TIME_HISTORY_SIZE;
@@ -194,33 +193,6 @@ public record Program(
                 } else {
                     toPatch.add(child);
                 }
-            }
-        }
-    }
-
-    private static void checkResourceTypes(
-            Program program,
-            List<TranslatableContents> errors
-    ) {
-        List<? extends String> disallowedResourceTypes = SFMConfig.getOrDefault(SFMConfig.SERVER.disallowedResourceTypesForTransfer);
-        for (ResourceIdentifier<?, ?, ?> referencedResource : program.referencedResources) {
-            try {
-                ResourceType<?, ?, ?> resourceType = referencedResource.getResourceType();
-                if (resourceType == null) {
-                    errors.add(LocalizationKeys.PROGRAM_ERROR_UNKNOWN_RESOURCE_TYPE.get(
-                            referencedResource));
-                } else {
-                    ResourceLocation resourceTypeId = Objects.requireNonNull(SFMResourceTypes.DEFERRED_TYPES
-                                                                                     .get()
-                                                                                     .getKey(resourceType));
-                    if (disallowedResourceTypes.contains(resourceTypeId.toString())) {
-                        errors.add(LocalizationKeys.PROGRAM_ERROR_DISALLOWED_RESOURCE_TYPE.get(
-                                referencedResource));
-                    }
-                }
-            } catch (ResourceLocationException e) {
-                errors.add(LocalizationKeys.PROGRAM_ERROR_MALFORMED_RESOURCE_TYPE.get(
-                        referencedResource));
             }
         }
     }
