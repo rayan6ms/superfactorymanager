@@ -12,7 +12,7 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import java.util.stream.Stream;
 
-public class FluidResourceType extends ResourceType<FluidStack, Fluid, IFluidHandler> {
+public class FluidResourceType extends RegistryBackedResourceType<FluidStack, Fluid, IFluidHandler> {
     public FluidResourceType() {
         super(Capabilities.FLUID_HANDLER);
     }

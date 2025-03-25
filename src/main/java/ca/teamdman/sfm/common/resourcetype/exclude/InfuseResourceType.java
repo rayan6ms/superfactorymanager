@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.common.resourcetype.exclude;
 
-import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.infuse.IInfusionHandler;
@@ -8,14 +7,16 @@ import mekanism.api.chemical.infuse.InfuseType;
 import mekanism.api.chemical.infuse.InfusionStack;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.common.capabilities.CapabilityManager;
 import net.neoforged.neoforge.common.capabilities.CapabilityToken;
+import net.minecraftforge.registries.IForgeRegistry;
 import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.stream.Stream;
 
-public class InfuseResourceType extends ResourceType<InfusionStack, InfuseType, IInfusionHandler> {
+public class InfuseResourceType extends RegistryBackedResourceType<InfusionStack, InfuseType, IInfusionHandler> {
     public static final Capability<IInfusionHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
     });
 
@@ -103,7 +104,7 @@ public class InfuseResourceType extends ResourceType<InfusionStack, InfuseType, 
     @Override
     public Registry<InfuseType> getRegistry() {
         throw new NotImplementedException();
-//        return MekanismAPI.infuseTypeRegistry();
+        return MekanismAPI.infuseTypeRegistry();
     }
 
     @Override

@@ -15,7 +15,6 @@ import org.jetbrains.annotations.Nullable;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.Collection;
 import java.util.function.Supplier;
 
 public class SFMCapabilityProviderMappers {

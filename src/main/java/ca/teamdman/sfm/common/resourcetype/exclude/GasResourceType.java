@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.common.resourcetype.exclude;
 
-import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import mekanism.api.Action;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
@@ -15,7 +14,7 @@ import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.stream.Stream;
 
-public class GasResourceType extends ResourceType<GasStack, Gas, IGasHandler> {
+public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, IGasHandler> {
     public static final Capability<IGasHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
     });
 

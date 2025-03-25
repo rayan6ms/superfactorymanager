@@ -47,7 +47,7 @@ public class SharedQuantityExpandedRetentionOutputResourceTracker implements IOu
         long retained_for_item = 0;
         var retained_for_resource_type = retention_obligations_by_item.get(type);
         if (retained_for_resource_type != null) {
-            ResourceLocation item_id = type.getRegistryKey(stack);
+            ResourceLocation item_id = type.getRegistryKeyForStack(stack);
             retained_for_item = retained_for_resource_type.getLong(item_id);
         }
         return retained_for_item >= max_put;
@@ -59,7 +59,7 @@ public class SharedQuantityExpandedRetentionOutputResourceTracker implements IOu
             STACK stack
     ) {
         if (matchesStack(stack)) {
-            ResourceLocation item_id = type.getRegistryKey(stack);
+            ResourceLocation item_id = type.getRegistryKeyForStack(stack);
             retention_obligations_by_item.computeIfAbsent(type, k -> new Object2LongOpenHashMap<>())
                     .addTo(item_id, type.getAmount(stack));
         }
@@ -77,7 +77,7 @@ public class SharedQuantityExpandedRetentionOutputResourceTracker implements IOu
         long retained_for_item = 0;
         var retained_for_resource_type = retention_obligations_by_item.get(resourceType);
         if (retained_for_resource_type != null) {
-            ResourceLocation item_id = resourceType.getRegistryKey(stack);
+            ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
             retained_for_item = retained_for_resource_type.getLong(item_id);
         }
         long remainingRetentionRoom = max_retain - retained_for_item;
@@ -91,7 +91,7 @@ public class SharedQuantityExpandedRetentionOutputResourceTracker implements IOu
             STACK stack,
             long amount
     ) {
-        ResourceLocation item_id = resourceType.getRegistryKey(stack);
+        ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
         transferred += amount;
         retention_obligations_by_item.computeIfAbsent(resourceType, k -> new Object2LongOpenHashMap<>())
                 .addTo(item_id, amount);

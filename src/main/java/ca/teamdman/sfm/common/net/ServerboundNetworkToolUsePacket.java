@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import ca.teamdman.sfml.ast.DirectionQualifier;
+import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
@@ -14,7 +15,6 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 
@@ -85,7 +85,7 @@ public record ServerboundNetworkToolUsePacket(
 
                 BlockEntity entity = level.getBlockEntity(pos);
                 if (entity != null) {
-                    if (!FMLEnvironment.production) {
+                    if (SFMEnvironmentUtils.isInIDE()) {
                         payload.append("---- (dev only) block entity ----\n");
                         payload.append(entity).append("\n");
                     }

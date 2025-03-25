@@ -4,8 +4,6 @@ import ca.teamdman.sfm.SFM;
 import net.minecraft.network.FriendlyByteBuf;
 import net.neoforged.neoforge.network.NetworkEvent;
 
-import java.util.function.Supplier;
-
 public interface SFMPacketDaddy<T extends SFMPacket> {
     enum PacketDirection {
         SERVERBOUND,
