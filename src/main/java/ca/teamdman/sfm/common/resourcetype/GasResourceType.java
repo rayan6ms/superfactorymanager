@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
-public class GasResourceType extends ResourceType<GasStack, Gas, IGasHandler> {
+public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, IGasHandler> {
     public static final BlockCapability<IGasHandler, @Nullable Direction> CAP = Capabilities.GAS.block();
 
     public GasResourceType() {

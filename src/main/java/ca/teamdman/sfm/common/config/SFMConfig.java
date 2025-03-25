@@ -1,15 +1,8 @@
 package ca.teamdman.sfm.common.config;
 
-import ca.teamdman.sfm.SFM;
-import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.fml.ModLoadingContext;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.config.ModConfig;
-import net.neoforged.fml.event.config.ModConfigEvent;
-import org.apache.commons.lang3.tuple.Pair;
-
-import java.util.List;
 
 
 /*
@@ -43,19 +36,33 @@ then it should be server config
  */
 public class SFMConfig {
     public static final ModConfigSpec SERVER_SPEC;
-    public static final ModConfigSpec CLIENT_SPEC;
     public static final SFMServerConfig SERVER;
+
+    public static final ModConfigSpec CLIENT_SPEC;
     public static final SFMClientConfig CLIENT;
 
+    public static final ModConfigSpec CLIENT_PROGRAM_EDITOR_SPEC;
+    public static final SFMClientProgramEditorConfig CLIENT_PROGRAM_EDITOR;
+
     static {
-        final Pair<SFMServerConfig, ModConfigSpec> serverSpecPair = new ModConfigSpec.Builder()
-                .configure(SFMServerConfig::new);
-        SERVER_SPEC = serverSpecPair.getRight();
-        SERVER = serverSpecPair.getLeft();
-        final Pair<SFMClientConfig, ModConfigSpec> clientSpecPair = new ModConfigSpec.Builder()
-                .configure(SFMClientConfig::new);
-        CLIENT_SPEC = clientSpecPair.getRight();
-        CLIENT = clientSpecPair.getLeft();
+        {
+            var pair =
+                    new ModConfigSpec.Builder().configure(SFMServerConfig::new);
+            SERVER_SPEC = pair.getRight();
+            SERVER = pair.getLeft();
+        }
+        {
+            var pair =
+                    new ModConfigSpec.Builder().configure(SFMClientConfig::new);
+            CLIENT_SPEC = pair.getRight();
+            CLIENT = pair.getLeft();
+        }
+        {
+            var pair =
+                    new ModConfigSpec.Builder().configure(SFMClientProgramEditorConfig::new);
+            CLIENT_PROGRAM_EDITOR_SPEC = pair.getRight();
+            CLIENT_PROGRAM_EDITOR = pair.getLeft();
+        }
     }
 
     /**
@@ -68,109 +75,20 @@ public class SFMConfig {
             return configValue.getDefault();
         }
     }
+    /**
+     * Get a config value in a way that doesn't fail when running tests
+     */
+    public static <T> T getOrFallback(ModConfigSpec.ConfigValue<T> configValue, T fallback) {
+        try {
+            return configValue.get();
+        } catch (Exception e) {
+            return fallback;
+        }
+    }
 
     public static void register(ModLoadingContext context) {
         context.registerConfig(ModConfig.Type.SERVER, SFMConfig.SERVER_SPEC);
         context.registerConfig(ModConfig.Type.CLIENT, SFMConfig.CLIENT_SPEC);
-    }
-
-    @Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class SFMServerConfig {
-        public final ModConfigSpec.BooleanValue disableProgramExecution;
-        public final ModConfigSpec.BooleanValue logResourceLossToConsole;
-        public final ModConfigSpec.IntValue timerTriggerMinimumIntervalInTicks;
-        public final ModConfigSpec.IntValue timerTriggerMinimumIntervalInTicksWhenOnlyForgeEnergyIO;
-        public final ModConfigSpec.IntValue maxIfStatementsInTriggerBeforeSimulationIsntAllowed;
-        public final ModConfigSpec.ConfigValue<List<?  extends String>> disallowedResourceTypesForTransfer;
-        public final ModConfigSpec.EnumValue<LevelsToShards> levelsToShards;
-
-        public enum LevelsToShards {
-            JustOne,
-            EachOne,
-            SumLevels,
-            SumLevelsScaledExponentially,
-        }
-
-        /**
-         * This is used by managers to detect when the config has changed.
-         * When the manager cached var differs from this, the manager will rebuild its program.
-         */
-        private int revision = 0;
-
-        SFMServerConfig(ModConfigSpec.Builder builder) {
-            builder.comment("This config is shown to clients, don't put anything secret in here");
-            disableProgramExecution = builder
-                    .comment("Prevents factory managers from compiling and running code (for emergencies)")
-                    .define("disableProgramExecution", false);
-
-            logResourceLossToConsole = builder
-                    .comment("Log resource loss to console")
-                    .define("logResourceLossToConsole", true);
-
-            timerTriggerMinimumIntervalInTicks = builder
-                    .defineInRange("timerTriggerMinimumIntervalInTicks", 20, 1, Integer.MAX_VALUE);
-
-            timerTriggerMinimumIntervalInTicksWhenOnlyForgeEnergyIO = builder
-                    .defineInRange(
-                            "timerTriggerMinimumIntervalInTicksWhenOnlyForgeEnergyIOStatementsPresent",
-                            1,
-                            1,
-                            Integer.MAX_VALUE
-                    );
-
-            maxIfStatementsInTriggerBeforeSimulationIsntAllowed = builder
-                    .comment(
-                            "The number of scenarios to check is 2^n where n is the number of if statements in a trigger")
-                    .defineInRange("maxIfStatementsInTriggerBeforeSimulationIsntAllowed", 10, 0, Integer.MAX_VALUE);
-
-            disallowedResourceTypesForTransfer = builder
-                    .comment("What resource types should SFM not be allowed to move")
-                    .defineListAllowEmpty(
-                            List.of("disallowedResourceTypesForTransfer"),
-                            List::of,
-                            String.class::isInstance
-                    );
-            levelsToShards = builder
-                    .comment(
-                            "How to convert Enchanted Books to Experience Shards",
-                            "JustOne = always produces 1 shard regardless of enchantments",
-                            "EachOne = produces 1 shard per enchantment on the book.",
-                            "SumLevels = produces a number of shards equal to the sum of the enchantments' levels",
-                            "SumLevelsScaledExponentially = produces a number of shards equal to the sum of 2 to the power of each enchantment's level (1 -> 1 shard, 2 -> 4 shards, 3 -> 8 shards, etc)"
-                    )
-                    .defineEnum("levelsToShards", LevelsToShards.JustOne);
-        }
-
-        public int getRevision() {
-            return revision;
-        }
-
-        @SubscribeEvent
-        public static void onConfigLoaded(ModConfigEvent.Loading event) {
-            if (event.getConfig().getSpec() == SERVER_SPEC) {
-                SFMConfig.SERVER.revision++;
-                SFM.LOGGER.info("SFM config loaded, now on revision {}", SFMConfig.SERVER.revision);
-            }
-        }
-
-        @SubscribeEvent
-        public static void onConfigReloaded(ModConfigEvent.Reloading event) {
-            if (event.getConfig().getSpec() == SERVER_SPEC) {
-                SFMConfig.SERVER.revision++;
-                SFM.LOGGER.info("SFM config reloaded, now on revision {}", SFMConfig.SERVER.revision);
-            }
-        }
-    }
-
-    public static class SFMClientConfig {
-        public final ModConfigSpec.BooleanValue showLineNumbers;
-        public final ModConfigSpec.BooleanValue showLabelGunReminderOverlay;
-        public final ModConfigSpec.BooleanValue showNetworkToolReminderOverlay;
-
-        SFMClientConfig(ModConfigSpec.Builder builder) {
-            showLineNumbers = builder.define("showLineNumbers", false);
-            showLabelGunReminderOverlay = builder.define("showLabelGunReminderOverlay", true);
-            showNetworkToolReminderOverlay = builder.define("showNetworkToolReminderOverlay", true);
-        }
+        context.registerConfig(ModConfig.Type.CLIENT, SFMConfig.CLIENT_PROGRAM_EDITOR_SPEC, "sfm-client-program-editor.toml");
     }
 }

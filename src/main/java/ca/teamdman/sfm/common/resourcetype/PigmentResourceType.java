@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
-public class PigmentResourceType extends ResourceType<PigmentStack, Pigment, IPigmentHandler> {
+public class PigmentResourceType extends RegistryBackedResourceType<PigmentStack, Pigment, IPigmentHandler> {
     public static final BlockCapability<IPigmentHandler, @Nullable Direction> CAP = Capabilities.PIGMENT.block();
 
     public PigmentResourceType() {

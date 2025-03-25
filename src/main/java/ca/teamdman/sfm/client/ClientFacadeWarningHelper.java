@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.client;
 
+import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.common.facade.FacadePlanWarning;
 import ca.teamdman.sfm.common.facade.FacadePlanner;
 import ca.teamdman.sfm.common.facade.IFacadePlan;
@@ -35,7 +36,7 @@ public class ClientFacadeWarningHelper {
         } else {
             ConfirmScreen confirmScreen = new ConfirmScreen(
                     (confirmed) -> {
-                        minecraft.popGuiLayer(); // Close confirm screen
+                        SFMScreenChangeHelpers.popScreen(); // Close confirm screen
                         if (confirmed) {
                             // Send packet
                             SFMPackets.sendToServer(msg);
@@ -48,7 +49,7 @@ public class ClientFacadeWarningHelper {
                     warning.confirmYes(),
                     warning.confirmNo()
             );
-            ClientScreenHelpers.setOrPushScreen(confirmScreen);
+            SFMScreenChangeHelpers.setOrPushScreen(confirmScreen);
             confirmScreen.setDelay(10);
         }
     }

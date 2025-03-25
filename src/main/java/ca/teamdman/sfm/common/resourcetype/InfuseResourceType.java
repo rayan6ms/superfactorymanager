@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
-public class InfuseResourceType extends ResourceType<InfusionStack, InfuseType, IInfusionHandler> {
+public class InfuseResourceType extends RegistryBackedResourceType<InfusionStack, InfuseType, IInfusionHandler> {
     public static final BlockCapability<IInfusionHandler, @Nullable Direction> CAP = Capabilities.INFUSION.block();
 
     public InfuseResourceType() {

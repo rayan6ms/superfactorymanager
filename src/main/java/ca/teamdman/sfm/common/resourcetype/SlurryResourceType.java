@@ -16,7 +16,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
-public class SlurryResourceType extends ResourceType<SlurryStack, Slurry, ISlurryHandler> {
+public class SlurryResourceType extends RegistryBackedResourceType<SlurryStack, Slurry, ISlurryHandler> {
     public static final BlockCapability<ISlurryHandler, @Nullable Direction> CAP = Capabilities.SLURRY.block();
 
     public SlurryResourceType() {

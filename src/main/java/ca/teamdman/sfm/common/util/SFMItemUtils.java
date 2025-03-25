@@ -7,13 +7,12 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.fml.loading.FMLEnvironment;
 
 import java.util.List;
 
 public class SFMItemUtils {
     public static void appendMoreInfoKeyReminderTextIfOnClient(List<Component> lines) {
-        if (FMLEnvironment.dist.isClient()) {
+        if (SFMEnvironmentUtils.isClient()) {
             lines.add(
                     LocalizationKeys.GUI_ADVANCED_TOOLTIP_HINT.getComponent(
                                     SFMKeyMappings.MORE_INFO_TOOLTIP_KEY
@@ -27,7 +26,7 @@ public class SFMItemUtils {
     }
 
     public static boolean isClientAndMoreInfoKeyPressed() {
-        return FMLEnvironment.dist.isClient() && ClientKeyHelpers.isKeyDownInScreenOrWorld(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY);
+        return SFMEnvironmentUtils.isClient() && ClientKeyHelpers.isKeyDownInScreenOrWorld(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY);
     }
 
     public static MutableComponent getRainbow(int length) {
