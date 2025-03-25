@@ -134,7 +134,7 @@ public class ClientExportHelper {
                 .get();
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Collection<ResourceType<?, ?, ?>> resourceTypes = SFMResourceTypes.DEFERRED_TYPES.get().getValues();
+        Collection<ResourceType<?, ?, ?>> resourceTypes = SFMResourceTypes.registry().getValues();
 
         // Ensure the folder exists
         var gameDir = FMLPaths.GAMEDIR.get();

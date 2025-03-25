@@ -21,8 +21,8 @@ public record SuggestedResourceIntellisenseAction<STACK, ITEM, CAP>(
                 resourceType,
                 item,
                 Component.literal(
-                        new ResourceIdentifier<STACK, ITEM, CAP>(
-                                Objects.requireNonNull(SFMResourceTypes.DEFERRED_TYPES.get().getKey(resourceType)),
+                        new ResourceIdentifier<>(
+                                Objects.requireNonNull(SFMResourceTypes.registry().getKey(resourceType)),
                                 resourceType.getRegistryKeyForItem(item)
                         ).toStringCondensed()
                 )
