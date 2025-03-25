@@ -58,7 +58,7 @@ public class SFMLIntellisense {
                     if (SFMEnvironmentUtils.isGameLoaded() && context
                             .intellisenseLevel()
                             .isResourceIntellisenseEnabled()) {
-                        for (ResourceType<?, ?, ?> resourceType : SFMResourceTypes.DEFERRED_TYPES.get().getValues()) {
+                        for (ResourceType<?, ?, ?> resourceType : SFMResourceTypes.registry().getValues()) {
                             gatherIntellisenseActions(context, resourceType, rtn::add);
                         }
                     }

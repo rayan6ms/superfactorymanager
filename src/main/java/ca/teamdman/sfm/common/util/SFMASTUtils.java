@@ -29,9 +29,7 @@ public class SFMASTUtils {
         potential = resourceType.withCount(potential, toMove);
         STACK stack = potential;
 
-        return SFMResourceTypes.DEFERRED_TYPES
-                .get()
-                .getResourceKey(resourceType)
+        return SFMResourceTypes.registry().getResourceKey(resourceType)
                 .map(x -> {
                     //noinspection unchecked,rawtypes
                     return (ResourceKey<ResourceType<STACK, ITEM, CAP>>) (ResourceKey) x;

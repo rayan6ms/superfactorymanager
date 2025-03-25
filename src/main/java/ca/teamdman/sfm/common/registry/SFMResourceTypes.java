@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.resourcetype.FluidResourceType;
 import ca.teamdman.sfm.common.resourcetype.ForgeEnergyResourceType;
 import ca.teamdman.sfm.common.resourcetype.ItemResourceType;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
@@ -28,22 +29,22 @@ import java.util.stream.Stream;
 
 public class SFMResourceTypes {
     public static final ResourceLocation REGISTRY_ID = new ResourceLocation(SFM.MOD_ID, "resource_type");
-    private static final DeferredRegister<ResourceType<?, ?, ?>> TYPES = DeferredRegister.create(
+    private static final DeferredRegister<ResourceType<?, ?, ?>> REGISTERER = DeferredRegister.create(
             REGISTRY_ID,
             SFM.MOD_ID
     );
-    public static final Supplier<IForgeRegistry<ResourceType<?, ?, ?>>> DEFERRED_TYPES = TYPES.makeRegistry(
+    private static final Supplier<IForgeRegistry<ResourceType<?, ?, ?>>> REGISTRY = REGISTERER.makeRegistry(
             () -> new RegistryBuilder<ResourceType<?, ?, ?>>().setName(
                     REGISTRY_ID));
-    public static final RegistryObject<ResourceType<ItemStack, Item, IItemHandler>> ITEM = TYPES.register(
+    public static final RegistryObject<ResourceType<ItemStack, Item, IItemHandler>> ITEM = REGISTERER.register(
             "item",
             ItemResourceType::new
     );
-    public static final RegistryObject<ResourceType<FluidStack, Fluid, IFluidHandler>> FLUID = TYPES.register(
+    public static final RegistryObject<ResourceType<FluidStack, Fluid, IFluidHandler>> FLUID = REGISTERER.register(
             "fluid",
             FluidResourceType::new
     );
-    public static final RegistryObject<ResourceType<Integer, Class<Integer>, IEnergyStorage>> FORGE_ENERGY = TYPES.register(
+    public static final RegistryObject<ResourceType<Integer, Class<Integer>, IEnergyStorage>> FORGE_ENERGY = REGISTERER.register(
             "forge_energy",
             ForgeEnergyResourceType::new
     );
@@ -51,12 +52,12 @@ public class SFMResourceTypes {
 
     static {
         if (SFMModCompat.isMekanismLoaded()) {
-//            SFMMekanismCompat.registerResourceTypes(TYPES);
+//            SFMMekanismCompat.registerResourceTypes(REGISTERER);
         }
     }
 
     public static int getResourceTypeCount() {
-        return TYPES.getEntries().size();
+        return REGISTERER.getEntries().size();
     }
 
     public static @Nullable ResourceType<?, ?, ?> fastLookup(
@@ -64,16 +65,21 @@ public class SFMResourceTypes {
     ) {
         return DEFERRED_TYPES_BY_ID.computeIfAbsent(
                 resourceTypeId,
-                i -> DEFERRED_TYPES.get().getValue(resourceTypeId)
+                i -> registry().getValue(resourceTypeId)
         );
     }
 
     public static Stream<Capability<?>> getCapabilities() {
-        return TYPES.getEntries().stream().map(RegistryObject::get).map(resourceType -> resourceType.CAPABILITY_KIND);
+        return REGISTERER.getEntries().stream().map(RegistryObject::get).map(resourceType -> resourceType.CAPABILITY_KIND);
     }
 
     public static void register(IEventBus bus) {
-        TYPES.register(bus);
+        REGISTERER.register(bus);
+    }
+
+    @MCVersionDependentBehaviour
+    public static IForgeRegistry<ResourceType<?, ?, ?>> registry() {
+        return REGISTRY.get();
     }
 
     /* TODO: add support for new resource types
