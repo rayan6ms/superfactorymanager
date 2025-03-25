@@ -41,9 +41,7 @@ public record ServerboundContainerExportsInspectionRequestPacket(
             sb.append("-- ").append(direction).append("\n");
             int len = sb.length();
             //noinspection unchecked,rawtypes
-            SFMResourceTypes.DEFERRED_TYPES
-                    .get()
-                    .getEntries().stream().map(entry -> buildInspectionResults(
+            SFMResourceTypes.registry().getEntries().stream().map(entry -> buildInspectionResults(
                             (ResourceKey) entry.getKey(),
                             entry.getValue(),
                             level,
