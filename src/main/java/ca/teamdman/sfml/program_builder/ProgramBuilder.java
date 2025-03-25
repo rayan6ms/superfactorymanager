@@ -108,8 +108,8 @@ public class ProgramBuilder {
                     errors.add(LocalizationKeys.PROGRAM_ERROR_UNKNOWN_RESOURCE_TYPE.get(
                             referencedResource));
                 } else {
-                    ResourceLocation resourceTypeId = Objects.requireNonNull(SFMResourceTypes.DEFERRED_TYPES
-                                                                                     .get()
+                    ResourceLocation resourceTypeId = Objects.requireNonNull(SFMResourceTypes
+                                                                                     .registry()
                                                                                      .getKey(resourceType));
                     if (disallowedResourceTypes.contains(resourceTypeId.toString())) {
                         errors.add(LocalizationKeys.PROGRAM_ERROR_DISALLOWED_RESOURCE_TYPE.get(
