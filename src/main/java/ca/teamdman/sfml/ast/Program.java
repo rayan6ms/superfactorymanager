@@ -1,24 +1,22 @@
 package ca.teamdman.sfml.ast;
 
-import ca.teamdman.langs.SFMLLexer;
-import ca.teamdman.langs.SFMLParser;
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.*;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import ca.teamdman.sfm.common.util.SFMTranslationUtils;
+import ca.teamdman.sfml.program_builder.ProgramBuilder;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.network.NetworkHooks;
-import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.BaseErrorListener;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
@@ -29,13 +27,13 @@ import static ca.teamdman.sfm.common.blockentity.ManagerBlockEntity.TICK_TIME_HI
 import static ca.teamdman.sfm.common.net.ServerboundManagerSetLogLevelPacket.MAX_LOG_LEVEL_NAME_LENGTH;
 
 public record Program(
-        ASTBuilder builder,
+        ASTBuilder astBuilder,
         String name,
         List<Trigger> triggers,
         Set<String> referencedLabels,
         Set<ResourceIdentifier<?, ?, ?>> referencedResources
 ) implements Statement {
-    /** 
+    /**
      * This comes from {@link java.io.DataOutputStream#writeUTF(String, DataOutput)}
      * and {@link NetworkHooks#openScreen(ServerPlayer, MenuProvider, Consumer)}
      */
@@ -52,92 +50,10 @@ public record Program(
             Consumer<Program> onSuccess,
             Consumer<List<TranslatableContents>> onFailure
     ) {
-        SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(programString));
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        SFMLParser parser = new SFMLParser(tokens);
-        ASTBuilder builder = new ASTBuilder();
-
-        // set up error capturing
-        lexer.removeErrorListeners();
-        parser.removeErrorListeners();
-        List<TranslatableContents> errors = new ArrayList<>();
-        List<String> buildErrors = new ArrayList<>();
-        ListErrorListener listener = new ListErrorListener(buildErrors);
-        lexer.addErrorListener(listener);
-        parser.addErrorListener(listener);
-
-        // initial parse
-        SFMLParser.ProgramContext context = parser.program();
-        buildErrors.stream().map(LocalizationKeys.PROGRAM_ERROR_LITERAL::get).forEach(errors::add);
-
-
-        // build AST
-        Program program = null;
-        if (errors.isEmpty()) {
-            try {
-                program = builder.visitProgram(context);
-                // Make sure all referenced resources are valid during compilation instead of waiting for the program to tick
-                checkResourceTypes(program, errors);
-            } catch (ResourceLocationException | IllegalArgumentException | AssertionError e) {
-                errors.add(LocalizationKeys.PROGRAM_ERROR_LITERAL.get(e.getMessage()));
-            } catch (Throwable t) {
-                errors.add(LocalizationKeys.PROGRAM_ERROR_COMPILE_FAILED.get());
-                SFM.LOGGER.warn(
-                        "Encountered unhandled error while compiling program\n```\n{}\n```",
-                        programString,
-                        t
-                );
-                if (!FMLEnvironment.production) {
-                    var message = t.getMessage();
-                    if (message != null) {
-                        errors.add(SFMTranslationUtils.getTranslatableContents(
-                                t.getClass().getSimpleName() + ": " + message
-                        ));
-                    } else {
-                        errors.add(SFMTranslationUtils.getTranslatableContents(t.getClass().getSimpleName()));
-                    }
-                }
-            }
-        }
-
-        if (program == null && errors.isEmpty()) {
-            errors.add(LocalizationKeys.PROGRAM_ERROR_COMPILE_FAILED.get());
-            SFM.LOGGER.error(
-                    "Program was somehow null after a successful compile. I have no idea how this could happen, but it definitely shouldn't.\n```\n{}\n```",
-                    programString
-            );
-        }
-
-        if (errors.isEmpty()) {
-            onSuccess.accept(program);
-        } else {
-            onFailure.accept(errors);
-        }
-    }
-
-    private static void checkResourceTypes(
-            Program program,
-            List<TranslatableContents> errors
-    ) {
-        List<? extends String> disallowedResourceTypes = SFMConfig.getOrDefault(SFMConfig.SERVER.disallowedResourceTypesForTransfer);
-        for (ResourceIdentifier<?, ?, ?> referencedResource : program.referencedResources) {
-            try {
-                ResourceType<?, ?, ?> resourceType = referencedResource.getResourceType();
-                if (resourceType == null) {
-                    errors.add(LocalizationKeys.PROGRAM_ERROR_UNKNOWN_RESOURCE_TYPE.get(
-                            referencedResource));
-                } else {
-                    ResourceLocation resourceTypeId = Objects.requireNonNull(SFMResourceTypes.DEFERRED_TYPES.get().getKey(resourceType));
-                    if (disallowedResourceTypes.contains(resourceTypeId.toString())) {
-                        errors.add(LocalizationKeys.PROGRAM_ERROR_DISALLOWED_RESOURCE_TYPE.get(
-                                referencedResource));
-                    }
-                }
-            } catch (ResourceLocationException e) {
-                errors.add(LocalizationKeys.PROGRAM_ERROR_MALFORMED_RESOURCE_TYPE.get(
-                        referencedResource));
-            }
-        }
+        ProgramBuilder
+                .build(programString)
+                .caseSuccess((program, metadata) -> onSuccess.accept(program))
+                .caseFailure(result -> onFailure.accept(result.metadata().errors()));
     }
 
     /**
@@ -262,7 +178,10 @@ public record Program(
         return rtn.toString();
     }
 
-    public void replaceOutputStatement(OutputStatement oldStatement, OutputStatement newStatement) {
+    public void replaceOutputStatement(
+            OutputStatement oldStatement,
+            OutputStatement newStatement
+    ) {
         Deque<Statement> toPatch = new ArrayDeque<>();
         toPatch.add(this);
         while (!toPatch.isEmpty()) {
@@ -275,6 +194,33 @@ public record Program(
                 } else {
                     toPatch.add(child);
                 }
+            }
+        }
+    }
+
+    private static void checkResourceTypes(
+            Program program,
+            List<TranslatableContents> errors
+    ) {
+        List<? extends String> disallowedResourceTypes = SFMConfig.getOrDefault(SFMConfig.SERVER.disallowedResourceTypesForTransfer);
+        for (ResourceIdentifier<?, ?, ?> referencedResource : program.referencedResources) {
+            try {
+                ResourceType<?, ?, ?> resourceType = referencedResource.getResourceType();
+                if (resourceType == null) {
+                    errors.add(LocalizationKeys.PROGRAM_ERROR_UNKNOWN_RESOURCE_TYPE.get(
+                            referencedResource));
+                } else {
+                    ResourceLocation resourceTypeId = Objects.requireNonNull(SFMResourceTypes.DEFERRED_TYPES
+                                                                                     .get()
+                                                                                     .getKey(resourceType));
+                    if (disallowedResourceTypes.contains(resourceTypeId.toString())) {
+                        errors.add(LocalizationKeys.PROGRAM_ERROR_DISALLOWED_RESOURCE_TYPE.get(
+                                referencedResource));
+                    }
+                }
+            } catch (ResourceLocationException e) {
+                errors.add(LocalizationKeys.PROGRAM_ERROR_MALFORMED_RESOURCE_TYPE.get(
+                        referencedResource));
             }
         }
     }

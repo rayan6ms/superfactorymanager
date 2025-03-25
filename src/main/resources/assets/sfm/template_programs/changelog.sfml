@@ -4,6 +4,14 @@ NAME "Changelog"
 -- Official SFM Donation Page:
 -- https://ko-fi.com/teamdman
 
+---- vNext ----
+-- Add intellisense
+-- Changed line numbers button to config button in program edit screen
+-- Add editor config to disable intellisense
+-- Fix missing focus highlight from tab-navigation of buttons in manager screen
+-- Fix syntax highlighting for "SECOND"
+-- Fix escaped quotes in strings containing the escaping backslash
+
 ---- 4.20.0 ----
 -- Fix disks having no name when program has no name for 1.21+
 -- VSCode extension updates, thanks @Titop54 for the help <3

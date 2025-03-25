@@ -311,7 +311,7 @@ public class ClientExportHelper {
 
         ResourceLocation stackRegistryKey;
         synchronized (registryReaderLock) {
-            stackRegistryKey = resourceType.getRegistryKey(stack);
+            stackRegistryKey = resourceType.getRegistryKeyForStack(stack);
         }
         ingredientObject.addProperty("ingredientId", stackRegistryKey.toString());
 

@@ -1,6 +1,6 @@
 package ca.teamdman.sfm;
 
-import ca.teamdman.sfm.client.gui.EditorUtils;
+import ca.teamdman.sfml.manipulation.ProgramStringManipulationUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -31,7 +31,7 @@ public class IndentationTests {
         assertEquals(expectedSelection, expectedProgram.substring(expectedSelectionStart, expectedSelectionEnd));
 
 
-        var result = EditorUtils.indent(program, selectionStart, selectionEnd);
+        var result = ProgramStringManipulationUtils.indent(program, selectionStart, selectionEnd);
         assertEquals(expectedProgram, result.content());
         assertEquals(
                 expectedSelection,
@@ -66,7 +66,7 @@ public class IndentationTests {
         assertEquals(expectedSelection, expectedProgram.substring(expectedSelectionStart, expectedSelectionEnd));
 
 
-        var result = EditorUtils.indent(program, selectionStart, selectionEnd);
+        var result = ProgramStringManipulationUtils.indent(program, selectionStart, selectionEnd);
         assertEquals(expectedProgram, result.content());
         assertEquals(
                 expectedSelection,
@@ -102,7 +102,7 @@ public class IndentationTests {
         assertEquals(expectedSelection, expectedProgram.substring(expectedSelectionStart, expectedSelectionEnd));
 
 
-        var result = EditorUtils.deindent(program, selectionStart, selectionEnd);
+        var result = ProgramStringManipulationUtils.deindent(program, selectionStart, selectionEnd);
         assertEquals(expectedProgram, result.content());
         assertEquals(
                 expectedSelection,
@@ -138,7 +138,7 @@ public class IndentationTests {
         assertEquals(expectedSelection, expectedProgram.substring(expectedSelectionStart, expectedSelectionEnd));
 
 
-        var result = EditorUtils.deindent(program, selectionStart, selectionEnd);
+        var result = ProgramStringManipulationUtils.deindent(program, selectionStart, selectionEnd);
         assertEquals(expectedProgram, result.content());
         assertEquals(
                 expectedSelection,
