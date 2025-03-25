@@ -189,7 +189,7 @@ public class OutputStatement implements IOStatement {
         // THIS SHOULD NEVER HAPPEN
         // will void items if it does
         if (!destination.type.isEmpty(extractedRemainder)) {
-            ResourceLocation resourceTypeName = SFMResourceTypes.DEFERRED_TYPES.getKey(source.type);
+            ResourceLocation resourceTypeName = SFMResourceTypes.registry().getKey(source.type);
             String stackName = destination.type.getItem(potential).toString();
             Level level = context.getManager().getLevel();
             assert level != null;

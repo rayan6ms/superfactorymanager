@@ -5,6 +5,7 @@ import ca.teamdman.sfm.common.resourcetype.FluidResourceType;
 import ca.teamdman.sfm.common.resourcetype.ForgeEnergyResourceType;
 import ca.teamdman.sfm.common.resourcetype.ItemResourceType;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -30,21 +31,21 @@ public class SFMResourceTypes {
             "resource_type"
     ));
 
-    private static final DeferredRegister<ResourceType<?, ?, ?>> TYPES = DeferredRegister.create(
+    private static final DeferredRegister<ResourceType<?, ?, ?>> REGISTERER = DeferredRegister.create(
             REGISTRY_ID,
             SFM.MOD_ID
     );
-    public static final Registry<ResourceType<?, ?, ?>> DEFERRED_TYPES = TYPES.makeRegistry(
+    public static final Registry<ResourceType<?, ?, ?>> REGISTRY = REGISTERER.makeRegistry(
             registryBuilder->{});
-    public static final Supplier<ResourceType<ItemStack, Item, IItemHandler>> ITEM = TYPES.register(
+    public static final Supplier<ResourceType<ItemStack, Item, IItemHandler>> ITEM = REGISTERER.register(
             "item",
             ItemResourceType::new
     );
-    public static final Supplier<ResourceType<FluidStack, Fluid, IFluidHandler>> FLUID = TYPES.register(
+    public static final Supplier<ResourceType<FluidStack, Fluid, IFluidHandler>> FLUID = REGISTERER.register(
             "fluid",
             FluidResourceType::new
     );
-    public static final Supplier<ResourceType<Integer, Class<Integer>, IEnergyStorage>> FORGE_ENERGY = TYPES.register(
+    public static final Supplier<ResourceType<Integer, Class<Integer>, IEnergyStorage>> FORGE_ENERGY = REGISTERER.register(
             "forge_energy",
             ForgeEnergyResourceType::new
     );
@@ -52,12 +53,12 @@ public class SFMResourceTypes {
 
 //    static {
 //        if (SFMModCompat.isMekanismLoaded()) {
-//            SFMMekanismCompat.registerResourceTypes(TYPES);
+//            SFMMekanismCompat.registerResourceTypes(REGISTERER);
 //        }
 //    }
 
     public static int getResourceTypeCount() {
-        return TYPES.getEntries().size();
+        return REGISTERER.getEntries().size();
     }
 
     public static @Nullable ResourceType<?, ?, ?> fastLookup(
@@ -65,16 +66,21 @@ public class SFMResourceTypes {
     ) {
         return DEFERRED_TYPES_BY_ID.computeIfAbsent(
                 resourceTypeId,
-                i -> DEFERRED_TYPES.get(resourceTypeId)
+                i -> registry().get(resourceTypeId)
         );
     }
 
     public static Stream<Capability<?>> getCapabilities() {
-        return TYPES.getEntries().stream().map(Supplier::get).map(resourceType -> resourceType.CAPABILITY_KIND);
+        return REGISTERER.getEntries().stream().map(Supplier::get).map(resourceType -> resourceType.CAPABILITY_KIND);
     }
 
     public static void register(IEventBus bus) {
-        TYPES.register(bus);
+        REGISTERER.register(bus);
+    }
+
+    @MCVersionDependentBehaviour
+    public static Registry<ResourceType<?, ?, ?>> registry() {
+        return REGISTRY;
     }
 
     /* TODO: add support for new resource types

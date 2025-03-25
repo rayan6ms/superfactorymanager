@@ -25,11 +25,6 @@ public class SFMMenus {
             BuiltInRegistries.MENU,
             SFM.MOD_ID
     );
-
-    public static void register(IEventBus bus) {
-        MENU_TYPES.register(bus);
-    }
-
     public static final Supplier<MenuType<ManagerContainerMenu>> MANAGER_MENU = MENU_TYPES.register(
             "manager",
             () -> IMenuTypeExtension.create(
@@ -67,7 +62,6 @@ public class SFMMenus {
                         }
                     })
     );
-
     public static final Supplier<MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK_MENU = MENU_TYPES.register(
             "test_barrel_tank",
             () -> IMenuTypeExtension.create(
@@ -105,6 +99,10 @@ public class SFMMenus {
                         }
                     })
     );
+
+    public static void register(IEventBus bus) {
+        MENU_TYPES.register(bus);
+    }
 
 
 }

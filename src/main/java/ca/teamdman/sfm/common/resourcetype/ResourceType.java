@@ -206,7 +206,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     }
 
     public String displayAsCode() {
-        ResourceLocation thisKey = SFMResourceTypes.DEFERRED_TYPES.getKey(this);
+        ResourceLocation thisKey = SFMResourceTypes.registry().getKey(this);
         return thisKey != null ? thisKey.toString() : "null";
     }
 

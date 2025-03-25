@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.capabilityprovidermapper.BlockEntityCapabilityProviderMapper;
 import ca.teamdman.sfm.common.capabilityprovidermapper.CapabilityProviderMapper;
 import ca.teamdman.sfm.common.capabilityprovidermapper.CauldronCapabilityProviderMapper;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
@@ -22,27 +23,33 @@ public class SFMCapabilityProviderMappers {
             SFM.MOD_ID,
             "capability_provider_mappers"
     ));
-    private static final DeferredRegister<CapabilityProviderMapper> MAPPERS = DeferredRegister.create(
+    private static final DeferredRegister<CapabilityProviderMapper> REGISTERER = DeferredRegister.create(
             REGISTRY_ID,
             SFM.MOD_ID
     );
-    public static final Registry<CapabilityProviderMapper> DEFERRED_MAPPERS = MAPPERS.makeRegistry(registryBuilder->{});
+    public static final Registry<CapabilityProviderMapper> REGISTRY = REGISTERER.makeRegistry(registryBuilder->{});
 
     @SuppressWarnings("unused")
-    public static final Supplier<BlockEntityCapabilityProviderMapper> BLOCK_ENTITY_MAPPER = MAPPERS.register(
+    public static final Supplier<BlockEntityCapabilityProviderMapper> BLOCK_ENTITY_MAPPER = REGISTERER.register(
             "block_entity",
             BlockEntityCapabilityProviderMapper::new
     );
 
     @SuppressWarnings("unused")
-    public static final Supplier<CauldronCapabilityProviderMapper> CAULDRON_MAPPER = MAPPERS.register(
+    public static final Supplier<CauldronCapabilityProviderMapper> CAULDRON_MAPPER = REGISTERER.register(
             "cauldron",
             CauldronCapabilityProviderMapper::new
     );
 
     public static void register(IEventBus bus) {
-        MAPPERS.register(bus);
+        REGISTERER.register(bus);
     }
+
+    @MCVersionDependentBehaviour
+    public static Registry<CapabilityProviderMapper> registry() {
+        return REGISTRY;
+    }
+
 
 //    static {
 //        if (SFMModCompat.isAE2Loaded()) {
@@ -61,7 +68,7 @@ public class SFMCapabilityProviderMappers {
     ) {
         if (!level.isLoaded(pos)) return null;
 
-        var mappers = DEFERRED_MAPPERS.entrySet();
+        var mappers = REGISTRY.entrySet();
         CapabilityProviderMapper beMapper = null;
         for (var entry : mappers) {
             CapabilityProviderMapper mapper = entry.getValue();

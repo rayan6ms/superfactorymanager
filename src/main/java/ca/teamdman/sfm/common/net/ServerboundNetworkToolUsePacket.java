@@ -125,8 +125,7 @@ public record ServerboundNetworkToolUsePacket(
                     payload.append(messages[i]).append("\n");
                     MutableBoolean foundExports = new MutableBoolean(false);
                     //noinspection unchecked,rawtypes
-                    SFMResourceTypes.DEFERRED_TYPES
-                            .entrySet()
+                    SFMResourceTypes.registry().entrySet()
                             .stream()
                             .map(entry -> ServerboundContainerExportsInspectionRequestPacket.buildInspectionResults(
                                     (ResourceKey) entry.getKey(),

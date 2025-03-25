@@ -46,6 +46,9 @@ sourceSets {
         }
         //// @MCVersionDependentBehaviour
 //        java {
+//            exclude "ca/teamdman/sfm/common/compat/SFMMekanismCompat.java"
+//        }
+//        java {
 //            exclude "ca/teamdman/sfm/common/resourcetype/GasResourceType.java"
 //            exclude "ca/teamdman/sfm/common/resourcetype/InfuseResourceType.java"
 //            exclude "ca/teamdman/sfm/common/resourcetype/MekanismEnergyResourceType.java"
