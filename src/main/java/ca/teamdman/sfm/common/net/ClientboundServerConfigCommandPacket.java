@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.net;
 
-import ca.teamdman.sfm.client.ClientScreenHelpers;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
+import ca.teamdman.sfm.client.gui.screen.TomlEditScreenOpenContext;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -16,6 +17,7 @@ public record ClientboundServerConfigCommandPacket(
         public PacketDirection getPacketDirection() {
             return PacketDirection.CLIENTBOUND;
         }
+
         @Override
         public void encode(
                 ClientboundServerConfigCommandPacket msg,
@@ -41,11 +43,15 @@ public record ClientboundServerConfigCommandPacket(
             String configTomlString = msg.configToml();
             configTomlString = configTomlString.replaceAll("\r", "");
             switch (msg.requestingEditMode()) {
-                case SHOW -> ClientScreenHelpers.showProgramEditScreen(configTomlString);
-                case EDIT -> ClientScreenHelpers.showProgramEditScreen(
+                case SHOW -> SFMScreenChangeHelpers.showTomlEditScreen(new TomlEditScreenOpenContext(
+                        configTomlString,
+                        $ -> {
+                        }
+                ));
+                case EDIT -> SFMScreenChangeHelpers.showTomlEditScreen(new TomlEditScreenOpenContext(
                         configTomlString,
                         (newContent) -> SFMPackets.sendToServer(new ServerboundServerConfigUpdatePacket(newContent))
-                );
+                ));
             }
         }
 

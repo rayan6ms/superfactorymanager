@@ -41,7 +41,7 @@ public record ServerboundBoolExprStatementInspectionRequestPacket(
             context.compileAndThen(
                     msg.programString,
                     (program, player, managerBlockEntity) ->
-                            program.builder()
+                            program.astBuilder()
                                     .getNodeAtIndex(msg.inputNodeIndex)
                                     .filter(BoolExpr.class::isInstance)
                                     .map(BoolExpr.class::cast)

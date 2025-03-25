@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
-public class ChemicalResourceType extends ResourceType<ChemicalStack, Chemical, IChemicalHandler> {
+public class ChemicalResourceType extends RegistryBackedResourceType<ChemicalStack, Chemical, IChemicalHandler> {
     public static final BlockCapability<IChemicalHandler, @Nullable Direction> CAP = Capabilities.CHEMICAL.block();
 
     public ChemicalResourceType() {

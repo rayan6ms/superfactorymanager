@@ -4,7 +4,6 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.gui.screen.ManagerScreen;
 import ca.teamdman.sfm.client.gui.screen.TestBarrelTankScreen;
 import ca.teamdman.sfm.common.registry.SFMMenus;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;

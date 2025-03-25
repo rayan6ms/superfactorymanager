@@ -9,7 +9,9 @@ import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMRecipeSerializers;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticRecipeDataGen;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.recipes.*;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.SpecialRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
@@ -17,8 +19,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
-
-import java.util.function.Consumer;
 
 public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
     public SFMRecipes(GatherDataEvent event) {

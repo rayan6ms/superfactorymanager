@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.client.gui.screen;
 
-import ca.teamdman.sfm.client.gui.ButtonBuilder;
+import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunClearPacket;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunCycleViewModePacket;
@@ -13,7 +13,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.EditBox;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
@@ -22,8 +21,6 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 public class LabelGunScreen extends Screen {
     private final InteractionHand HAND;
@@ -42,7 +39,7 @@ public class LabelGunScreen extends Screen {
     @Override
     protected void init() {
         super.init();
-        SFMScreenUtils.enableKeyRepeating();
+        SFMScreenRenderUtils.enableKeyRepeating();
         this.labelField = addRenderableWidget(new EditBox(
                 this.font,
                 this.width / 2 - 150,
@@ -59,7 +56,7 @@ public class LabelGunScreen extends Screen {
         this.labelField.setFocused(true);
 
         this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setSize(50, 20)
                         .setPosition(this.width / 2 - 210, 50)
                         .setText(LocalizationKeys.LABEL_GUN_GUI_CLEAR_BUTTON)
@@ -71,7 +68,7 @@ public class LabelGunScreen extends Screen {
                         .build()
         );
         this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setSize(50, 20)
                         .setPosition(this.width / 2 + 160, 50)
                         .setText(LocalizationKeys.LABEL_GUN_GUI_PRUNE_BUTTON)
@@ -83,7 +80,7 @@ public class LabelGunScreen extends Screen {
                         .build()
         );
         this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setSize(200, 20)
                         .setPosition(this.width / 2 - 2 - 100, this.height - 25)
                         .setText(LocalizationKeys.LABEL_GUN_GUI_CYCLE_VIEW_BUTTON)
@@ -94,7 +91,7 @@ public class LabelGunScreen extends Screen {
                         .build()
         );
         this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setSize(300, 20)
                         .setPosition(this.width / 2 - 2 - 150, this.height - 50)
                         .setText(CommonComponents.GUI_DONE)
@@ -182,7 +179,7 @@ public class LabelGunScreen extends Screen {
             int height
     ) {
         int count = LABEL_HOLDER.getPositions(label).size();
-        Button button = new ButtonBuilder()
+        Button button = new SFMButtonBuilder()
                 .setSize(width, height)
                 .setPosition(x, y)
                 .setText(LocalizationKeys.LABEL_GUN_GUI_LABEL_BUTTON.getComponent(label, count))
