@@ -109,6 +109,7 @@ public class ProgramSyntaxHighlightingHelper {
             case SFMLLexer.GLOBAL:
             case SFMLLexer.NUMBER_WITH_G_SUFFIX:
             case SFMLLexer.SECONDS:
+            case SFMLLexer.SECOND:
             case SFMLLexer.SLOTS:
             case SFMLLexer.EXCEPT:
             case SFMLLexer.RETAIN:

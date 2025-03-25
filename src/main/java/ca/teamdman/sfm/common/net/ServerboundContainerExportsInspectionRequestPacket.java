@@ -36,8 +36,7 @@ public record ServerboundContainerExportsInspectionRequestPacket(
             sb.append("-- ").append(direction).append("\n");
             int len = sb.length();
             //noinspection unchecked,rawtypes
-            SFMResourceTypes.DEFERRED_TYPES
-                    .entrySet().stream().map(entry -> buildInspectionResults(
+            SFMResourceTypes.registry().entrySet().stream().map(entry -> buildInspectionResults(
                             (ResourceKey) entry.getKey(),
                             entry.getValue(),
                             level,
@@ -97,12 +96,10 @@ public record ServerboundContainerExportsInspectionRequestPacket(
 
                 List<ResourceLimit> resourceLimitList = new ArrayList<>();
                 slotContents.forEach((slot, stack) -> {
-                    ResourceLocation stackId = resourceType.getRegistryKey(stack);
+                    ResourceLocation stackId = resourceType.getRegistryKeyForStack(stack);
                     ResourceIdentifier<STACK, ITEM, CAP> resourceIdentifier = new ResourceIdentifier<>(
-                            resourceTypeResourceKey.location().getNamespace(),
-                            resourceTypeResourceKey.location().getPath(),
-                            stackId.getNamespace(),
-                            stackId.getPath()
+                            resourceTypeResourceKey,
+                            stackId
                     );
                     ResourceLimit resourceLimit = new ResourceLimit(
                             new ResourceIdSet(List.of(resourceIdentifier)),

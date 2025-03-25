@@ -5,7 +5,6 @@ import ca.teamdman.sfm.common.item.DiskItem;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.fml.ModList;
 import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;

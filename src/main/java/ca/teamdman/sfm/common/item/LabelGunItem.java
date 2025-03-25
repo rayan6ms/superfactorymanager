@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.item;
 
 import ca.teamdman.sfm.client.ClientKeyHelpers;
-import ca.teamdman.sfm.client.ClientScreenHelpers;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.handler.LabelGunKeyMappingHandler;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
@@ -12,7 +12,6 @@ import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.common.registry.SFMDataComponents;
 import com.mojang.serialization.Codec;
 import io.netty.buffer.ByteBuf;
-import mekanism.common.content.gear.mekasuit.ModuleJetpackUnit;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
@@ -193,7 +192,7 @@ public class LabelGunItem extends Item {
     ) {
         var stack = player.getItemInHand(hand);
         if (level.isClientSide) {
-            ClientScreenHelpers.showLabelGunScreen(stack, hand);
+            SFMScreenChangeHelpers.showLabelGunScreen(stack, hand);
         }
         return InteractionResultHolder.sidedSuccess(stack, level.isClientSide());
     }

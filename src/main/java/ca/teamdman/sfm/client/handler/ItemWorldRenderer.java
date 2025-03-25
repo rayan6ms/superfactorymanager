@@ -1,14 +1,13 @@
 package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.gui.screen.SFMScreenUtils;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenRenderUtils;
 import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.item.NetworkToolItem;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.HelpsWithMinecraftVersionIndependence;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMDirections;
-import ca.teamdman.sfm.common.registry.SFMDataComponents;
 import com.google.common.collect.HashMultimap;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -38,9 +37,6 @@ import org.joml.Matrix4f;
 import org.joml.Quaternionf;
 
 import java.util.*;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
 
 @EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 /*
@@ -317,7 +313,7 @@ public class ItemWorldRenderer {
         Font font = Minecraft.getInstance().font;
         poseStack.translate(0, labels.size() * (font.lineHeight + 0.1) / -2f, 0);
         for (String label : labels) {
-            SFMScreenUtils.drawInBatch(
+            SFMScreenRenderUtils.drawInBatch(
                     label,
                     font,
                     -font.width(label) / 2f,

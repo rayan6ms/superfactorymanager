@@ -11,12 +11,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.neoforged.neoforge.capabilities.BlockCapability;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
-public class SlurryResourceType extends ResourceType<SlurryStack, Slurry, ISlurryHandler> {
+public class SlurryResourceType extends RegistryBackedResourceType<SlurryStack, Slurry, ISlurryHandler> {
     public static final BlockCapability<ISlurryHandler, @Nullable Direction> CAP = Capabilities.SLURRY.block();
 
     public SlurryResourceType() {

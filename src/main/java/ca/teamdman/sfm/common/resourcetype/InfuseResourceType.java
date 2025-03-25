@@ -11,12 +11,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.neoforged.neoforge.capabilities.BlockCapability;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
-public class InfuseResourceType extends ResourceType<InfusionStack, InfuseType, IInfusionHandler> {
+public class InfuseResourceType extends RegistryBackedResourceType<InfusionStack, InfuseType, IInfusionHandler> {
     public static final BlockCapability<IInfusionHandler, @Nullable Direction> CAP = Capabilities.INFUSION.block();
 
     public InfuseResourceType() {

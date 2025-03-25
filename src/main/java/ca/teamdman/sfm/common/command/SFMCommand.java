@@ -2,7 +2,6 @@ package ca.teamdman.sfm.common.command;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.export.ClientExportHelper;
-import ca.teamdman.sfm.client.export.ClientExportHelper;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import ca.teamdman.sfm.common.net.ClientboundShowChangelogPacket;
 import ca.teamdman.sfm.common.registry.SFMPackets;
@@ -19,12 +18,9 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.server.command.EnumArgument;
-
-import java.io.IOException;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
@@ -129,7 +125,7 @@ public class SFMCommand {
 
         if (FMLEnvironment.dist.isClient()) {
             command.then(Commands.literal("export_info")
-                                 .requires(__ -> true)
+                                 .requires(source -> source.hasPermission(Commands.LEVEL_ALL))
                                  .then(Commands.argument("includeHidden", BoolArgumentType.bool())
                                                .executes(ctx -> {
                                                    boolean includeHidden = BoolArgumentType.getBool(

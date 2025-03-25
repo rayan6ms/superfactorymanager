@@ -6,10 +6,6 @@ import ca.teamdman.sfm.common.program.linting.IProgramLinter;
 import ca.teamdman.sfm.common.program.linting.MekanismSideConfigProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.*;
-import ca.teamdman.sfm.common.resourcetype.GasResourceType;
-import ca.teamdman.sfm.common.resourcetype.InfuseResourceType;
-import ca.teamdman.sfm.common.resourcetype.PigmentResourceType;
-import ca.teamdman.sfm.common.resourcetype.SlurryResourceType;
 import ca.teamdman.sfml.ast.DirectionQualifier;
 import ca.teamdman.sfml.ast.IOStatement;
 import ca.teamdman.sfml.ast.ResourceIdentifier;
@@ -38,14 +34,22 @@ public class SFMMekanismCompat {
         return switch (trans) {
             case ITEM -> SFMResourceTypes.ITEM.get();
             case FLUID -> SFMResourceTypes.FLUID.get();
-            case GAS -> SFMResourceTypes.DEFERRED_TYPES
-                    .get(ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "gas"));
-            case INFUSION -> SFMResourceTypes.DEFERRED_TYPES
-                    .get(ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "infusion"));
-            case PIGMENT -> SFMResourceTypes.DEFERRED_TYPES
-                    .get(ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "pigment"));
-            case SLURRY -> SFMResourceTypes.DEFERRED_TYPES
-                    .get(ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "slurry"));
+            case GAS -> {
+                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "gas");
+                yield SFMResourceTypes.registry().get(id);
+            }
+            case INFUSION -> {
+                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "infusion");
+                yield SFMResourceTypes.registry().get(id);
+            }
+            case PIGMENT -> {
+                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "pigment");
+                yield SFMResourceTypes.registry().get(id);
+            }
+            case SLURRY -> {
+                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "slurry");
+                yield SFMResourceTypes.registry().get(id);
+            }
             default -> null;
         };
     }
@@ -91,7 +95,7 @@ public class SFMMekanismCompat {
                 continue;
             }
 
-            var maybeResourceTypeKe = SFMResourceTypes.DEFERRED_TYPES.getResourceKey(resourceType);
+            var maybeResourceTypeKe = SFMResourceTypes.registry().getResourceKey(resourceType);
             if (maybeResourceTypeKe.isEmpty()) {
                 continue;
             }
@@ -106,7 +110,7 @@ public class SFMMekanismCompat {
             if (!outputSides.isEmpty()) {
                 sb
                         .append("-- ")
-                        .append(LocalizationKeys.CONTAINER_INSPECTOR_MEKANISM_MACHINE_OUTPUTS.getString())
+                        .append(LocalizationKeys.CONTAINER_INSPECTOR_MEKANISM_MACHINE_OUTPUTS.getStub())
                         .append("\n");
                 sb.append("INPUT ").append(resourceTypeKey.location()).append(":: FROM target ");
                 sb.append(outputSides
@@ -129,7 +133,7 @@ public class SFMMekanismCompat {
             if (!inputSides.isEmpty()) {
                 sb
                         .append("-- ")
-                        .append(LocalizationKeys.CONTAINER_INSPECTOR_MEKANISM_MACHINE_INPUTS.getString())
+                        .append(LocalizationKeys.CONTAINER_INSPECTOR_MEKANISM_MACHINE_INPUTS.getStub())
                         .append("\n");
                 sb.append("OUTPUT ").append(resourceTypeKey.location()).append(":: TO target ");
                 sb.append(inputSides
@@ -171,19 +175,6 @@ public class SFMMekanismCompat {
                 "mekanism",
                 MekanismSideConfigProgramLinter::new
         );
-    }
-
-    public static void configureTopBottomIO(TileComponentConfig config) {
-        for (TransmissionType transmissionType : TransmissionType.values()) {
-            ConfigInfo info = config.getConfig(transmissionType);
-            if (info == null) continue;
-            info.setDataType(DataType.INPUT, RelativeSide.TOP);
-            info.setDataType(DataType.OUTPUT, RelativeSide.BOTTOM);
-            info.addDisabledSides(RelativeSide.FRONT, RelativeSide.BACK, RelativeSide.LEFT, RelativeSide.RIGHT);
-            for (RelativeSide side : RelativeSide.values()) {
-                config.sideChanged(transmissionType, side);
-            }
-        }
     }
 
     public static void configureExclusiveIO(

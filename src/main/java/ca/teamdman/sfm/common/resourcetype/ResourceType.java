@@ -1,34 +1,23 @@
 package ca.teamdman.sfm.common.resourcetype;
 
-import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.CapabilityConsumer;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
-import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.Stored;
 import ca.teamdman.sfml.ast.*;
 import com.mojang.datafixers.util.Pair;
-import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.capabilities.BlockCapability;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.ArrayList;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 public abstract class ResourceType<STACK, ITEM, CAP> {
-    private final Map<ITEM, ResourceLocation> registryKeyCache = new Object2ObjectOpenHashMap<>();
-
-
     public final BlockCapability<CAP, @Nullable Direction> CAPABILITY_KIND;
 
     public ResourceType(BlockCapability<CAP, @Nullable Direction> CAPABILITY_KIND) {
@@ -80,7 +69,6 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             int slot
     );
 
-
     /**
      * @return the remainder, what was not inserted
      */
@@ -105,7 +93,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
         if (!matchesStackType(stack)) return false;
         @SuppressWarnings("unchecked") STACK stack_ = (STACK) stack;
         if (isEmpty(stack_)) return false;
-        var stackId = getRegistryKey(stack_);
+        var stackId = getRegistryKeyForStack(stack_);
         return resourceId.matchesResourceLocation(stackId);
     }
 
@@ -190,23 +178,17 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     }
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean registryKeyExists(ResourceLocation location) {
-        return getRegistry().containsKey(location);
-    }
+    public abstract boolean registryKeyExists(ResourceLocation location);
 
-    public ResourceLocation getRegistryKey(STACK stack) {
-        ITEM item = getItem(stack);
-        var found = registryKeyCache.get(item);
-        if (found != null) return found;
-        found = getRegistry().getKey(item);
-        if (found == null) {
-            throw new NullPointerException("Registry key not found for item: " + item);
-        }
-        registryKeyCache.put(item, found);
-        return found;
-    }
+    public abstract ResourceLocation getRegistryKeyForStack(STACK stack);
 
-    public abstract Registry<ITEM> getRegistry();
+    public abstract ResourceLocation getRegistryKeyForItem(ITEM item);
+
+    public abstract @Nullable ITEM getItemFromRegistryKey(ResourceLocation location);
+
+    public abstract Set<ResourceLocation> getRegistryKeys();
+
+    public abstract Collection<ITEM> getItems();
 
     public abstract ITEM getItem(STACK stack);
 
@@ -221,7 +203,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     }
 
     public String displayAsCode() {
-        ResourceLocation thisKey = SFMResourceTypes.DEFERRED_TYPES.getKey(this);
+        ResourceLocation thisKey = SFMResourceTypes.registry().getKey(this);
         return thisKey != null ? thisKey.toString() : "null";
     }
 
@@ -233,5 +215,4 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             STACK stack,
             long amount
     );
-
 }

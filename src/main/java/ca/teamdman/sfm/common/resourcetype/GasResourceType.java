@@ -11,12 +11,11 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.neoforged.neoforge.capabilities.BlockCapability;
-import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
-public class GasResourceType extends ResourceType<GasStack, Gas, IGasHandler> {
+public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, IGasHandler> {
     public static final BlockCapability<IGasHandler, @Nullable Direction> CAP = Capabilities.GAS.block();
 
     public GasResourceType() {

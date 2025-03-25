@@ -16,7 +16,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.level.ChunkEvent;
 import org.jetbrains.annotations.Nullable;
 
@@ -75,7 +74,7 @@ public class WaterNetworkManager {
         } else {
             removeMember(level, pos);
         }
-//        if (!FMLEnvironment.production) {
+//        if (SFMEnvironment.isInIDE()) {
 //            Long2ObjectMap<WaterNetwork> levelNetworks = NETWORKS.get(level);
 //            if (levelNetworks == null) return;
 //            List<WaterNetwork> logNetworks = levelNetworks.values().stream().distinct().toList();

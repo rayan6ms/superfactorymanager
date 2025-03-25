@@ -1,8 +1,9 @@
 package ca.teamdman.sfm.common.item;
 
 import ca.teamdman.sfm.client.ClientKeyHelpers;
-import ca.teamdman.sfm.client.ClientScreenHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
+import ca.teamdman.sfm.client.gui.screen.ProgramEditScreenOpenContext;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
@@ -11,6 +12,7 @@ import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.program.linting.ProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMDataComponents;
 import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.ChatFormatting;
@@ -25,8 +27,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -168,21 +168,23 @@ public class DiskItem extends Item {
     ) {
         var stack = pPlayer.getItemInHand(pUsedHand);
         if (pLevel.isClientSide) {
-            ClientScreenHelpers.showProgramEditScreen(
+            SFMScreenChangeHelpers.showProgramEditScreen(new ProgramEditScreenOpenContext(
                     getProgram(stack),
-                    programString -> SFMPackets.sendToServer(new ServerboundDiskItemSetProgramPacket(
-                                programString,
-                                pUsedHand
-                        ))
-            );
+                    LabelPositionHolder.from(stack),
+                    newProgramString -> SFMPackets.sendToServer(new ServerboundDiskItemSetProgramPacket(
+                            newProgramString,
+                            pUsedHand
+                    ))
+            ));
         }
         return InteractionResultHolder.sidedSuccess(stack, pLevel.isClientSide());
     }
 
     @Override
     public Component getName(ItemStack stack) {
-        if (FMLEnvironment.dist == Dist.CLIENT) {
-            if (ClientKeyHelpers.isKeyDownInScreenOrWorld(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY)) return super.getName(stack);
+        if (SFMEnvironmentUtils.isClient()) {
+            if (ClientKeyHelpers.isKeyDownInScreenOrWorld(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY))
+                return super.getName(stack);
         }
         var name = getProgramName(stack);
         if (name.isEmpty()) return super.getName(stack);

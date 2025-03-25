@@ -6,17 +6,14 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.*;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import com.mojang.math.Constants;
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -182,7 +179,7 @@ public class OutputStatement implements IOStatement {
                 .getLogger()
                 .info(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_END.get(
                         moved,
-                        destination.type.getRegistryKey(
+                        destination.type.getRegistryKeyForStack(
                                 extracted),
                         source,
                         destination
@@ -192,7 +189,7 @@ public class OutputStatement implements IOStatement {
         // THIS SHOULD NEVER HAPPEN
         // will void items if it does
         if (!destination.type.isEmpty(extractedRemainder)) {
-            ResourceLocation resourceTypeName = SFMResourceTypes.DEFERRED_TYPES.getKey(source.type);
+            ResourceLocation resourceTypeName = SFMResourceTypes.registry().getKey(source.type);
             String stackName = destination.type.getItem(potential).toString();
             Level level = context.getManager().getLevel();
             assert level != null;

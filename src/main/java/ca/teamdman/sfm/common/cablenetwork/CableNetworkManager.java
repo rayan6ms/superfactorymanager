@@ -48,7 +48,7 @@ public class CableNetworkManager {
      * For diagnostics, called when a lookup map has changed
      */
     private static void onNetworkLookupChanged() {
-//        if (FMLEnvironment.production) return;
+//        if (!SFMEnvironment.isInIDE()) return;
 //        SFM.LOGGER.info("Network lookup changed");
 //        SFM.LOGGER.info("NETWORKS_BY_LEVEL:");
 //        for (Map.Entry<Level, List<CableNetwork>> entry : NETWORKS_BY_LEVEL.entrySet()) {

@@ -40,7 +40,7 @@ public record ServerboundIfStatementInspectionRequestPacket(
         ) {
             context.compileAndThen(
                     msg.programString,
-                    (program, player, managerBlockEntity) -> program.builder()
+                    (program, player, managerBlockEntity) -> program.astBuilder()
                             .getNodeAtIndex(msg.inputNodeIndex)
                             .filter(IfStatement.class::isInstance)
                             .map(IfStatement.class::cast)
