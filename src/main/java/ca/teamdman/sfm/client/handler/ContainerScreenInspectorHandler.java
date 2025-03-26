@@ -93,36 +93,53 @@ public class ContainerScreenInspectorHandler {
                 );
             }
 
+            // draw centered notices
+            {
+                var notice = LocalizationKeys.CONTAINER_INSPECTOR_NOTICE_1
+                        .getComponent()
+                        .withStyle(ChatFormatting.GOLD);
+                int offset = font.width(notice) / 2;
+                font.drawShadow(
+                        poseStack,
+                        notice,
+                        screen.width / 2f - offset,
+                        5,
+                        0xFFFFFF
+                );
+            }
+            {
+                var notice = LocalizationKeys.CONTAINER_INSPECTOR_NOTICE_2.getComponent(
+                        SFMKeyMappings.CONTAINER_INSPECTOR_KEY
+                                .get()
+                                .getTranslatedKeyMessage()
+                                .plainCopy()
+                                .withStyle(ChatFormatting.AQUA)
+                ).withStyle(ChatFormatting.GOLD);
+                int offset = font.width(notice) / 2;
+                font.drawShadow(
+                        poseStack,
+                        notice,
+                        screen.width / 2f - offset,
+                        16,
+                        0xFFFFFF
+                );
+            }
+
             // draw text for slot totals
-            var notice = LocalizationKeys.CONTAINER_INSPECTOR_NOTICE.getComponent().withStyle(ChatFormatting.GOLD);
-            int offset = font.width(notice) / 2;
             font.drawShadow(
                     poseStack,
-                    notice,
-                    screen.width / 2f - offset,
-                    5,
-                    0xFFFFFF
-            );
-            font.drawShadow(
-                    poseStack,
-                    LocalizationKeys.CONTAINER_INSPECTOR_CONTAINER_SLOT_COUNT.getComponent(Component
-                                                                                                             .literal(
-                                                                                                                     String.valueOf(
-                                                                                                                             containerSlotCount))
-                                                                                                             .withStyle(
-                                                                                                                     ChatFormatting.BLUE)),
+                    LocalizationKeys.CONTAINER_INSPECTOR_CONTAINER_SLOT_COUNT.getComponent(
+                            Component.literal(String.valueOf(containerSlotCount)).withStyle(ChatFormatting.BLUE)
+                    ),
                     5,
                     25,
                     0xFFFFFF
             );
             font.drawShadow(
                     poseStack,
-                    LocalizationKeys.CONTAINER_INSPECTOR_INVENTORY_SLOT_COUNT.getComponent(Component
-                                                                                                             .literal(
-                                                                                                                     String.valueOf(
-                                                                                                                             inventorySlotCount))
-                                                                                                             .withStyle(
-                                                                                                                     ChatFormatting.YELLOW)),
+                    LocalizationKeys.CONTAINER_INSPECTOR_INVENTORY_SLOT_COUNT.getComponent(
+                            Component.literal(String.valueOf(inventorySlotCount)).withStyle(ChatFormatting.YELLOW)
+                    ),
                     5,
                     40,
                     0xFFFFFF
