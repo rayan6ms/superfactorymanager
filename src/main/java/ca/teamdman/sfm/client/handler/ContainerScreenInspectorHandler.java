@@ -96,38 +96,56 @@ public class ContainerScreenInspectorHandler {
                 );
             }
 
+            // draw centered notices
+            {
+                var notice = LocalizationKeys.CONTAINER_INSPECTOR_NOTICE_1
+                        .getComponent()
+                        .withStyle(ChatFormatting.GOLD);
+                int offset = font.width(notice) / 2;
+                graphics.drawString(
+                        font,
+                        notice,
+                        screen.width / 2 - offset,
+                        5,
+                        0xFFFFFF,
+                        true
+                );
+            }
+            {
+                var notice = LocalizationKeys.CONTAINER_INSPECTOR_NOTICE_2.getComponent(
+                        SFMKeyMappings.CONTAINER_INSPECTOR_KEY
+                                .get()
+                                .getTranslatedKeyMessage()
+                                .plainCopy()
+                                .withStyle(ChatFormatting.AQUA)
+                ).withStyle(ChatFormatting.GOLD);
+                int offset = font.width(notice) / 2;
+                graphics.drawString(
+                        font,
+                        notice,
+                        screen.width / 2 - offset,
+                        16,
+                        0xFFFFFF,
+                        true
+                );
+            }
+
             // draw text for slot totals
-            var notice = LocalizationKeys.CONTAINER_INSPECTOR_NOTICE.getComponent().withStyle(ChatFormatting.GOLD);
-            int offset = font.width(notice) / 2;
             graphics.drawString(
-                    Minecraft.getInstance().font,
-                    notice,
-                    screen.width / 2 - offset,
-                    5,
-                    0xFFFFFF,
-                    true
-            );
-            graphics.drawString(
-                    Minecraft.getInstance().font,
-                    LocalizationKeys.CONTAINER_INSPECTOR_CONTAINER_SLOT_COUNT.getComponent(Component
-                                                                                                             .literal(
-                                                                                                                     String.valueOf(
-                                                                                                                             containerSlotCount))
-                                                                                                             .withStyle(
-                                                                                                                     ChatFormatting.BLUE)),
+                    font,
+                    LocalizationKeys.CONTAINER_INSPECTOR_CONTAINER_SLOT_COUNT.getComponent(
+                            Component.literal(String.valueOf(containerSlotCount)).withStyle(ChatFormatting.BLUE)
+                    ),
                     5,
                     25,
                     0xFFFFFF,
                     true
             );
             graphics.drawString(
-                    Minecraft.getInstance().font,
-                    LocalizationKeys.CONTAINER_INSPECTOR_INVENTORY_SLOT_COUNT.getComponent(Component
-                                                                                                             .literal(
-                                                                                                                     String.valueOf(
-                                                                                                                             inventorySlotCount))
-                                                                                                             .withStyle(
-                                                                                                                     ChatFormatting.YELLOW)),
+                    font,
+                    LocalizationKeys.CONTAINER_INSPECTOR_INVENTORY_SLOT_COUNT.getComponent(
+                            Component.literal(String.valueOf(inventorySlotCount)).withStyle(ChatFormatting.YELLOW)
+                    ),
                     5,
                     40,
                     0xFFFFFF,
