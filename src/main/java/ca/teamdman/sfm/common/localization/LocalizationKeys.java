@@ -271,7 +271,7 @@ public final class LocalizationKeys {
     );
     public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_5 = new LocalizationEntry(
             () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.5",
-            () -> "Press " + "%s to toggle label view."
+            () -> "Press  %s to toggle label view."
     );
     public static final LocalizationEntry LABEL_GUN_VIEW_MODE_SHOW_ONLY_ACTIVE_AND_TARGETED = new LocalizationEntry(
             () -> "sfm.label_gun.view_mode.show_only_active_and_targeted",
@@ -681,9 +681,13 @@ public final class LocalizationKeys {
             "gui.sfm.container_inspector.mekanism_machine_outputs",
             "The following are based on the MACHINE'S output config"
     );
-    public static final LocalizationEntry CONTAINER_INSPECTOR_NOTICE = new LocalizationEntry(
-            "gui.sfm.container_inspector.notice",
+    public static final LocalizationEntry CONTAINER_INSPECTOR_NOTICE_1 = new LocalizationEntry(
+            "gui.sfm.container_inspector.notice.1",
             "GUI slots don't always correspond to automation slots!!!"
+    );
+    public static final LocalizationEntry CONTAINER_INSPECTOR_NOTICE_2 = new LocalizationEntry(
+            "gui.sfm.container_inspector.notice.2",
+            "Press %s to toggle this overlay."
     );
     public static final LocalizationEntry CONTAINER_INSPECTOR_CONTAINER_SLOT_COUNT = new LocalizationEntry(
             "gui.sfm.container_inspector.container_slot_count",
