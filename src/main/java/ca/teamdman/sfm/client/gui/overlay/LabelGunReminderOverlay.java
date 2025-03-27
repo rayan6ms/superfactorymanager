@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.client.gui.overlay;
 
+import ca.teamdman.sfm.client.gui.screen.SFMFontUtils;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.item.LabelGunItem;
@@ -18,6 +19,9 @@ import net.neoforged.neoforge.client.gui.overlay.IGuiOverlay;
 import org.jetbrains.annotations.Nullable;
 
 public class LabelGunReminderOverlay implements IGuiOverlay {
+
+
+    @SuppressWarnings("DuplicatedCode")
     @Override
     public void render(
             ExtendedGui gui,
@@ -52,14 +56,17 @@ public class LabelGunReminderOverlay implements IGuiOverlay {
         int reminderWidth = font.width(reminder);
         int x = screenWidth / 2 - reminderWidth / 2;
         int y = 20;
-        guiGraphics.drawString(
+        SFMFontUtils.draw(
+                guiGraphics,
                 font,
                 reminder,
                 x,
                 y,
-                FastColor.ARGB32.color(255, 172, 208, 255)
+                FastColor.ARGB32.color(255, 172, 208, 255),
+                true
         );
     }
+
 
     @SuppressWarnings("BooleanMethodIsAlwaysInverted")
     private static @Nullable LabelGunItem.LabelGunViewMode getViewMode(Minecraft minecraft) {
