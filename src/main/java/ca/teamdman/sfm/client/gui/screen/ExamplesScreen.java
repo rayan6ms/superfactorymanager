@@ -38,29 +38,24 @@ public class ExamplesScreen extends Screen {
         this.renderTransparentBackground(graphics);
         super.render(graphics, pMouseX, pMouseY, pPartialTick);
         MutableComponent warning1 = LocalizationKeys.EXAMPLES_GUI_WARNING_1.getComponent();
-        graphics.drawString(
+
+        SFMFontUtils.draw(
+                graphics,
                 this.font,
                 warning1,
                 this.width / 2 - this.font.width(warning1) / 2,
                 20,
-                0xffffff,
-                false
-        );
-        graphics.drawString(
-                this.font,
-                warning1,
-                this.width / 2 - this.font.width(warning1) / 2,
-                20,
-                0xffffff,
+                16777215,
                 false
         );
         MutableComponent warning2 = LocalizationKeys.EXAMPLES_GUI_WARNING_2.getComponent();
-        graphics.drawString(
+        SFMFontUtils.draw(
+                graphics,
                 this.font,
                 warning2,
                 this.width / 2 - this.font.width(warning2) / 2,
                 36,
-                0xffffff,
+                16777215,
                 false
         );
     }
