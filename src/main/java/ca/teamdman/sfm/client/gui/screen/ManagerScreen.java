@@ -474,12 +474,14 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
         // draw state string
         var state = menu.state;
-        this.font.draw(
+        SFMFontUtils.draw(
                 poseStack,
+                this.font,
                 MANAGER_GUI_STATE.getComponent(state.LOC.getComponent().withStyle(state.COLOR)),
                 titleLabelX,
                 20,
-                0
+                0,
+                false
         );
 
         // draw log level
@@ -491,24 +493,28 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                     0f
             );
             poseStack.scale(0.5f, 0.5f, 1f);
-            this.font.draw(
+            SFMFontUtils.draw(
                     poseStack,
+                    this.font,
                     Component.literal(menu.logLevel),
-                    0f,
-                    0f,
-                    0
+                    0,
+                    0,
+                    0,
+                    false
             );
             poseStack.popPose();
         }
 
         // draw status string
         if (statusCountdown > 0) {
-            this.font.draw(
+            SFMFontUtils.draw(
                     poseStack,
+                    this.font,
                     status,
                     inventoryLabelX + font.width(playerInventoryTitle.getString()) + 5,
                     inventoryLabelY,
-                    0
+                    0,
+                    false
             );
         }
 
@@ -589,12 +595,14 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                 String formattedMillis = format.format(hoveredTickTimeMilliseconds);
                 ChatFormatting lagColor = getMillisecondColour(hoveredTickTimeMilliseconds);
                 Component milliseconds = Component.literal(formattedMillis).withStyle(lagColor);
-                this.font.draw(
+                SFMFontUtils.draw(
                         poseStack,
+                        this.font,
                         MANAGER_GUI_HOVERED_TICK_TIME_MS.getComponent(milliseconds),
                         titleLabelX,
-                        20f + font.lineHeight + 0.1f,
-                        0
+                        20 + font.lineHeight,
+                        0,
+                        false
                 );
             }
 
@@ -621,12 +629,14 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
             String formattedMillis = format.format(peakTickTimeMilliseconds);
             ChatFormatting lagColor = getMillisecondColour(peakTickTimeMilliseconds);
             Component milliseconds = Component.literal(formattedMillis).withStyle(lagColor);
-            this.font.draw(
+            SFMFontUtils.draw(
                     poseStack,
+                    this.font,
                     MANAGER_GUI_PEAK_TICK_TIME_MS.getComponent(milliseconds),
                     titleLabelX,
-                    20f + font.lineHeight + 0.1f,
-                    0
+                    20 + font.lineHeight,
+                    0,
+                    false
             );
         }
 
