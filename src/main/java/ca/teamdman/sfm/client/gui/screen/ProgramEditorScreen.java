@@ -634,7 +634,7 @@ public class ProgramEditorScreen extends Screen {
                 if (shouldShowLineNumbers()) {
                     // Draw line number
                     String lineNumber = String.valueOf(line + 1);
-                    SFMScreenRenderUtils.drawInBatch(
+                    SFMFontUtils.drawInBatch(
                             lineNumber,
                             this.font,
                             lineX - 2 - this.font.width(lineNumber),
@@ -650,7 +650,7 @@ public class ProgramEditorScreen extends Screen {
                     isCursorAtEndOfLine = cursorIndex == charCount + lineLength;
                     cursorY = lineY;
                     // draw text before cursor
-                    cursorX = SFMScreenRenderUtils.drawInBatch(
+                    cursorX = SFMFontUtils.drawInBatch(
                             substring(componentColoured, 0, cursorIndex - charCount),
                             font,
                             lineX,
@@ -662,7 +662,7 @@ public class ProgramEditorScreen extends Screen {
                     ) - 1;
                     ProgramEditorScreen.this.suggestedActions.setXY(cursorX + 10, cursorY);
                     // draw text after cursor
-                    SFMScreenRenderUtils.drawInBatch(
+                    SFMFontUtils.drawInBatch(
                             substring(componentColoured, cursorIndex - charCount, lineLength),
                             font,
                             cursorX,
@@ -673,7 +673,7 @@ public class ProgramEditorScreen extends Screen {
                             buffer
                     );
                 } else {
-                    SFMScreenRenderUtils.drawInBatch(
+                    SFMFontUtils.drawInBatch(
                             componentColoured,
                             font,
                             lineX,
@@ -708,7 +708,7 @@ public class ProgramEditorScreen extends Screen {
             }
 
             if (isCursorAtEndOfLine) {
-                graphics.drawString(this.font, "_", cursorX, cursorY, -1);
+                SFMFontUtils.draw(graphics, this.font, "_", cursorX, cursorY, -1, true);
             } else {
                 graphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + 1 + 9, -1);
             }
