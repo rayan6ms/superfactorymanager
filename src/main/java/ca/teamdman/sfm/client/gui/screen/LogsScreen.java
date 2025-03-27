@@ -379,7 +379,7 @@ public class LogsScreen extends Screen {
                     cursorY = lineY;
                     // we draw the raw before coloured in case of token recognition errors
                     // draw before cursor
-                    cursorX = SFMScreenRenderUtils.drawInBatch(
+                    cursorX = SFMFontUtils.drawInBatch(
                             ProgramEditorScreen.substring(componentColoured, 0, cursorIndex - charCount),
                             font,
                             lineX,
@@ -388,7 +388,7 @@ public class LogsScreen extends Screen {
                             false,
                             matrix4f,
                             buffer) - 1;
-                    SFMScreenRenderUtils.drawInBatch(
+                    SFMFontUtils.drawInBatch(
                             ProgramEditorScreen.substring(componentColoured, cursorIndex - charCount, lineLength),
                             font,
                             cursorX,
@@ -398,7 +398,7 @@ public class LogsScreen extends Screen {
                             matrix4f,
                             buffer);
                 } else {
-                    SFMScreenRenderUtils.drawInBatch(
+                    SFMFontUtils.drawInBatch(
                             componentColoured,
                             font,
                             lineX,
@@ -440,7 +440,15 @@ public class LogsScreen extends Screen {
             }
 
             if (isCursorAtEndOfLine) {
-                pGuiGraphics.drawString(this.font, "_", cursorX, cursorY, -1);
+                SFMFontUtils.draw(
+                        pGuiGraphics,
+                        this.font,
+                        "_",
+                        cursorX,
+                        cursorY,
+                        -1,
+                        true
+                );
             } else {
                 pGuiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + 1 + 9, -1);
             }

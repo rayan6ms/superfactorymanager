@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.client.gui.widget;
 
+import ca.teamdman.sfm.client.gui.screen.SFMFontUtils;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenRenderUtils;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -228,7 +228,7 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
             // Calculate the y position based on the item's position in the full list
             int lineY = SFMScreenRenderUtils.getY(this) + this.innerPadding() + (i * itemHeight);
 
-            SFMScreenRenderUtils.drawInBatch(
+            SFMFontUtils.drawInBatch(
                     item.getComponent(),
                     this.font,
                     lineX,

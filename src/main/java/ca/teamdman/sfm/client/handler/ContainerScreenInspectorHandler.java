@@ -2,6 +2,7 @@ package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientRayCastHelpers;
+import ca.teamdman.sfm.client.gui.screen.SFMFontUtils;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
@@ -12,8 +13,8 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -86,8 +87,9 @@ public class ContainerScreenInspectorHandler {
                     colour = 0xFFF;
                     containerSlotCount++;
                 }
-                graphics.drawString(
-                        Minecraft.getInstance().font,
+                SFMFontUtils.draw(
+                        graphics,
+                        font,
                         Component.literal(Integer.toString(slot.getSlotIndex())),
                         screen.getGuiLeft() + slot.x,
                         screen.getGuiTop() + slot.y,
@@ -102,7 +104,8 @@ public class ContainerScreenInspectorHandler {
                         .getComponent()
                         .withStyle(ChatFormatting.GOLD);
                 int offset = font.width(notice) / 2;
-                graphics.drawString(
+                SFMFontUtils.draw(
+                        graphics,
                         font,
                         notice,
                         screen.width / 2 - offset,
@@ -120,7 +123,8 @@ public class ContainerScreenInspectorHandler {
                                 .withStyle(ChatFormatting.AQUA)
                 ).withStyle(ChatFormatting.GOLD);
                 int offset = font.width(notice) / 2;
-                graphics.drawString(
+                SFMFontUtils.draw(
+                        graphics,
                         font,
                         notice,
                         screen.width / 2 - offset,
@@ -131,7 +135,8 @@ public class ContainerScreenInspectorHandler {
             }
 
             // draw text for slot totals
-            graphics.drawString(
+            SFMFontUtils.draw(
+                    graphics,
                     font,
                     LocalizationKeys.CONTAINER_INSPECTOR_CONTAINER_SLOT_COUNT.getComponent(
                             Component.literal(String.valueOf(containerSlotCount)).withStyle(ChatFormatting.BLUE)
@@ -141,7 +146,8 @@ public class ContainerScreenInspectorHandler {
                     0xFFFFFF,
                     true
             );
-            graphics.drawString(
+            SFMFontUtils.draw(
+                    graphics,
                     font,
                     LocalizationKeys.CONTAINER_INSPECTOR_INVENTORY_SLOT_COUNT.getComponent(
                             Component.literal(String.valueOf(inventorySlotCount)).withStyle(ChatFormatting.YELLOW)

@@ -6,10 +6,8 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.program_builder.ProgramBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -40,29 +38,24 @@ public class ExamplesScreen extends Screen {
         this.renderBackground(graphics);
         super.render(graphics, pMouseX, pMouseY, pPartialTick);
         MutableComponent warning1 = LocalizationKeys.EXAMPLES_GUI_WARNING_1.getComponent();
-        graphics.drawString(
+
+        SFMFontUtils.draw(
+                graphics,
                 this.font,
                 warning1,
                 this.width / 2 - this.font.width(warning1) / 2,
                 20,
-                0xffffff,
-                false
-        );
-        graphics.drawString(
-                this.font,
-                warning1,
-                this.width / 2 - this.font.width(warning1) / 2,
-                20,
-                0xffffff,
+                16777215,
                 false
         );
         MutableComponent warning2 = LocalizationKeys.EXAMPLES_GUI_WARNING_2.getComponent();
-        graphics.drawString(
+        SFMFontUtils.draw(
+                graphics,
                 this.font,
                 warning2,
                 this.width / 2 - this.font.width(warning2) / 2,
                 36,
-                0xffffff,
+                16777215,
                 false
         );
     }
