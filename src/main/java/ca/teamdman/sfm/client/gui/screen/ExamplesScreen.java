@@ -50,7 +50,7 @@ public class ExamplesScreen extends Screen {
                 warning1,
                 this.width / 2 - this.font.width(warning1) / 2,
                 20,
-                16777215,
+                0xffffff,
                 false
         );
         MutableComponent warning2 = LocalizationKeys.EXAMPLES_GUI_WARNING_2.getComponent();
@@ -60,7 +60,7 @@ public class ExamplesScreen extends Screen {
                 warning2,
                 this.width / 2 - this.font.width(warning2) / 2,
                 36,
-                16777215,
+                0xffffff,
                 false
         );
     }
