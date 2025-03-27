@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.client.gui.overlay;
 
+import ca.teamdman.sfm.client.gui.screen.SFMFontUtils;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
@@ -41,12 +42,14 @@ public class NetworkToolReminderOverlay implements LayeredDraw.Layer {
         int reminderWidth = font.width(reminder);
         int x = guiGraphics.guiWidth() / 2 - reminderWidth / 2;
         int y = 30;
-        guiGraphics.drawString(
+        SFMFontUtils.draw(
+                guiGraphics,
                 font,
                 reminder,
                 x,
                 y,
-                FastColor.ARGB32.color(255, 172, 208, 255)
+                FastColor.ARGB32.color(255, 172, 208, 255),
+                true
         );
     }
 

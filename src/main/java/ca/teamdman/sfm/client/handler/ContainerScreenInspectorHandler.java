@@ -2,6 +2,7 @@ package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientRayCastHelpers;
+import ca.teamdman.sfm.client.gui.screen.SFMFontUtils;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
@@ -86,8 +87,9 @@ public class ContainerScreenInspectorHandler {
                     colour = 0xFFF;
                     containerSlotCount++;
                 }
-                graphics.drawString(
-                        Minecraft.getInstance().font,
+                SFMFontUtils.draw(
+                        graphics,
+                        font,
                         Component.literal(Integer.toString(slot.getSlotIndex())),
                         screen.getGuiLeft() + slot.x,
                         screen.getGuiTop() + slot.y,
@@ -96,38 +98,60 @@ public class ContainerScreenInspectorHandler {
                 );
             }
 
+            // draw centered notices
+            {
+                var notice = LocalizationKeys.CONTAINER_INSPECTOR_NOTICE_1
+                        .getComponent()
+                        .withStyle(ChatFormatting.GOLD);
+                int offset = font.width(notice) / 2;
+                SFMFontUtils.draw(
+                        graphics,
+                        font,
+                        notice,
+                        screen.width / 2 - offset,
+                        5,
+                        0xFFFFFF,
+                        true
+                );
+            }
+            {
+                var notice = LocalizationKeys.CONTAINER_INSPECTOR_NOTICE_2.getComponent(
+                        SFMKeyMappings.CONTAINER_INSPECTOR_KEY
+                                .get()
+                                .getTranslatedKeyMessage()
+                                .plainCopy()
+                                .withStyle(ChatFormatting.AQUA)
+                ).withStyle(ChatFormatting.GOLD);
+                int offset = font.width(notice) / 2;
+                SFMFontUtils.draw(
+                        graphics,
+                        font,
+                        notice,
+                        screen.width / 2 - offset,
+                        16,
+                        0xFFFFFF,
+                        true
+                );
+            }
+
             // draw text for slot totals
-            var notice = LocalizationKeys.CONTAINER_INSPECTOR_NOTICE.getComponent().withStyle(ChatFormatting.GOLD);
-            int offset = font.width(notice) / 2;
-            graphics.drawString(
-                    Minecraft.getInstance().font,
-                    notice,
-                    screen.width / 2 - offset,
-                    5,
-                    0xFFFFFF,
-                    true
-            );
-            graphics.drawString(
-                    Minecraft.getInstance().font,
-                    LocalizationKeys.CONTAINER_INSPECTOR_CONTAINER_SLOT_COUNT.getComponent(Component
-                                                                                                             .literal(
-                                                                                                                     String.valueOf(
-                                                                                                                             containerSlotCount))
-                                                                                                             .withStyle(
-                                                                                                                     ChatFormatting.BLUE)),
+            SFMFontUtils.draw(
+                    graphics,
+                    font,
+                    LocalizationKeys.CONTAINER_INSPECTOR_CONTAINER_SLOT_COUNT.getComponent(
+                            Component.literal(String.valueOf(containerSlotCount)).withStyle(ChatFormatting.BLUE)
+                    ),
                     5,
                     25,
                     0xFFFFFF,
                     true
             );
-            graphics.drawString(
-                    Minecraft.getInstance().font,
-                    LocalizationKeys.CONTAINER_INSPECTOR_INVENTORY_SLOT_COUNT.getComponent(Component
-                                                                                                             .literal(
-                                                                                                                     String.valueOf(
-                                                                                                                             inventorySlotCount))
-                                                                                                             .withStyle(
-                                                                                                                     ChatFormatting.YELLOW)),
+            SFMFontUtils.draw(
+                    graphics,
+                    font,
+                    LocalizationKeys.CONTAINER_INSPECTOR_INVENTORY_SLOT_COUNT.getComponent(
+                            Component.literal(String.valueOf(inventorySlotCount)).withStyle(ChatFormatting.YELLOW)
+                    ),
                     5,
                     40,
                     0xFFFFFF,
