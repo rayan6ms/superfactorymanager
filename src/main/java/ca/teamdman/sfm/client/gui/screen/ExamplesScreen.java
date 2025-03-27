@@ -43,20 +43,25 @@ public class ExamplesScreen extends Screen {
         this.renderBackground(pPoseStack);
         super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
         MutableComponent warning1 = LocalizationKeys.EXAMPLES_GUI_WARNING_1.getComponent();
-        this.font.draw(
+
+        SFMFontUtils.draw(
                 pPoseStack,
+                this.font,
                 warning1,
-                this.width / 2f - this.font.width(warning1) / 2f,
+                this.width / 2 - this.font.width(warning1) / 2,
                 20,
-                16777215
+                16777215,
+                false
         );
         MutableComponent warning2 = LocalizationKeys.EXAMPLES_GUI_WARNING_2.getComponent();
-        this.font.draw(
+        SFMFontUtils.draw(
                 pPoseStack,
+                this.font,
                 warning2,
-                this.width / 2f - this.font.width(warning2) / 2f,
+                this.width / 2 - this.font.width(warning2) / 2,
                 36,
-                16777215
+                16777215,
+                false
         );
     }
 

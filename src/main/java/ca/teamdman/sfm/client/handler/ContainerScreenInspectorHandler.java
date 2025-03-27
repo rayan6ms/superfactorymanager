@@ -2,6 +2,7 @@ package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientRayCastHelpers;
+import ca.teamdman.sfm.client.gui.screen.SFMFontUtils;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
@@ -84,12 +85,14 @@ public class ContainerScreenInspectorHandler {
                     colour = 0xFFF;
                     containerSlotCount++;
                 }
-                font.draw(
+                SFMFontUtils.draw(
                         poseStack,
+                        font,
                         Component.literal(Integer.toString(slot.getSlotIndex())),
                         screen.getGuiLeft() + slot.x,
                         screen.getGuiTop() + slot.y,
-                        colour
+                        colour,
+                        false
                 );
             }
 
@@ -99,12 +102,14 @@ public class ContainerScreenInspectorHandler {
                         .getComponent()
                         .withStyle(ChatFormatting.GOLD);
                 int offset = font.width(notice) / 2;
-                font.drawShadow(
+                SFMFontUtils.draw(
                         poseStack,
+                        font,
                         notice,
-                        screen.width / 2f - offset,
+                        screen.width / 2 - offset,
                         5,
-                        0xFFFFFF
+                        0xFFFFFF,
+                        true
                 );
             }
             {
@@ -116,33 +121,39 @@ public class ContainerScreenInspectorHandler {
                                 .withStyle(ChatFormatting.AQUA)
                 ).withStyle(ChatFormatting.GOLD);
                 int offset = font.width(notice) / 2;
-                font.drawShadow(
+                SFMFontUtils.draw(
                         poseStack,
+                        font,
                         notice,
-                        screen.width / 2f - offset,
+                        screen.width / 2 - offset,
                         16,
-                        0xFFFFFF
+                        0xFFFFFF,
+                        true
                 );
             }
 
             // draw text for slot totals
-            font.drawShadow(
+            SFMFontUtils.draw(
                     poseStack,
+                    font,
                     LocalizationKeys.CONTAINER_INSPECTOR_CONTAINER_SLOT_COUNT.getComponent(
                             Component.literal(String.valueOf(containerSlotCount)).withStyle(ChatFormatting.BLUE)
                     ),
                     5,
                     25,
-                    0xFFFFFF
+                    0xFFFFFF,
+                    true
             );
-            font.drawShadow(
+            SFMFontUtils.draw(
                     poseStack,
+                    font,
                     LocalizationKeys.CONTAINER_INSPECTOR_INVENTORY_SLOT_COUNT.getComponent(
                             Component.literal(String.valueOf(inventorySlotCount)).withStyle(ChatFormatting.YELLOW)
                     ),
                     5,
                     40,
-                    0xFFFFFF
+                    0xFFFFFF,
+                    true
             );
             poseStack.popPose();
         }
