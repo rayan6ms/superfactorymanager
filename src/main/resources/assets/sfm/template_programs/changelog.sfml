@@ -5,7 +5,7 @@ NAME "Changelog"
 -- https://ko-fi.com/teamdman
 
 ---- 4.21.0 ----
--- Add intellisense
+-- Add intellisense - backslash to accept suggestion
 -- Changed line numbers button to config button in program edit screen
 -- Add editor config to disable intellisense
 -- Fix missing focus highlight from tab-navigation of buttons in manager screen
