@@ -11,6 +11,7 @@ NAME "Changelog"
 -- Fix missing focus highlight from tab-navigation of buttons in manager screen
 -- Fix syntax highlighting for "SECOND"
 -- Fix escaped quotes in strings containing the escaping backslash
+-- Add reminder when SFM crashes the game that there's a config to turn off managers
 
 ---- 4.20.0 ----
 -- Fix disks having no name when program has no name for 1.21+
