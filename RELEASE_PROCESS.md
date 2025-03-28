@@ -12,6 +12,7 @@ Manual: Commit bump
 Action: Propagate changes
 Action: Run gameTestServer for all versions
 Action: runData for all versions
+Action: Propagate changes
 Action: Build
 Action: Wipe jars summary dir
 Action: Collect jars
