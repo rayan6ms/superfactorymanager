@@ -1,10 +1,10 @@
 package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.ClientDiagnosticInfo;
 import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
+import ca.teamdman.sfm.common.diagnostics.SFMDiagnostics;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.*;
@@ -283,7 +283,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         if (Screen.hasShiftDown() && !isReadOnly()) {
             sendAttemptFix();
         } else {
-            this.onSaveDiagClipboard();
+            this.onSaveDiagnosticsToClipboard();
         }
     }
 
@@ -409,11 +409,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         return !errors.isEmpty() || !warnings.isEmpty();
     }
 
-    private void onSaveDiagClipboard() {
+    private void onSaveDiagnosticsToClipboard() {
         try {
             var disk = menu.CONTAINER.getItem(0);
             if (!(disk.getItem() instanceof DiskItem)) return;
-            String diagnosticInfo = ClientDiagnosticInfo.getDiagnosticInfo(menu.program, disk);
+            String diagnosticInfo = SFMDiagnostics.getDiagnosticsSummary(disk);
             Minecraft.getInstance().keyboardHandler.setClipboard(diagnosticInfo);
             status = MANAGER_GUI_STATUS_SAVED_CLIPBOARD.getComponent();
             statusCountdown = STATUS_DURATION;

@@ -2,7 +2,9 @@ package ca.teamdman.sfm.common.blockentity;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.config.SFMConfig;
+import ca.teamdman.sfm.common.config.SFMConfigTracker;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
+import ca.teamdman.sfm.common.diagnostics.SFMDiagnostics;
 import ca.teamdman.sfm.common.handler.OpenContainerTracker;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.localization.LocalizationEntry;
@@ -16,7 +18,9 @@ import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMContainerUtil;
 import ca.teamdman.sfml.ast.Program;
+import com.google.common.base.Joiner;
 import net.minecraft.ChatFormatting;
+import net.minecraft.CrashReportCategory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
@@ -94,41 +98,81 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
             @SuppressWarnings("unused") BlockState state,
             ManagerBlockEntity manager
     ) {
-        long start = System.nanoTime();
-        manager.tick++;
-        if (manager.configRevision != SFMConfig.SERVER.getRevision()) {
-            manager.shouldRebuildProgram = true;
-        }
-        if (manager.shouldRebuildProgram && !manager.shouldRebuildProgramLock) {
-            manager.rebuildProgramAndUpdateDisk();
-            manager.shouldRebuildProgram = false;
-        }
-        if (manager.program != null) {
-            boolean didSomething = manager.program.tick(manager);
-            if (didSomething) {
-                long nanoTimePassed = Long.min(System.nanoTime() - start, Integer.MAX_VALUE);
-                manager.tickTimeNanos[manager.tickIndex] = (int) nanoTimePassed;
-                manager.tickIndex = (manager.tickIndex + 1) % manager.tickTimeNanos.length;
-                manager.logger.trace(x -> x.accept(LocalizationKeys.PROGRAM_TICK_TIME_MS.get(nanoTimePassed
-                                                                                             / 1_000_000f)));
-                manager.sendUpdatePacket();
-                manager.logger.pruneSoWeDontEatAllTheRam();
+        try {
+            long start = System.nanoTime();
+            manager.tick++;
+            if (manager.configRevision != SFMConfig.SERVER.getRevision()) {
+                manager.shouldRebuildProgram = true;
+            }
+            if (manager.shouldRebuildProgram && !manager.shouldRebuildProgramLock) {
+                manager.rebuildProgramAndUpdateDisk();
+                manager.shouldRebuildProgram = false;
+            }
+            if (manager.program != null) {
+                boolean didSomething = manager.program.tick(manager);
+                if (didSomething) {
+                    long nanoTimePassed = Long.min(System.nanoTime() - start, Integer.MAX_VALUE);
+                    manager.tickTimeNanos[manager.tickIndex] = (int) nanoTimePassed;
+                    manager.tickIndex = (manager.tickIndex + 1) % manager.tickTimeNanos.length;
+                    manager.logger.trace(x -> x.accept(LocalizationKeys.PROGRAM_TICK_TIME_MS.get(nanoTimePassed
+                                                                                                 / 1_000_000f)));
+                    manager.sendUpdatePacket();
+                    manager.logger.pruneSoWeDontEatAllTheRam();
 
-                if (manager.logger.getLogLevel() == org.apache.logging.log4j.Level.TRACE
-                    || manager.logger.getLogLevel() == org.apache.logging.log4j.Level.DEBUG
-                    || manager.logger.getLogLevel() == org.apache.logging.log4j.Level.INFO) {
-                    org.apache.logging.log4j.Level newLevel = org.apache.logging.log4j.Level.OFF;
-                    manager.logger.info(x -> x.accept(LocalizationKeys.LOG_LEVEL_UPDATED.get(newLevel)));
-                    var oldLevel = manager.logger.getLogLevel();
-                    manager.setLogLevel(newLevel);
-                    SFM.LOGGER.debug(
-                            "SFM updated manager {} {} log level to {} after a single execution at {} level",
-                            manager.getBlockPos(),
-                            manager.getLevel(),
-                            newLevel,
-                            oldLevel
-                    );
+                    if (manager.logger.getLogLevel() == org.apache.logging.log4j.Level.TRACE
+                        || manager.logger.getLogLevel() == org.apache.logging.log4j.Level.DEBUG
+                        || manager.logger.getLogLevel() == org.apache.logging.log4j.Level.INFO) {
+                        org.apache.logging.log4j.Level newLevel = org.apache.logging.log4j.Level.OFF;
+                        manager.logger.info(x -> x.accept(LocalizationKeys.LOG_LEVEL_UPDATED.get(newLevel)));
+                        var oldLevel = manager.logger.getLogLevel();
+                        manager.setLogLevel(newLevel);
+                        SFM.LOGGER.debug(
+                                "SFM updated manager {} {} log level to {} after a single execution at {} level",
+                                manager.getBlockPos(),
+                                manager.getLevel(),
+                                newLevel,
+                                oldLevel
+                        );
+                    }
                 }
+            }
+        } catch (Throwable t) {
+            // tell the user that they can disable the manager in the config
+            String configPath;
+            var found = SFMConfigTracker.getPathForConfig(SFMConfig.SERVER_SPEC);
+            if (found != null) {
+                configPath = found.toString();
+            } else {
+                configPath = "sfm-server.toml";
+            }
+            String configValuePath = Joiner.on(".").join(SFMConfig.SERVER.disableProgramExecution.getPath());
+            SFM.LOGGER.fatal(
+                    "SFM detected a problem while ticking a manager. You can set `{} = true` in {} to help recover your world.",
+                    configValuePath,
+                    configPath
+            );
+            throw t;
+        }
+    }
+
+    @Override
+    public void fillCrashReportCategory(CrashReportCategory pReportCategory) {
+        super.fillCrashReportCategory(pReportCategory);
+        {
+            String configPath;
+            var found = SFMConfigTracker.getPathForConfig(SFMConfig.SERVER_SPEC);
+            if (found != null) {
+                configPath = found.toString();
+            } else {
+                configPath = "sfm-server.toml";
+            }
+            String configValuePath = Joiner.on(".").join(SFMConfig.SERVER.disableProgramExecution.getPath());
+            pReportCategory.setDetail("SFM Reminder", "You can set `" + configValuePath + " = true` in " + configPath + " to help recover your world.");
+        }
+        {
+            ItemStack disk = getDisk();
+            if (disk != null && !disk.isEmpty()) {
+                pReportCategory.setDetail("SFM Details", SFMDiagnostics.getDiagnosticsSummary(disk));
             }
         }
     }
@@ -194,7 +238,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         return program.referencedLabels();
     }
 
-    public @Nullable ItemStack getDisk() {
+    public @Nullable ItemStack getDisk() { // TODO: make this not nullable, should be fine to return empty :P
         var item = getItem(0);
         if (item.getItem() instanceof DiskItem) return item;
         return null;
