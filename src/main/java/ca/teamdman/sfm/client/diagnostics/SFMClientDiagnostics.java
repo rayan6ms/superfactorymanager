@@ -1,7 +1,8 @@
-package ca.teamdman.sfm.client;
+package ca.teamdman.sfm.client.diagnostics;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.item.DiskItem;
+import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.Minecraft;
@@ -11,12 +12,18 @@ import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;
 
 import java.text.SimpleDateFormat;
 
-public class ClientDiagnosticInfo {
-    public static String getDiagnosticInfo(String program, ItemStack diskStack) {
-        StringBuilder content = new StringBuilder(program);
+public class SFMClientDiagnostics {
+    public static String getDiagnosticsSummary(
+            ItemStack diskStack
+    ) {
+        StringBuilder content = new StringBuilder();
         try {
             content
-                    .append("\n\n-- Diagnostic info --\n");
+                    .append("-- Diagnostic info --\n");
+
+            content.append("-- Program:\n")
+                    .append(DiskItem.getProgram(diskStack))
+                    .append("\n\n");
 
             content.append("-- DateTime: ")
                     .append(new SimpleDateFormat("yyyy-MM-dd HH:mm.ss").format(new java.util.Date()))
@@ -59,6 +66,9 @@ public class ClientDiagnosticInfo {
                     content.append("-- * ").append(warning.getString()).append("\n");
                 }
             }
+
+            var labels = LabelPositionHolder.from(diskStack);
+            content.append("\n-- Labels\n").append(labels.toDebugString());
         } catch (Throwable t) {
             SFM.LOGGER.error("Failed gathering diagnostic info, returning partial results. Error: ", t);
         }
