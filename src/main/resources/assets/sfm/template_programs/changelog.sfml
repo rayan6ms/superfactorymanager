@@ -12,6 +12,8 @@ NAME "Changelog"
 -- Fix syntax highlighting for "SECOND"
 -- Fix escaped quotes in strings containing the escaping backslash
 -- Add reminder when SFM crashes the game that there's a config to turn off managers
+-- Add hotkey reminder to ctrl+i overlay
+-- Fix disconnect issue when clearing facades from cables
 
 ---- 4.20.0 ----
 -- Fix disks having no name when program has no name for 1.21+
