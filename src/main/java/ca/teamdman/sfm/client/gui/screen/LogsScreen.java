@@ -1,11 +1,11 @@
 package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.ClientDiagnosticInfo;
 import ca.teamdman.sfm.client.ClientTranslationHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
+import ca.teamdman.sfm.common.diagnostics.SFMDiagnostics;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.logging.TranslatableLogEvent;
 import ca.teamdman.sfm.common.net.ServerboundManagerClearLogsPacket;
@@ -245,8 +245,7 @@ public class LogsScreen extends Screen {
 
     private void onCopyLogsClicked(Button button) {
         StringBuilder clip = new StringBuilder();
-        clip.append(ClientDiagnosticInfo.getDiagnosticInfo(
-                MENU.program,
+        clip.append(SFMDiagnostics.getDiagnosticsSummary(
                 MENU.getDisk()
         ));
         clip.append("\n-- LOGS --\n");
