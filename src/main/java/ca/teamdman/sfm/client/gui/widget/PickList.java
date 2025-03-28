@@ -96,7 +96,7 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
             float pPartialTick
     ) {
         if (items.isEmpty()) return;
-        super.render(graphics, pMouseX, pMouseY, pPartialTick);
+        super.renderWidget(graphics, pMouseX, pMouseY, pPartialTick);
     }
 
     public void selectPreviousWrapping() {
