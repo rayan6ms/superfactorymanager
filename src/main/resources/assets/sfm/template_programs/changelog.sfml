@@ -5,11 +5,10 @@ NAME "Changelog"
 -- https://ko-fi.com/teamdman
 
 ---- 4.21.0 ----
--- Add intellisense, off by default - backslash to accept suggestion
--- Changed line numbers button to config button in program edit screen
--- Add editor config to enable intellisense
+-- Add intellisense, disabled by default - backslash to accept suggestion
+-- Bottom left button in program edit screen now opens editor config
 -- Fix missing focus highlight from tab-navigation of buttons in manager screen
--- Fix syntax highlighting for "SECOND"
+-- Fix syntax highlighting for "SECOND" keyword
 -- Fix escaped quotes in strings containing the escaping backslash
 -- Add reminder when SFM crashes the game that there's a config to turn off managers
 -- Add hotkey reminder to ctrl+i overlay
