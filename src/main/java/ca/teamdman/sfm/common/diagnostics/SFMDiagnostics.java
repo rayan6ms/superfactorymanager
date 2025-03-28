@@ -7,8 +7,8 @@ import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import net.minecraft.SharedConstants;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.versions.forge.ForgeVersion;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;
 
 import java.text.SimpleDateFormat;
 
@@ -40,7 +40,7 @@ public class SFMDiagnostics {
                     .append('\n');
 
             content.append("-- Forge Version: ")
-                    .append(ForgeVersion.getVersion())
+                    .append(NeoForgeVersion.getVersion())
                     .append('\n');
 
             //noinspection CodeBlock2Expr
