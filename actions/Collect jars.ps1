@@ -126,7 +126,10 @@ try {
     ########
 
     # Copy selected jars to the output directory
-    $sortedJars | ForEach-Object {
+    $sortedJars `
+    | Where-Object { $_.FullPath.Contains("(SFM)") } `
+    | Where-Object { $_.FullPath.Contains("MC") } `
+    | ForEach-Object {
         Copy-Item -Path $_.FullPath -Destination $outdir
     }
 
