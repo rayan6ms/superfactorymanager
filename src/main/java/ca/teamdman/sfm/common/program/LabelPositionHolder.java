@@ -166,6 +166,16 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
         return rtn;
     }
 
+    public String toDebugString() {
+        int total = 0;
+        StringBuilder rtn = new StringBuilder();
+        for (var entry : labels().entrySet()) {
+            rtn.append("-- * ").append(entry.getKey()).append(" - ").append(entry.getValue().size()).append(" positions\n");
+            total += entry.getValue().size();
+        }
+        return "-- LabelPositionHolder - " + total + " total labels\n" + rtn;
+    }
+
     public LabelPositionHolder removeAll(BlockPos value) {
         labels().values().forEach(list -> list.remove(value));
         return this;
