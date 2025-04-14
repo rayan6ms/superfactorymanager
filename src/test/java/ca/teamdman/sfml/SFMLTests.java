@@ -760,4 +760,26 @@ public class SFMLTests {
         assertEquals("sfm:fluid:minecraft:.*", ident.toString());
         assertEquals("fluid:minecraft:", ident.toStringCondensed());
     }
+
+    @Test
+    public void nbtWorks() {
+        var programString = """
+            EVERY 20 TICKS DO
+              INPUT WITH NBT {damage: 12} FROM a
+              OUTPUT TO b
+            END
+            """.stripTrailing().stripIndent();
+        assertNoCompileErrors(programString);
+    }
+
+    @Test
+    public void nbtWorks2() {
+        var programString = """
+            EVERY 20 TICKS DO
+              INPUT WITH NBT {damage: 12} AND TAG c:ores AND NOT NBT {name: "asd" } FROM a
+              OUTPUT TO b
+            END
+            """.stripTrailing().stripIndent();
+        assertNoCompileErrors(programString);
+    }
 }

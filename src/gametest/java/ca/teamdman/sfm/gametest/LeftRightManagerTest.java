@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.gametest;
 
+import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -19,6 +20,12 @@ public class LeftRightManagerTest extends SFMTestBuilder {
     protected void setupChests(@Stored BlockPos offset) {
         addChest("left", new BlockPos(2, 2, 0).offset(offset));
         addChest("right", new BlockPos(0, 2, 0).offset(offset));
+    }
+
+    @Override
+    public SFMTestBuilder setProgram(String program) {
+        SFM.LOGGER.warn("TODO: assert that only 'left' and 'right' labels are used");
+        return super.setProgram(program);
     }
 }
 

@@ -18,8 +18,8 @@ trigger : EVERY interval DO block END           #TimerTrigger
         | EVERY REDSTONE PULSE DO block END     #PulseTrigger
         ;
 
-interval: NUMBER? GLOBAL? (PLUS NUMBER)? (TICKS | TICK | SECONDS | SECOND)      # IntervalSpace
-        | NUMBER_WITH_G_SUFFIX (PLUS NUMBER)? (TICKS | TICK | SECONDS | SECOND) # IntervalNoSpace;
+interval: INTEGER? GLOBAL? (PLUS INTEGER)? (TICKS | TICK | SECONDS | SECOND)      # IntervalSpace
+        | INTEGER_WITH_G_SUFFIX (PLUS INTEGER)? (TICKS | TICK | SECONDS | SECOND) # IntervalNoSpace;
 
 //
 // BLOCK STATEMENT
@@ -75,6 +75,7 @@ withClause  : LPAREN withClause RPAREN           # WithParen
             | withClause AND withClause          # WithConjunction
             | withClause OR withClause           # WithDisjunction
             | (TAG HASHTAG?|HASHTAG) tagMatcher  # WithTag
+            | NBT nbtStructPattern               # WithNBT
             ;
 
 tagMatcher  : identifier COLON identifier (SLASH identifier)*
@@ -129,9 +130,19 @@ setOp           : OVERALL
                 ;
 
 
-
-
-
+// /data get entity @s SelectedItem
+// /give @p stick{display:{Name:'[{"text":"Enter Name Here","italic":false}]'},Enchantments:[{id:knockback,lvl:10}]} 1
+nbtStructPattern       : OPEN_CURLY nbtKeyValuePair (COMMA nbtKeyValuePair)* COMMA? CLOSE_CURLY ;
+nbtKeyValuePair : nbtKey COLON nbtValue ;
+nbtKey          : identifier | string ;
+nbtValue        : STRING
+                | INTEGER
+                | REAL_NUMBER
+                | nbtStructPattern
+                | OPEN_SQUARE nbtValue (COMMA nbtValue)* CLOSE_SQUARE
+                | TRUE
+                | FALSE
+                ;
 
 //
 // IO HELPERS
@@ -139,14 +150,14 @@ setOp           : OVERALL
 labelAccess     : label (COMMA label)* roundrobin? sidequalifier? slotqualifier?;
 roundrobin      : ROUND ROBIN BY (LABEL | BLOCK);
 label           : (identifier)   #RawLabel
-                | string                  #StringLabel
+                | string         #StringLabel
                 ;
 
-identifier : (IDENTIFIER | REDSTONE | GLOBAL | SECOND | SECONDS) ;
+identifier : (IDENTIFIER | REDSTONE | GLOBAL | SECOND | SECONDS | NAME) ;
 
 // GENERAL
 string: STRING ;
-number: NUMBER ;
+number: INTEGER ;
 
 
 
@@ -201,6 +212,7 @@ WITHOUT : W I T H O U T;
 WITH    : W I T H ;
 TAG     : T A G ;
 HASHTAG : '#' ;
+NBT     : N B T ;
 
 // ROUND ROBIN
 ROUND : R O U N D ;
@@ -247,12 +259,20 @@ DASH    : '-';
 LPAREN  : '(';
 RPAREN  : ')';
 
+OPEN_CURLY : '{';
+CLOSE_CURLY: '}';
+OPEN_SQUARE : '[';
+CLOSE_SQUARE: ']';
 
-NUMBER_WITH_G_SUFFIX    : [0-9]+[gG] ;
-NUMBER                  : [0-9]+ ;
+
+INTEGER_WITH_G_SUFFIX   : [0-9]+[gG] ;
+INTEGER                 : [0-9]+ ;
+REAL_NUMBER             : [0-9]+ '.' [0-9]+ ;
 IDENTIFIER              : [a-zA-Z_*][a-zA-Z0-9_*]* | '*'; // Note that the * in the square brackets is a literl
 
-STRING : '"' (~'"'|'\\"')* '"' ;
+STRING : '"' (~'"'|'\\"')* '"'
+       | '\'' (~'\''|'\\\'')* '\''
+       ;
 
 LINE_COMMENT : '--' ~[\r\n]* -> channel(HIDDEN);
 //LINE_COMMENT : '--' ~[\r\n]* (EOF|'\r'? '\n');

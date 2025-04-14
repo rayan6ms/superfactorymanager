@@ -3,7 +3,10 @@ package ca.teamdman.sfml.ast;
 import ca.teamdman.langs.SFMLBaseVisitor;
 import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfm.common.config.SFMConfig;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
@@ -211,7 +214,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitIntervalSpace(SFMLParser.IntervalSpaceContext ctx) {
-        TerminalNode firstNumber = ctx.NUMBER(0);
+        TerminalNode firstNumber = ctx.INTEGER(0);
         int ticks;
         if (firstNumber == null) {
             ticks = 1;
@@ -228,7 +231,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         }
 
         int offset = 0;
-        TerminalNode secondNumber = ctx.NUMBER(1);
+        TerminalNode secondNumber = ctx.INTEGER(1);
         if (secondNumber != null) {
             offset = Integer.parseInt(secondNumber.getText());
         }
@@ -240,7 +243,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
 
     @Override
     public ASTNode visitIntervalNoSpace(SFMLParser.IntervalNoSpaceContext ctx) {
-        String firstNumber = ctx.NUMBER_WITH_G_SUFFIX().getText();
+        String firstNumber = ctx.INTEGER_WITH_G_SUFFIX().getText();
         String front = firstNumber.substring(0, firstNumber.length() - 1);
         int ticks = Integer.parseInt(front);
         if (ctx.SECONDS() != null) {
@@ -250,7 +253,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         Interval.IntervalAlignment alignment = Interval.IntervalAlignment.GLOBAL;
 
         int offset = 0;
-        TerminalNode secondNumber = ctx.NUMBER();
+        TerminalNode secondNumber = ctx.INTEGER();
         if (secondNumber != null) {
             offset = Integer.parseInt(secondNumber.getText());
         }
@@ -566,6 +569,19 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     @Override
     public WithTag visitWithTag(SFMLParser.WithTagContext ctx) {
         WithTag rtn = new WithTag((TagMatcher) visit(ctx.tagMatcher()));
+        AST_NODE_CONTEXTS.add(new Pair<>(rtn, ctx));
+        return rtn;
+    }
+
+    @Override
+    public WithNBTExactMatch visitWithNBT(SFMLParser.WithNBTContext ctx) {
+        CompoundTag tag;
+        try {
+            tag = TagParser.parseTag(ctx.nbtStructPattern().getText());
+        } catch (CommandSyntaxException e) {
+            throw new RuntimeException(e);
+        }
+        WithNBTExactMatch rtn = new WithNBTExactMatch(tag);
         AST_NODE_CONTEXTS.add(new Pair<>(rtn, ctx));
         return rtn;
     }

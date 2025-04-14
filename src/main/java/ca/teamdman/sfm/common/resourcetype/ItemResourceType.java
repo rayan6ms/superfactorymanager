@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -11,6 +12,7 @@ import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
@@ -69,6 +71,11 @@ public class ItemResourceType extends RegistryBackedResourceType<ItemStack, Item
     @Override
     public boolean matchesCapabilityType(Object o) {
         return o instanceof IItemHandler;
+    }
+
+    @Override
+    public @Nullable CompoundTag getNBTForStack(ItemStack stack) {
+        return stack.getTag();
     }
 
     /**

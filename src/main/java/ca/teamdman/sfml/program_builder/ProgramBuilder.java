@@ -12,6 +12,7 @@ import ca.teamdman.sfm.common.util.SFMTranslationUtils;
 import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.ast.ResourceIdentifier;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
@@ -54,19 +55,23 @@ public class ProgramBuilder {
             } catch (ResourceLocationException | IllegalArgumentException | AssertionError e) {
                 errors.add(LocalizationKeys.PROGRAM_ERROR_LITERAL.get(e.getMessage()));
             } catch (Throwable t) {
-                errors.add(LocalizationKeys.PROGRAM_ERROR_COMPILE_FAILED.get());
-                SFM.LOGGER.warn(
-                        "Encountered unhandled error while compiling program\n```\n{}\n```",
-                        programString,
-                        t
-                );
-                var message = t.getMessage();
-                if (message != null) {
-                    errors.add(SFMTranslationUtils.getTranslatableContents(
-                            t.getClass().getSimpleName() + ": " + message
-                    ));
+                if (t.getCause() instanceof CommandSyntaxException cse && cse.getRawMessage() instanceof TranslatableContents message) {
+                    errors.add(message);
                 } else {
-                    errors.add(SFMTranslationUtils.getTranslatableContents(t.getClass().getSimpleName()));
+                    errors.add(LocalizationKeys.PROGRAM_ERROR_COMPILE_FAILED.get());
+                    SFM.LOGGER.warn(
+                            "Encountered unhandled error while compiling program\n```\n{}\n```",
+                            programString,
+                            t
+                    );
+                    var message = t.getMessage();
+                    if (message != null) {
+                        errors.add(SFMTranslationUtils.getTranslatableContents(
+                                t.getClass().getSimpleName() + ": " + message
+                        ));
+                    } else {
+                        errors.add(SFMTranslationUtils.getTranslatableContents(t.getClass().getSimpleName()));
+                    }
                 }
             }
         }

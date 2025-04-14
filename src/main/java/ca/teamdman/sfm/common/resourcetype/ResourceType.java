@@ -10,6 +10,7 @@ import ca.teamdman.sfml.ast.*;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.capabilities.Capability;
 import org.jetbrains.annotations.Nullable;
@@ -161,6 +162,10 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
                         )));
             }
         }
+    }
+
+    public @Nullable CompoundTag getNBTForStack(STACK stack) {
+        return null;
     }
 
     public abstract Stream<ResourceLocation> getTagsForStack(STACK stack);

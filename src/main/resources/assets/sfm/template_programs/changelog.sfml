@@ -4,6 +4,15 @@ NAME "Changelog"
 -- Official SFM Donation Page:
 -- https://ko-fi.com/teamdman
 
+---- vNext ----
+-- Add support for single-quote strings
+-- Add support for "NAME" being used as an identifier
+-- Add support for NBT tag exact matching
+EVERY 20 TICKS DO
+  INPUT WITH NBT {damage: 12} FROM a
+  OUTPUT TO b
+END
+
 ---- 4.21.0 ----
 -- Add intellisense, disabled by default - backslash to accept suggestion
 -- Bottom left button in program edit screen now opens editor config
