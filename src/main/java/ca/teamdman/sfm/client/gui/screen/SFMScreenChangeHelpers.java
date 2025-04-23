@@ -1,6 +1,8 @@
 package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.gui.widget.smarttext.PlainTextSmartTextLanguage;
+import ca.teamdman.sfm.client.gui.widget.smarttext.SNBTSmartTextLanguage;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundManagerLogDesireUpdatePacket;
@@ -10,6 +12,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -104,7 +107,7 @@ public class SFMScreenChangeHelpers {
     public static void showItemInspectorScreen(ItemStack stack) {
         CompoundTag tag = stack.getTag();
         if (tag != null) {
-            String content = tag.toString();
+            String content = NbtUtils.prettyPrint(tag);
             Minecraft minecraft = Minecraft.getInstance();
             minecraft.keyboardHandler.setClipboard(content);
             SFM.LOGGER.info("Copied {} characters to clipboard", content.length());
@@ -114,6 +117,12 @@ public class SFMScreenChangeHelpers {
                             Component.literal(String.valueOf(content.length())).withStyle(ChatFormatting.AQUA)
                     )
             );
+            SFMScreenChangeHelpers.setOrPushScreen(new SmartTextScreen(new SNBTSmartTextLanguage(), content));
+        } else {
+            SFMScreenChangeHelpers.setOrPushScreen(new SmartTextScreen(
+                    new PlainTextSmartTextLanguage(),
+                    "No tag present"
+            ));
         }
     }
 

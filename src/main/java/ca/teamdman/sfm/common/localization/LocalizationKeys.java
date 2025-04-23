@@ -313,6 +313,10 @@ public final class LocalizationKeys {
             "gui.sfm.title.program_template_picker",
             "Program Template Picker"
     );
+    public static final LocalizationEntry SMART_TEXT_GUI_TITLE = new LocalizationEntry(
+            "gui.sfm.title.smart_text",
+            "Smart Text Editor for %s"
+    );
     public static final LocalizationEntry INTELLISENSE_PICK_LIST_GUI_TITLE = new LocalizationEntry(
             "gui.sfm.title.intellisense_pick_list",
             "Intellisense Pick List"
@@ -981,7 +985,6 @@ public final class LocalizationKeys {
             "Advanced"
     );
 
-
     public static List<LocalizationEntry> getEntries() {
         // use reflection to get all the public static LocalizationEntry fields
         var rtn = new ArrayList<LocalizationEntry>();
@@ -994,7 +997,32 @@ public final class LocalizationKeys {
                 }
             }
         }
+        for (var innerClass : LocalizationKeys.class.getDeclaredClasses()) {
+            for (var field : innerClass.getFields()) {
+                if (field.getType() == LocalizationEntry.class) {
+                    try {
+                        rtn.add((LocalizationEntry) field.get(null));
+                    } catch (IllegalAccessException e) {
+                        SFM.LOGGER.error("Failed reading entry field from inner class", e);
+                    }
+                }
+            }
+        }
         return rtn;
     }
 
+    public static final class LanguageNames {
+        public static final LocalizationEntry SNBT = new LocalizationEntry(
+                "sfm.language_names.snbt",
+                "SNBT"
+        );
+        public static final LocalizationEntry SFML = new LocalizationEntry(
+                "sfm.language_names.sfml",
+                "SFML"
+        );
+        public static final LocalizationEntry PLAIN_TEXT = new LocalizationEntry(
+                "sfm.language_names.plain_text",
+                "Plain Text"
+        );
+    }
 }
