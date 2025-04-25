@@ -4,6 +4,10 @@ NAME "Changelog"
 -- Official SFM Donation Page:
 -- https://ko-fi.com/teamdman
 
+---- vNEXT ----
+-- Thank you SpruceMist for the GitHub sponsorship <3
+---- Check out the "Thank you!" example for more names <3
+
 ---- 4.21.0 ----
 -- Add intellisense, disabled by default - backslash to accept suggestion
 -- Bottom left button in program edit screen now opens editor config
