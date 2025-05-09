@@ -5,11 +5,13 @@ import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticItemModelsDataGen;
 import net.minecraft.client.renderer.block.model.BlockModel;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
+
+import java.util.function.Supplier;
 
 public class SFMItemModels extends MCVersionAgnosticItemModelsDataGen {
     public SFMItemModels(
@@ -34,7 +36,7 @@ public class SFMItemModels extends MCVersionAgnosticItemModelsDataGen {
         basicItem(SFMItems.NETWORK_TOOL_ITEM);
 
         // force custom renderer
-        getBuilder(SFMItems.FORM_ITEM.getId().toString())
+        getBuilder(BuiltInRegistries.ITEM.getKey(SFMItems.FORM_ITEM.get()).toString())
                 .parent(new ModelFile.UncheckedModelFile("builtin/entity"))
                 .guiLight(BlockModel.GuiLight.FRONT);
         getBuilder("form_base")
@@ -43,28 +45,26 @@ public class SFMItemModels extends MCVersionAgnosticItemModelsDataGen {
     }
 
     private void justParent(
-            RegistryObject<? extends Item> item,
-            RegistryObject<? extends Block> block
+            Supplier<? extends Item> item, Supplier<? extends Block> block
     ) {
         justParent(item, block, "");
     }
 
     private void justParent(
-            RegistryObject<? extends Item> item,
-            RegistryObject<? extends Block> block,
-            String extra
+            Supplier<? extends Item> item, Supplier<? extends Block> block, String extra
     ) {
-        withExistingParent(block.getId().getPath(), SFM.MOD_ID + ":block/" + item.getId().getPath() + extra);
+        var blockPath = BuiltInRegistries.BLOCK.getKey(block.get()).getPath();
+        var itemPath = BuiltInRegistries.ITEM.getKey(item.get()).getPath();
+        withExistingParent(blockPath, SFM.MOD_ID + ":block/" + itemPath + extra);
     }
 
     private void basicItem(
-            RegistryObject<? extends Item> item
+            Supplier<? extends Item> item
     ) {
-        withExistingParent(item.getId().getPath(), mcLoc("item/generated")).texture(
+        var itemPath = BuiltInRegistries.ITEM.getKey(item.get()).getPath();
+        withExistingParent(itemPath, mcLoc("item/generated")).texture(
                 "layer0",
-                modLoc("item/" + item
-                        .getId()
-                        .getPath())
+                modLoc("item/" + itemPath)
         );
     }
 }

@@ -3,7 +3,7 @@ package ca.teamdman.sfm.client.gui.screen;
 import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.config.SFMClientProgramEditorConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.CommonComponents;
@@ -39,34 +39,31 @@ public class ProgramEditorConfigScreen extends Screen {
 
     @Override
     public void render(
-            @NotNull PoseStack pPoseStack,
+            @NotNull GuiGraphics graphics,
             int pMouseX,
             int pMouseY,
             float pPartialTick
     ) {
-        this.renderBackground(pPoseStack);
-        super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+        this.renderTransparentBackground(graphics);
+        super.render(graphics, pMouseX, pMouseY, pPartialTick);
 
         int y = this.height / 2 - 65;
         int x = this.width / 2 - 150; // Shifted to the left for centering
-        drawString(
-                pPoseStack,
+        graphics.drawString(
                 font,
                 LocalizationKeys.PROGRAM_EDITOR_CONFIG_LINE_NUMBERS.getComponent(),
                 x,
                 y,
                 0xFFFFFF
         );
-        drawString(
-                pPoseStack,
+        graphics.drawString(
                 font,
                 LocalizationKeys.PROGRAM_EDITOR_CONFIG_INTELLISENSE.getComponent(),
                 x,
                 y + 50,
                 0xFFFFFF
         );
-        drawCenteredString(
-                pPoseStack,
+        graphics.drawCenteredString(
                 font,
                 this.title,
                 this.width / 2,

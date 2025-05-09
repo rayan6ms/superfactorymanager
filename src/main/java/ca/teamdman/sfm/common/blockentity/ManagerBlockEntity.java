@@ -22,6 +22,7 @@ import com.google.common.base.Joiner;
 import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReportCategory;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -272,6 +273,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         return ITEMS.get(slot);
     }
 
+
     @Override
     public ItemStack removeItem(
             int slot,
@@ -303,6 +305,17 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     }
 
     @Override
+    protected NonNullList<ItemStack> getItems() {
+        return ITEMS;
+    }
+
+    @Override
+    protected void setItems(NonNullList<ItemStack> pItems) {
+        ITEMS.clear();
+        ITEMS.addAll(pItems);
+    }
+
+    @Override
     public int getMaxStackSize() {
         return 1;
     }
@@ -320,15 +333,30 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         return SFMContainerUtil.stillValid(this, player);
     }
 
+
     @Override
-    public void load(CompoundTag tag) {
-        super.load(tag);
-        ContainerHelper.loadAllItems(tag, ITEMS);
+    protected void saveAdditional(
+            CompoundTag pTag,
+            HolderLookup.Provider pRegistries
+    ) {
+        super.saveAdditional(pTag, pRegistries);
+        ContainerHelper.saveAllItems(pTag, ITEMS, pRegistries);
+    }
+
+    @Override
+    protected void loadAdditional(
+            CompoundTag pTag,
+            HolderLookup.Provider pRegistries
+    ) {
+        super.loadAdditional(pTag, pRegistries);
+        ContainerHelper.loadAllItems(pTag, ITEMS, pRegistries);
         this.shouldRebuildProgram = true;
         if (level != null) {
             this.tick = level.random.nextInt();
         }
     }
+
+
 
     @Override
     public void clearContent() {
@@ -339,7 +367,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         var disk = getDisk();
         if (disk != null) {
             LabelPositionHolder.clear(disk);
-            disk.setTag(null);
+            DiskItem.clearData(disk);
             setItem(0, disk);
             setChanged();
         }
@@ -412,6 +440,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         return LocalizationKeys.MANAGER_CONTAINER.getComponent();
     }
 
+
     @Override
     protected AbstractContainerMenu createMenu(
             int windowId,
@@ -420,11 +449,6 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         return new ManagerContainerMenu(windowId, inv, this);
     }
 
-    @Override
-    protected void saveAdditional(CompoundTag tag) {
-        super.saveAdditional(tag);
-        ContainerHelper.saveAllItems(tag, ITEMS);
-    }
 
     public enum State {
         NO_PROGRAM(

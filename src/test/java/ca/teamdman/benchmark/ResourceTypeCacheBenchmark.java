@@ -35,13 +35,13 @@ public class ResourceTypeCacheBenchmark {
     @Setup()
     public void setup() {
          values = new ResourceLocation[] {
-            new ResourceLocation("sfm","item"),
-            new ResourceLocation("sfm","fluid"),
-            new ResourceLocation("sfm","gas"),
-            new ResourceLocation("sfm","forge_energy"),
-            new ResourceLocation("sfm","infusion"),
-            new ResourceLocation("sfm","mana"),
-            new ResourceLocation("sfm","bruh"),
+            ResourceLocation.fromNamespaceAndPath("sfm","item"),
+            ResourceLocation.fromNamespaceAndPath("sfm","fluid"),
+            ResourceLocation.fromNamespaceAndPath("sfm","gas"),
+            ResourceLocation.fromNamespaceAndPath("sfm","forge_energy"),
+            ResourceLocation.fromNamespaceAndPath("sfm","infusion"),
+            ResourceLocation.fromNamespaceAndPath("sfm","mana"),
+            ResourceLocation.fromNamespaceAndPath("sfm","bruh"),
         };
         for (ResourceLocation value : values) {
             intCache.put(value.hashCode(), value.toString());

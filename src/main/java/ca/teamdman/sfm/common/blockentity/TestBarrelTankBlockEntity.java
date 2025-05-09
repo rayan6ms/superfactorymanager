@@ -5,7 +5,7 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.util.SFMContainerUtil;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -16,20 +16,11 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.wrapper.InvWrapper;
-import org.jetbrains.annotations.Nullable;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 public class TestBarrelTankBlockEntity extends BaseContainerBlockEntity {
-    private final LazyOptional<IItemHandler> item_capability = LazyOptional.of(() -> new InvWrapper(this));
     private NonNullList<ItemStack> items = NonNullList.withSize(27, ItemStack.EMPTY);
     private final FluidTank tank = new FluidTank(1000);
-    public final LazyOptional<IFluidHandler> fluid_capability = LazyOptional.of(() -> tank);
 
     public TestBarrelTankBlockEntity(
             BlockPos pPos,
@@ -45,24 +36,15 @@ public class TestBarrelTankBlockEntity extends BaseContainerBlockEntity {
     }
 
     @Override
-    public <T> LazyOptional<T> getCapability(
-            Capability<T> cap,
-            @Nullable Direction side
+    protected void loadAdditional(
+            CompoundTag pTag,
+            HolderLookup.Provider pRegistries
     ) {
-        if (cap == ForgeCapabilities.ITEM_HANDLER) {
-            return item_capability.cast();
-        }
-        if (cap == ForgeCapabilities.FLUID_HANDLER) {
-            return fluid_capability.cast();
-        }
-        return super.getCapability(cap, side);
+        super.loadAdditional(pTag, pRegistries);
+        this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
+        ContainerHelper.loadAllItems(pTag, this.items, pRegistries);
     }
 
-    @Override
-    public void load(CompoundTag pTag) {
-        super.load(pTag);
-        this.items = NonNullList.withSize(this.getContainerSize(), ItemStack.EMPTY);
-    }
 
     @Override
     public void clearContent() {
@@ -120,14 +102,24 @@ public class TestBarrelTankBlockEntity extends BaseContainerBlockEntity {
         return items;
     }
 
+    @Override
+    protected void setItems(NonNullList<ItemStack> pItems) {
+        this.items = pItems;
+    }
+
     public FluidTank getTank() {
         return tank;
     }
 
     @Override
-    protected void saveAdditional(CompoundTag pTag) {
-        super.saveAdditional(pTag);
+    protected void saveAdditional(
+            CompoundTag pTag,
+            HolderLookup.Provider pRegistries
+    ) {
+        super.saveAdditional(pTag, pRegistries);
+        ContainerHelper.saveAllItems(pTag, this.items, pRegistries);
     }
+
 
     @Override
     protected Component getDefaultName() {

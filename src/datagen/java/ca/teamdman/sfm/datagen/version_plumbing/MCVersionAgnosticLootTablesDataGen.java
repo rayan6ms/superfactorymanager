@@ -1,29 +1,25 @@
 package ca.teamdman.sfm.datagen.version_plumbing;
 
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import com.google.common.collect.Lists;
-import com.mojang.datafixers.util.Pair;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.loot.LootTableProvider;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.data.loot.LootTableSubProvider;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
-import net.minecraft.world.level.storage.loot.LootTables;
-import net.minecraft.world.level.storage.loot.ValidationContext;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
-import net.minecraft.world.level.storage.loot.parameters.LootContextParamSet;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.predicates.ExplosionCondition;
 import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.function.BiConsumer;
-import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
 
@@ -33,42 +29,42 @@ public abstract class MCVersionAgnosticLootTablesDataGen extends LootTableProvid
             GatherDataEvent event,
             String modId
     ) {
-        super(event.getGenerator());
+        super(event.getGenerator().getPackOutput(), Collections.emptySet(), Collections.emptyList(), event.getLookupProvider());
     }
 
 
     protected abstract void populate(BlockLootWriter writer);
 
-    @MCVersionDependentBehaviour
     @Override
-    protected List<Pair<Supplier<Consumer<BiConsumer<ResourceLocation, LootTable.Builder>>>, LootContextParamSet>> getTables() {
-        return Lists.newArrayList(Pair.of(this::createBlockLoot, LootContextParamSets.BLOCK));
+    public List<SubProviderEntry> getTables() {
+        return List.of(new SubProviderEntry(this::createBlockLoot, LootContextParamSets.BLOCK));
     }
 
     /// Blocks present here but not involved when populating the writer will cause a validation error
-    protected abstract Set<? extends RegistryObject<Block>> getExpectedBlocks();
+    protected abstract Set<? extends Block> getExpectedBlocks();
 
-    private MyBlockLoot createBlockLoot() {
+    private MyBlockLoot createBlockLoot(HolderLookup.Provider provider) {
         BlockLootWriter writer = new BlockLootWriter();
         populate(writer);
         ArrayList<BlockLootBehaviour> behaviours = writer.finish();
-        Set<? extends RegistryObject<Block>> expectedBlocks = getExpectedBlocks();
-        Set<RegistryObject<? extends Block>> seenBlocks = behaviours.stream()
+        Set<? extends Block> expectedBlocks = getExpectedBlocks();
+        Set<? extends Block> seenBlocks = behaviours.stream()
                 .map(BlockLootBehaviour::getInvolvedBlocks)
                 .flatMap(List::stream)
+                .map(Supplier::get)
                 .collect(Collectors.toSet());
-        Set<RegistryObject<? extends Block>> notSeen = expectedBlocks.stream()
+        Set<? extends Block> notSeen = expectedBlocks.stream()
                 .filter(block -> !seenBlocks.contains(block))
                 .collect(Collectors.toSet());
-        Set<RegistryObject<? extends Block>> notExpected = seenBlocks.stream()
+        Set<? extends Block> notExpected = seenBlocks.stream()
                 .filter(block -> !expectedBlocks.contains(block))
                 .collect(Collectors.toSet());
         List<String> problems = new ArrayList<>();
-        for (RegistryObject<? extends Block> expected : notSeen) {
-            problems.add("Expected block " + expected.getId() + " not seen");
+        for (Block expected : notSeen) {
+            problems.add("Expected block " + BuiltInRegistries.BLOCK.getId(expected) + " not seen");
         }
-        for (RegistryObject<? extends Block> unexpected : notExpected) {
-            problems.add("Unexpected block " + unexpected.getId() + " seen");
+        for (Block unexpected : notExpected) {
+            problems.add("Unexpected block " + BuiltInRegistries.BLOCK.getId(unexpected) + " seen");
         }
         if (!problems.isEmpty()) {
             throw new IllegalStateException("Loot table problems:\n" + String.join("\n", problems));
@@ -76,32 +72,32 @@ public abstract class MCVersionAgnosticLootTablesDataGen extends LootTableProvid
         return new MyBlockLoot(behaviours);
     }
 
-    @MCVersionDependentBehaviour
-    @Override
-    protected void validate(
-            Map<ResourceLocation, LootTable> map,
-            ValidationContext tracker
-    ) {
-        map.forEach((k, v) -> LootTables.validate(tracker, k, v));
-    }
+//    @MCVersionDependentBehaviour
+//    @Override
+//    protected void validate(
+//            Map<ResourceLocation, LootTable> map,
+//            ValidationContext tracker
+//    ) {
+//        map.forEach((k, v) -> LootTables.validate(tracker, k, v));
+//    }
 
     private interface BlockLootBehaviour {
-        List<RegistryObject<? extends Block>> getInvolvedBlocks();
+        List<Supplier<? extends Block>> getInvolvedBlocks();
 
-        void apply(BiConsumer<ResourceLocation, LootTable.Builder> writer);
+        void apply(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> writer);
     }
 
     private record DropOtherBlockLootBehaviour(
-            RegistryObject<? extends Block> block,
-            RegistryObject<? extends Block> other
+            Supplier<? extends Block> block,
+            Supplier<? extends Block> other
     ) implements BlockLootBehaviour {
         @Override
-        public List<RegistryObject<? extends Block>> getInvolvedBlocks() {
+        public List<Supplier<? extends Block>> getInvolvedBlocks() {
             return List.of(block, other);
         }
 
         @Override
-        public void apply(BiConsumer<ResourceLocation, LootTable.Builder> writer) {
+        public void apply(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> writer) {
             var pool = LootPool.lootPool()
                     .setRolls(ConstantValue.exactly(1))
                     .add(LootItem.lootTableItem(other.get()))
@@ -114,14 +110,14 @@ public abstract class MCVersionAgnosticLootTablesDataGen extends LootTableProvid
         private final ArrayList<BlockLootBehaviour> behaviours = new ArrayList<>();
 
         public void dropSelf(
-                RegistryObject<? extends Block> block
+                Supplier<? extends Block> block
         ) {
             behaviours.add(new DropOtherBlockLootBehaviour(block, block));
         }
 
         public void dropOther(
-                RegistryObject<? extends Block> block,
-                RegistryObject<? extends Block> other
+                Supplier<? extends Block> block,
+                Supplier<? extends Block> other
         ) {
             behaviours.add(new DropOtherBlockLootBehaviour(block, other));
         }
@@ -131,17 +127,17 @@ public abstract class MCVersionAgnosticLootTablesDataGen extends LootTableProvid
         }
     }
 
-    @MCVersionDependentBehaviour
-    private static class MyBlockLoot extends net.minecraft.data.loot.BlockLoot {
+    private static class MyBlockLoot implements @MCVersionDependentBehaviour LootTableSubProvider {
         private final List<BlockLootBehaviour> behaviours;
 
         public MyBlockLoot(List<BlockLootBehaviour> behaviours) {
             this.behaviours = behaviours;
         }
 
+        @MCVersionDependentBehaviour
         @Override
-        public void accept(BiConsumer<ResourceLocation, LootTable.Builder> writer) {
-            behaviours.forEach(behaviour -> behaviour.apply(writer));
+        public void generate(BiConsumer<ResourceKey<LootTable>, LootTable.Builder> biConsumer) {
+            behaviours.forEach(behaviours -> behaviours.apply(biConsumer));
         }
     }
 

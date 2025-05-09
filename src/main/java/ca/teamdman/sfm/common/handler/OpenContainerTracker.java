@@ -5,19 +5,17 @@ import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.util.NotStored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.player.PlayerContainerEvent;
 
 import java.util.HashMap;
 import java.util.Map;
 import java.util.WeakHashMap;
 import java.util.stream.Stream;
 
-import static net.minecraftforge.event.entity.player.PlayerContainerEvent.Close;
-import static net.minecraftforge.event.entity.player.PlayerContainerEvent.Open;
-
 // TODO: consider replacing with ContainerOpenersCounter, see BarrelBlockEntity
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = SFM.MOD_ID)
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, modid = SFM.MOD_ID)
 public class OpenContainerTracker {
     private static final Map<BlockPos, Map<ServerPlayer, ManagerContainerMenu>> OPEN_CONTAINERS = new WeakHashMap<>();
 
@@ -30,7 +28,7 @@ public class OpenContainerTracker {
     }
 
     @SubscribeEvent
-    public static void onOpenContainer(Open event) {
+    public static void onOpenContainer(PlayerContainerEvent.Open event) {
         if (event.getEntity() instanceof ServerPlayer serverPlayer
             && event.getContainer() instanceof ManagerContainerMenu mcm) {
             OPEN_CONTAINERS.computeIfAbsent(mcm.MANAGER_POSITION, k -> new HashMap<>()).put(serverPlayer, mcm);
@@ -38,7 +36,7 @@ public class OpenContainerTracker {
     }
 
     @SubscribeEvent
-    public static void onCloseContainer(Close event) {
+    public static void onCloseContainer(PlayerContainerEvent.Close event) {
         if (event.getEntity() instanceof ServerPlayer serverPlayer
             && event.getContainer() instanceof ManagerContainerMenu mcm) {
             if (OPEN_CONTAINERS.containsKey(mcm.MANAGER_POSITION)) {

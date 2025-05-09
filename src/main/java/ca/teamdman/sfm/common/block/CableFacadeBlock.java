@@ -9,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -49,7 +50,7 @@ public class CableFacadeBlock extends CableBlock implements EntityBlock, IFacada
     @SuppressWarnings("deprecation")
     @Override
     public ItemStack getCloneItemStack(
-            BlockGetter pLevel,
+            LevelReader pLevel,
             @NotStored BlockPos pPos,
             BlockState pState
     ) {

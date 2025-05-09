@@ -5,7 +5,7 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import org.apache.logging.log4j.Level;
 
@@ -24,7 +24,7 @@ public record ServerboundManagerSetLogLevelPacket(
         @Override
         public void encode(
                 ServerboundManagerSetLogLevelPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeVarInt(msg.windowId());
             friendlyByteBuf.writeBlockPos(msg.pos());
@@ -32,7 +32,7 @@ public record ServerboundManagerSetLogLevelPacket(
         }
 
         @Override
-        public ServerboundManagerSetLogLevelPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ServerboundManagerSetLogLevelPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ServerboundManagerSetLogLevelPacket(
                     friendlyByteBuf.readVarInt(),
                     friendlyByteBuf.readBlockPos(),

@@ -1,12 +1,10 @@
 package ca.teamdman.sfm.client.gui.widget;
 
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import com.mojang.blaze3d.vertex.PoseStack;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.network.chat.Component;
 
 public class SFMExtendedButtonWithTooltip extends SFMExtendedButton {
-    private final OnTooltip TOOLTIP;
-
     @MCVersionDependentBehaviour
     public SFMExtendedButtonWithTooltip(
             int xPos,
@@ -15,17 +13,9 @@ public class SFMExtendedButtonWithTooltip extends SFMExtendedButton {
             int height,
             Component displayString,
             OnPress handler,
-            OnTooltip tooltip
+            Tooltip tooltip
     ) {
         super(xPos, yPos, width, height, displayString, handler);
-        TOOLTIP = tooltip;
-    }
-
-    @MCVersionDependentBehaviour
-    @Override
-    public void renderToolTip(PoseStack pose, int mx, int my) {
-        if (isHovered && visible) {
-            TOOLTIP.onTooltip(this, pose, mx, my);
-        }
+        setTooltip(tooltip);
     }
 }

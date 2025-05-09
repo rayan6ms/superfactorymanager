@@ -1,11 +1,8 @@
 package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.SFM;
-import net.minecraft.network.FriendlyByteBuf;
-import net.minecraftforge.network.NetworkEvent;
-
-import java.util.function.Supplier;
-
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 
 public interface SFMPacketDaddy<T extends SFMPacket> {
     enum PacketDirection {
@@ -19,10 +16,10 @@ public interface SFMPacketDaddy<T extends SFMPacket> {
 
     void encode(
             T msg,
-            FriendlyByteBuf friendlyByteBuf
+            RegistryFriendlyByteBuf friendlyByteBuf
     );
 
-    T decode(FriendlyByteBuf friendlyByteBuf);
+    T decode(RegistryFriendlyByteBuf friendlyByteBuf);
 
     void handle(
             T msg,
@@ -31,9 +28,9 @@ public interface SFMPacketDaddy<T extends SFMPacket> {
 
     default void handleOuter(
             T msg,
-            Supplier<NetworkEvent.Context> contextSupplier
+            IPayloadContext outerContext
     ) {
-        SFMPacketHandlingContext context = new SFMPacketHandlingContext(contextSupplier);
+        SFMPacketHandlingContext context = new SFMPacketHandlingContext(outerContext);
         context.enqueueAndFinish(() -> {
             try {
                 handle(msg, context);

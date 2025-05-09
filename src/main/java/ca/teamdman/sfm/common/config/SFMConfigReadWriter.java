@@ -4,27 +4,25 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.electronwill.nightconfig.core.CommentedConfig;
-import com.electronwill.nightconfig.core.file.CommentedFileConfig;
 import com.electronwill.nightconfig.core.io.WritingMode;
 import com.electronwill.nightconfig.toml.TomlFormat;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.Bindings;
-import net.minecraftforge.fml.config.IConfigEvent;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.network.ConfigSync;
-import net.minecraftforge.network.HandshakeHandler;
-import net.minecraftforge.network.HandshakeMessages;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.fml.config.IConfigSpec;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
+import net.neoforged.neoforge.server.ServerLifecycleHooks;
 import org.jetbrains.annotations.Nullable;
 
 import java.io.IOException;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.function.Function;
 import java.util.function.Supplier;
 
 @SuppressWarnings("BooleanMethodIsAlwaysInverted")
@@ -107,23 +105,43 @@ public class SFMConfigReadWriter {
             Path configPath,
             CommentedConfig newConfig
     ) {
-        final CommentedFileConfig fileConfig = modConfig.getHandler()
-                .reader(configBasePath)
-                .apply(modConfig);
-        SFM.LOGGER.info("Setting up new config data for {}", modConfig.getFileName());
-        if (!setConfigData(modConfig, fileConfig)) {
-            SFM.LOGGER.warn("Failed to set new config data for {}", modConfig.getFileName());
+        SFM.LOGGER.info("Updating active client config and firing reloaded event");
+        Class<?> loadedConfigClass;
+        try {
+            loadedConfigClass = Class.forName("net.neoforged.fml.config.LoadedConfig");
+        } catch (ClassNotFoundException e) {
+            SFM.LOGGER.error("Failed to get LoadedConfig class", e);
+            return false;
+        }
+        IConfigSpec.ILoadedConfig loadedConfig;
+        try {
+            Constructor<?> declaredConstructor = loadedConfigClass.getDeclaredConstructor(
+                    CommentedConfig.class,
+                    Path.class,
+                    ModConfig.class
+            );
+            declaredConstructor.setAccessible(true);
+            loadedConfig = (IConfigSpec.ILoadedConfig) declaredConstructor.newInstance(
+                    newConfig,
+                    configPath,
+                    modConfig
+            );
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException |
+                 NoSuchMethodException e) {
+            SFM.LOGGER.error("Failed to create LoadedConfig instance", e);
             return false;
         }
 
-        SFM.LOGGER.info("Firing config changed event for {}", modConfig.getFileName());
         try {
-            Method fireEvent = ModConfig.class.getDeclaredMethod("fireEvent", IConfigEvent.class);
-            fireEvent.setAccessible(true);
-            IConfigEvent event = Bindings.getConfigConfiguration().get().reloading().apply(modConfig);
-            fireEvent.invoke(modConfig, event);
-        } catch (InvocationTargetException | IllegalAccessException | NoSuchMethodException e) {
-            SFM.LOGGER.warn("Failed to fire changed event for {}", modConfig.getFileName(), e);
+            Method setConfig = ModConfig.class.getDeclaredMethod("setConfig", loadedConfigClass, Function.class);
+            setConfig.setAccessible(true);
+            setConfig.invoke(
+                    modConfig,
+                    loadedConfig,
+                    (Function) (Function<ModConfig, ModConfigEvent>) (ModConfigEvent.Reloading::new)
+            );
+        } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+            SFM.LOGGER.error("Failed to set new config data", e);
             return false;
         }
         return true;
@@ -131,7 +149,7 @@ public class SFMConfigReadWriter {
 
     public static @Nullable CommentedConfig parseConfigToml(
             String configToml,
-            ForgeConfigSpec configSpec
+            ModConfigSpec configSpec
     ) {
         CommentedConfig config = TomlFormat.instance().createParser().parse(configToml);
         if (!configSpec.isCorrect(config)) {
@@ -140,7 +158,7 @@ public class SFMConfigReadWriter {
         return config;
     }
 
-    public static @Nullable String getConfigToml(ForgeConfigSpec configSpec) {
+    public static @Nullable String getConfigToml(ModConfigSpec configSpec) {
         Path configPath = SFMConfigTracker.getPathForConfig(configSpec);
         if (configPath == null) {
             SFM.LOGGER.error("Failed to get config path when trying to get config TOML contents");

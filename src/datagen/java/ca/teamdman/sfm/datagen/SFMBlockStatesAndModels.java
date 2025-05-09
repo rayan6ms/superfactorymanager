@@ -7,11 +7,12 @@ import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticBlockStatesAndModelsDataGen;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraftforge.client.model.generators.ConfiguredModel;
-import net.minecraftforge.client.model.generators.ModelBuilder;
-import net.minecraftforge.client.model.generators.ModelFile;
-import net.minecraftforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.client.model.generators.ConfiguredModel;
+import net.neoforged.neoforge.client.model.generators.ModelBuilder;
+import net.neoforged.neoforge.client.model.generators.ModelFile;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 public class SFMBlockStatesAndModels extends MCVersionAgnosticBlockStatesAndModelsDataGen {
     public SFMBlockStatesAndModels(GatherDataEvent event) {
@@ -21,7 +22,7 @@ public class SFMBlockStatesAndModels extends MCVersionAgnosticBlockStatesAndMode
     @Override
     protected void registerStatesAndModels() {
         simpleBlock(SFMBlocks.MANAGER_BLOCK.get(), models().cubeBottomTop(
-                SFMBlocks.MANAGER_BLOCK.getId().getPath(),
+                BuiltInRegistries.BLOCK.getKey(SFMBlocks.MANAGER_BLOCK.get()).getPath(),
                 modLoc("block/manager_side"),
                 modLoc("block/manager_bot"),
                 modLoc("block/manager_top")
@@ -35,7 +36,7 @@ public class SFMBlockStatesAndModels extends MCVersionAgnosticBlockStatesAndMode
 //        ).texture("particle", "#top"));
 
         simpleBlock(SFMBlocks.TEST_BARREL_TANK_BLOCK.get(), models().cubeAll(
-                SFMBlocks.TEST_BARREL_TANK_BLOCK.getId().getPath(),
+                BuiltInRegistries.BLOCK.getKey(SFMBlocks.TEST_BARREL_TANK_BLOCK.get()).getPath(),
                 modLoc("block/test_barrel_tank")
         ).texture("particle", "#all"));
 
@@ -46,12 +47,12 @@ public class SFMBlockStatesAndModels extends MCVersionAgnosticBlockStatesAndMode
 
         ModelFile waterIntakeModelActive = models()
                 .cubeAll(
-                        SFMBlocks.WATER_TANK_BLOCK.getId().getPath() + "_active",
+                        BuiltInRegistries.BLOCK.getKey(SFMBlocks.WATER_TANK_BLOCK.get()).getPath() + "_active",
                         modLoc("block/water_intake_active")
                 );
         ModelFile waterIntakeModelInactive = models()
                 .cubeAll(
-                        SFMBlocks.WATER_TANK_BLOCK.getId().getPath() + "_inactive",
+                        BuiltInRegistries.BLOCK.getKey(SFMBlocks.WATER_TANK_BLOCK.get()).getPath() + "_inactive",
                         modLoc("block/water_intake_inactive")
                 );
         getVariantBuilder(SFMBlocks.WATER_TANK_BLOCK.get())

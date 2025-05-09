@@ -8,7 +8,7 @@ import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.config.SFMConfigReadWriter;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ClientboundClientConfigCommandPacket(
         ConfigCommandBehaviourInput requestingEditMode
@@ -22,13 +22,13 @@ public record ClientboundClientConfigCommandPacket(
         @Override
         public void encode(
                 ClientboundClientConfigCommandPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeEnum(msg.requestingEditMode());
         }
 
         @Override
-        public ClientboundClientConfigCommandPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ClientboundClientConfigCommandPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ClientboundClientConfigCommandPacket(
                     friendlyByteBuf.readEnum(ConfigCommandBehaviourInput.class)
             );

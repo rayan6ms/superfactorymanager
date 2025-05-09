@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ClientboundShowChangelogPacket(
 ) implements SFMPacket {
@@ -14,12 +14,12 @@ public record ClientboundShowChangelogPacket(
         @Override
         public void encode(
                 ClientboundShowChangelogPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
         }
 
         @Override
-        public ClientboundShowChangelogPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ClientboundShowChangelogPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ClientboundShowChangelogPacket(
             );
         }

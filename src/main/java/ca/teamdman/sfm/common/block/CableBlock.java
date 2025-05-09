@@ -16,21 +16,22 @@ import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.phys.BlockHitResult;
 import org.jetbrains.annotations.Nullable;
 
 public class CableBlock extends Block implements ICableBlock, IFacadableBlock {
     public CableBlock() {
-        super(Block.Properties
-                      .of(Material.METAL)
+        super(Block.Properties.of()
+                      .instrument(NoteBlockInstrument.BASS)
                       .destroyTime(1f)
                       .sound(SoundType.METAL));
     }
@@ -69,20 +70,20 @@ public class CableBlock extends Block implements ICableBlock, IFacadableBlock {
         }
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public InteractionResult use(
+    protected ItemInteractionResult useItemOn(
+            ItemStack pStack,
             BlockState pState,
             Level pLevel,
-            @Stored BlockPos pPos,
+            BlockPos pPos,
             Player pPlayer,
             InteractionHand pHand,
-            BlockHitResult pHit
+            BlockHitResult pHitResult
     ) {
         if (pPlayer.getOffhandItem().getItem() == SFMItems.NETWORK_TOOL_ITEM.get()) {
             if (pLevel.isClientSide() && pHand == InteractionHand.MAIN_HAND) {
                 ServerboundFacadePacket msg = new ServerboundFacadePacket(
-                        pHit,
+                        pHitResult,
                         FacadeSpreadLogic.fromParts(Screen.hasControlDown(), Screen.hasAltDown()),
                         pPlayer.getMainHandItem(),
                         InteractionHand.MAIN_HAND
@@ -92,11 +93,11 @@ public class CableBlock extends Block implements ICableBlock, IFacadableBlock {
                     NetworkToolKeyMappingHandler.setExternalDebounce();
                 }
                 ClientFacadeWarningHelper.sendFacadePacketFromClientWithConfirmationIfNecessary(msg);
-                return InteractionResult.CONSUME;
+                return ItemInteractionResult.CONSUME;
             }
-            return InteractionResult.SUCCESS;
+            return ItemInteractionResult.SUCCESS;
         }
-        return InteractionResult.PASS;
+        return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
     }
 
     @Override

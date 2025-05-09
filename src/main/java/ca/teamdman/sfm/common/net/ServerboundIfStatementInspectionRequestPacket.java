@@ -5,7 +5,7 @@ import ca.teamdman.sfm.common.program.SimulateExploreAllPathsProgramBehaviour;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfml.ast.IfStatement;
 import ca.teamdman.sfml.ast.Program;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ServerboundIfStatementInspectionRequestPacket(
         String programString,
@@ -19,14 +19,14 @@ public record ServerboundIfStatementInspectionRequestPacket(
         @Override
         public void encode(
                 ServerboundIfStatementInspectionRequestPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeUtf(msg.programString, Program.MAX_PROGRAM_LENGTH);
             friendlyByteBuf.writeInt(msg.inputNodeIndex());
         }
 
         @Override
-        public ServerboundIfStatementInspectionRequestPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ServerboundIfStatementInspectionRequestPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ServerboundIfStatementInspectionRequestPacket(
                     friendlyByteBuf.readUtf(Program.MAX_PROGRAM_LENGTH),
                     friendlyByteBuf.readInt()

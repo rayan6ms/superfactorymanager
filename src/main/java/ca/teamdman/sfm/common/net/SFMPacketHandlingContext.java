@@ -10,25 +10,28 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.network.NetworkEvent;
+import net.neoforged.neoforge.network.handling.IPayloadContext;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BiConsumer;
-import java.util.function.Supplier;
 
 public class SFMPacketHandlingContext {
-    private final NetworkEvent.Context inner;
+    private final IPayloadContext inner;
 
-    public SFMPacketHandlingContext(Supplier<NetworkEvent.Context> inner) {
-        this.inner = inner.get();
+    public SFMPacketHandlingContext(IPayloadContext inner) {
+        this.inner = inner;
     }
 
     public @Nullable ServerPlayer sender() {
-        return inner.getSender();
+        if (inner.player() instanceof ServerPlayer player) {
+            return player;
+        } else {
+            return null;
+        }
     }
 
     public void finish() {
-        inner.setPacketHandled(true);
+//        inner.setPacketHandled(true);
     }
 
     public void enqueueAndFinish(Runnable runnable) {
@@ -87,7 +90,7 @@ public class SFMPacketHandlingContext {
             return;
         }
 
-        var level = sender.getLevel();
+        var level = sender.level();
         //noinspection ConstantValue
         if (level == null) {
             SFM.LOGGER.warn("Invalid packet received from {}: level is null", sender.getName().getString());
@@ -121,7 +124,7 @@ public class SFMPacketHandlingContext {
         if (player == null) return;
         ManagerBlockEntity manager;
         if (player.containerMenu instanceof ManagerContainerMenu mcm) {
-            if (player.getLevel().getBlockEntity(mcm.MANAGER_POSITION) instanceof ManagerBlockEntity mbe) {
+            if (player.level().getBlockEntity(mcm.MANAGER_POSITION) instanceof ManagerBlockEntity mbe) {
                 manager = mbe;
             } else {
                 return;

@@ -8,20 +8,26 @@ import ca.teamdman.sfml.ast.Block;
 import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.ast.Trigger;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
@@ -31,11 +37,15 @@ import java.util.stream.LongStream;
 public abstract class SFMGameTestBase {
 
     public static ItemStack enchant(
+            GameTestHelper helper,
             ItemStack stack,
-            Enchantment enchantment,
+            ResourceKey<Enchantment> enchantment,
             int level
     ) {
-        EnchantmentHelper.setEnchantments(Map.of(enchantment, level), stack);
+        Registry<Enchantment> enchantmentRegistry = helper.getLevel().registryAccess().registry(Registries.ENCHANTMENT).get();
+        EnchantmentHelper.updateEnchantments(stack, xs -> {
+            xs.set(enchantmentRegistry.getHolderOrThrow(enchantment), level);
+        });
         return stack;
     }
 
@@ -194,13 +204,11 @@ public abstract class SFMGameTestBase {
             GameTestHelper helper,
             @NotStored BlockPos pos
     ) {
-        BlockEntity blockEntity = helper
-                .getBlockEntity(pos);
-        SFMGameTestBase.assertTrue(blockEntity != null, "No block entity found at " + pos);
-        Optional<IItemHandler> found = blockEntity
-                .getCapability(ForgeCapabilities.ITEM_HANDLER)
-                .resolve();
-        SFMGameTestBase.assertTrue(found.isPresent(), "No item handler found at " + pos);
-        return found.get();
+        BlockPos worldPos = helper.absolutePos(pos);
+        var found = helper
+                .getLevel()
+                .getCapability(Capabilities.ItemHandler.BLOCK, worldPos, Direction.DOWN);
+        SFMGameTestBase.assertTrue(found != null, "No item handler found at " + worldPos);
+        return found;
     }
 }

@@ -1,27 +1,27 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.event.entity.player.ItemTooltipEvent;
-import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.stream.Stream;
 
 public class ItemResourceType extends RegistryBackedResourceType<ItemStack, Item, IItemHandler> {
     public ItemResourceType() {
-        super(ForgeCapabilities.ITEM_HANDLER);
+        super(Capabilities.ItemHandler.BLOCK);
     }
 
     @Override
-    public IForgeRegistry<Item> getRegistry() {
-        return ForgeRegistries.ITEMS;
+    public Registry<Item> getRegistry() {
+        return BuiltInRegistries.ITEM;
     }
 
 
@@ -86,7 +86,7 @@ public class ItemResourceType extends RegistryBackedResourceType<ItemStack, Item
             Block block = Block.byItem(itemStack.getItem());
             if (block != Blocks.AIR) {
                 //noinspection deprecation
-                blockTagKeys = block.builtInRegistryHolder().getTagKeys();
+                blockTagKeys = block.builtInRegistryHolder().tags();
             } else {
                 blockTagKeys = Stream.empty();
             }

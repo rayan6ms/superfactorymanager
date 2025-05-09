@@ -3,8 +3,8 @@ package ca.teamdman.sfm.common.block;
 import ca.teamdman.sfm.common.block.shape.ShapeCache;
 import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
 import ca.teamdman.sfm.common.facade.FacadeTransparency;
+import ca.teamdman.sfm.common.registry.SFMBlockCapabilities;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.Stored;
 import com.google.common.collect.ImmutableMap;
@@ -15,13 +15,13 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.neoforged.neoforge.common.extensions.ILevelExtension;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
@@ -189,13 +189,10 @@ public class FancyCableBlock extends CableBlock implements IFacadableBlock {
             return true;
         }
 
-        BlockEntity blockEntity = level.getBlockEntity(relative);
-        if (blockEntity == null) {
+        if (!(level instanceof ILevelExtension levelExtension)) {
             return false;
         }
 
-        return SFMResourceTypes
-                .getCapabilities()
-                .anyMatch(cap -> blockEntity.getCapability(cap, direction).isPresent());
+        return SFMBlockCapabilities.hasAnyCapabilityAnyDirection(levelExtension, relative);
     }
 }

@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.common.item.LabelGunItem;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 
 public record ServerboundLabelGunUpdatePacket(
@@ -18,14 +18,14 @@ public record ServerboundLabelGunUpdatePacket(
         @Override
         public void encode(
                 ServerboundLabelGunUpdatePacket msg,
-                FriendlyByteBuf buf
+                RegistryFriendlyByteBuf buf
         ) {
             buf.writeUtf(msg.label, MAX_LABEL_LENGTH);
             buf.writeEnum(msg.hand);
         }
 
         @Override
-        public ServerboundLabelGunUpdatePacket decode(FriendlyByteBuf buf) {
+        public ServerboundLabelGunUpdatePacket decode(RegistryFriendlyByteBuf buf) {
             return new ServerboundLabelGunUpdatePacket(
                     buf.readUtf(MAX_LABEL_LENGTH),
                     buf.readEnum(InteractionHand.class)

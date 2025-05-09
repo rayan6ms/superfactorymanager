@@ -10,12 +10,12 @@ import ca.teamdman.sfm.common.program.linting.ProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.Stored;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.Container;
 import net.minecraft.world.Containers;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -28,17 +28,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.network.NetworkHooks;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 
 public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICableBlock {
     public static final BooleanProperty TRIGGERED = BlockStateProperties.TRIGGERED;
 
     public ManagerBlock() {
-        super(BlockBehaviour.Properties
-                      .of(Material.PISTON)
+        super(BlockBehaviour.Properties.of()
                       .destroyTime(2)
                       .sound(SoundType.METAL));
         registerDefaultState(getStateDefinition().any().setValue(TRIGGERED, false));
@@ -48,6 +46,11 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
     @SuppressWarnings("deprecation")
     public RenderShape getRenderShape(BlockState state) {
         return RenderShape.MODEL;
+    }
+
+    @Override
+    protected MapCodec<WaterTankBlock> codec() {
+        throw new NotImplementedException("This isn't used until 1.20.5 apparently");
     }
 
     @Override
@@ -85,14 +88,12 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    public InteractionResult use(
-            BlockState state,
+    protected InteractionResult useWithoutItem(
+            BlockState pState,
             Level level,
             @NotStored BlockPos pos,
             Player player,
-            InteractionHand hand,
-            BlockHitResult hit
+            BlockHitResult pHitResult
     ) {
         if (level.getBlockEntity(pos) instanceof ManagerBlockEntity manager && player instanceof ServerPlayer sp) {
             // update warnings on disk as we open the gui
@@ -106,7 +107,7 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
                     );
                 }
             }
-            NetworkHooks.openScreen(sp, manager, buf -> ManagerContainerMenu.encode(manager, buf));
+            sp.openMenu(manager, buf -> ManagerContainerMenu.encode(manager, buf));
             return InteractionResult.CONSUME;
         }
         return InteractionResult.SUCCESS;

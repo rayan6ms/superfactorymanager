@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.blockentity;
 
 import ca.teamdman.sfm.common.facade.FacadeData;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.ModelProperty;
+import net.neoforged.neoforge.client.model.data.ModelProperty;
 import org.jetbrains.annotations.Nullable;
 
 public interface IFacadeBlockEntity {

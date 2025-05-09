@@ -9,7 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.GameTestHolder;
 
 @GameTestHolder(SFM.MOD_ID)
 public class SFMProgramLinterGameTests extends SFMGameTestBase {

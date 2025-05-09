@@ -2,7 +2,6 @@ package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
-import ca.teamdman.sfm.client.gui.widget.SFMExtendedButtonWithTooltip;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.diagnostics.SFMDiagnostics;
@@ -15,10 +14,10 @@ import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfml.ast.Program;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
@@ -31,6 +30,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import org.apache.logging.log4j.Level;
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.text.DecimalFormat;
@@ -40,7 +40,7 @@ import static ca.teamdman.sfm.common.localization.LocalizationKeys.*;
 
 @SuppressWarnings({"FieldCanBeLocal", "unused", "NotNullFieldNotInitialized"})
 public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu> {
-    private static final ResourceLocation BACKGROUND_TEXTURE_LOCATION = new ResourceLocation(
+    private static final ResourceLocation BACKGROUND_TEXTURE_LOCATION = ResourceLocation.fromNamespaceAndPath(
             SFM.MOD_ID,
             "textures/gui/container/manager.png"
     );
@@ -131,24 +131,19 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
     @Override
     public void render(
-            PoseStack poseStack,
+            GuiGraphics graphics,
             int mx,
             int my,
             float partialTicks
     ) {
-        this.renderBackground(poseStack);
-        super.render(poseStack, mx, my, partialTicks);
-        this.renderTooltip(poseStack, mx, my);
+        this.renderTransparentBackground(graphics);
+        super.render(graphics, mx, my, partialTicks);
+        this.renderTooltip(graphics, mx, my);
 
         updateVisibilities();
 
         // update status countdown
         statusCountdown -= partialTicks;
-    }
-
-    @MCVersionDependentBehaviour
-    public float getBlitOffsetGood() {
-        return (float) getBlitOffset();
     }
 
     @Override
@@ -460,22 +455,22 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
 
     @MCVersionDependentBehaviour
     private void disableTexture() {
-        RenderSystem.disableTexture();
+//        RenderSystem.disableTexture(); // 1.19.2
     }
 
     @Override
     protected void renderLabels(
-            PoseStack poseStack,
+            GuiGraphics graphics,
             int mx,
             int my
     ) {
-        // draw title
-        super.renderLabels(poseStack, mx, my);
+        PoseStack poseStack = graphics.pose();        // draw title
+        super.renderLabels(graphics, mx, my);
 
         // draw state string
         var state = menu.state;
         SFMFontUtils.draw(
-                poseStack,
+                graphics,
                 this.font,
                 MANAGER_GUI_STATE.getComponent(state.LOC.getComponent().withStyle(state.COLOR)),
                 titleLabelX,
@@ -494,7 +489,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
             );
             poseStack.scale(0.5f, 0.5f, 1f);
             SFMFontUtils.draw(
-                    poseStack,
+                    graphics,
                     this.font,
                     Component.literal(menu.logLevel),
                     0,
@@ -508,7 +503,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         // draw status string
         if (statusCountdown > 0) {
             SFMFontUtils.draw(
-                    poseStack,
+                    graphics,
                     this.font,
                     status,
                     inventoryLabelX + font.width(playerInventoryTitle.getString()) + 5,
@@ -539,22 +534,21 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         RenderSystem.defaultBlendFunc();
         RenderSystem.setShader(GameRenderer::getPositionColorShader);
         Tesselator tesselator = Tesselator.getInstance();
-        Matrix4f pose = poseStack.last().pose();
+        Matrix4f pose = graphics.pose().last().pose();
         BufferBuilder bufferbuilder;
 
+
         // Draw the plot background
-        bufferbuilder = tesselator.getBuilder();
-        bufferbuilder.begin(VertexFormat.Mode.DEBUG_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
-        bufferbuilder.vertex(pose, plotX, plotY, 0).color(0, 0, 0, 0.5f).endVertex();
-        bufferbuilder.vertex(pose, plotX + plotWidth, plotY, 0).color(0, 0, 0, 0.5f).endVertex();
-        bufferbuilder.vertex(pose, plotX + plotWidth, plotY + plotHeight, 0).color(0, 0, 0, 0.5f).endVertex();
-        bufferbuilder.vertex(pose, plotX, plotY + plotHeight, 0).color(0, 0, 0, 0.5f).endVertex();
-        bufferbuilder.vertex(pose, plotX, plotY, 0).color(0, 0, 0, 0.5f).endVertex();
-        tesselator.end();
+        bufferbuilder = tesselator.begin(VertexFormat.Mode.DEBUG_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+        bufferbuilder.addVertex(pose, plotX, plotY, 0).setColor(0, 0, 0, 0.5f);
+        bufferbuilder.addVertex(pose, plotX + plotWidth, plotY, 0).setColor(0, 0, 0, 0.5f);
+        bufferbuilder.addVertex(pose, plotX + plotWidth, plotY + plotHeight, 0).setColor(0, 0, 0, 0.5f);
+        bufferbuilder.addVertex(pose, plotX, plotY + plotHeight, 0).setColor(0, 0, 0, 0.5f);
+        bufferbuilder.addVertex(pose, plotX, plotY, 0).setColor(0, 0, 0, 0.5f);
+        BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
 
         // Draw lines for each data point
-        bufferbuilder = tesselator.getBuilder();
-        bufferbuilder.begin(VertexFormat.Mode.DEBUG_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+        bufferbuilder = tesselator.begin(VertexFormat.Mode.DEBUG_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
         int mouseTickTimeIndex = -1;
         for (int i = 0; i < menu.tickTimeNanos.length; i++) {
             long y = menu.tickTimeNanos[i];
@@ -571,9 +565,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
             float blue = (c.getColor() & 0xFF) / 255f;
 
             bufferbuilder
-                    .vertex(pose, (float) plotPosX, (float) plotPosY, getBlitOffsetGood())
-                    .color(red, green, blue, 1f)
-                    .endVertex();
+                    .addVertex(pose, (float) plotPosX, (float) plotPosY, getBlitOffsetGood())
+                    .setColor(red, green, blue, 1f);
 
             // Check if the mouse is hovering over this line
             if (mx - leftPos >= plotPosX - spaceBetweenPoints / 2
@@ -583,7 +576,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                 mouseTickTimeIndex = i;
             }
         }
-        tesselator.end();
+        BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
 
         // Draw the tick time text
         var format = new DecimalFormat("0.000");
@@ -596,7 +589,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                 ChatFormatting lagColor = getMillisecondColour(hoveredTickTimeMilliseconds);
                 Component milliseconds = Component.literal(formattedMillis).withStyle(lagColor);
                 SFMFontUtils.draw(
-                        poseStack,
+                        graphics,
                         this.font,
                         MANAGER_GUI_HOVERED_TICK_TIME_MS.getComponent(milliseconds),
                         titleLabelX,
@@ -609,20 +602,17 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
             // draw a vertical line
             RenderSystem.setShader(GameRenderer::getPositionColorShader);
             tesselator = Tesselator.getInstance();
-            bufferbuilder = tesselator.getBuilder();
-            bufferbuilder.begin(VertexFormat.Mode.DEBUG_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
-            pose = poseStack.last().pose();
+            bufferbuilder = tesselator.begin(VertexFormat.Mode.DEBUG_LINE_STRIP, DefaultVertexFormat.POSITION_COLOR);
+            pose = graphics.pose().last().pose();
 
             int x = plotX + spaceBetweenPoints * mouseTickTimeIndex;
             bufferbuilder
-                    .vertex(pose, (float) x, (float) plotY, getBlitOffsetGood())
-                    .color(1f, 1f, 1f, 1f)
-                    .endVertex();
+                    .addVertex(pose, (float) x, (float) plotY, getBlitOffsetGood())
+                    .setColor(1f, 1f, 1f, 1f);
             bufferbuilder
-                    .vertex(pose, (float) x, (float) plotY + plotHeight, getBlitOffsetGood())
-                    .color(1f, 1f, 1f, 1f)
-                    .endVertex();
-            tesselator.end();
+                    .addVertex(pose, (float) x, (float) plotY + plotHeight, getBlitOffsetGood())
+                    .setColor(1f, 1f, 1f, 1f);
+            BufferUploader.drawWithShader(bufferbuilder.buildOrThrow());
         } else {
             // Draw the tick time text for peak value
             var peakTickTimeMilliseconds = peakTickTimeNanoseconds / 1_000_000f;
@@ -630,7 +620,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
             ChatFormatting lagColor = getMillisecondColour(peakTickTimeMilliseconds);
             Component milliseconds = Component.literal(formattedMillis).withStyle(lagColor);
             SFMFontUtils.draw(
-                    poseStack,
+                    graphics,
                     this.font,
                     MANAGER_GUI_PEAK_TICK_TIME_MS.getComponent(milliseconds),
                     titleLabelX,
@@ -646,15 +636,20 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     @MCVersionDependentBehaviour
-    private void enableTexture() {
-        RenderSystem.enableTexture();
+    private void enableTexture(){
+//        RenderSystem.enableTexture(); // 1.19.2
+    }
+
+    @MCVersionDependentBehaviour
+    public float getBlitOffsetGood() {
+        return 0F;
     }
 
     @Override
     protected void renderTooltip(
-            PoseStack pose,
-            int mx,
-            int my
+            GuiGraphics pGuiGraphics,
+            int pX,
+            int pY
     ) {
         if (Minecraft.getInstance().screen != this) {
             // this should fix the annoying Ctrl+E popup when editing
@@ -665,41 +660,40 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                     .forEach(w -> w.setFocused(false));
             return;
         }
-        drawChildTooltips(pose, mx, my);
+        drawChildTooltips(pGuiGraphics, pX, pY);
         // render hovered item
-        super.renderTooltip(pose, mx, my);
+        super.renderTooltip(pGuiGraphics, pX, pY);
     }
 
+    @SuppressWarnings("unused")
     @MCVersionDependentBehaviour
     private void drawChildTooltips(
-            PoseStack pose,
+            GuiGraphics guiGraphics,
             int mx,
             int my
     ) {
         // 1.19.2: manually render button tooltips
-        this.renderables
-                .stream()
-                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
-                .map(SFMExtendedButtonWithTooltip.class::cast)
-                .forEach(x -> x.renderToolTip(pose, mx, my));
+//        this.renderables
+//                .stream()
+//                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
+//                .map(SFMExtendedButtonWithTooltip.class::cast)
+//                .forEach(x -> x.renderToolTip(pose, mx, my));
     }
 
     @Override
     protected void renderBg(
-            PoseStack matrixStack,
+            GuiGraphics graphics,
             float partialTicks,
             int mx,
             int my
     ) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
         if (!menu.logLevel.equals(Level.OFF.name())) {
             RenderSystem.setShaderColor(0.2f, 0.8f, 1f, 1f);
         } else {
             RenderSystem.setShaderColor(1f, 1f, 1f, 1f);
         }
-        RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE_LOCATION);
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
-        blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        graphics.blit(BACKGROUND_TEXTURE_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
     }
 }

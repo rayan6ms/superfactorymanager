@@ -3,8 +3,8 @@ package ca.teamdman.sfm.datagen;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticLanguageDataGen;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,15 +24,15 @@ public class SFMLanguageProvider extends MCVersionAgnosticLanguageDataGen {
             seen.add(entry.key().get());
         }
         List<String> unmapped = new ArrayList<>();
-        ForgeRegistries.ITEMS
-                .getEntries()
+        BuiltInRegistries.ITEM
+                .entrySet()
                 .stream()
                 .filter(entry -> entry.getKey().location().getNamespace().equals(SFM.MOD_ID))
                 .filter(entry -> !seen.contains(entry.getValue().getDescriptionId()))
                 .map(entry -> entry.getValue().toString())
                 .forEach(unmapped::add);
-        ForgeRegistries.BLOCKS
-                .getEntries()
+        BuiltInRegistries.BLOCK
+                .entrySet()
                 .stream()
                 .filter(entry -> entry.getKey().location().getNamespace().equals(SFM.MOD_ID))
                 .filter(entry -> !seen.contains(entry.getValue().getDescriptionId()))

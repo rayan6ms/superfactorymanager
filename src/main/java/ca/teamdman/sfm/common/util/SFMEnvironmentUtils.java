@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.common.util;
 
 import cpw.mods.modlauncher.Launcher;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 public class SFMEnvironmentUtils {
     public static boolean isGameLoaded() {

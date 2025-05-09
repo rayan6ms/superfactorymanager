@@ -7,14 +7,20 @@ import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunUsePacket;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.SFMDataComponents;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
+import com.mojang.serialization.Codec;
+import io.netty.buffer.ByteBuf;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.ByteBufCodecs;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.util.ByIdMap;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -28,10 +34,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Locale;
+import java.util.function.IntFunction;
 
 public class LabelGunItem extends Item {
     public LabelGunItem() {
-        super(new Properties().stacksTo(1).tab(SFMItems.TAB));
+        super(new Properties().stacksTo(1));
     }
 
     public static void setActiveLabel(
@@ -42,19 +50,13 @@ public class LabelGunItem extends Item {
             clearActiveLabel(stack);
         } else {
             LabelPositionHolder.from(stack).addReferencedLabel(label).save(stack);
-            stack.getOrCreateTag().putString("sfm:active_label", label);
+            stack.set(SFMDataComponents.ACTIVE_LABEL, label);
+
         }
     }
 
-    public static void clearActiveLabel(
-            ItemStack gun
-    ) {
-        gun.getOrCreateTag().remove("sfm:active_label");
-    }
-
     public static String getActiveLabel(ItemStack stack) {
-        //noinspection DataFlowIssue
-        return !stack.hasTag() ? "" : stack.getTag().getString("sfm:active_label");
+        return stack.getOrDefault(SFMDataComponents.ACTIVE_LABEL, "");
     }
 
     public static String getNextLabel(
@@ -86,23 +88,25 @@ public class LabelGunItem extends Item {
         return labels.get(nextLabelIndex);
     }
 
+
+    public static void clearActiveLabel(
+            ItemStack gun
+    ) {
+        gun.remove(SFMDataComponents.ACTIVE_LABEL);
+    }
+
     /**
      * Returns the current enum mode for the label gun item.
      */
     public static LabelGunViewMode getViewMode(ItemStack stack) {
-        int ordinal = stack.getOrCreateTag().getInt("sfm:label_gun_view_mode");
-        // fallback if out of bounds or missing
-        if (ordinal < 0 || ordinal >= LabelGunViewMode.values().length) {
-            return LabelGunViewMode.SHOW_ALL;
-        }
-        return LabelGunViewMode.values()[ordinal];
+        return stack.getOrDefault(SFMDataComponents.LABEL_GUN_VIEW_MODE, LabelGunViewMode.SHOW_ALL);
     }
 
     /**
      * Sets the view mode in NBT.
      */
     public static void setViewMode(ItemStack stack, LabelGunViewMode mode) {
-        stack.getOrCreateTag().putInt("sfm:label_gun_view_mode", mode.ordinal());
+        stack.set(SFMDataComponents.LABEL_GUN_VIEW_MODE, mode);
     }
 
     public static void cycleViewMode(ItemStack stack) {
@@ -138,9 +142,9 @@ public class LabelGunItem extends Item {
     @Override
     public void appendHoverText(
             ItemStack stack,
-            @Nullable Level level,
+            TooltipContext pContext,
             List<Component> lines,
-            TooltipFlag detail
+            TooltipFlag pTooltipFlag
     ) {
         if (SFMItemUtils.isClientAndMoreInfoKeyPressed()) {
             Options options = Minecraft.getInstance().options;
@@ -207,9 +211,18 @@ public class LabelGunItem extends Item {
         LabelGunItem.setActiveLabel(stack, null);
     }
 
-    public enum LabelGunViewMode {
+    public enum LabelGunViewMode implements StringRepresentable {
         SHOW_ALL,
         SHOW_ONLY_ACTIVE_LABEL_AND_TARGETED_BLOCK,
-        SHOW_ONLY_TARGETED_BLOCK,
+        SHOW_ONLY_TARGETED_BLOCK;
+
+        public static final Codec<LabelGunViewMode> CODEC = StringRepresentable.fromEnum(LabelGunViewMode::values);
+        public static final IntFunction<LabelGunViewMode> BY_ID = ByIdMap.continuous(LabelGunViewMode::ordinal, values(), ByIdMap.OutOfBoundsStrategy.WRAP);
+        public static final StreamCodec<ByteBuf, LabelGunViewMode> STREAM_CODEC = ByteBufCodecs.idMapper(BY_ID, LabelGunViewMode::ordinal);
+
+        @Override
+        public String getSerializedName() {
+            return name().toLowerCase(Locale.ROOT);
+        }
     }
 }

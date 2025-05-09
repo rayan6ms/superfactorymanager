@@ -7,6 +7,7 @@ import io.netty.buffer.Unpooled;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 import java.util.Collection;
 
@@ -31,7 +32,7 @@ public record ClientboundManagerLogsPacket(
         @Override
         public void encode(
                 ClientboundManagerLogsPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeVarInt(msg.windowId());
             friendlyByteBuf.writeVarInt(msg.logsBuf.readableBytes());
@@ -42,7 +43,7 @@ public record ClientboundManagerLogsPacket(
         }
 
         @Override
-        public ClientboundManagerLogsPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ClientboundManagerLogsPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             int windowId = friendlyByteBuf.readVarInt();
 
             int size = friendlyByteBuf.readVarInt(); // don't trust readableBytes

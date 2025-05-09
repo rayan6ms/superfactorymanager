@@ -4,8 +4,8 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.config.SFMConfigReadWriter;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraftforge.network.HandshakeMessages;
 
 public record ServerboundServerConfigUpdatePacket(
         String newConfig
@@ -22,13 +22,13 @@ public record ServerboundServerConfigUpdatePacket(
         @Override
         public void encode(
                 ServerboundServerConfigUpdatePacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeUtf(msg.newConfig, MAX_CONFIG_LENGTH);
         }
 
         @Override
-        public ServerboundServerConfigUpdatePacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ServerboundServerConfigUpdatePacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ServerboundServerConfigUpdatePacket(friendlyByteBuf.readUtf(MAX_CONFIG_LENGTH));
         }
 

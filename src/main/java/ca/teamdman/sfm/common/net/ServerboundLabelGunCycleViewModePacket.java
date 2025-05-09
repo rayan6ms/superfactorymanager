@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.common.item.LabelGunItem;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 
@@ -16,13 +16,13 @@ public record ServerboundLabelGunCycleViewModePacket(
         @Override
         public void encode(
                 ServerboundLabelGunCycleViewModePacket msg,
-                FriendlyByteBuf buf
+                RegistryFriendlyByteBuf buf
         ) {
             buf.writeEnum(msg.hand);
         }
 
         @Override
-        public ServerboundLabelGunCycleViewModePacket decode(FriendlyByteBuf buf) {
+        public ServerboundLabelGunCycleViewModePacket decode(RegistryFriendlyByteBuf buf) {
             return new ServerboundLabelGunCycleViewModePacket(buf.readEnum(InteractionHand.class));
         }
 

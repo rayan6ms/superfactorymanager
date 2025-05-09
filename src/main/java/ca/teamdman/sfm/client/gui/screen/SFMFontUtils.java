@@ -1,17 +1,18 @@
 package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Matrix4f;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
+import org.joml.Matrix4f;
 
 public class SFMFontUtils {
     /**
      * Draws text to the screen
+     *
      * @return the width of the drawn text
      */
     @MCVersionDependentBehaviour
@@ -33,7 +34,7 @@ public class SFMFontUtils {
                 dropShadow,
                 matrix4f,
                 bufferSource,
-                transparent,
+                transparent ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL,
                 0,
                 LightTexture.FULL_BRIGHT
         );
@@ -41,6 +42,7 @@ public class SFMFontUtils {
 
     /**
      * Draws text to the screen
+     *
      * @return the width of the drawn text
      */
     @SuppressWarnings("UnusedReturnValue")
@@ -63,7 +65,7 @@ public class SFMFontUtils {
                 dropShadow,
                 matrix4f,
                 bufferSource,
-                transparent,
+                transparent ? Font.DisplayMode.SEE_THROUGH : Font.DisplayMode.NORMAL,
                 0,
                 LightTexture.FULL_BRIGHT
         );
@@ -74,7 +76,7 @@ public class SFMFontUtils {
      */
     @MCVersionDependentBehaviour
     public static void draw(
-            PoseStack context,
+            GuiGraphics graphics,
             Font font,
             Component text,
             int x,
@@ -82,11 +84,7 @@ public class SFMFontUtils {
             int colour,
             boolean shadow
     ) {
-        if (shadow) {
-            font.drawShadow(context, text, x, y, colour);
-        } else {
-            font.draw(context, text, x, y, colour);
-        }
+        graphics.drawString(font, text, x, y, colour, shadow);
     }
 
     /**
@@ -94,7 +92,7 @@ public class SFMFontUtils {
      */
     @MCVersionDependentBehaviour
     public static void draw(
-            PoseStack context,
+            GuiGraphics graphics,
             Font font,
             String text,
             int x,
@@ -102,10 +100,6 @@ public class SFMFontUtils {
             int colour,
             boolean shadow
     ) {
-        if (shadow) {
-            font.drawShadow(context, text, x, y, colour);
-        } else {
-            font.draw(context, text, x, y, colour);
-        }
+        graphics.drawString(font, text, x, y, colour, shadow);
     }
 }

@@ -7,8 +7,8 @@ import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -33,7 +33,7 @@ public class FancyCableFacadeBlock extends FancyCableBlock implements EntityBloc
     @SuppressWarnings("deprecation")
     @Override
     public ItemStack getCloneItemStack(
-            BlockGetter pLevel,
+            LevelReader pLevel,
             @NotStored BlockPos pPos,
             BlockState pState
     ) {

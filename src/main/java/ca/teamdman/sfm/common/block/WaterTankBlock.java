@@ -6,12 +6,15 @@ import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import ca.teamdman.sfm.common.util.Stored;
 import ca.teamdman.sfm.common.watertanknetwork.WaterNetworkManager;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.tags.FluidTags;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -27,7 +30,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.level.material.Material;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -40,7 +43,7 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
 
 
     public WaterTankBlock() {
-        super(BlockBehaviour.Properties.of(Material.PISTON).destroyTime(2).sound(SoundType.WOOD));
+        super(BlockBehaviour.Properties.of().destroyTime(2).sound(SoundType.WOOD));
         registerDefaultState(getStateDefinition().any().setValue(IN_WATER, false));
     }
 
@@ -68,19 +71,25 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
         WaterNetworkManager.onActiveStateChanged(pLevel, pPos, pNewState);
     }
 
+
     @Override
     public void appendHoverText(
             ItemStack pStack,
-            @Nullable BlockGetter pLevel,
-            List<Component> pTooltip,
-            TooltipFlag pFlag
+            Item.TooltipContext pContext,
+            List<Component> pTootipComponents,
+            TooltipFlag pTooltipFlag
     ) {
-        pTooltip.add(LocalizationKeys.WATER_TANK_ITEM_TOOLTIP_1
+        pTootipComponents.add(LocalizationKeys.WATER_TANK_ITEM_TOOLTIP_1
                              .getComponent()
                              .withStyle(ChatFormatting.GRAY));
-        pTooltip.add(LocalizationKeys.WATER_TANK_ITEM_TOOLTIP_2
+        pTootipComponents.add(LocalizationKeys.WATER_TANK_ITEM_TOOLTIP_2
                              .getComponent()
                              .withStyle(ChatFormatting.GRAY));
+    }
+
+    @Override
+    protected MapCodec<WaterTankBlock> codec() {
+        throw new NotImplementedException("This isn't used until 1.20.5 apparently");
     }
 
     @Override
@@ -146,11 +155,12 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
 
     @Override
     public ItemStack pickupBlock(
-            LevelAccessor level,
-            @NotStored BlockPos pos,
-            BlockState state
+            @Nullable Player player,
+            LevelAccessor levelAccessor,
+            @NotStored BlockPos blockPos,
+            BlockState blockState
     ) {
-        return state.getValue(IN_WATER) ? new ItemStack(Fluids.WATER.getBucket()) : ItemStack.EMPTY;
+        return blockState.getValue(IN_WATER) ? new ItemStack(Fluids.WATER.getBucket()) : ItemStack.EMPTY;
     }
 
     @Override
@@ -160,9 +170,10 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
 
     @Override
     public boolean canPlaceLiquid(
-            BlockGetter level,
-            @NotStored BlockPos pos,
-            BlockState state,
+            @Nullable Player player,
+            BlockGetter blockGetter,
+            @NotStored BlockPos blockPos,
+            BlockState blockState,
             Fluid fluid
     ) {
         return fluid.isSame(Fluids.WATER);

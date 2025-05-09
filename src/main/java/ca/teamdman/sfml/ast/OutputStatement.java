@@ -9,11 +9,11 @@ import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -218,7 +218,7 @@ public class OutputStatement implements IOStatement {
             report.append("=== Manager ===\n");
             report
                     .append("Level: ")
-                    .append(level.dimensionTypeId().location())
+                    .append(level.dimension().location())
                     .append(" (")
                     .append(level)
                     .append(")\n");
@@ -257,7 +257,7 @@ public class OutputStatement implements IOStatement {
                 .append(")\n");
         BlockEntity inputBlockEntity = level.getBlockEntity(slot.getPos());
         if (inputBlockEntity != null) {
-            ResourceLocation inputBlockEntityType = ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(inputBlockEntity.getType());
+            ResourceLocation inputBlockEntityType = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(inputBlockEntity.getType());
             report
                     .append("Block Entity: ")
                     .append(inputBlockEntity.getClass().getName())
@@ -268,7 +268,7 @@ public class OutputStatement implements IOStatement {
             report.append("Block Entity: null\n");
         }
         BlockState blockState = level.getBlockState(slot.getPos());
-        ResourceLocation blockType = ForgeRegistries.BLOCKS.getKey(blockState.getBlock());
+        ResourceLocation blockType = BuiltInRegistries.BLOCK.getKey(blockState.getBlock());
         report
                 .append("Block: ")
                 .append(blockState.getBlock().getClass().getName())
@@ -578,7 +578,7 @@ public class OutputStatement implements IOStatement {
                                             finalSlot,
                                             type.getAmount(stack)
                                             + " of "
-                                            + type.getMaxStackSizeForSlot(capability, finalSlot)
+                                            + Math.min(type.getMaxStackSize(stack), type.getMaxStackSizeForSlot(capability, finalSlot))
                                             + " "
                                             + type.getItem(stack)
                                     )));
@@ -594,16 +594,31 @@ public class OutputStatement implements IOStatement {
         }
     }
 
+    @SuppressWarnings("RedundantIfStatement")
     private <STACK, ITEM, CAP> boolean shouldCreateSlot(
             ResourceType<STACK, ITEM, CAP> type,
             CAP cap,
             STACK stack,
             int slot
     ) {
-        // we check the stack limit on the capability
-        // this is to accommodate drawers/bins/barrels/black hole units/whatever
-        // those blocks hold many more items than normal in a single stack
-        // we don't also test the tracker because we can deposit into empty slots
-        return type.getAmount(stack) < type.getMaxStackSizeForSlot(cap, slot);
+        // Chest holding dirt: maxStackSizeForStack=64 maxStackSizeForSlot=99
+        // Bin holding sticks: maxStackSizeForStack=64 maxStackSizeForSlot=102400
+        long amount = type.getAmount(stack);
+        long maxStackSizeForSlot = type.getMaxStackSizeForSlot(cap, slot);
+        if (maxStackSizeForSlot > 99) {
+            // If the slot is bigger than normal, ignore stack size
+            // This is for barrels/bins/drawers
+            return amount < maxStackSizeForSlot;
+        }
+        if (amount >= maxStackSizeForSlot) {
+            // Respect traditional slot limits
+            return false;
+        }
+        long maxStackSizeForStack = type.getMaxStackSize(stack);
+        if (amount >= maxStackSizeForStack) {
+            // Respect stack limits
+            return false;
+        }
+        return true;
     }
 }

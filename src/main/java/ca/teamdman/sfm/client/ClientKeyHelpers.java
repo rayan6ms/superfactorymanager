@@ -1,9 +1,9 @@
 package ca.teamdman.sfm.client;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import net.neoforged.neoforge.common.util.Lazy;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.common.util.Lazy;
 
 public class ClientKeyHelpers {
     public static boolean isKeyDownInScreenOrWorld(Lazy<KeyMapping> key) {

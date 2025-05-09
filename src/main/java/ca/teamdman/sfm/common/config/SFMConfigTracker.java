@@ -2,35 +2,41 @@ package ca.teamdman.sfm.common.config;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import com.electronwill.nightconfig.core.Config;
-import com.electronwill.nightconfig.core.file.FileConfig;
 import net.minecraft.server.MinecraftServer;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.config.ConfigTracker;
-import net.minecraftforge.fml.config.IConfigSpec;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
-import net.minecraftforge.server.ServerLifecycleHooks;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.config.ConfigTracker;
+import net.neoforged.fml.config.IConfigSpec;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 public class SFMConfigTracker {
-    private static final HashMap<IConfigSpec<?>, Path> configPaths = new HashMap<>();
+    private static final HashMap<IConfigSpec, Path> configPaths = new HashMap<>();
 
-    public static @Nullable Path getPathForConfig(IConfigSpec<?> spec) {
+    public static @Nullable Path getPathForConfig(IConfigSpec spec) {
         return configPaths.get(spec);
     }
 
+    @SuppressWarnings({"unchecked", "UnstableApiUsage"})
     @MCVersionDependentBehaviour
     private static Set<ModConfig> getModConfigs(ModConfig.Type modConfigType) {
-        return ConfigTracker.INSTANCE.configSets().get(modConfigType);
+        ConfigTracker configTracker = ConfigTracker.INSTANCE;
+        try {
+            Field configSetsField = configTracker.getClass().getDeclaredField("configSets");
+            configSetsField.setAccessible(true);
+            Map<ModConfig.Type, Set<ModConfig>> configSets = (Map<ModConfig.Type, Set<ModConfig>>) configSetsField.get(configTracker);
+            return configSets.get(modConfigType);
+        } catch (NoSuchFieldException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     static @Nullable ModConfig getServerModConfig() {
@@ -55,7 +61,7 @@ public class SFMConfigTracker {
         return null;
     }
 
-    @Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
     public static class ModConfigEventListeners {
         /**
          * Tracks when configs are loaded
@@ -76,7 +82,7 @@ public class SFMConfigTracker {
         private static void handleConfigEvent(ModConfigEvent event) {
             ModConfig modConfig = event.getConfig();
             if (modConfig.getModId().equals(SFM.MOD_ID)) {
-                IConfigSpec<?> spec = modConfig.getSpec();
+                IConfigSpec spec = modConfig.getSpec();
                 Path path = getConfigPath(spec);
                 if (path != null) {
                     configPaths.put(spec, path);
@@ -85,39 +91,29 @@ public class SFMConfigTracker {
         }
 
         @MCVersionDependentBehaviour
-        private static @Nullable Path getConfigPath(IConfigSpec<?> configSpec) {
-            FileConfig fileConfig = getFileConfig(configSpec);
-            if (fileConfig != null) {
-                return fileConfig.getNioPath();
+        private static @Nullable Path getConfigPath(IConfigSpec configSpec) {
+            IConfigSpec.ILoadedConfig loadedConfig;
+            try {
+                Field loadedConfigField = configSpec.getClass().getDeclaredField("loadedConfig");
+                loadedConfigField.setAccessible(true);
+                loadedConfig = (IConfigSpec.ILoadedConfig) loadedConfigField.get(configSpec);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                SFM.LOGGER.error("Failed to extract loadedConfig field", e);
+                return null;
             }
-            return null;
-        }
-
-
-        private static @Nullable FileConfig getFileConfig(IConfigSpec<?> configSpec) {
-            Config config = getChildConfig(configSpec);
-            if (config instanceof FileConfig fileConfig) {
-                return fileConfig;
+            try {
+                Class<?> loadedConfigClass = loadedConfig.getClass();
+                Field pathField = loadedConfigClass.getDeclaredField("path");
+                pathField.setAccessible(true);
+                return (Path) pathField.get(loadedConfig);
+            } catch (NoSuchFieldException | IllegalAccessException e) {
+                SFM.LOGGER.error("Failed to extract path field", e);
+                return null;
             }
-            return null;
-        }
-
-        private static @Nullable Config getChildConfig(IConfigSpec<?> configSpec) {
-            if (configSpec instanceof ForgeConfigSpec forgeConfigSpec) {
-                try {
-                    Field childConfigField = forgeConfigSpec.getClass().getDeclaredField("childConfig");
-                    childConfigField.setAccessible(true);
-                    return (Config) childConfigField.get(forgeConfigSpec);
-                } catch (NoSuchFieldException | IllegalAccessException e) {
-                    SFM.LOGGER.error("Failed to extract childConfig field", e);
-                    return null;
-                }
-            }
-            return null;
         }
     }
 
-    @Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+    @EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
     public static class GameConfigEventListeners {
         /**
          * Tracks when configs are unloaded

@@ -2,11 +2,11 @@ package ca.teamdman.sfm.common.compat;
 
 import ca.teamdman.sfm.common.util.NotStored;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.fml.ModList;
 
 public class SFMModCompat {
     public static boolean isMekanismLoaded() {
@@ -26,7 +26,7 @@ public class SFMModCompat {
             @NotStored BlockPos pos
     ) {
         Block block = level.getBlockState(pos).getBlock();
-        ResourceLocation blockId = ForgeRegistries.BLOCKS.getKey(block);
+        ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
         assert blockId != null;
         return blockId.getNamespace().equals("mekanism");
     }

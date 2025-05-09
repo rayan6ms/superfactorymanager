@@ -13,22 +13,20 @@ import ca.teamdman.sfm.common.net.ServerboundManagerLogDesireUpdatePacket;
 import ca.teamdman.sfm.common.net.ServerboundManagerSetLogLevelPacket;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.math.Matrix4f;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.components.MultilineTextField;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.core.time.MutableInstant;
+import org.joml.Matrix4f;
 
 import java.util.*;
 
@@ -290,9 +288,12 @@ public class LogsScreen extends Screen {
     }
 
     @Override
-    public void render(PoseStack poseStack, int mx, int my, float partialTicks) {
-        this.renderBackground(poseStack);
-        super.render(poseStack, mx, my, partialTicks);
+    public void render(GuiGraphics pGuiGraphics, int pMouseX, int pMouseY, float pPartialTick) {
+        // not sure why here twice, todo: remove this lol
+//        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
+
+        this.renderTransparentBackground(pGuiGraphics);
+        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
         if (!MENU.logLevel.equals(lastKnownLogLevel)) {
             onLogLevelChange();
         }
@@ -300,6 +301,7 @@ public class LogsScreen extends Screen {
 
     // TODO: enable scrolling without focus
     private class MyMultiLineEditBox extends MultiLineEditBox {
+        private int frame = 0;
         public MyMultiLineEditBox() {
             super(
                     LogsScreen.this.font,
@@ -341,12 +343,13 @@ public class LogsScreen extends Screen {
         }
 
         @Override
-        protected void renderContents(PoseStack poseStack, int mx, int my, float partialTicks) {
+        protected void renderContents(GuiGraphics pGuiGraphics, int mx, int my, float partialTicks) {
+            PoseStack poseStack = pGuiGraphics.pose();
             Matrix4f matrix4f = poseStack.last().pose();
             if (shouldRebuildText()) {
                 rebuildText();
             }
-            boolean isCursorVisible = this.isFocused() && this.frame / 6 % 2 == 0;
+            boolean isCursorVisible = this.isFocused() && this.frame++ / 60 % 2 == 0;
             boolean isCursorAtEndOfLine = false;
             int cursorIndex = textField.cursor();
             int lineX = SFMScreenRenderUtils.getX(this) + this.innerPadding();
@@ -367,7 +370,7 @@ public class LogsScreen extends Screen {
                 boolean cursorOnThisLine = isCursorVisible
                                            && cursorIndex >= charCount
                                            && cursorIndex <= charCount + lineLength;
-                var buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+                var buffer = pGuiGraphics.bufferSource();
 
                 if (cursorOnThisLine) {
                     isCursorAtEndOfLine = cursorIndex == charCount + lineLength;
@@ -422,7 +425,7 @@ public class LogsScreen extends Screen {
                     ));
 
                     SFMScreenRenderUtils.renderHighlight(
-                            poseStack,
+                            pGuiGraphics,
                             lineX + highlightStartX,
                             lineY,
                             lineX + highlightEndX,
@@ -436,7 +439,7 @@ public class LogsScreen extends Screen {
 
             if (isCursorAtEndOfLine) {
                 SFMFontUtils.draw(
-                        poseStack,
+                        pGuiGraphics,
                         this.font,
                         "_",
                         cursorX,
@@ -445,7 +448,7 @@ public class LogsScreen extends Screen {
                         true
                 );
             } else {
-                GuiComponent.fill(poseStack, cursorX, cursorY - 1, cursorX + 1, cursorY + 1 + 9, -1);
+                pGuiGraphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + 1 + 9, -1);
             }
         }
     }

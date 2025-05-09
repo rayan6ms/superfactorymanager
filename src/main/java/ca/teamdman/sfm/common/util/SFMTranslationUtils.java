@@ -61,7 +61,25 @@ public class SFMTranslationUtils {
             String key,
             Object... args
     ) {
-        return new TranslatableContents(key, args);
+        Object[] newArgs = new Object[args.length];
+        for (int i = 0; i < args.length; i++) {
+            Object arg = args[i];
+            if (TranslatableContents.isAllowedPrimitiveArgument(arg)) {
+                newArgs[i] = arg;
+            } else if (arg == null) {
+                newArgs[i] = "null";
+            } else {
+//                SFM.LOGGER.warn(
+//                        "Invalid argument type for translation argument {} key '{}': {}",
+//                        i,
+//                        key,
+//                        arg.getClass().getName(),
+//                        new IllegalArgumentException()
+//                );
+                newArgs[i] = arg.toString();
+            }
+        }
+        return new TranslatableContents(key, null, newArgs);
     }
 
     /**

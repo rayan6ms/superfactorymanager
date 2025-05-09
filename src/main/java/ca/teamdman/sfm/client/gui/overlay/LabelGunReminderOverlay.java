@@ -7,30 +7,27 @@ import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.util.SFMHandUtils;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.DeltaTracker;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.client.gui.overlay.ForgeGui;
-import net.minecraftforge.client.gui.overlay.IGuiOverlay;
 import org.jetbrains.annotations.Nullable;
 
-public class LabelGunReminderOverlay implements IGuiOverlay {
+public class LabelGunReminderOverlay implements LayeredDraw.Layer {
 
 
     @SuppressWarnings("DuplicatedCode")
     @Override
     public void render(
-            ForgeGui gui,
-            PoseStack poseStack,
-            float partialTick,
-            int screenWidth,
-            int screenHeight
+            GuiGraphics guiGraphics,
+            DeltaTracker deltaTracker
     ) {
-        Minecraft minecraft = gui.getMinecraft();
+        Minecraft minecraft = Minecraft.getInstance();
         if (minecraft.options.hideGui) {
             return;
         }
@@ -54,10 +51,10 @@ public class LabelGunReminderOverlay implements IGuiOverlay {
                         .getTranslatedKeyMessage().plainCopy().withStyle(ChatFormatting.YELLOW)
         );
         int reminderWidth = font.width(reminder);
-        int x = screenWidth / 2 - reminderWidth / 2;
+        int x = guiGraphics.guiWidth() / 2 - reminderWidth / 2;
         int y = 20;
         SFMFontUtils.draw(
-                poseStack,
+                guiGraphics,
                 font,
                 reminder,
                 x,

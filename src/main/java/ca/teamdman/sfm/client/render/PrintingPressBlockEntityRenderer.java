@@ -3,12 +3,12 @@ package ca.teamdman.sfm.client.render;
 import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.math.Vector3f;
+import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 
 public class PrintingPressBlockEntityRenderer implements BlockEntityRenderer<PrintingPressBlockEntity> {
@@ -55,18 +55,19 @@ public class PrintingPressBlockEntityRenderer implements BlockEntityRenderer<Pri
                 .getItemRenderer()
                 .renderStatic(
                         stack,
-                        ItemTransforms.TransformType.GROUND,
+                        ItemDisplayContext.GROUND,
                         packedLight,
                         packedOverlay,
                         poseStack,
                         buf,
+                        blockEntity.getLevel(),
                         (int) blockEntity.getBlockPos().asLong()
                 );
     }
 
     @MCVersionDependentBehaviour
     private static void rotate(PoseStack poseStack) {
-        var depthAxis = new Vector3f(1, 0, 0);
+        var depthAxis = Axis.XP;
         poseStack.mulPose(depthAxis.rotationDegrees(-90));
     }
 }

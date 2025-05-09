@@ -11,17 +11,20 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.capabilities.Capability;
+import net.neoforged.neoforge.capabilities.BlockCapability;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 public abstract class ResourceType<STACK, ITEM, CAP> {
-    public final Capability<CAP> CAPABILITY_KIND;
+    public final BlockCapability<CAP, @Nullable Direction> CAPABILITY_KIND;
 
-    public ResourceType(Capability<CAP> CAPABILITY_KIND) {
+    public ResourceType(BlockCapability<CAP, @Nullable Direction> CAPABILITY_KIND) {
         this.CAPABILITY_KIND = CAPABILITY_KIND;
     }
 
@@ -111,7 +114,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
                 .trace(x -> x.accept(LocalizationKeys.LOG_RESOURCE_TYPE_GET_CAPABILITIES_BEGIN.get(
                         displayAsCode(),
                         displayAsCapabilityClass(),
-                        labelAccess
+                        labelAccess.toString() // @MCVersionDependentBehaviour We must cast to string here // do I want to update the base method to perform the component/boolean/string/other check and call tostring on my own?
                 )));
 
         DirectionQualifier directions = labelAccess.directions();
@@ -137,10 +140,9 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             BiConsumer<Direction, CAP> consumer
     ) {
         for (Direction dir : directions) {
-            Optional<CAP> maybeCap = programContext.getNetwork()
-                    .getCapability(CAPABILITY_KIND, pos, dir, programContext.getLogger())
-                    .resolve();
-            if (maybeCap.isPresent()) {
+            @Nullable CAP maybeCap = programContext.getNetwork()
+                    .getCapability(CAPABILITY_KIND, pos, dir, programContext.getLogger());
+            if (maybeCap != null) {
                 programContext
                         .getLogger()
                         .debug(x -> x.accept(LocalizationKeys.LOG_RESOURCE_TYPE_GET_CAPABILITIES_CAP_PRESENT.get(
@@ -148,8 +150,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
                                 pos,
                                 dir
                         )));
-                CAP cap = maybeCap.get();
-                consumer.accept(dir, cap);
+                consumer.accept(dir, maybeCap);
             } else {
                 // Log error
                 programContext
@@ -211,7 +212,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     }
 
     public String displayAsCapabilityClass() {
-        return CAPABILITY_KIND.getName();
+        return CAPABILITY_KIND.name().toString();
     }
 
     protected abstract STACK setCount(

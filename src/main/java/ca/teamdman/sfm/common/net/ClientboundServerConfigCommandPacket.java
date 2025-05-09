@@ -4,7 +4,7 @@ import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.gui.screen.TomlEditScreenOpenContext;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.registry.SFMPackets;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ClientboundServerConfigCommandPacket(
         String configToml,
@@ -21,14 +21,14 @@ public record ClientboundServerConfigCommandPacket(
         @Override
         public void encode(
                 ClientboundServerConfigCommandPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeUtf(msg.configToml(), MAX_LENGTH);
             friendlyByteBuf.writeEnum(msg.requestingEditMode());
         }
 
         @Override
-        public ClientboundServerConfigCommandPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ClientboundServerConfigCommandPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ClientboundServerConfigCommandPacket(
                     friendlyByteBuf.readUtf(MAX_LENGTH),
                     friendlyByteBuf.readEnum(ConfigCommandBehaviourInput.class)

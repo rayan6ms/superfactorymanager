@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.common.item.NetworkToolItem;
 import ca.teamdman.sfm.common.registry.SFMItems;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
@@ -18,13 +18,13 @@ public record ServerboundNetworkToolToggleOverlayPacket(
         @Override
         public void encode(
                 ServerboundNetworkToolToggleOverlayPacket msg,
-                FriendlyByteBuf buf
+                RegistryFriendlyByteBuf buf
         ) {
             buf.writeEnum(msg.hand);
         }
 
         @Override
-        public ServerboundNetworkToolToggleOverlayPacket decode(FriendlyByteBuf buf) {
+        public ServerboundNetworkToolToggleOverlayPacket decode(RegistryFriendlyByteBuf buf) {
             return new ServerboundNetworkToolToggleOverlayPacket(buf.readEnum(InteractionHand.class));
         }
 

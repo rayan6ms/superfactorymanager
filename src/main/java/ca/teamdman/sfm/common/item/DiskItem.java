@@ -10,16 +10,13 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundDiskItemSetProgramPacket;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.program.linting.ProgramLinter;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.SFMDataComponents;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
-import ca.teamdman.sfm.common.util.SFMTranslationUtils;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.ChatFormatting;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -40,32 +37,34 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class DiskItem extends Item {
+
     public DiskItem() {
-        super(new Item.Properties().tab(SFMItems.TAB));
+        super(new Item.Properties());
     }
 
     public static String getProgram(ItemStack stack) {
-        return stack
-                .getOrCreateTag()
-                .getString("sfm:program");
+        return stack.getOrDefault(SFMDataComponents.PROGRAM_STRING, "");
     }
 
     public static void setProgram(
             ItemStack stack,
-            String program
+            String programString
     ) {
-        program = program.replaceAll("\r", "");
-        stack
-                .getOrCreateTag()
-                .putString("sfm:program", program);
+        programString = programString.replaceAll("\r", "");
+        stack.set(SFMDataComponents.PROGRAM_STRING, programString);
     }
 
     public static void pruneIfDefault(ItemStack stack) {
         if (getProgram(stack).isBlank() && LabelPositionHolder.from(stack).isEmpty()) {
-            for (String key : stack.getOrCreateTag().getAllKeys().toArray(String[]::new)) {
-                stack.removeTagKey(key);
-            }
+            clearData(stack);
         }
+    }
+
+    public static void clearData(ItemStack stack) {
+        stack.remove(SFMDataComponents.PROGRAM_STRING);
+        stack.remove(SFMDataComponents.PROGRAM_ERRORS);
+        stack.remove(SFMDataComponents.PROGRAM_WARNINGS);
+        stack.remove(SFMDataComponents.LABEL_POSITION_HOLDER);
     }
 
     public static @Nullable Program compileAndUpdateErrorsAndWarnings(
@@ -120,72 +119,45 @@ public class DiskItem extends Item {
         return rtn.get();
     }
 
-    public static List<TranslatableContents> getErrors(ItemStack stack) {
-        return stack
-                .getOrCreateTag()
-                .getList("sfm:errors", Tag.TAG_COMPOUND)
-                .stream()
-                .map(CompoundTag.class::cast)
-                .map(SFMTranslationUtils::deserializeTranslation)
-                .toList();
+    public static List<Component> getErrors(ItemStack stack) {
+        return stack.getOrDefault(SFMDataComponents.PROGRAM_ERRORS, Collections.emptyList());
     }
 
     public static void setErrors(
             ItemStack stack,
             List<TranslatableContents> errors
     ) {
-        stack
-                .getOrCreateTag()
-                .put(
-                        "sfm:errors",
-                        errors
-                                .stream()
-                                .map(SFMTranslationUtils::serializeTranslation)
-                                .collect(ListTag::new, ListTag::add, ListTag::addAll)
-                );
+        stack.set(SFMDataComponents.PROGRAM_ERRORS, errors
+                .stream()
+                .map(MutableComponent::create)
+                .collect(Collectors.toList()));
     }
 
-    public static List<TranslatableContents> getWarnings(ItemStack stack) {
-        return stack
-                .getOrCreateTag()
-                .getList("sfm:warnings", Tag.TAG_COMPOUND)
-                .stream()
-                .map(CompoundTag.class::cast)
-                .map(SFMTranslationUtils::deserializeTranslation)
-                .collect(
-                        Collectors.toList());
+    public static List<Component> getWarnings(ItemStack stack) {
+        return stack.getOrDefault(SFMDataComponents.PROGRAM_WARNINGS, Collections.emptyList());
     }
 
     public static void setWarnings(
             ItemStack stack,
             List<TranslatableContents> warnings
     ) {
-        stack
-                .getOrCreateTag()
-                .put(
-                        "sfm:warnings",
-                        warnings
-                                .stream()
-                                .map(SFMTranslationUtils::serializeTranslation)
-                                .collect(ListTag::new, ListTag::add, ListTag::addAll)
-                );
-    }
-
-    public static String getProgramName(ItemStack stack) {
-        return stack
-                .getOrCreateTag()
-                .getString("sfm:name");
+        stack.set(SFMDataComponents.PROGRAM_WARNINGS, warnings
+                .stream()
+                .map(MutableComponent::create)
+                .collect(Collectors.toList()));
     }
 
     public static void setProgramName(
             ItemStack stack,
             String name
     ) {
-        if (stack.getItem() instanceof DiskItem) {
-            stack
-                    .getOrCreateTag()
-                    .putString("sfm:name", name);
+        if (!name.isEmpty()) {
+            stack.set(DataComponents.ITEM_NAME, Component.literal(name));
         }
+    }
+
+    public static String getProgramName(ItemStack stack) {
+        return stack.getOrDefault(DataComponents.ITEM_NAME, Component.empty()).getString();
     }
 
     @Override
@@ -222,33 +194,33 @@ public class DiskItem extends Item {
     @Override
     public void appendHoverText(
             ItemStack stack,
-            @Nullable Level level,
+            TooltipContext context,
             List<Component> lines,
             TooltipFlag detail
     ) {
-        var program = getProgram(stack);
-        if (SFMItemUtils.isClientAndMoreInfoKeyPressed() && !program.isEmpty()) {
-            lines.add(SFMItemUtils.getRainbow(getName(stack).getString().length()));
-            lines.addAll(ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(program, false));
-        } else {
-            lines.addAll(LabelPositionHolder.from(stack).asHoverText());
-            getErrors(stack)
-                    .stream()
-                    .map(MutableComponent::create)
-                    .map(line -> line.withStyle(ChatFormatting.RED))
-                    .forEach(lines::add);
-            getWarnings(stack)
-                    .stream()
-                    .map(MutableComponent::create)
-                    .map(line -> line.withStyle(ChatFormatting.YELLOW))
-                    .forEach(lines::add);
-            if (!program.isEmpty()) {
-                SFMItemUtils.appendMoreInfoKeyReminderTextIfOnClient(lines);
+        String program = DiskItem.getProgram(stack);
+            if (SFMItemUtils.isClientAndMoreInfoKeyPressed() && !program.isEmpty()) {
+                // show the program
+                lines.add(SFMItemUtils.getRainbow(getName(stack).getString().length()));
+                lines.addAll(ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(program, false));
+            } else {
+                lines.addAll(LabelPositionHolder.from(stack).asHoverText());
+                getErrors(stack)
+                        .stream()
+                        .map(Component::copy)
+                        .map(line -> line.withStyle(ChatFormatting.RED))
+                        .forEach(lines::add);
+                getWarnings(stack)
+                        .stream()
+                        .map(Component::copy)
+                        .map(line -> line.withStyle(ChatFormatting.YELLOW))
+                        .forEach(lines::add);
+                if (!program.isEmpty()) {
+                    SFMItemUtils.appendMoreInfoKeyReminderTextIfOnClient(lines);
+                }
+            }
+        if (!program.isEmpty()) {
+                lines.add(LocalizationKeys.DISK_EDIT_IN_HAND_TOOLTIP.getComponent().withStyle(ChatFormatting.GRAY));
             }
         }
-        if (program.isEmpty()) {
-            lines.add(LocalizationKeys.DISK_EDIT_IN_HAND_TOOLTIP.getComponent().withStyle(ChatFormatting.GRAY));
-        }
-    }
-
 }

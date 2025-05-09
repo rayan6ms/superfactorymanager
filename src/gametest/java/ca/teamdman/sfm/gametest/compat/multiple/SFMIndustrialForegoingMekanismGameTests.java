@@ -26,10 +26,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.gametest.GameTestHolder;
+import net.neoforged.common.capabilities.ForgeCapabilities;
+import net.neoforged.fluids.FluidStack;
+import net.neoforged.fluids.capability.IFluidHandler;
+import net.neoforged.gametest.GameTestHolder;
 
 import java.lang.reflect.Field;
 import java.util.Objects;

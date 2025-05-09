@@ -4,7 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticBlockTagsDataGen;
 import net.minecraft.tags.BlockTags;
-import net.minecraftforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 public class SFMBlockTags extends MCVersionAgnosticBlockTagsDataGen {
     public SFMBlockTags(GatherDataEvent event) {

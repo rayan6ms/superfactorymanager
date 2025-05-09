@@ -1,25 +1,25 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import java.util.stream.Stream;
 
 public class FluidResourceType extends RegistryBackedResourceType<FluidStack, Fluid, IFluidHandler> {
     public FluidResourceType() {
-        super(ForgeCapabilities.FLUID_HANDLER);
+        super(Capabilities.FluidHandler.BLOCK);
     }
 
     @Override
-    public IForgeRegistry<Fluid> getRegistry() {
-        return ForgeRegistries.FLUIDS;
+    public Registry<Fluid> getRegistry() {
+        return BuiltInRegistries.FLUID;
     }
 
     @Override
@@ -64,9 +64,9 @@ public class FluidResourceType extends RegistryBackedResourceType<FluidStack, Fl
     ) {
         var in = getStackInSlot(handler, slot);
         var toExtract = new FluidStack(
-                in.getFluid(),
+                in.getFluidHolder(),
                 (int) Mth.clamp(amount_long, Integer.MIN_VALUE, Integer.MAX_VALUE),
-                in.getTag()
+                in.getComponentsPatch()
         );
         return handler.drain(
                 toExtract,
@@ -104,7 +104,7 @@ public class FluidResourceType extends RegistryBackedResourceType<FluidStack, Fl
         // fluid handlers return the amount moved, not the remainder, so we have to convert
         var inserted = handler.fill(stack, simulate ? IFluidHandler.FluidAction.SIMULATE : IFluidHandler.FluidAction.EXECUTE);
         int remainder = stack.getAmount() - inserted;
-        return new FluidStack(stack.getFluid(), remainder, stack.getTag());
+        return new FluidStack(stack.getFluidHolder(), remainder, stack.getComponentsPatch());
     }
 
     @Override

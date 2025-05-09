@@ -1,15 +1,33 @@
-//file:noinspection GroovyAssignabilityCheck
 plugins {
+    id 'java-library'
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.minecraftforge.gradle' version '5.1.+'
+    id 'net.neoforged.gradle.userdev' version '7.0.145'
     id 'antlr'
-    id 'org.parchmentmc.librarian.forgegradle' version '1.+'
     id 'application'
 }
 
+tasks.named('wrapper', Wrapper).configure {
+    // Define wrapper values here so as to not have to always do so when updating gradlew.properties.
+    // Switching this to Wrapper.DistributionType.ALL will download the full gradle sources that comes with
+    // documentation attached on cursor hover of gradle classes and methods. However, this comes with increased
+    // file size for Gradle. If you do switch this to ALL, run the Gradle wrapper task twice afterwards.
+    // (Verify by checking gradle/wrapper/gradle-wrapper.properties to see if distributionUrl now points to `-all`)
+    distributionType = Wrapper.DistributionType.BIN
+}
 
+base {
+    archivesName = "${mod_name}-MC${minecraft_version}-${mod_version}"
+}
+
+// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+minecraft.accessTransformers.file rootProject.file('src/main/resources/META-INF/accesstransformer.cfg')
+//minecraft.accessTransformers.entry public net.minecraft.client.Minecraft textureManager # textureManager
+
+// this must come before runs for the sourcesets to be available when calling modSource project.sourceSets.gametest
 sourceSets {
     main {
         resources {
@@ -17,8 +35,15 @@ sourceSets {
             srcDirs += "src/main/resources"
             exclude ".cache"
         }
+
+        java {
+            exclude "ca/teamdman/sfm/client/jei/**"
+            exclude "ca/teamdman/sfm/common/resourcetype/exclude/**"
+//            exclude "ca/teamdman/sfm/common/compat/SFMMekanismCompat.java"
+        }
         java {
             exclude "ca/teamdman/sfm/common/capabilityprovidermapper/ae2/**"
+//            exclude "ca/teamdman/sfm/common/program/linting/MekanismSideConfigProgramLinter.java"
         }
         java {
             exclude "ca/teamdman/sfm/common/block/TunnelledManagerBlock.java"
@@ -28,6 +53,17 @@ sourceSets {
             exclude "ca/teamdman/sfm/common/block/BatteryBlock.java"
             exclude "ca/teamdman/sfm/common/blockentity/BatteryBlockEntity.java"
         }
+        //// @MCVersionDependentBehaviour
+//        java {
+//            exclude "ca/teamdman/sfm/common/compat/SFMMekanismCompat.java"
+//        }
+        java {
+            exclude "ca/teamdman/sfm/common/resourcetype/GasResourceType.java"
+            exclude "ca/teamdman/sfm/common/resourcetype/InfuseResourceType.java"
+            exclude "ca/teamdman/sfm/common/resourcetype/MekanismEnergyResourceType.java"
+            exclude "ca/teamdman/sfm/common/resourcetype/PigmentResourceType.java"
+            exclude "ca/teamdman/sfm/common/resourcetype/SlurryResourceType.java"
+        }
     }
     // https://docs.gradle.org/current/userguide/java_testing.html#sec:configuring_java_integration_tests
     test {
@@ -36,10 +72,16 @@ sourceSets {
     gametest {
         java {
             srcDir "src/gametest/java"
+//            exclude "ca/teamdman/sfm/gametest/compat/**"
+            exclude "ca/teamdman/sfm/gametest/compat/industrialforegoing"
+            exclude "ca/teamdman/sfm/gametest/compat/multiple"
+            exclude "ca/teamdman/sfm/gametest/compat/thermal"
+            exclude "ca/teamdman/sfm/gametest/ai/**"
         }
         compileClasspath += main.output
         resources {
             srcDirs += "src/gametest/resources"
+            exclude "README.md"
         }
     }
     datagen {
@@ -48,11 +90,24 @@ sourceSets {
     generated
 }
 
+
+// Ensure sources are available for other modules
 configurations {
-    extendConfigurations(implementation, gametestImplementation, testImplementation)
-    extendConfigurations(compileOnly, gametestCompileOnly, testCompileOnly)
-    extendConfigurations(runtimeOnly, gametestRuntimeOnly, testRuntimeOnly)
-    datagenImplementation.extendsFrom(minecraft) // don't load mods when doing datagen lol
+
+//    extendConfigurations(implementation, gametestImplementation, testImplementation)
+//    extendConfigurations(compileOnly, gametestCompileOnly, testCompileOnly)
+//    extendConfigurations(runtimeOnly, gametestRuntimeOnly, testRuntimeOnly)
+//    datagenImplementation.extendsFrom(minecraft) // don't load mods when doing datagen lol
+    // the extendsFrom on datagenImplementation isn't available with NeoForge so I guess I keep the old style
+    // mods can break the datagen here :/
+    // guess it's fine since I only have most mods on the 1.19.2 branch
+
+    extendConfigurations(implementation, gametestImplementation, testImplementation, datagenImplementation)
+    extendConfigurations(compileOnly, gametestCompileOnly, testCompileOnly, datagenCompileOnly)
+    extendConfigurations(runtimeOnly, gametestRuntimeOnly, testRuntimeOnly, datagenRuntimeOnly)
+//    testImplementation.extendsFrom(minecraft)
+//    gametestImplementation.extendsFrom(minecraft)
+//    datagenImplementation.extendsFrom(minecraft)
 }
 
 static void extendConfigurations(Configuration base, Configuration... configurations) {
@@ -62,173 +117,72 @@ static void extendConfigurations(Configuration base, Configuration... configurat
 }
 
 
-version = mod_version
-group = mod_group_id
 
-base {
-    archivesName = "${mod_name}-MC${minecraft_version}"
-}
+// Default run configurations.
+// These can be tweaked, removed, or duplicated as needed.
+runs {
+    // applies to all the run configs below
+    configureEach {
+        // Recommended logging data for a userdev environment
+        // The markers can be added/remove as needed separated by commas.
+        // "SCAN": For mods scan.
+        // "REGISTRIES": For firing of registry events.
+        // "REGISTRYDUMP": For getting the contents of all registries.
+        systemProperty 'forge.logging.markers', 'REGISTRIES'
 
-// Mojang ships Java 17 to end users in 1.18+, so your mod should target Java 17.
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+        // Recommended logging level for the console
+        // You can set various levels here.
+        // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
+        systemProperty 'forge.logging.console.level', 'debug'
 
-println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
-minecraft {
-    // The mappings can be changed at any time and must be in the following format.
-    // Channel:   Version:
-    // official   MCVersion             Official field/method names from Mojang mapping files
-    // parchment  YYYY.MM.DD-MCVersion  Open community-sourced parameter names and javadocs layered on top of official
-    //
-    // You must be aware of the Mojang license when using the 'official' or 'parchment' mappings.
-    // See more information here: https://github.com/MinecraftForge/MCPConfig/blob/master/Mojang.md
-    //
-    // Parchment is an unofficial project maintained by ParchmentMC, separate from MinecraftForge
-    // Additional setup is needed to use their mappings: https://parchmentmc.org/docs/getting-started
-    //
-    // Use non-default mappings at your own risk. They may not always work.
-    // Simply re-run your setup task after changing the mappings to update your workspace.
-    mappings channel: mapping_channel, version: mapping_version
+        // fix annoying dependency mixin problems
+        // systemProperty 'mixin.env.remapRefMap', 'true'
+        // systemProperty 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
-    // When true, this property will have all Eclipse run configurations run the "prepareX" task for the given run configuration before launching the game.
-    // In most cases, it is not necessary to enable.
-    // enableEclipsePrepareRuns = true
+        // Enable JetBrains runtime hotswap support
+        jvmArguments '-XX:+AllowEnhancedClassRedefinition', '-XX:+IgnoreUnrecognizedVMOptions', '-XX:+AllowRedefinitionToAddDeleteMethods'
 
-    // When true, this property will have all IntelliJ IDEA run configurations run the "prepareX" task for the given run configuration before launching the game.
-    // In most cases, it is not necessary to enable.
-    // enableIdeaPrepareRuns = true
+        modSource project.sourceSets.main
+    }
 
-    // This property allows configuring Gradle's ProcessResources task(s) to run on IDE output locations before launching the game.
-    // It is REQUIRED to be set to true for this template to function.
-    // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
-//    copyIdeResources = true
+    client {
+        modSource project.sourceSets.gametest
+        // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+    }
 
-    // When true, this property will add the folder name of all declared run configurations to generated IDE run configurations.
-    // The folder name can be set on a run configuration using the "folderName" property.
-    // By default, the folder name of a run configuration is the name of the Gradle project containing it.
-    // generateRunFolders = true
+    client_teamy {
+//        https://discord.com/channels/313125603924639766/1232440595738529913/1246122881516048445
+        configure('client')
 
-    // This property enables access transformers for use in development.
-    // They will be applied to the Minecraft artifact.
-    // The access transformer file can be anywhere in the project.
-    // However, it must be at "META-INF/accesstransformer.cfg" in the final mod jar to be loaded by Forge.
-    // This default location is a best practice to automatically put the file in the right place in the final jar.
-    // See https://docs.minecraftforge.net/en/latest/advanced/accesstransformers/ for more information.
-    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+        modSource project.sourceSets.gametest
+        // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
 
-    // Default run configurations.
-    // These can be tweaked, removed, or duplicated as needed.
-    runs {
-        client {
-            workingDirectory project.file('run')
+        programArguments '--username', 'TeamDman', '--uuid', '83f1df8b-0ba3-4de0-8a26-e51a1fd74318', '--width', '1708', '--height', '960'
+    }
 
-            // Recommended logging data for a userdev environment
-            // The markers can be added/remove as needed separated by commas.
-            // "SCAN": For mods scan.
-            // "REGISTRIES": For firing of registry events.
-            // "REGISTRYDUMP": For getting the contents of all registries.
-            property 'forge.logging.markers', 'REGISTRIES'
+    server {
+        modSource project.sourceSets.gametest
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+        programArgument '--nogui'
+    }
 
-            // Recommended logging level for the console
-            // You can set various levels here.
-            // Please read: https://stackoverflow.com/questions/2031163/when-to-use-the-different-log-levels
-            property 'forge.logging.console.level', 'debug'
+    // This run config launches GameTestServer and runs all registered gametests, then exits.
+    // By default, the server will crash when no gametests are provided.
+    // The gametest system is also enabled by default for other run configs under the /test command.
+    gameTestServer {
+        modSource project.sourceSets.gametest
+        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+    }
 
-            // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-            property 'forge.enabledGameTestNamespaces', mod_id
+    data {
+        modSource project.sourceSets.datagen
+        // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
+        // workingDirectory project.file('run-data')
 
-            // Ensure mixin dependencies play nice
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
-
-            // https://github.com/ChiefArug/ThermalSysteams/blob/main/build.gradle#L27
-            // https://discord.com/channels/313125603924639766/983834532904042537/1089449308048343090
-            jvmArgs '-XX:+AllowEnhancedClassRedefinition', '-XX:+IgnoreUnrecognizedVMOptions', '-XX:+AllowRedefinitionToAddDeleteMethods'
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                    source sourceSets.gametest
-                }
-            }
-        }
-
-        client_teamy {
-            //noinspection GroovyAssignabilityCheck
-            parent runs.client
-            args '--username', 'TeamDman', '--uuid', '83f1df8b-0ba3-4de0-8a26-e51a1fd74318', '--width', '1708', '--height', '960'
-        }
-
-        server {
-            workingDirectory project.file('runServer')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            property 'forge.logging.console.level', 'debug'
-
-            property 'forge.enabledGameTestNamespaces', mod_id
-
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
-
-            jvmArgs '-XX:+AllowEnhancedClassRedefinition', '-XX:+IgnoreUnrecognizedVMOptions', '-XX:+AllowRedefinitionToAddDeleteMethods'
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                    source sourceSets.gametest
-                }
-            }
-        }
-
-        // This run config launches GameTestServer and runs all registered gametests, then exits.
-        // By default, the server will crash when no gametests are provided.
-        // The gametest system is also enabled by default for other run configs under the /test command.
-        gameTestServer {
-            workingDirectory project.file('runGameTest')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            property 'forge.logging.console.level', 'debug'
-
-            property 'forge.enabledGameTestNamespaces', mod_id
-
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
-
-            jvmArgs '-XX:+AllowEnhancedClassRedefinition', '-XX:+IgnoreUnrecognizedVMOptions', '-XX:+AllowRedefinitionToAddDeleteMethods'
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                    source sourceSets.gametest
-                }
-            }
-        }
-
-        data {
-            workingDirectory project.file('runData')
-
-            property 'forge.logging.markers', 'REGISTRIES'
-
-            property 'forge.logging.console.level', 'debug'
-
-            property 'mixin.env.remapRefMap', 'true'
-            property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
-
-            jvmArgs '-XX:+AllowEnhancedClassRedefinition', '-XX:+IgnoreUnrecognizedVMOptions', '-XX:+AllowRedefinitionToAddDeleteMethods'
-
-            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-            args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
-
-            ideaModule "${project.name}.datagen"
-
-            mods {
-                "${mod_id}" {
-                    source sourceSets.main
-                    source sourceSets.datagen
-                }
-            }
-        }
+        // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     }
 }
 
@@ -270,29 +224,35 @@ repositories {
 
 dependencies {
     // Specify the version of Minecraft to use.
-    // Any artifact can be supplied so long as it has a "userdev" classifier artifact and is a compatible patcher artifact.
-    // The "userdev" classifier will be requested and setup by ForgeGradle.
-    // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
-    // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
-    //noinspection VulnerableLibrariesLocal
-    minecraft "net.minecraftforge:forge:${minecraft_version}-${neo_version}"
+    // Depending on the plugin applied there are several options. We will assume you applied the userdev plugin as shown above.
+    // The group for userdev is net.neoforged, the module name is neoforge, and the version is the same as the neoforge version.
+    // You can however also use the vanilla plugin (net.neoforged.gradle.vanilla) to use a version of Minecraft without the neoforge loader.
+    // And its provides the option to then use net.minecraft as the group, and one of; client, server or joined as the module name, plus the game version as version.
+    // For all intends and purposes: You can treat this dependency as if it is a normal library you would use.
+    implementation "net.neoforged:neoforge:${neo_version}"
 
-    // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
+    // Example mod dependency with JEI
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
-    // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}")
-    // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-forge-api:${jei_version}")
-    // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
+    // compileOnly "mezz.jei:jei-${mc_version}-common-api:${jei_version}"
+    // compileOnly "mezz.jei:jei-${mc_version}-forge-api:${jei_version}"
+    // runtimeOnly "mezz.jei:jei-${mc_version}-forge:${jei_version}"
 
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
     // The group id is ignored when searching -- in this case, it is "blank"
-    // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
+    // implementation "blank:coolmod-${mc_version}:${coolmod_version}"
+
+    // Example mod dependency using a file as dependency
+    // implementation files("libs/coolmod-${mc_version}-${coolmod_version}.jar")
+
+    // Example project dependency using a sister or child project:
+    // implementation project(":myproject")
 
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
 
-    antlr 'org.antlr:antlr4:4.9.1'
+    antlr 'org.antlr:antlr4:4.13.1'
     testImplementation 'com.github.javaparser:javaparser-symbol-solver-core:3.26.2'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
@@ -303,139 +263,43 @@ dependencies {
     testImplementation 'org.openjdk.jmh:jmh-generator-bytecode:1.37'
     testAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
 
-    runtimeOnly fg.deobf("curse.maven:the-one-probe-245211:3927520") //TheOneProbe - 1.19-6.2.1
-
-    compileOnly fg.deobf('mezz.jei:jei-1.19.2-forge:11.6.0.1018')
-    runtimeOnly fg.deobf('mezz.jei:jei-1.19.2-forge:11.6.0.1018')
-//    runtimeOnly fg.deobf("curse.maven:jei-238222:3944627") //jei-1.19.2-forge-11.2.0.256.jar
+//    runtimeOnly "curse.maven:easy-villagers-400514:5153632" // Easy Villagers 1.20.4-1.1.4
 
 
-    runtimeOnly fg.deobf("curse.maven:powah-633483:4729361") // [FORGE 1.19.2] v4.0.11
-    runtimeOnly fg.deobf("curse.maven:cloth-config-348521:4973444") // [Forge 1.19-1.19.2] v8.3.115
+    implementation "curse.maven:mekanism-268560:5656332" // Mekanism-1.21.1-10.7.4.60.jar
+    implementation "mekanism:Mekanism:1.21.1-10.7.4.60:api"
 
-    runtimeOnly fg.deobf("curse.maven:ato-405593:4046926") // alltheores-2.0.2-1.19.2-43.1.3.jar
-
-    // https://www.curseforge.com/minecraft/mc-mods/tool-kit/files/3933949
-    runtimeOnly fg.deobf("curse.maven:tool-kit-324888:3933949")
-
-    runtimeOnly fg.deobf("curse.maven:ftb-library-404465:4661834") // ftb-library-forge-1902.4.1-build.236.jar
-    runtimeOnly fg.deobf("curse.maven:architectury-api-419699:5137942") // [Forge 1.19.2] v6.6.92
-
-//    https://www.curseforge.com/minecraft/mc-mods/ex-pattern-provider/files/5250574
-    runtimeOnly fg.deobf("curse.maven:ex-pattern-provider-892005:5250574") // ExtendedAE-1.19-0.2.2-forge.jar
-
-
-    runtimeOnly fg.deobf("curse.maven:toast-control-271740:4028343") // ToastControl-1.19.2-7.0.0.jar
-    runtimeOnly fg.deobf("curse.maven:placebo-283644:5180198") // Placebo-1.19.2-7.4.0.jar
-
-
-    runtimeOnly fg.deobf("curse.maven:mouse-tweaks-60089:3871353") // [1.19+] Mouse Tweaks 2.23 Forge
-
-    runtimeOnly fg.deobf("curse.maven:inventory-essentials-368825:4751198")
-    // inventoryessentials-forge-1.19.2-5.4.0.jar
-    runtimeOnly fg.deobf("curse.maven:balm-531761:4751735") // balm-forge-1.19.2-4.6.0.jar
-
-    runtimeOnly fg.deobf("curse.maven:construction-wand-399558:4455719") // constructionwand-1.19.2-2.10.jar
-    runtimeOnly fg.deobf("curse.maven:worldedit-225608:3922622") // WorldEdit 7.2.12 (Forge/Fabric for MC 1.19.2)
-
-    // disable because the seed recipes don't work in phyto without additional scripts
-//    runtimeOnly fg.deobf("curse.maven:mystical-agriculture-246640:5225677") // MysticalAgriculture-1.19.2-6.0.14.jar
-//    runtimeOnly fg.deobf("curse.maven:cucumber-272335:4773184") // Cucumber-1.19.2-6.0.10.jar
-
-    gametestImplementation fg.deobf("com.teamcofh:cofh_core:1.19.2-10.2.0.+")
-    runtimeOnly fg.deobf("com.teamcofh:cofh_core:1.19.2-10.2.0.+")
-
-    gametestImplementation fg.deobf("com.teamcofh:thermal_core:1.19.2-10.2.0.+")
-    runtimeOnly fg.deobf("com.teamcofh:thermal_core:1.19.2-10.2.0.+")
-
-    gametestImplementation fg.deobf("com.teamcofh:thermal_expansion:1.19.2-10.2.0.+")
-    runtimeOnly fg.deobf("com.teamcofh:thermal_expansion:1.19.2-10.2.0.+")
-
-    implementation fg.deobf("appeng:appliedenergistics2-forge:12.9.9")
-    compileOnly fg.deobf("appeng:appliedenergistics2-forge:12.9.9:api")
-
-
-    // don't use cursemaven for CoFH since the maven gives better IDE inspections
-//    // https://legacy.curseforge.com/minecraft/mc-mods/thermal-foundation/files/4382373
-//    // thermal_foundation-1.19.2-10.2.0.47.jar
-//    gametestImplementation fg.deobf("curse.maven:thermal-foundation-222880:4382373")
-//    runtimeOnly fg.deobf("curse.maven:thermal-foundation-222880:4382373")
-//
-//    // https://legacy.curseforge.com/minecraft/mc-mods/thermal-expansion/files/4382371
-//    // thermal_expansion-1.19.2-10.2.0.21.jar
-//    gametestImplementation fg.deobf("curse.maven:thermal-expansion-69163:4382371")
-//    runtimeOnly fg.deobf("curse.maven:thermal-expansion-69163:4382371")
-//
-//    // https://legacy.curseforge.com/minecraft/mc-mods/cofh-core/files
-//    // cofh_core-1.19.2-10.2.1.40.jar
-//    gametestImplementation fg.deobf("curse.maven:cofh-core-69162:4385216")
-//    runtimeOnly fg.deobf("curse.maven:cofh-core-69162:4385216")
-
-    runtimeOnly fg.deobf("curse.maven:titanium-287342:4152837") //titanium-1.19.2-3.7.1-24.jar
-    runtimeOnly fg.deobf("curse.maven:patchouli-306770:4031402") //Patchouli-1.19.2-77.jar
-    runtimeOnly fg.deobf("curse.maven:industrial-foregoing-266515:4459182")// industrial-foregoing-1.19.2-3.3.2.3-5.jar
-    gametestImplementation fg.deobf("curse.maven:industrial-foregoing-266515:4459182")
-    gametestImplementation fg.deobf("curse.maven:titanium-287342:4152837") //titanium-1.19.2-3.7.1-24.jar
-    gametestImplementation fg.deobf("curse.maven:patchouli-306770:4031402") //Patchouli-1.19.2-77.jar
-
-    implementation fg.deobf("curse.maven:mekanism-268560:4644795") //Mekanism-1.19.2-10.3.9.13.jar
-    implementation "mekanism:Mekanism:1.19.2-10.3.8.477:api"
-
-    // https://legacy.curseforge.com/minecraft/mc-mods/sophisticated-core/files/4503931
-    // sophisticatedcore-1.19.2-0.5.51.251.jar
-    gametestImplementation fg.deobf("curse.maven:sophisticated-core-618298:4503931")
-    runtimeOnly fg.deobf("curse.maven:sophisticated-core-618298:4503931")
-
-    // https://www.curseforge.com/minecraft/mc-mods/sophisticated-storage/files/4503929
-    // sophisticatedstorage-1.19.2-0.6.29.335.jar
-    gametestImplementation fg.deobf("curse.maven:sophisticated-storage-619320:4503929")
-    runtimeOnly fg.deobf("curse.maven:sophisticated-storage-619320:4503929")
-
-    runtimeOnly fg.deobf("curse.maven:extreme-sound-muffler-363363:4821189")
-    // Extreme sound muffler 3.39 - Forge 1.19.2
-
-    implementation fg.deobf("curse.maven:botania-225643:5608807") // Botania-1.19.2-440.2-FORGE.jar
-    implementation fg.deobf("curse.maven:ars-nouveau-401955:5171729") // ars_nouveau-1.19.2-3.23.0.jar
-    implementation fg.deobf("curse.maven:curios-309927:5494603") // curios-forge-1.19.2-5.1.6.3.jar
-
-    implementation fg.deobf("curse.maven:flux-networks-248020:4620438") // Flux-Networks-1.19.2-7.1.4
-    implementation fg.deobf("curse.maven:project-e-226410:4860858") // ProjectE-1.19.2-PE1.1.0.jar
+    implementation "curse.maven:spark-361579:5759671" // spark-1.10.109-neoforge.jar
 }
 
-// This block of code expands all declared replace properties in the specified resource tar+gets.
+// This block of code expands all declared replace properties in the specified resource targets.
 // A missing property will result in an error. Properties are expanded using ${} Groovy notation.
 // When "copyIdeResources" is enabled, this will also run before the game launches in IDE environments.
 // See https://docs.gradle.org/current/dsl/org.gradle.language.jvm.tasks.ProcessResources.html
-def resourceTargets = ['META-INF/mods.toml', 'pack.mcmeta']
-def replaceProperties = [
-        minecraft_version      : minecraft_version,
-        minecraft_version_range: minecraft_version_range,
-        neo_version            : neo_version,
-        neo_version_range      : neo_version_range,
-        loader_version_range   : loader_version_range,
-        mod_id                 : mod_id,
-        mod_name               : mod_name,
-        mod_license            : mod_license,
-        mod_version            : mod_version,
-        mod_authors            : mod_authors,
-        mod_description        : mod_description,
-        mod_issue_tracker      : mod_issue_tracker
-]
-processResources {
-    duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
-
+tasks.withType(ProcessResources).configureEach {
+    var replaceProperties = [
+            minecraft_version   : minecraft_version,
+            minecraft_version_range: minecraft_version_range,
+            neo_version         : neo_version,
+            neo_version_range: neo_version_range,
+            loader_version_range: loader_version_range,
+            mod_id              : mod_id,
+            mod_name: mod_name,
+            mod_license: mod_license,
+            mod_version: mod_version,
+            mod_authors         : mod_authors,
+            mod_description: mod_description,
+            mod_issue_tracker: mod_issue_tracker,
+    ]
     inputs.properties replaceProperties
-    replaceProperties.put 'project', project
 
-    filesMatching(resourceTargets) {
-        expand replaceProperties
+    filesMatching(['META-INF/neoforge.mods.toml', 'pack.mcmeta']) {
+        expand replaceProperties + [project: project]
     }
-}
 
-processGametestResources {
+    // prevent duplicate resource issues from additional sourceSets
     duplicatesStrategy(DuplicatesStrategy.EXCLUDE)
 }
-
 
 test {
     useJUnitPlatform()
@@ -457,20 +321,15 @@ jar {
 }
 
 // Example configuration to allow publishing using the maven-publish plugin
-// This is the preferred method to reobfuscate your jar file
-jar.finalizedBy('reobfJar')
-// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing
-// publish.dependsOn('reobfJar')
-
 publishing {
     publications {
-        mavenJava(MavenPublication) {
-            artifact jar
+        register('mavenJava', MavenPublication) {
+            from components.java
         }
     }
     repositories {
         maven {
-            url "file://${project.projectDir}/mcmodsrepo"
+            url "file://${project.projectDir}/repo"
         }
     }
 }
@@ -479,6 +338,10 @@ tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
 }
 
+
+test {
+    useJUnitPlatform()
+}
 
 generateGrammarSource {
     arguments = [

@@ -1,12 +1,12 @@
 package ca.teamdman.sfm.common.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class SFMClientConfig {
-    public final ForgeConfigSpec.BooleanValue showLabelGunReminderOverlay;
-    public final ForgeConfigSpec.BooleanValue showNetworkToolReminderOverlay;
+    public final ModConfigSpec.BooleanValue showLabelGunReminderOverlay;
+    public final ModConfigSpec.BooleanValue showNetworkToolReminderOverlay;
 
-    SFMClientConfig(ForgeConfigSpec.Builder builder) {
+    SFMClientConfig(ModConfigSpec.Builder builder) {
         showLabelGunReminderOverlay = builder.define("showLabelGunReminderOverlay", true);
         showNetworkToolReminderOverlay = builder.define("showNetworkToolReminderOverlay", true);
     }

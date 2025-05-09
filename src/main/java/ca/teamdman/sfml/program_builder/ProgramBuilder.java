@@ -25,6 +25,9 @@ import java.util.Objects;
 
 public class ProgramBuilder {
     public static ProgramBuildResult build(String programString) {
+        if (programString == null) {
+            programString = "";
+        }
         SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(programString));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         SFMLParser parser = new SFMLParser(tokens);

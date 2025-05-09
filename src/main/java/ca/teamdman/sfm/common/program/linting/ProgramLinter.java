@@ -8,7 +8,8 @@ import ca.teamdman.sfm.common.compat.SFMModCompat;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.program.ProgramContext;
-import ca.teamdman.sfm.common.registry.SFMCapabilityProviderMappers;
+import ca.teamdman.sfm.common.registry.SFMBlockCapabilities;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfml.ast.*;
 import com.mojang.datafixers.util.Pair;
 import mekanism.api.RelativeSide;
@@ -26,11 +27,9 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.*;
@@ -117,9 +116,9 @@ public class ProgramLinter {
 
         // remove labels with no viable capability provider
         var level = manager.getLevel();
-        assert level != null;
-        labels.removeIf((label, pos) -> SFMCapabilityProviderMappers.discoverCapabilityProvider(level, pos) == null);
-
+        if (level != null) {
+            labels.removeIf((label, pos) -> !SFMBlockCapabilities.hasAnyCapabilityAnyDirection(level, pos));
+        }
         // save new labels
         labels.save(disk);
 
@@ -166,7 +165,11 @@ public class ProgramLinter {
                     boolean anySuccess = false;
                     ConfigInfo transmissionConfig = mekBlockEntityConfig.getConfig(transmissionType);
                     if (transmissionConfig != null) {
-                        Set<Direction> activeSides = transmissionConfig.getSides(dataTypePredicate);
+                        Set<Direction> activeSides = getSideConfig(
+                                transmissionConfig,
+                                dataTypePredicate,
+                                mekBlockEntity.getDirection()
+                        );
                         for (Direction direction : directions) {
                             if (activeSides.contains(direction)) {
                                 anySuccess = true;
@@ -242,7 +245,11 @@ public class ProgramLinter {
                         boolean anySuccess = false;
                         ConfigInfo transmissionConfig = config.getConfig(transmissionType);
                         if (transmissionConfig != null) {
-                            Set<Direction> activeSides = transmissionConfig.getSides(dataTypePredicate);
+                            Set<Direction> activeSides = getSideConfig(
+                                    transmissionConfig,
+                                    dataTypePredicate,
+                                    mekBlockEntity.getDirection()
+                            );
                             for (Direction direction : directions) {
                                 if (activeSides.contains(direction)) {
                                     anySuccess = true;
@@ -261,6 +268,22 @@ public class ProgramLinter {
                 }
             });
         }
+    }
+
+    @MCVersionDependentBehaviour
+    private static Set<Direction> getSideConfig(
+            ConfigInfo transmissionConfig,
+            Predicate<DataType> dataTypePredicate,
+            Direction blockFacing
+    ) {
+        Set<Map.Entry<RelativeSide, DataType>> sideConfig = transmissionConfig.getSideConfig();
+        Set<RelativeSide> found = new HashSet<>();
+        for (var x : sideConfig) {
+            if (dataTypePredicate.test(x.getValue())) {
+                found.add(x.getKey());
+            }
+        }
+        return found.stream().map(x -> x.getDirection(blockFacing)).collect(Collectors.toSet());
     }
 
     private static void addWarningsForUsingIOWithoutCorrespondingOppositeIO(
@@ -354,7 +377,7 @@ public class ProgramLinter {
                                 )
                         ));
                     }
-                    var viable = SFMCapabilityProviderMappers.discoverCapabilityProvider(level, pos) != null;
+                    var viable = SFMBlockCapabilities.hasAnyCapabilityAnyDirection(level, pos);
                     if (!viable && adjacent) {
                         warnings.add(PROGRAM_WARNING_CONNECTED_BUT_NOT_VIABLE_LABEL.get(
                                 label,

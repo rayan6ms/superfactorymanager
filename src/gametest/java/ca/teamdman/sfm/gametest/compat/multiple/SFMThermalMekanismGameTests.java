@@ -18,8 +18,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.registries.ForgeRegistries;
+import net.neoforged.gametest.GameTestHolder;
+import net.neoforged.registries.ForgeRegistries;
 import org.apache.logging.log4j.Level;
 
 import java.util.ArrayDeque;

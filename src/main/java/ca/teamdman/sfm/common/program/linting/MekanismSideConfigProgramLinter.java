@@ -136,7 +136,7 @@ public class MekanismSideConfigProgramLinter implements IProgramLinter {
                         boolean anySuccess = false;
                         ConfigInfo transmissionConfig = config.getConfig(transmissionType);
                         if (transmissionConfig != null) {
-                            Set<Direction> activeSides = transmissionConfig.getSides(dataTypePredicate);
+                            Set<Direction> activeSides = SFMMekanismCompat.getSides(transmissionConfig, mekBlockEntity, dataTypePredicate);
                             for (Direction direction : directions) {
                                 if (activeSides.contains(direction)) {
                                     anySuccess = true;
@@ -195,7 +195,7 @@ public class MekanismSideConfigProgramLinter implements IProgramLinter {
                 for (TransmissionType transmissionType : referencedTransmissionTypes) {
                     ConfigInfo transmissionConfig = mekBlockEntityConfig.getConfig(transmissionType);
                     if (transmissionConfig != null) {
-                        Set<Direction> activeSides = transmissionConfig.getSides(dataTypePredicate);
+                        Set<Direction> activeSides = SFMMekanismCompat.getSides(transmissionConfig, mekBlockEntity, dataTypePredicate);
                         boolean anySuccess = directions.stream().anyMatch(activeSides::contains);
                         if (!anySuccess) {
                             // pick the first direction from the statement

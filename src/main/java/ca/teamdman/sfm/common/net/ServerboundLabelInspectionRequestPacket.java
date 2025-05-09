@@ -7,7 +7,7 @@ import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
 public record ServerboundLabelInspectionRequestPacket(
@@ -23,13 +23,13 @@ public record ServerboundLabelInspectionRequestPacket(
         @Override
         public void encode(
                 ServerboundLabelInspectionRequestPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeUtf(msg.label(), Program.MAX_LABEL_LENGTH);
         }
 
         @Override
-        public ServerboundLabelInspectionRequestPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ServerboundLabelInspectionRequestPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ServerboundLabelInspectionRequestPacket(
                     friendlyByteBuf.readUtf(Program.MAX_LABEL_LENGTH)
             );
@@ -73,10 +73,10 @@ public record ServerboundLabelInspectionRequestPacket(
                         .append(pos.getY())
                         .append(",")
                         .append(pos.getZ());
-                if (player.getLevel().isLoaded(pos)) {
+                if (player.level().isLoaded(pos)) {
                     payload
                             .append(" -- ")
-                            .append(player.getLevel().getBlockState(pos).getBlock().getName().getString());
+                            .append(player.level().getBlockState(pos).getBlock().getName().getString());
                 } else {
                     payload
                             .append(" -- chunk not loaded");
@@ -97,13 +97,13 @@ public record ServerboundLabelInspectionRequestPacket(
                         .append(pos.getY())
                         .append(",")
                         .append(pos.getZ());
-                if (player.getLevel().isLoaded(pos)) {
+                if (player.level().isLoaded(pos)) {
                     payload
                             .append(" -- ")
-                            .append(player.getLevel().getBlockState(pos).getBlock().getName().getString());
+                            .append(player.level().getBlockState(pos).getBlock().getName().getString());
 
                     payload.append("\n").append(ServerboundContainerExportsInspectionRequestPacket
-                                                        .buildInspectionResults(player.getLevel(), pos)
+                                                        .buildInspectionResults(player.level(), pos)
                                                         .indent(1));
                 } else {
                     payload

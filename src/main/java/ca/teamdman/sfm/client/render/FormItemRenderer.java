@@ -10,19 +10,20 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BlockEntityWithoutLevelRenderer;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.ItemRenderer;
+import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ModelEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ModelEvent;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = SFM.MOD_ID, value = Dist.CLIENT)
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = SFM.MOD_ID, value = Dist.CLIENT)
 public class FormItemRenderer extends BlockEntityWithoutLevelRenderer {
 
-    private static final ResourceLocation BASE_MODEL = new ResourceLocation(SFM.MOD_ID, "item/form_base");
+    private static final ModelResourceLocation BASE_MODEL = ModelResourceLocation.standalone(ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "item/form_base"));
 
     public FormItemRenderer() {
         super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
@@ -39,7 +40,7 @@ public class FormItemRenderer extends BlockEntityWithoutLevelRenderer {
     @Override
     public void renderByItem(
             ItemStack stack,
-            @MCVersionDependentBehaviour ItemTransforms.TransformType transformType,
+            @MCVersionDependentBehaviour ItemDisplayContext transformType,
             PoseStack poseStack,
             MultiBufferSource multiBuffer,
             int packedLight,
@@ -53,7 +54,7 @@ public class FormItemRenderer extends BlockEntityWithoutLevelRenderer {
         var buffer = ItemRenderer.getFoilBufferDirect(multiBuffer, renderType, true, stack.hasFoil());
         poseStack.pushPose();
 
-        if (transformType != ItemTransforms.TransformType.FIXED && transformType != ItemTransforms.TransformType.GUI) {
+        if (transformType != ItemDisplayContext.FIXED && transformType != ItemDisplayContext.GUI) {
             poseStack.scale(0.5F, 0.5F, 1F);
             poseStack.translate(0.5, 0.5, 0);
 //            poseStack.mulPose(Vector3f.YP.rotationDegrees(-65));

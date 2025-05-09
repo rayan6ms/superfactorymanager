@@ -5,18 +5,18 @@ import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.infuse.IInfusionHandler;
 import mekanism.api.chemical.infuse.InfuseType;
 import mekanism.api.chemical.infuse.InfusionStack;
+import mekanism.common.capabilities.Capabilities;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
 public class InfuseResourceType extends RegistryBackedResourceType<InfusionStack, InfuseType, IInfusionHandler> {
-    public static final Capability<IInfusionHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
-    });
+    public static final BlockCapability<IInfusionHandler, @Nullable Direction> CAP = Capabilities.INFUSION.block();
 
     public InfuseResourceType() {
         super(CAP);
@@ -95,18 +95,18 @@ public class InfuseResourceType extends RegistryBackedResourceType<InfusionStack
 
     @Override
     public Stream<ResourceLocation> getTagsForStack(InfusionStack infusionStack) {
-        return infusionStack.getType().getTags().map(TagKey::location);
+        return infusionStack.getChemical().getTags().map(TagKey::location);
     }
 
 
     @Override
-    public IForgeRegistry<InfuseType> getRegistry() {
-        return MekanismAPI.infuseTypeRegistry();
+    public Registry<InfuseType> getRegistry() {
+        return MekanismAPI.INFUSE_TYPE_REGISTRY;
     }
 
     @Override
     public InfuseType getItem(InfusionStack stack) {
-        return stack.getType();
+        return stack.getChemical();
     }
 
     @Override

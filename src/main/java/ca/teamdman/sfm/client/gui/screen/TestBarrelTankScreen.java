@@ -1,12 +1,11 @@
 package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.gui.widget.SFMExtendedButtonWithTooltip;
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.texture.TextureAtlas;
@@ -16,11 +15,12 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor.ARGB32;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.neoforged.neoforge.fluids.FluidStack;
+import org.joml.Matrix4f;
 
 public class TestBarrelTankScreen extends AbstractContainerScreen<TestBarrelTankContainerMenu> {
-    private static final ResourceLocation BACKGROUND_TEXTURE_LOCATION = new ResourceLocation(
+    private static final ResourceLocation BACKGROUND_TEXTURE_LOCATION = ResourceLocation.fromNamespaceAndPath(
             SFM.MOD_ID,
             "textures/gui/container/manager.png"
     );
@@ -33,17 +33,17 @@ public class TestBarrelTankScreen extends AbstractContainerScreen<TestBarrelTank
         super(menu, inv, title);
     }
 
-    @SuppressWarnings({"deprecation", "resource"})
+    @SuppressWarnings({"deprecation"})
     @Override
     public void render(
-            PoseStack poseStack,
+            GuiGraphics graphics,
             int mx,
             int my,
             float partialTicks
     ) {
-        this.renderBackground(poseStack);
-        super.render(poseStack, mx, my, partialTicks);
-        this.renderTooltip(poseStack, mx, my);
+        this.renderTransparentBackground(graphics);
+        super.render(graphics, mx, my, partialTicks);
+        this.renderTooltip(graphics, mx, my);
 
         FluidStack fluidStack = new FluidStack(Fluids.WATER, 1000);
         IClientFluidTypeExtensions fluidType = IClientFluidTypeExtensions.of(fluidStack.getFluid());
@@ -57,15 +57,15 @@ public class TestBarrelTankScreen extends AbstractContainerScreen<TestBarrelTank
         RenderSystem.setShaderTexture(0, TextureAtlas.LOCATION_BLOCKS);
         RenderSystem.enableBlend();
 
-        BufferBuilder vertexBuffer = Tesselator.getInstance().getBuilder();
-        vertexBuffer.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
-        Matrix4f matrix = poseStack.last().pose();
+        Tesselator tesselator = Tesselator.getInstance();
+        BufferBuilder vertexBuffer = tesselator.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX);
+        Matrix4f matrix = graphics.pose().last().pose();
 
-        vertexBuffer.vertex(matrix, 0f, 128f, 1f).uv(fluidSprite.getU0(), fluidSprite.getV1()).endVertex();
-        vertexBuffer.vertex(matrix, 128f, 128f, 1f).uv(fluidSprite.getU1(), fluidSprite.getV1()).endVertex();
-        vertexBuffer.vertex(matrix, 128f, 0f, 1f).uv(fluidSprite.getU1(), fluidSprite.getV0()).endVertex();
-        vertexBuffer.vertex(matrix, 0f, 0f, 1f).uv(fluidSprite.getU0(), fluidSprite.getV0()).endVertex();
-        BufferUploader.drawWithShader(vertexBuffer.end());
+        vertexBuffer.addVertex(matrix, 0f, 128f, 1f).setUv(fluidSprite.getU0(), fluidSprite.getV1());
+        vertexBuffer.addVertex(matrix, 128f, 128f, 1f).setUv(fluidSprite.getU1(), fluidSprite.getV1());
+        vertexBuffer.addVertex(matrix, 128f, 0f, 1f).setUv(fluidSprite.getU1(), fluidSprite.getV0());
+        vertexBuffer.addVertex(matrix, 0f, 0f, 1f).setUv(fluidSprite.getU0(), fluidSprite.getV0());
+        BufferUploader.drawWithShader(vertexBuffer.buildOrThrow());
         RenderSystem.disableBlend();
     }
 
@@ -77,51 +77,50 @@ public class TestBarrelTankScreen extends AbstractContainerScreen<TestBarrelTank
 
     @Override
     protected void renderLabels(
-            PoseStack poseStack,
-            int mx,
-            int my
+            GuiGraphics pGuiGraphics,
+            int pMouseX,
+            int pMouseY
     ) {
         // draw title
-        super.renderLabels(poseStack, mx, my);
+        super.renderLabels(pGuiGraphics, pMouseX, pMouseY);
     }
 
+    @MCVersionDependentBehaviour
     @Override
     protected void renderTooltip(
-            PoseStack pose,
+            GuiGraphics pGuiGraphics,
             int mx,
             int my
     ) {
-        drawChildTooltips(pose, mx, my);
+        drawChildTooltips(pGuiGraphics, mx, my);
 
         // render hovered item
-        super.renderTooltip(pose, mx, my);
+        super.renderTooltip(pGuiGraphics, mx, my);
     }
 
     @MCVersionDependentBehaviour
     private void drawChildTooltips(
-            PoseStack pose,
+            GuiGraphics guiGraphics,
             int mx,
             int my
     ) {
         // 1.19.2: manually render button tooltips
-        this.renderables
-                .stream()
-                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
-                .map(SFMExtendedButtonWithTooltip.class::cast)
-                .forEach(x -> x.renderToolTip(pose, mx, my));
+//        this.renderables
+//                .stream()
+//                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
+//                .map(SFMExtendedButtonWithTooltip.class::cast)
+//                .forEach(x -> x.renderToolTip(pose, mx, my));
     }
 
     @Override
     protected void renderBg(
-            PoseStack matrixStack,
+            GuiGraphics guiGraphics,
             float partialTicks,
             int mx,
             int my
     ) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderTexture(0, BACKGROUND_TEXTURE_LOCATION);
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
-        this.blit(matrixStack, i, j, 0, 0, this.imageWidth, this.imageHeight);
+        guiGraphics.blit(BACKGROUND_TEXTURE_LOCATION, i, j, 0, 0, this.imageWidth, this.imageHeight);
     }
 }

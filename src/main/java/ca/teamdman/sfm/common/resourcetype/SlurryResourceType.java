@@ -5,18 +5,18 @@ import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.slurry.ISlurryHandler;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
+import mekanism.common.capabilities.Capabilities;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
 public class SlurryResourceType extends RegistryBackedResourceType<SlurryStack, Slurry, ISlurryHandler> {
-    public static final Capability<ISlurryHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
-    });
+    public static final BlockCapability<ISlurryHandler, @Nullable Direction> CAP = Capabilities.SLURRY.block();
 
     public SlurryResourceType() {
         super(CAP);
@@ -95,17 +95,17 @@ public class SlurryResourceType extends RegistryBackedResourceType<SlurryStack, 
 
     @Override
     public Stream<ResourceLocation> getTagsForStack(SlurryStack slurryStack) {
-        return slurryStack.getType().getTags().map(TagKey::location);
+        return slurryStack.getChemical().getTags().map(TagKey::location);
     }
 
     @Override
-    public IForgeRegistry<Slurry> getRegistry() {
-        return MekanismAPI.slurryRegistry();
+    public Registry<Slurry> getRegistry() {
+        return MekanismAPI.SLURRY_REGISTRY;
     }
 
     @Override
     public Slurry getItem(SlurryStack stack) {
-        return stack.getType();
+        return stack.getChemical();
     }
 
     @Override

@@ -8,31 +8,32 @@ import ca.teamdman.sfm.common.blockentity.TestBarrelTankBlockEntity;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.extensions.IForgeMenuType;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.network.IContainerFactory;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
+import net.neoforged.neoforge.network.IContainerFactory;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.function.Supplier;
 
 public class SFMMenus {
     private static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(
-            ForgeRegistries.MENU_TYPES,
+            BuiltInRegistries.MENU,
             SFM.MOD_ID
     );
-    public static final RegistryObject<MenuType<ManagerContainerMenu>> MANAGER_MENU = MENU_TYPES.register(
+    public static final Supplier<MenuType<ManagerContainerMenu>> MANAGER_MENU = MENU_TYPES.register(
             "manager",
-            () -> IForgeMenuType.create(
+            () -> IMenuTypeExtension.create(
                     new IContainerFactory<>() {
                         @Override
                         public ManagerContainerMenu create(
                                 int windowId,
                                 Inventory inv,
-                                FriendlyByteBuf data
+                                RegistryFriendlyByteBuf data
                         ) {
                             return new ManagerContainerMenu(
                                     windowId,
@@ -61,15 +62,15 @@ public class SFMMenus {
                         }
                     })
     );
-    public static final RegistryObject<MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK_MENU = MENU_TYPES.register(
+    public static final Supplier<MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK_MENU = MENU_TYPES.register(
             "test_barrel_tank",
-            () -> IForgeMenuType.create(
+            () -> IMenuTypeExtension.create(
                     new IContainerFactory<>() {
                         @Override
                         public TestBarrelTankContainerMenu create(
                                 int windowId,
                                 Inventory inv,
-                                FriendlyByteBuf data
+                                RegistryFriendlyByteBuf data
                         ) {
                             return new TestBarrelTankContainerMenu(
                                     windowId,

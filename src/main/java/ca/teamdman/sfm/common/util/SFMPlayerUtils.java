@@ -6,6 +6,6 @@ import net.minecraft.world.level.Level;
 public class SFMPlayerUtils {
     @MCVersionDependentBehaviour
     public static Level getLevel(Player player) {
-        return player.level;
+        return player.level();
     }
 }

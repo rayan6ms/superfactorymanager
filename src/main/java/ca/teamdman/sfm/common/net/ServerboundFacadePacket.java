@@ -4,7 +4,7 @@ import ca.teamdman.sfm.common.facade.FacadePlanner;
 import ca.teamdman.sfm.common.facade.FacadeSpreadLogic;
 import ca.teamdman.sfm.common.facade.IFacadePlan;
 import ca.teamdman.sfm.common.util.SFMPlayerUtils;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -37,20 +37,20 @@ public record ServerboundFacadePacket(
         @Override
         public void encode(
                 ServerboundFacadePacket msg,
-                FriendlyByteBuf buf
+                RegistryFriendlyByteBuf buf
         ) {
             buf.writeBlockHitResult(msg.hitResult);
             buf.writeEnum(msg.spreadLogic);
-            buf.writeItem(msg.paintStack);
+            ItemStack.OPTIONAL_STREAM_CODEC.encode(buf, msg.paintStack);
             buf.writeEnum(msg.paintHand);
         }
 
         @Override
-        public ServerboundFacadePacket decode(FriendlyByteBuf buf) {
+        public ServerboundFacadePacket decode(RegistryFriendlyByteBuf buf) {
             return new ServerboundFacadePacket(
                     buf.readBlockHitResult(),
                     buf.readEnum(FacadeSpreadLogic.class),
-                    buf.readItem(),
+                    ItemStack.OPTIONAL_STREAM_CODEC.decode(buf),
                     buf.readEnum(InteractionHand.class)
             );
         }

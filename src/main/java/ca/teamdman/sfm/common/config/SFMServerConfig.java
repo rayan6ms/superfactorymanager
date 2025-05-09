@@ -1,29 +1,29 @@
 package ca.teamdman.sfm.common.config;
 
 import ca.teamdman.sfm.SFM;
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.config.ModConfigEvent;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.fml.event.config.ModConfigEvent;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.List;
 
-@Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class SFMServerConfig {
-    public final ForgeConfigSpec.BooleanValue disableProgramExecution;
-    public final ForgeConfigSpec.BooleanValue logResourceLossToConsole;
-    public final ForgeConfigSpec.IntValue timerTriggerMinimumIntervalInTicks;
-    public final ForgeConfigSpec.IntValue timerTriggerMinimumIntervalInTicksWhenOnlyForgeEnergyIO;
-    public final ForgeConfigSpec.IntValue maxIfStatementsInTriggerBeforeSimulationIsntAllowed;
-    public final ForgeConfigSpec.ConfigValue<List<? extends String>> disallowedResourceTypesForTransfer;
-    public final ForgeConfigSpec.EnumValue<LevelsToShards> levelsToShards;
+    public final ModConfigSpec.BooleanValue disableProgramExecution;
+    public final ModConfigSpec.BooleanValue logResourceLossToConsole;
+    public final ModConfigSpec.IntValue timerTriggerMinimumIntervalInTicks;
+    public final ModConfigSpec.IntValue timerTriggerMinimumIntervalInTicksWhenOnlyForgeEnergyIO;
+    public final ModConfigSpec.IntValue maxIfStatementsInTriggerBeforeSimulationIsntAllowed;
+    public final ModConfigSpec.ConfigValue<List<? extends String>> disallowedResourceTypesForTransfer;
+    public final ModConfigSpec.EnumValue<LevelsToShards> levelsToShards;
     /**
      * This is used by managers to detect when the config has changed.
      * When the manager cached var differs from this, the manager will rebuild its program.
      */
     private int revision = 0;
 
-    SFMServerConfig(ForgeConfigSpec.Builder builder) {
+    SFMServerConfig(ModConfigSpec.Builder builder) {
         builder.comment("This config is shown to clients, don't put anything secret in here");
         disableProgramExecution = builder
                 .comment("Prevents factory managers from compiling and running code (for emergencies)")

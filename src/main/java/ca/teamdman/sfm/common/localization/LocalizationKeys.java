@@ -171,7 +171,7 @@ public final class LocalizationKeys {
     );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry ITEM_GROUP = new LocalizationEntry(
-            "itemGroup.sfm",
+            "item_group.sfm.main",
             "Super Factory Manager"
     );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
@@ -936,6 +936,11 @@ public final class LocalizationKeys {
 //            () -> SFMBlocks.BATTERY_BLOCK.get().getDescriptionId(),
 //            () -> "Battery (WIP)"
 //    );
+
+    public static final LocalizationEntry SFM_BAD_TRANSLATION_ARGUMENT = new LocalizationEntry(
+            "sfm.error.bad_translation_argument",
+            "Failed to create translatable contents for key \"{}\" with error {}"
+    );
     public static final LocalizationEntry CONFIG_UPDATE_AND_SYNC_RESULT_SUCCESS = new LocalizationEntry(
             "chat.sfm.config_update_and_sync_result.success",
             "Successfully updated SFM config."

@@ -4,10 +4,11 @@ import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.Stored;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -15,13 +16,13 @@ import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
+import org.apache.commons.lang3.NotImplementedException;
 
 public class PrintingPressBlock extends BaseEntityBlock implements EntityBlock {
 
     public PrintingPressBlock() {
-        super(BlockBehaviour.Properties.of(Material.METAL).strength(5.0F, 6.0F).noOcclusion());
+        super(BlockBehaviour.Properties.of().strength(5.0F, 6.0F).noOcclusion());
         this.registerDefaultState(this.defaultBlockState());
     }
 
@@ -58,20 +59,24 @@ public class PrintingPressBlock extends BaseEntityBlock implements EntityBlock {
     }
 
     @Override
-    @SuppressWarnings("deprecation")
-    public InteractionResult use(
+    protected MapCodec<WaterTankBlock> codec() {
+        throw new NotImplementedException("This isn't used until 1.20.5 apparently");
+    }
+
+    @Override
+    protected ItemInteractionResult useItemOn(
+            ItemStack stack,
             BlockState state,
             Level level,
             @NotStored BlockPos pos,
             Player player,
             InteractionHand hand,
-            BlockHitResult hit
+            BlockHitResult hitResult
     ) {
         if (!level.isClientSide() && level.getBlockEntity(pos) instanceof PrintingPressBlockEntity blockEntity) {
-            var stack = player.getItemInHand(hand);
             player.setItemInHand(hand, blockEntity.acceptStack(stack));
         }
-        return InteractionResult.SUCCESS;
+        return ItemInteractionResult.SUCCESS;
     }
 
     @Override

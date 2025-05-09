@@ -9,7 +9,7 @@ import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import ca.teamdman.sfm.common.util.SFMStreamUtils;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.block.Block;
 
@@ -32,7 +32,7 @@ public record ServerboundLabelGunUsePacket(
         @Override
         public void encode(
                 ServerboundLabelGunUsePacket msg,
-                FriendlyByteBuf buf
+                RegistryFriendlyByteBuf buf
         ) {
             buf.writeEnum(msg.hand);
             buf.writeBlockPos(msg.pos);
@@ -42,7 +42,7 @@ public record ServerboundLabelGunUsePacket(
         }
 
         @Override
-        public ServerboundLabelGunUsePacket decode(FriendlyByteBuf buf) {
+        public ServerboundLabelGunUsePacket decode(RegistryFriendlyByteBuf buf) {
             return new ServerboundLabelGunUsePacket(
                     buf.readEnum(InteractionHand.class),
                     buf.readBlockPos(),
@@ -62,7 +62,7 @@ public record ServerboundLabelGunUsePacket(
                 return;
             }
             var stack = sender.getItemInHand(msg.hand);
-            var level = sender.getLevel();
+            var level = sender.level();
             if (!(stack.getItem() instanceof LabelGunItem)) {
                 return;
             }

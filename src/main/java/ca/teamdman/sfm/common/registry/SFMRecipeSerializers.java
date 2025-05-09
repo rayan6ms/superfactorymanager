@@ -4,31 +4,32 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.recipe.DiskResetRecipe;
 import ca.teamdman.sfm.common.recipe.LabelGunResetRecipe;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
-import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
+import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
+import net.neoforged.bus.api.IEventBus;
+import net.neoforged.neoforge.registries.DeferredRegister;
+
+import java.util.function.Supplier;
 
 public class SFMRecipeSerializers {
     private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(
-            ForgeRegistries.RECIPE_SERIALIZERS,
+            BuiltInRegistries.RECIPE_SERIALIZER,
             SFM.MOD_ID
     );
 
-    public static final RegistryObject<RecipeSerializer<PrintingPressRecipe>> PRINTING_PRESS = RECIPE_SERIALIZERS.register(
+    public static final Supplier<RecipeSerializer<PrintingPressRecipe>> PRINTING_PRESS = RECIPE_SERIALIZERS.register(
             "printing_press",
             PrintingPressRecipe.Serializer::new
     );
 
-    public static final RegistryObject<SimpleRecipeSerializer<DiskResetRecipe>> DISK_RESET = RECIPE_SERIALIZERS.register(
+    public static final Supplier<SimpleCraftingRecipeSerializer<DiskResetRecipe>> DISK_RESET = RECIPE_SERIALIZERS.register(
             "disk_reset",
-            () -> new SimpleRecipeSerializer<>(DiskResetRecipe::new)
+            () -> new SimpleCraftingRecipeSerializer<>(DiskResetRecipe::new)
     );
-    public static final RegistryObject<SimpleRecipeSerializer<LabelGunResetRecipe>> LABEL_GUN_RESET = RECIPE_SERIALIZERS.register(
+    public static final Supplier<SimpleCraftingRecipeSerializer<LabelGunResetRecipe>> LABEL_GUN_RESET = RECIPE_SERIALIZERS.register(
             "label_gun_reset",
-            () -> new SimpleRecipeSerializer<>(LabelGunResetRecipe::new)
+            () -> new SimpleCraftingRecipeSerializer<>(LabelGunResetRecipe::new)
     );
 
     public static void register(IEventBus bus) {

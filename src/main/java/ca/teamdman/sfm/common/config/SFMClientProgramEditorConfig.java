@@ -1,12 +1,12 @@
 package ca.teamdman.sfm.common.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class SFMClientProgramEditorConfig {
-    public final ForgeConfigSpec.BooleanValue showLineNumbers;
-    public final ForgeConfigSpec.EnumValue<IntellisenseLevel> intellisenseLevel;
+    public final ModConfigSpec.BooleanValue showLineNumbers;
+    public final ModConfigSpec.EnumValue<IntellisenseLevel> intellisenseLevel;
 
-    SFMClientProgramEditorConfig(ForgeConfigSpec.Builder builder) {
+    SFMClientProgramEditorConfig(ModConfigSpec.Builder builder) {
         showLineNumbers = builder.define("showLineNumbers", true);
         intellisenseLevel = builder.defineEnum("intellisenseLevel", IntellisenseLevel.OFF);
     }

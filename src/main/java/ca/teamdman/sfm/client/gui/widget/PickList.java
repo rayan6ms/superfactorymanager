@@ -3,18 +3,16 @@ package ca.teamdman.sfm.client.gui.widget;
 import ca.teamdman.sfm.client.gui.screen.SFMFontUtils;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenRenderUtils;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.math.Matrix4f;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractScrollWidget;
 import net.minecraft.client.gui.narration.NarratedElementType;
 import net.minecraft.client.gui.narration.NarrationElementOutput;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.simmetrics.StringDistance;
 import org.simmetrics.builders.StringDistanceBuilder;
 import org.simmetrics.metrics.StringDistances;
@@ -80,25 +78,25 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
             int x,
             int y
     ) {
-        this.x = x;
-        this.y = y;
+        this.setX(x);
+        this.setY(y);
     }
 
     @Override
     @MCVersionDependentBehaviour
-    public void updateNarration(NarrationElementOutput narration) {
+    protected void updateWidgetNarration(NarrationElementOutput narration) {
         narration.add(NarratedElementType.TITLE, getMessage());
     }
 
     @Override
-    public void render(
-            PoseStack pPoseStack,
+    public void renderWidget(
+            GuiGraphics graphics,
             int pMouseX,
             int pMouseY,
             float pPartialTick
     ) {
         if (items.isEmpty()) return;
-        super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+        super.renderWidget(graphics, pMouseX, pMouseY, pPartialTick);
     }
 
     public void selectPreviousWrapping() {
@@ -203,7 +201,7 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
 
     @Override
     protected void renderContents(
-            PoseStack poseStack,
+            GuiGraphics graphics,
             int mx,
             int my,
             float partialTick
@@ -217,8 +215,8 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
         int endIndex = Math.min(items.size(), startIndex + visibleCount);
 
         // Only render the visible items
-        Matrix4f matrix4f = poseStack.last().pose();
-        var buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+        Matrix4f matrix4f = graphics.pose().last().pose();
+        var buffer = graphics.bufferSource();
         int lineX = SFMScreenRenderUtils.getX(this) + this.innerPadding();
         Rect2i highlight = null;
 
@@ -253,7 +251,7 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
 
         if (highlight != null) {
             SFMScreenRenderUtils.renderHighlight(
-                    poseStack,
+                    graphics,
                     highlight.getX(),
                     highlight.getY(),
                     highlight.getX() + highlight.getWidth(),

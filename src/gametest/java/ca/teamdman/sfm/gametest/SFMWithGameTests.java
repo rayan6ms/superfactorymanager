@@ -8,7 +8,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
-import net.minecraftforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.GameTestHolder;
 
 import java.util.Arrays;
 import java.util.function.BiConsumer;
@@ -60,7 +60,7 @@ public class SFMWithGameTests extends SFMGameTestBase {
                                     END
                                     """)
                 .preContents("left", Arrays.asList(
-                        enchant(new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100), // Slot 0
+                        enchant(helper, new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100), // Slot 0
                         new ItemStack(Items.DIRT, 64),                                       // Slot 1
                         new ItemStack(Items.STONE, 64)                                       // Slot 2
                 ))
@@ -70,7 +70,7 @@ public class SFMWithGameTests extends SFMGameTestBase {
                         new ItemStack(Items.STONE, 64)      // Slot 2 (Stone remains)
                 ))
                 .postContents("right", Arrays.asList(
-                        enchant(new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100), // Slot 0
+                        enchant(helper, new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100), // Slot 0
                         new ItemStack(Items.DIRT, 64)                                        // Slot 1
                         // The rest are empty by default
                 ))
@@ -274,7 +274,7 @@ public class SFMWithGameTests extends SFMGameTestBase {
                                     END
                                     """)
                 .preContents("left", Arrays.asList(
-                        enchant(new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100),
+                        enchant(helper, new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100),
                         new ItemStack(Items.DIRT, 64),
                         new ItemStack(Items.STONE, 64)
                 ))
@@ -284,7 +284,7 @@ public class SFMWithGameTests extends SFMGameTestBase {
                         new ItemStack(Items.STONE, 64)
                 ))
                 .postContents("right", Arrays.asList(
-                        enchant(new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100),
+                        enchant(helper, new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100),
                         new ItemStack(Items.DIRT, 64)
                 ))
                 .run();

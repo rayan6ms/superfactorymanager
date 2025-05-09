@@ -5,7 +5,7 @@ import ca.teamdman.sfm.common.program.SimulateExploreAllPathsProgramBehaviour;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfml.ast.BoolExpr;
 import ca.teamdman.sfml.ast.Program;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ServerboundBoolExprStatementInspectionRequestPacket(
         String programString,
@@ -19,14 +19,14 @@ public record ServerboundBoolExprStatementInspectionRequestPacket(
         @Override
         public void encode(
                 ServerboundBoolExprStatementInspectionRequestPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeUtf(msg.programString, Program.MAX_PROGRAM_LENGTH);
             friendlyByteBuf.writeInt(msg.inputNodeIndex());
         }
 
         @Override
-        public ServerboundBoolExprStatementInspectionRequestPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ServerboundBoolExprStatementInspectionRequestPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ServerboundBoolExprStatementInspectionRequestPacket(
                     friendlyByteBuf.readUtf(Program.MAX_PROGRAM_LENGTH),
                     friendlyByteBuf.readInt()

@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ClientboundLabelInspectionResultsPacket(
         String results
@@ -16,13 +16,13 @@ public record ClientboundLabelInspectionResultsPacket(
         @Override
         public void encode(
                 ClientboundLabelInspectionResultsPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeUtf(msg.results(), MAX_RESULTS_LENGTH);
         }
 
         @Override
-        public ClientboundLabelInspectionResultsPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ClientboundLabelInspectionResultsPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ClientboundLabelInspectionResultsPacket(
                     friendlyByteBuf.readUtf(MAX_RESULTS_LENGTH)
             );

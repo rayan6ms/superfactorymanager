@@ -4,10 +4,11 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticLootTablesDataGen;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.registries.RegistryObject;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
 
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SFMLootTables extends MCVersionAgnosticLootTablesDataGen {
 
@@ -28,13 +29,13 @@ public class SFMLootTables extends MCVersionAgnosticLootTablesDataGen {
     }
 
     @Override
-    protected Set<? extends RegistryObject<Block>> getExpectedBlocks() {
-        Set<RegistryObject<? extends Block>> exclude = Set.of(
-                SFMBlocks.TEST_BARREL_BLOCK,
-                SFMBlocks.TEST_BARREL_TANK_BLOCK
-//                SFMBlocks.BATTERY_BLOCK
+    protected Set<? extends Block> getExpectedBlocks() {
+        Set<? extends Block> exclude = Set.of(
+                SFMBlocks.TEST_BARREL_BLOCK.get(),
+                SFMBlocks.TEST_BARREL_TANK_BLOCK.get()
+//                SFMBlocks.BATTERY_BLOCK.get()
         );
-        Set<? extends RegistryObject<Block>> rtn = SFMBlocks.getBlocks();
+        Set<? extends Block> rtn = SFMBlocks.getBlocks().stream().map(DeferredHolder::get).collect(Collectors.toSet());
         rtn.removeIf(exclude::contains);
         return rtn;
     }

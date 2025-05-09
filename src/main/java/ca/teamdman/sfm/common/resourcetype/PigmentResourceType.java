@@ -5,18 +5,18 @@ import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.pigment.IPigmentHandler;
 import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.pigment.PigmentStack;
+import mekanism.common.capabilities.Capabilities;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
 public class PigmentResourceType extends RegistryBackedResourceType<PigmentStack, Pigment, IPigmentHandler> {
-    public static final Capability<IPigmentHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
-    });
+    public static final BlockCapability<IPigmentHandler, @Nullable Direction> CAP = Capabilities.PIGMENT.block();
 
     public PigmentResourceType() {
         super(CAP);
@@ -95,18 +95,18 @@ public class PigmentResourceType extends RegistryBackedResourceType<PigmentStack
 
     @Override
     public Stream<ResourceLocation> getTagsForStack(PigmentStack pigmentStack) {
-        return pigmentStack.getType().getTags().map(TagKey::location);
+        return pigmentStack.getChemical().getTags().map(TagKey::location);
     }
 
 
     @Override
-    public IForgeRegistry<Pigment> getRegistry() {
-        return MekanismAPI.pigmentRegistry();
+    public Registry<Pigment> getRegistry() {
+        return MekanismAPI.PIGMENT_REGISTRY;
     }
 
     @Override
     public Pigment getItem(PigmentStack stack) {
-        return stack.getType();
+        return stack.getChemical();
     }
 
     @Override

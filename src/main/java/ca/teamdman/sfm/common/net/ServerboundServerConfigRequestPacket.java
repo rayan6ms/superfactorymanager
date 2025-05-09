@@ -6,7 +6,7 @@ import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.config.SFMConfigReadWriter;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import net.minecraft.commands.Commands;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
 public record ServerboundServerConfigRequestPacket(
@@ -21,13 +21,13 @@ public record ServerboundServerConfigRequestPacket(
         @Override
         public void encode(
                 ServerboundServerConfigRequestPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeEnum(msg.requestingEditMode());
         }
 
         @Override
-        public ServerboundServerConfigRequestPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ServerboundServerConfigRequestPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ServerboundServerConfigRequestPacket(friendlyByteBuf.readEnum(ConfigCommandBehaviourInput.class));
         }
 

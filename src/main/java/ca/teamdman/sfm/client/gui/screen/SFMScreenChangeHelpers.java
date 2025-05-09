@@ -9,6 +9,7 @@ import ca.teamdman.sfm.common.registry.SFMPackets;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -102,8 +103,14 @@ public class SFMScreenChangeHelpers {
     // TODO: copy item id, not just NBT
     // TODO: replace with showing a screen with the data
     public static void showItemInspectorScreen(ItemStack stack) {
-        CompoundTag tag = stack.getTag();
-        if (tag != null) {
+//        CompoundTag tag = stack.getTag();
+        CompoundTag tag = new CompoundTag();
+        ClientLevel level = Minecraft.getInstance().level;
+        assert level != null;
+        // when we add our own nbt editor would be neat to also add a button to switch between ours and ftb library's nbt editor
+        // https://github.com/FTBTeam/FTB-Library/blob/09712e7ac26bda48c32f372ae23fe06d100eabc4/common/src/main/java/dev/ftb/mods/ftblibrary/FTBLibraryCommands.java#L155
+        stack.save(level.registryAccess(), tag);
+        if (!tag.isEmpty()) {
             String content = tag.toString();
             Minecraft minecraft = Minecraft.getInstance();
             minecraft.keyboardHandler.setClipboard(content);

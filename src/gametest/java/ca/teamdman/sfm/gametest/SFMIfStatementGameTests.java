@@ -15,11 +15,13 @@ import ca.teamdman.sfml.ast.Program;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.GameTestHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -566,7 +568,11 @@ public class SFMIfStatementGameTests extends SFMGameTestBase {
         assertTrue(warnings.isEmpty(), "expected 0 warning, got " + warnings.size());
 
         // count the execution paths
-        GatherWarningsProgramBehaviour simulation = new GatherWarningsProgramBehaviour(warnings::addAll);
+        GatherWarningsProgramBehaviour simulation = new GatherWarningsProgramBehaviour(x -> {
+            for (TranslatableContents problem : x) {
+                warnings.add(MutableComponent.create(problem));
+            }
+        });
         program.tick(ProgramContext.createSimulationContext(
                 program,
                 labelPositionHolder,
@@ -623,12 +629,15 @@ public class SFMIfStatementGameTests extends SFMGameTestBase {
         // assert expected warnings
         var warnings = DiskItem.getWarnings(manager.getDisk());
         assertTrue(warnings.size() == 1, "expected 1 warning, got " + warnings.size());
-        assertTrue(warnings
-                           .get(0)
-                           .getKey()
-                           .equals(LocalizationKeys.PROGRAM_WARNING_UNUSED_INPUT_LABEL // should be unused input
-                                           .key()
-                                           .get()), "expected output without matching input warning");
+        assertTrue(
+                (
+                        (TranslatableContents) warnings
+                                .getFirst()
+                                .getContents()
+                ).getKey()
+                        .equals(LocalizationKeys.PROGRAM_WARNING_UNUSED_INPUT_LABEL // should be unused input
+                                        .key()
+                                        .get()), "expected output without matching input warning");
         helper.succeed();
     }
 
@@ -672,7 +681,11 @@ public class SFMIfStatementGameTests extends SFMGameTestBase {
         assertTrue(warnings.isEmpty(), "expected 0 warning, got " + warnings.size());
 
         // count the execution paths
-        GatherWarningsProgramBehaviour simulation = new GatherWarningsProgramBehaviour(warnings::addAll);
+        GatherWarningsProgramBehaviour simulation = new GatherWarningsProgramBehaviour(x -> {
+            for (TranslatableContents problem : x) {
+                warnings.add(MutableComponent.create(problem));
+            }
+        });
         program.tick(ProgramContext.createSimulationContext(
                 program,
                 labelPositionHolder,

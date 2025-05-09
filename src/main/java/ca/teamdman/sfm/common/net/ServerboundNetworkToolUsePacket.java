@@ -9,14 +9,15 @@ import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfml.ast.DirectionQualifier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.Capability;
+import net.neoforged.neoforge.capabilities.BlockCapability;
 import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -34,14 +35,14 @@ public record ServerboundNetworkToolUsePacket(
         @Override
         public void encode(
                 ServerboundNetworkToolUsePacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeBlockPos(msg.blockPosition);
             friendlyByteBuf.writeEnum(msg.blockFace);
         }
 
         @Override
-        public ServerboundNetworkToolUsePacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ServerboundNetworkToolUsePacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ServerboundNetworkToolUsePacket(
                     friendlyByteBuf.readBlockPos(),
                     friendlyByteBuf.readEnum(Direction.class)
@@ -57,7 +58,7 @@ public record ServerboundNetworkToolUsePacket(
                 // we don't know if the player has the program edit screen open from a manager or a disk in hand
                 ServerPlayer player = context.sender();
                 if (player == null) return;
-                Level level = player.getLevel();
+                Level level = player.level();
                 BlockPos pos = msg.blockPosition();
                 if (!level.isLoaded(pos)) return;
                 StringBuilder payload = new StringBuilder()
@@ -90,15 +91,15 @@ public record ServerboundNetworkToolUsePacket(
                         payload.append(entity).append("\n");
                     }
                     payload.append("---- capability directions ----\n");
-                    for (var cap : (Iterable<Capability<?>>) SFMResourceTypes.getCapabilities()::iterator) {
+                    for (var cap : (Iterable<BlockCapability<?, @Nullable Direction>>) SFMResourceTypes.getCapabilities()::iterator) {
                         String directions = DirectionQualifier.EVERY_DIRECTION
                                 .stream()
-                                .filter(dir -> entity.getCapability(cap, dir).isPresent())
+                                .filter(dir -> level.getCapability(cap, pos, dir) != null)
                                 .map(dir -> dir == null ? "NULL DIRECTION" : DirectionQualifier.directionToString(dir))
                                 .collect(Collectors.joining(", ", "[", "]"));
                         if (!directions.equals("[]")) {
                             payload
-                                    .append(cap.getName())
+                                    .append(cap.name())
                                     .append("\n")
                                     .append(directions)
                                     .append("\n");
@@ -125,7 +126,7 @@ public record ServerboundNetworkToolUsePacket(
                     payload.append(messages[i]).append("\n");
                     MutableBoolean foundExports = new MutableBoolean(false);
                     //noinspection unchecked,rawtypes
-                    SFMResourceTypes.registry().getEntries()
+                    SFMResourceTypes.registry().entrySet()
                             .stream()
                             .map(entry -> ServerboundContainerExportsInspectionRequestPacket.buildInspectionResults(
                                     (ResourceKey) entry.getKey(),
@@ -148,7 +149,7 @@ public record ServerboundNetworkToolUsePacket(
                 if (entity != null) {
                     if (player.hasPermissions(2)) {
                         payload.append("---- (op only) nbt data ----\n");
-                        payload.append(entity.serializeNBT()).append("\n");
+                        payload.append(entity.saveWithoutMetadata(level.registryAccess())).append("\n");
                     }
                 }
 

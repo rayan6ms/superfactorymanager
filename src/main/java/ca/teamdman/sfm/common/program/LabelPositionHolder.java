@@ -1,11 +1,15 @@
 package ca.teamdman.sfm.common.program;
 
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.util.CompressedBlockPosSet;
+import ca.teamdman.sfm.common.registry.SFMDataComponents;
+import com.mojang.serialization.Codec;
+import com.mojang.serialization.MapCodec;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.*;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.*;
@@ -16,6 +20,21 @@ import java.util.stream.Collectors;
 
 @SuppressWarnings("UnusedReturnValue")
 public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
+    public static final StreamCodec<FriendlyByteBuf, LabelPositionHolder> STREAM_CODEC = StreamCodec.ofMember(
+            LabelPositionHolder::encode,
+            LabelPositionHolder::decode
+    );
+    public static final MapCodec<LabelPositionHolder> CODEC =
+            RecordCodecBuilder.mapCodec(
+                    builder -> builder.group(
+                            Codec.unboundedMap(
+                                    Codec.STRING,
+                                    BlockPos.CODEC.listOf().xmap(HashSet::new, ArrayList::new)
+                            ).fieldOf("labels").forGetter(LabelPositionHolder::labels)
+                    ).apply(builder, LabelPositionHolder::new)
+            );
+
+
     private final static WeakHashMap<ItemStack, LabelPositionHolder> CACHE = new WeakHashMap<>();
 
     private LabelPositionHolder() {
@@ -27,6 +46,34 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
         other.labels().forEach((key, value) -> this.labels().put(key, new HashSet<>(value)));
     }
 
+    public static void encode(
+            LabelPositionHolder labelPositionHolder,
+            FriendlyByteBuf friendlyByteBuf
+    ) {
+        friendlyByteBuf.writeVarInt(labelPositionHolder.labels().size());
+        for (Map.Entry<String, ? extends Set<BlockPos>> entry : labelPositionHolder.labels().entrySet()) {
+            String label = entry.getKey();
+            Set<BlockPos> positions = entry.getValue();
+            friendlyByteBuf.writeUtf(label);
+            friendlyByteBuf.writeVarInt(positions.size());
+            positions.forEach(friendlyByteBuf::writeBlockPos);
+        }
+    }
+
+    public static LabelPositionHolder decode(FriendlyByteBuf friendlyByteBuf) {
+        LabelPositionHolder rtn = LabelPositionHolder.empty();
+        int size = friendlyByteBuf.readVarInt();
+        for (int i = 0; i < size; i++) {
+            String label = friendlyByteBuf.readUtf();
+            int positionsSize = friendlyByteBuf.readVarInt();
+            HashSet<BlockPos> positions = new HashSet<>();
+            for (int j = 0; j < positionsSize; j++) {
+                positions.add(friendlyByteBuf.readBlockPos());
+            }
+            rtn.labels().put(label, positions);
+        }
+        return rtn;
+    }
 
     /**
      * Get the label position holder for this disk.
@@ -36,74 +83,32 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
      * This mutably borrows the cache entry.
      */
     public static LabelPositionHolder from(ItemStack stack) {
-        return CACHE.computeIfAbsent(stack, s -> {
-            var tag = stack.getOrCreateTag().getCompound("sfm:labels");
-            return deserialize(tag);
-        });
+        return CACHE.computeIfAbsent(
+                stack,
+                s -> {
+                    LabelPositionHolder immutableLabelPositionHolder = stack.get(SFMDataComponents.LABEL_POSITION_HOLDER);
+                    if (immutableLabelPositionHolder == null) {
+                        return new LabelPositionHolder();
+                    }
+                    return new LabelPositionHolder(immutableLabelPositionHolder);
+                }
+        );
     }
 
     public static LabelPositionHolder empty() {
         return new LabelPositionHolder();
     }
 
-    public static LabelPositionHolder deserialize(CompoundTag tag) {
-        var labels = LabelPositionHolder.empty();
-        for (var label : tag.getAllKeys()) {
-            Tag positionsTag = tag.get(label);
-            assert positionsTag != null;
-            int positionsTagType = tag.getTagType(label);
-            if (positionsTagType == Tag.TAG_LIST) {
-                ListTag positionsList = (ListTag) positionsTag;
-                int elementType = positionsList.getElementType();
-                if (elementType == Tag.TAG_LONG) {
-                    // old: storing BlockPos as long
-                    labels.addAll(
-                            label,
-                            positionsList.stream()
-                                    .map(LongTag.class::cast)
-                                    .mapToLong(LongTag::getAsLong)
-                                    .mapToObj(BlockPos::of).collect(Collectors.toList())
-                    );
-                } else if (elementType == Tag.TAG_COMPOUND) {
-                    // old: storing BlockPos as compound
-                    // this was used in FTB Academy packs I think
-                    labels.addAll(
-                            label,
-                            positionsList.stream()
-                                    .map(CompoundTag.class::cast)
-                                    .map(NbtUtils::readBlockPos)
-                                    .collect(Collectors.toList())
-                    );
-                }
-            } else if (positionsTagType == Tag.TAG_BYTE_ARRAY) {
-                labels.addAll(
-                        label,
-                        CompressedBlockPosSet.from((ByteArrayTag) positionsTag).into()
-                );
-            }
-        }
-        return labels;
-    }
-
     public LabelPositionHolder save(ItemStack stack) {
-        stack.getOrCreateTag().put("sfm:labels", serialize());
-        CACHE.put(stack, new LabelPositionHolder(this));
+        LabelPositionHolder copy = new LabelPositionHolder(this);
+        stack.set(SFMDataComponents.LABEL_POSITION_HOLDER, copy);
+        CACHE.put(stack, copy);
         return this;
     }
 
     public static void clear(ItemStack stack) {
-        stack.getOrCreateTag().remove("sfm:labels");
+        stack.remove(SFMDataComponents.LABEL_POSITION_HOLDER);
         CACHE.remove(stack);
-    }
-
-    public CompoundTag serialize() {
-        var tag = new CompoundTag();
-        for (var entry : labels().entrySet()) {
-            String label = entry.getKey();
-            ByteArrayTag positionsTag = CompressedBlockPosSet.from(entry.getValue()).asTag();
-            tag.put(label, positionsTag);
-        }
-        return tag;
     }
 
     public boolean contains(

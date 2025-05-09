@@ -12,7 +12,7 @@ import com.google.common.collect.HashMultimap;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.math.Matrix4f;
+import com.mojang.math.Axis;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
@@ -28,15 +28,17 @@ import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.RenderLevelStageEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.RenderLevelStageEvent;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Quaternionf;
 
 import java.util.*;
 
-@Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 /*
  * This class uses code from tasgon's "observable" mod, also using MPLv2
  * https://github.com/tasgon/observable/blob/master/common/src/main/kotlin/observable/client/Overlay.kt
@@ -274,7 +276,7 @@ public class ItemWorldRenderer {
         if (vbo != null) {
             poseStack.pushPose();
             // we need to pass in a new destination quaternion to avoid undesired camera mutation
-//            poseStack.mulPose(event.getCamera().rotation().invert(new Quaternionf()));
+            poseStack.mulPose(event.getCamera().rotation().invert(new Quaternionf()));
             poseStack.translate(
                     -event.getCamera().getPosition().x,
                     -event.getCamera().getPosition().y,
@@ -305,7 +307,7 @@ public class ItemWorldRenderer {
         poseStack.pushPose();
         poseStack.translate(pos.getX() + 0.5, pos.getY() + 0.5, pos.getZ() + 0.5);
         poseStack.mulPose(camera.rotation());
-//        poseStack.mulPose(Axis.YP.rotationDegrees(180));
+        poseStack.mulPose(Axis.YP.rotationDegrees(180));
         poseStack.scale(-0.025f, -0.025f, 0.025f);
 
         Font font = Minecraft.getInstance().font;
@@ -339,7 +341,7 @@ public class ItemWorldRenderer {
             int b,
             int a
     ) {
-        builder.vertex(matrix4f, x, y, z).color(r, g, b, a).endVertex();
+        builder.addVertex(matrix4f, x, y, z).setColor(r, g, b, a);
     }
 
     private static void writeFaceVertices(
@@ -459,8 +461,9 @@ public class ItemWorldRenderer {
 
         @HelpsWithMinecraftVersionIndependence
         private BufferBuilder createBufferBuilder(int numPositions) {
-            BufferBuilder bufferBuilder = new BufferBuilder(RENDER_TYPE.bufferSize() * numPositions);
-            bufferBuilder.begin(RENDER_TYPE.mode(), RENDER_TYPE.format());
+//            BufferBuilder bufferBuilder = new BufferBuilder(RENDER_TYPE.bufferSize() * numPositions);
+//            bufferBuilder.begin(RENDER_TYPE.mode(), RENDER_TYPE.format());
+            BufferBuilder bufferBuilder = Tesselator.getInstance().begin(RENDER_TYPE.mode(), RENDER_TYPE.format());
             return bufferBuilder;
         }
 
@@ -490,8 +493,8 @@ public class ItemWorldRenderer {
                 poseStack.popPose();
             }
 
-            BufferBuilder.RenderedBuffer meshData = bufferBuilder.end();
-            VertexBuffer vbo = new VertexBuffer();
+            MeshData meshData = bufferBuilder.buildOrThrow();
+            VertexBuffer vbo = new VertexBuffer(VertexBuffer.Usage.STATIC);
             vbo.bind();
             vbo.upload(meshData);
             VertexBuffer.unbind();

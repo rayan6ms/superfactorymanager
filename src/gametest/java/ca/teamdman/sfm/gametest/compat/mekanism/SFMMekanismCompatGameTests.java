@@ -11,19 +11,22 @@ import ca.teamdman.sfm.gametest.declarative.SFMDeclarativeTestBuilder;
 import ca.teamdman.sfm.gametest.declarative.SFMTestSpec;
 import ca.teamdman.sfm.gametest.declarative.TestBlockDef;
 import mekanism.api.RelativeSide;
-import mekanism.api.chemical.infuse.InfusionStack;
-import mekanism.api.math.FloatingLong;
+import mekanism.api.chemical.ChemicalStack;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.registries.MekanismBlocks;
-import mekanism.common.registries.MekanismInfuseTypes;
+import mekanism.common.registries.MekanismChemicals;
 import mekanism.common.tier.BinTier;
 import mekanism.common.tier.ChemicalTankTier;
 import mekanism.common.tier.EnergyCubeTier;
 import mekanism.common.tile.TileEntityBin;
 import mekanism.common.tile.TileEntityChemicalTank;
 import mekanism.common.tile.TileEntityEnergyCube;
+import mekanism.common.tile.base.TileEntityMekanism;
+import mekanism.common.tile.component.TileComponentConfig;
+import mekanism.common.tile.component.config.ConfigInfo;
 import mekanism.common.tile.component.config.DataType;
 import mekanism.common.tile.multiblock.TileEntityInductionPort;
+import mekanism.common.tile.prefab.TileEntityConfigurableMachine;
 import mekanism.common.util.UnitDisplayUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -35,10 +38,10 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.gametest.GameTestHolder;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -47,7 +50,30 @@ import java.util.Objects;
 @SuppressWarnings({"DuplicatedCode", "DataFlowIssue"})
 @GameTestHolder(SFM.MOD_ID)
 public class SFMMekanismCompatGameTests extends SFMGameTestBase {
-    @GameTest(template = "3x2x1")
+    private static void set_all_io(TileComponentConfig config) {
+        for (TransmissionType type : TransmissionType.values()) {
+            ConfigInfo info = config.getConfig(type);
+            if (info != null) {
+                for (RelativeSide side : RelativeSide.values()) {
+                    info.setDataType(DataType.INPUT_OUTPUT, side);
+                    config.sideChanged(type, side);
+                }
+            }
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends TileEntityMekanism> T getAndPrepMekTile(GameTestHelper helper, BlockPos mekanismPos) {
+        var tile = helper.getBlockEntity(mekanismPos);
+        if (tile instanceof TileEntityConfigurableMachine mek) {
+            set_all_io(mek.getConfig());
+            return (T) mek;
+        } else if (tile instanceof TileEntityBin bin) {
+        }
+        return (T) tile;
+    }
+
+    @GameTest(template = "3x2x1", skyAccess = true)
     public static void mek_chemtank_infusion_empty(GameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
@@ -56,9 +82,11 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
 
         // set up the world
         helper.setBlock(leftPos, MekanismBlocks.ULTIMATE_CHEMICAL_TANK.getBlock());
-        var leftTank = ((TileEntityChemicalTank) helper.getBlockEntity(leftPos));
+        TileEntityChemicalTank leftTank = getAndPrepMekTile(helper, leftPos);
+
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_CHEMICAL_TANK.getBlock());
-        var rightTank = ((TileEntityChemicalTank) helper.getBlockEntity(rightPos));
+        TileEntityChemicalTank rightTank = getAndPrepMekTile(helper, rightPos);
+
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
@@ -79,15 +107,15 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
 
 
         // ensure it can move into an empty tank
-        leftTank.getInfusionTank().setStack(new InfusionStack(MekanismInfuseTypes.REDSTONE.get(), 1_000_000L));
-        rightTank.getInfusionTank().setStack(InfusionStack.EMPTY);
+        leftTank.getChemicalTank().setStack(new ChemicalStack(MekanismChemicals.REDSTONE.get(), 1_000_000L));
+        rightTank.getChemicalTank().setStack(ChemicalStack.EMPTY);
         succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
-            assertTrue(leftTank.getInfusionTank().getStack().isEmpty(), "Contents did not depart");
-            assertTrue(rightTank.getInfusionTank().getStack().getAmount() == 1_000_000L, "Contents did not arrive");
+            assertTrue(leftTank.getChemicalTank().getStack().isEmpty(), "Contents did not depart");
+            assertTrue(rightTank.getChemicalTank().getStack().getAmount() == 1_000_000L, "Contents did not arrive");
         });
     }
 
-    @GameTest(template = "3x2x1")
+    @GameTest(template = "3x2x1", skyAccess = true)
     public static void mek_chemtank_infusion_some(GameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
@@ -96,9 +124,9 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
 
         // set up the world
         helper.setBlock(leftPos, MekanismBlocks.ULTIMATE_CHEMICAL_TANK.getBlock());
-        var leftTank = ((TileEntityChemicalTank) helper.getBlockEntity(leftPos));
+        TileEntityChemicalTank leftTank = getAndPrepMekTile(helper,leftPos);
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_CHEMICAL_TANK.getBlock());
-        var rightTank = ((TileEntityChemicalTank) helper.getBlockEntity(rightPos));
+        TileEntityChemicalTank rightTank = getAndPrepMekTile(helper,rightPos);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
@@ -119,15 +147,15 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
 
 
         // ensure it can move when there's already some in the destination
-        leftTank.getInfusionTank().setStack(new InfusionStack(MekanismInfuseTypes.REDSTONE.get(), 1_000_000L));
-        rightTank.getInfusionTank().setStack(new InfusionStack(MekanismInfuseTypes.REDSTONE.get(), 1_000_000L));
+        leftTank.getChemicalTank().setStack(new ChemicalStack(MekanismChemicals.REDSTONE.get(), 1_000_000L));
+        rightTank.getChemicalTank().setStack(new ChemicalStack(MekanismChemicals.REDSTONE.get(), 1_000_000L));
         succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
-            assertTrue(leftTank.getInfusionTank().getStack().isEmpty(), "Contents did not depart");
-            assertTrue(rightTank.getInfusionTank().getStack().getAmount() == 2_000_000L, "Contents did not arrive");
+            assertTrue(leftTank.getChemicalTank().getStack().isEmpty(), "Contents did not depart");
+            assertTrue(rightTank.getChemicalTank().getStack().getAmount() == 2_000_000L, "Contents did not arrive");
         });
     }
 
-    @GameTest(template = "3x2x1")
+    @GameTest(template = "3x2x1", skyAccess = true)
     public static void mek_chemtank_infusion_full(GameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
@@ -136,9 +164,9 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
 
         // set up the world
         helper.setBlock(leftPos, MekanismBlocks.ULTIMATE_CHEMICAL_TANK.getBlock());
-        var leftTank = ((TileEntityChemicalTank) helper.getBlockEntity(leftPos));
+        TileEntityChemicalTank leftTank = getAndPrepMekTile(helper,leftPos);
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_CHEMICAL_TANK.getBlock());
-        var rightTank = ((TileEntityChemicalTank) helper.getBlockEntity(rightPos));
+        TileEntityChemicalTank rightTank = getAndPrepMekTile(helper,rightPos);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
@@ -158,24 +186,24 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
                 .save(manager.getDisk());
 
         // ensure it can move into a nearly full tank
-        leftTank.getInfusionTank().setStack(new InfusionStack(MekanismInfuseTypes.REDSTONE.get(), 2_000_000L));
+        leftTank.getChemicalTank().setStack(new ChemicalStack(MekanismChemicals.REDSTONE.get(), 2_000_000L));
         rightTank
-                .getInfusionTank()
-                .setStack(new InfusionStack(
-                        MekanismInfuseTypes.REDSTONE.get(),
+                .getChemicalTank()
+                .setStack(new ChemicalStack(
+                        MekanismChemicals.REDSTONE.get(),
                         ChemicalTankTier.ULTIMATE.getStorage() - 1_000_000L
                 ));
         succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
-            assertTrue(leftTank.getInfusionTank().getStack().getAmount() == 1_000_000L, "Contents did not depart");
+            assertTrue(leftTank.getChemicalTank().getStack().getAmount() == 1_000_000L, "Contents did not depart");
             assertTrue(
-                    rightTank.getInfusionTank().getStack().getAmount() == ChemicalTankTier.ULTIMATE.getStorage(),
+                    rightTank.getChemicalTank().getStack().getAmount() == ChemicalTankTier.ULTIMATE.getStorage(),
                     "Contents did not arrive"
             );
         });
     }
 
 
-    @GameTest(template = "3x2x1")
+    @GameTest(template = "3x2x1", skyAccess = true)
     public static void mek_bin_empty(GameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
@@ -184,9 +212,10 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
 
         // set up the world
         helper.setBlock(leftPos, MekanismBlocks.ULTIMATE_BIN.getBlock());
-        var left = ((TileEntityBin) helper.getBlockEntity(leftPos));
+        TileEntityBin left = getAndPrepMekTile(helper,leftPos);
+
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_BIN.getBlock());
-        var right = ((TileEntityBin) helper.getBlockEntity(rightPos));
+        TileEntityBin right = getAndPrepMekTile(helper,rightPos);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
@@ -216,7 +245,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
     }
 
 
-    @GameTest(template = "3x2x1")
+    @GameTest(template = "3x2x1", skyAccess = true)
     public static void mek_bin_some(GameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
@@ -225,9 +254,9 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
 
         // set up the world
         helper.setBlock(leftPos, MekanismBlocks.ULTIMATE_BIN.getBlock());
-        var left = ((TileEntityBin) helper.getBlockEntity(leftPos));
+        TileEntityBin left = getAndPrepMekTile(helper,leftPos);
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_BIN.getBlock());
-        var right = ((TileEntityBin) helper.getBlockEntity(rightPos));
+        TileEntityBin right = getAndPrepMekTile(helper,rightPos);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
@@ -257,7 +286,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
     }
 
 
-    @GameTest(template = "3x2x1")
+    @GameTest(template = "3x2x1", skyAccess = true)
     public static void mek_bin_full(GameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
@@ -266,9 +295,9 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
 
         // set up the world
         helper.setBlock(leftPos, MekanismBlocks.ULTIMATE_BIN.getBlock());
-        var left = ((TileEntityBin) helper.getBlockEntity(leftPos));
+        TileEntityBin left = getAndPrepMekTile(helper,leftPos);
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_BIN.getBlock());
-        var right = ((TileEntityBin) helper.getBlockEntity(rightPos));
+        TileEntityBin right = getAndPrepMekTile(helper,rightPos);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
@@ -298,7 +327,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
     }
 
 
-    @GameTest(template = "3x2x1")
+    @GameTest(template = "3x2x1", skyAccess = true)
     public static void mek_energy_empty(GameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
@@ -307,9 +336,11 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
 
         // set up the world
         helper.setBlock(leftPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
-        var left = ((TileEntityEnergyCube) helper.getBlockEntity(leftPos));
+        TileEntityEnergyCube left = getAndPrepMekTile(helper,leftPos);
+
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
-        var right = ((TileEntityEnergyCube) helper.getBlockEntity(rightPos));
+        TileEntityEnergyCube right = getAndPrepMekTile(helper,rightPos);
+
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
@@ -329,16 +360,15 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
                 .save(manager.getDisk());
 
         left.setEnergy(0, EnergyCubeTier.ULTIMATE.getMaxEnergy());
-        right.setEnergy(0, FloatingLong.ZERO);
+        right.setEnergy(0, 0);
         succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
-            assertTrue(left.getEnergy(0).equals(FloatingLong.ZERO), "Contents did not depart");
-            assertTrue(right.getEnergy(0).equals(EnergyCubeTier.ULTIMATE.getMaxEnergy()), "Contents did not arrive");
-
+            assertTrue(left.getEnergy(0) == 0, "Contents did not depart");
+            assertTrue(right.getEnergy(0) == EnergyCubeTier.ULTIMATE.getMaxEnergy(), "Contents did not arrive");
         });
     }
 
 
-    @GameTest(template = "3x2x1")
+    @GameTest(template = "3x2x1", skyAccess = true)
     public static void mek_energy_some(GameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
@@ -347,9 +377,9 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
 
         // set up the world
         helper.setBlock(leftPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
-        var left = ((TileEntityEnergyCube) helper.getBlockEntity(leftPos));
+        TileEntityEnergyCube left = getAndPrepMekTile(helper,leftPos);
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
-        var right = ((TileEntityEnergyCube) helper.getBlockEntity(rightPos));
+        TileEntityEnergyCube right = getAndPrepMekTile(helper,rightPos);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
@@ -368,17 +398,16 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
                 .add("b", helper.absolutePos(rightPos))
                 .save(manager.getDisk());
 
-        left.setEnergy(0, FloatingLong.create(1_000));
-        right.setEnergy(0, FloatingLong.create(1_000));
+        left.setEnergy(0, 1_000);
+        right.setEnergy(0, 1_000);
         succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
-            assertTrue(left.getEnergy(0).equals(FloatingLong.ZERO), "Contents did not depart");
-            assertTrue(right.getEnergy(0).equals(FloatingLong.create(2_000)), "Contents did not arrive");
-
+            assertTrue(left.getEnergy(0) == 0, "Contents did not depart");
+            assertTrue(right.getEnergy(0) == 2_000, "Contents did not arrive");
         });
     }
 
 
-    @GameTest(template = "3x2x1")
+    @GameTest(template = "3x2x1", skyAccess = true)
     public static void mek_energy_full(GameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
@@ -387,9 +416,9 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
 
         // set up the world
         helper.setBlock(leftPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
-        var left = ((TileEntityEnergyCube) helper.getBlockEntity(leftPos));
+        TileEntityEnergyCube left = getAndPrepMekTile(helper,leftPos);
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
-        var right = ((TileEntityEnergyCube) helper.getBlockEntity(rightPos));
+        TileEntityEnergyCube right = getAndPrepMekTile(helper,rightPos);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
@@ -409,20 +438,19 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
                 .save(manager.getDisk());
 
         left.setEnergy(0, EnergyCubeTier.ULTIMATE.getMaxEnergy());
-        right.setEnergy(0, EnergyCubeTier.ULTIMATE.getMaxEnergy().subtract(1_000));
+        right.setEnergy(0, EnergyCubeTier.ULTIMATE.getMaxEnergy() - (1_000));
         succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
             assertTrue(
-                    left.getEnergy(0).equals(EnergyCubeTier.ULTIMATE.getMaxEnergy().subtract(1_000)),
+                    left.getEnergy(0) == (EnergyCubeTier.ULTIMATE.getMaxEnergy() - (1_000)),
                     "Contents did not depart"
             );
-            assertTrue(right.getEnergy(0).equals(EnergyCubeTier.ULTIMATE.getMaxEnergy()), "Contents did not arrive");
-
+            assertTrue(right.getEnergy(0) == EnergyCubeTier.ULTIMATE.getMaxEnergy(), "Contents did not arrive");
         });
     }
 
 
-    @GameTest(template = "3x2x1")
-    public static void mek_energy_one(GameTestHelper helper) {
+    @GameTest(template = "3x2x1", skyAccess = true)
+    public static void mek_energy_ten(GameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
         var rightPos = new BlockPos(0, 2, 0);
@@ -430,9 +458,11 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
 
         // set up the world
         helper.setBlock(leftPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
-        var left = ((TileEntityEnergyCube) helper.getBlockEntity(leftPos));
+        var left = getAndPrepMekTile(helper, leftPos);
+
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
-        var right = ((TileEntityEnergyCube) helper.getBlockEntity(rightPos));
+        var right = getAndPrepMekTile(helper, rightPos);
+
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
@@ -440,7 +470,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
         manager.setProgram("""
                                    EVERY 20 TICKS DO
-                                     INPUT 1 forge_energy:forge:energy FROM a NORTH SIDE
+                                     INPUT 10 forge_energy:forge:energy FROM a TOP SIDE
                                      OUTPUT forge_energy:forge:energy TO b TOP SIDE
                                    END
                                    """.stripIndent());
@@ -451,19 +481,16 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
                 .add("b", helper.absolutePos(rightPos))
                 .save(manager.getDisk());
 
-        left.setEnergy(0, FloatingLong.create(100));
-        right.setEnergy(0, FloatingLong.ZERO);
+        left.setEnergy(0, 100);
+        right.setEnergy(0, 0);
         succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
             assertTrue(
                     left
-                            .getEnergy(0)
-                            .equals(FloatingLong
-                                            .create(100)
-                                            .subtract(UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(1))),
+                            .getEnergy(0) == 100 - UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(10),
                     "Contents did not depart"
             );
             assertTrue(
-                    right.getEnergy(0).equals(UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(1)),
+                    right.getEnergy(0) == UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(10),
                     "Contents did not arrive"
             );
 
@@ -471,7 +498,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
     }
 
 
-    @GameTest(template = "25x3x25")
+    @GameTest(template = "25x3x25", skyAccess = true)
     public static void many_lava_cauldrons(GameTestHelper helper) {
         // designate positions
         var sourceBlocks = new ArrayList<BlockPos>();
@@ -496,7 +523,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
 
         // set up the manager
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
-        ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
+        ManagerBlockEntity manager = helper.getBlockEntity(managerPos);
         manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
 
         // create the program
@@ -525,9 +552,8 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
             ));
             int found = destBlocks
                     .stream()
-                    .map(helper::getBlockEntity)
-                    .map(be -> be.getCapability(ForgeCapabilities.FLUID_HANDLER))
-                    .map(x -> x.orElse(null))
+                    .map(helper::absolutePos)
+                    .map(pos -> helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, pos, Direction.DOWN))
                     .peek(Objects::requireNonNull)
                     .map(x -> x.getFluidInTank(0))
                     .mapToInt(FluidStack::getAmount)
@@ -538,7 +564,7 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         });
     }
 
-    @GameTest(template = "3x4x3")
+    @GameTest(template = "3x4x3", skyAccess = true)
     public static void multi_fluid(GameTestHelper helper) {
         var a1Pos = new BlockPos(2, 2, 1);
         var a2Pos = new BlockPos(1, 2, 0);
@@ -550,21 +576,13 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         helper.setBlock(b1Pos, MekanismBlocks.BASIC_FLUID_TANK.getBlock());
         helper.setBlock(b2Pos, MekanismBlocks.BASIC_FLUID_TANK.getBlock());
         var a1 = helper
-                .getBlockEntity(a1Pos)
-                .getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.NORTH)
-                .orElse(null);
+                .getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(a1Pos), Direction.UP);
         var a2 = helper
-                .getBlockEntity(a2Pos)
-                .getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.NORTH)
-                .orElse(null);
+                .getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(a2Pos), Direction.UP);
         var b1 = helper
-                .getBlockEntity(b1Pos)
-                .getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.NORTH)
-                .orElse(null);
+                .getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(b1Pos), Direction.UP);
         var b2 = helper
-                .getBlockEntity(b2Pos)
-                .getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.NORTH)
-                .orElse(null);
+                .getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(b2Pos), Direction.UP);
 
         a1.fill(new FluidStack(Fluids.WATER, 3000), IFluidHandler.FluidAction.EXECUTE);
         a2.fill(new FluidStack(Fluids.LAVA, 3000), IFluidHandler.FluidAction.EXECUTE);
@@ -630,8 +648,10 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         // set up the energy source
         helper.setBlock(powerCubePos, MekanismBlocks.CREATIVE_ENERGY_CUBE.getBlock());
 
-        TileEntityEnergyCube powerCube = (TileEntityEnergyCube) helper.getBlockEntity(powerCubePos);
+        TileEntityEnergyCube powerCube = getAndPrepMekTile(helper, powerCubePos);
         powerCube.setEnergy(0, EnergyCubeTier.CREATIVE.getMaxEnergy());
+//        powerCube.getConfig().setupIOConfig(TransmissionType.ENERGY,powerCube.getEnergyContainer(), RelativeSide.TOP, true);
+//        powerCube.getConfig().
 
         // set up the manager
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
@@ -639,13 +659,13 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
         manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
 
         // create the program
-        long incr = 10_000_000_000L;
-        var startingAmount = FloatingLong.create(0L);
+        long incr = 1_000_000_000L;
+        long startingAmount = 0L;
         var program = """
                     NAME "induction matrix test"
                     EVERY 20 TICKS DO
-                        INPUT %d mekanism_energy:: FROM source NORTH SIDE
-                        OUTPUT mekanism_energy:: TO dest NORTH SIDE
+                        INPUT %d fe:: FROM source TOP SIDE
+                        OUTPUT fe:: TO dest NORTH SIDE
                     END
                 """.formatted(incr);
 
@@ -668,14 +688,14 @@ public class SFMMekanismCompatGameTests extends SFMGameTestBase {
                 throw new GameTestAssertException("Induction matrix did not form");
             }
 
-            var expected = startingAmount.add(incr);
-            FloatingLong energy = inductionPort.getEnergy(0);
-            boolean success = energy.equals(expected);
+            var expected = startingAmount + incr;
+            long joules = inductionPort.getEnergy(0);
+            long energy = UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertTo(joules);
+            boolean success = energy == expected;
             assertTrue(
                     success,
-                    "Expected energy did not match"
+                    "Expected energy did not match, got " + energy + " expected " + expected
             );
-
         });
     }
 

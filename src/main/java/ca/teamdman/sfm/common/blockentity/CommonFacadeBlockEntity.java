@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.blockentity;
 
 import ca.teamdman.sfm.common.facade.FacadeData;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
@@ -10,7 +11,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.model.data.ModelData;
+import net.neoforged.neoforge.client.model.data.ModelData;
 import org.jetbrains.annotations.Nullable;
 
 public abstract class CommonFacadeBlockEntity extends BlockEntity implements IFacadeBlockEntity {
@@ -47,8 +48,11 @@ public abstract class CommonFacadeBlockEntity extends BlockEntity implements IFa
     public abstract ModelData getModelData();
 
     @Override
-    public void load(CompoundTag pTag) {
-        super.load(pTag);
+    protected void loadAdditional(
+            CompoundTag pTag,
+            HolderLookup.Provider pRegistries
+    ) {
+        super.loadAdditional(pTag, pRegistries);
         FacadeData tried = FacadeData.load(level, pTag);
         if (tried != null) {
             this.facadeData = tried;
@@ -62,15 +66,18 @@ public abstract class CommonFacadeBlockEntity extends BlockEntity implements IFa
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
+    public CompoundTag getUpdateTag(HolderLookup.Provider pRegistries) {
         CompoundTag pTag = new CompoundTag();
-        saveAdditional(pTag);
+        saveAdditional(pTag, pRegistries);
         return pTag;
     }
 
     @Override
-    protected void saveAdditional(CompoundTag pTag) {
-        super.saveAdditional(pTag);
+    protected void saveAdditional(
+            CompoundTag pTag,
+            HolderLookup.Provider pRegistries
+    ) {
+        super.saveAdditional(pTag, pRegistries);
         if (facadeData != null) {
             facadeData.save(pTag);
         }

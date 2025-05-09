@@ -3,7 +3,7 @@ package ca.teamdman.sfm.common.net;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ClientboundContainerExportsInspectionResultsPacket(
         int windowId,
@@ -24,14 +24,14 @@ public record ClientboundContainerExportsInspectionResultsPacket(
         @Override
         public void encode(
                 ClientboundContainerExportsInspectionResultsPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeVarInt(msg.windowId());
             friendlyByteBuf.writeUtf(msg.results(), MAX_RESULTS_LENGTH);
         }
 
         @Override
-        public ClientboundContainerExportsInspectionResultsPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ClientboundContainerExportsInspectionResultsPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ClientboundContainerExportsInspectionResultsPacket(
                     friendlyByteBuf.readVarInt(),
                     friendlyByteBuf.readUtf(MAX_RESULTS_LENGTH)

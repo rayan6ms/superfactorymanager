@@ -4,7 +4,7 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ServerboundManagerProgramPacket(
         int windowId,
@@ -19,7 +19,7 @@ public record ServerboundManagerProgramPacket(
         @Override
         public void encode(
                 ServerboundManagerProgramPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeVarInt(msg.windowId());
             friendlyByteBuf.writeBlockPos(msg.pos());
@@ -27,7 +27,7 @@ public record ServerboundManagerProgramPacket(
         }
 
         @Override
-        public ServerboundManagerProgramPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ServerboundManagerProgramPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ServerboundManagerProgramPacket(
                     friendlyByteBuf.readVarInt(),
                     friendlyByteBuf.readBlockPos(),

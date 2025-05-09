@@ -3,9 +3,10 @@ package ca.teamdman.sfm.common.recipe;
 import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMRecipeSerializers;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.inventory.CraftingContainer;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.crafting.CraftingBookCategory;
+import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CustomRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.Level;
@@ -14,18 +15,20 @@ import net.minecraft.world.level.Level;
  * Printing press copies a form using ink and paper.
  */
 public class LabelGunResetRecipe extends CustomRecipe {
-    public LabelGunResetRecipe(ResourceLocation id) {
-        super(id);
+    public LabelGunResetRecipe(
+            CraftingBookCategory pCategory
+    ) {
+        super(pCategory);
     }
 
     @Override
     public boolean matches(
-            CraftingContainer pContainer,
-            Level pLevel
+            CraftingInput craftingInput,
+            Level level
     ) {
         int foundLabelGuns = 0;
-        for (int i = 0; i < pContainer.getContainerSize(); i++) {
-            ItemStack stack = pContainer.getItem(i);
+        for (int i = 0; i < craftingInput.size(); i++) {
+            ItemStack stack = craftingInput.getItem(i);
             if (stack.getItem() instanceof LabelGunItem) {
                 foundLabelGuns++;
             } else if (!stack.isEmpty()) {
@@ -36,10 +39,13 @@ public class LabelGunResetRecipe extends CustomRecipe {
     }
 
     @Override
-    public ItemStack assemble(CraftingContainer pContainer) {
+    public ItemStack assemble(
+            CraftingInput craftingInput,
+            HolderLookup.Provider provider
+    ) {
         int foundLabelGuns = 0;
-        for (int i = 0; i < pContainer.getContainerSize(); i++) {
-            ItemStack stack = pContainer.getItem(i);
+        for (int i = 0; i < craftingInput.size(); i++) {
+            ItemStack stack = craftingInput.getItem(i);
             if (stack.getItem() instanceof LabelGunItem) {
                 foundLabelGuns++;
             } else if (!stack.isEmpty()) {

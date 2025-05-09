@@ -4,7 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ClientboundManagerLogLevelUpdatedPacket(
         int windowId,
@@ -18,14 +18,14 @@ public record ClientboundManagerLogLevelUpdatedPacket(
         @Override
         public void encode(
                 ClientboundManagerLogLevelUpdatedPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeVarInt(msg.windowId());
             friendlyByteBuf.writeUtf(msg.logLevel(), ServerboundManagerSetLogLevelPacket.MAX_LOG_LEVEL_NAME_LENGTH);
         }
 
         @Override
-        public ClientboundManagerLogLevelUpdatedPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ClientboundManagerLogLevelUpdatedPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ClientboundManagerLogLevelUpdatedPacket(
                     friendlyByteBuf.readVarInt(),
                     friendlyByteBuf.readUtf(ServerboundManagerSetLogLevelPacket.MAX_LOG_LEVEL_NAME_LENGTH)

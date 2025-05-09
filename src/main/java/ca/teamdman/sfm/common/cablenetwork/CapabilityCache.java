@@ -10,8 +10,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.util.LazyOptional;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 public class CapabilityCache {
     // Position => Capability => Direction => LazyOptional
     // We don't use an EnumMap here for Direction because we need to support the null key
-    private final Long2ObjectMap<Object2ObjectOpenHashMap<Capability<?>, SFMDirections.NullableDirectionEnumMap<LazyOptional<?>>>> CACHE = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectMap<Object2ObjectOpenHashMap<BlockCapability<?, @Nullable Direction>, SFMDirections.NullableDirectionEnumMap<BlockCapabilityCache<?, @Nullable Direction>>>> CACHE = new Long2ObjectOpenHashMap<>();
     // Chunk position => Set of Block positions
     private final Long2ObjectMap<LongArraySet> CHUNK_TO_BLOCK_POSITIONS = new Long2ObjectOpenHashMap<>();
 
@@ -40,9 +40,9 @@ public class CapabilityCache {
         addToChunkMap(pos);
     }
 
-    public <CAP> @Nullable LazyOptional<CAP> getCapability(
+    public <CAP> @Nullable BlockCapabilityCache<CAP, @Nullable Direction> getCapability(
             @NotStored BlockPos pos,
-            Capability<CAP> capKind,
+            BlockCapability<CAP, Direction> capKind,
             @Nullable Direction direction
     ) {
         var capMap = CACHE.get(pos.asLong());
@@ -50,11 +50,12 @@ public class CapabilityCache {
             var dirMap = capMap.get(capKind);
             if (dirMap != null) {
                 var found = dirMap.get(direction);
-                if (found != null) {
+                if (found == null) {
+                    return null;
+                } else {
                     //noinspection unchecked
-                    return (LazyOptional<CAP>) found;
+                    return (BlockCapabilityCache<CAP, Direction>) found;
                 }
-
             }
         }
         return null;
@@ -67,13 +68,13 @@ public class CapabilityCache {
 
             var capMap = entry.getValue();
             for (var e : capMap.entrySet()) {
-                Capability<?> capKind = e.getKey();
+                BlockCapability<?, @Nullable Direction> capKind = e.getKey();
 
                 var dirMap = e.getValue();
                 for (Direction direction : SFMDirections.DIRECTIONS) {
-                    LazyOptional<?> cap = dirMap.get(direction);
+                    BlockCapabilityCache<?, @Nullable Direction> cap = dirMap.get(direction);
                     if (cap != null) {
-                        putCapability(BlockPos.of(pos), (Capability) capKind, direction, cap);
+                        putCapability(BlockPos.of(pos), (BlockCapability) capKind, direction, cap);
                     }
                 }
             }
@@ -86,7 +87,7 @@ public class CapabilityCache {
 
     public void remove(
             @NotStored BlockPos pos,
-            Capability<?> capKind,
+            BlockCapability<?, @Nullable Direction> capKind,
             @Nullable Direction direction
     ) {
         var capMap = CACHE.get(pos.asLong());
@@ -107,9 +108,9 @@ public class CapabilityCache {
 
     public <CAP> void putCapability(
             @NotStored BlockPos pos,
-            Capability<CAP> capKind,
+            BlockCapability<CAP, @Nullable Direction> capKind,
             @Nullable Direction direction,
-            LazyOptional<CAP> cap
+            BlockCapabilityCache<CAP, @Nullable Direction> cap
     ) {
         var capMap = CACHE.computeIfAbsent(pos.asLong(), k -> new Object2ObjectOpenHashMap<>());
         var dirMap = capMap.computeIfAbsent(capKind, k -> new SFMDirections.NullableDirectionEnumMap<>());

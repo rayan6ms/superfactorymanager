@@ -5,14 +5,11 @@ import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundNetworkToolUsePacket;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.SFMDataComponents;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.CompressedBlockPosSet;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.ByteArrayTag;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.NbtUtils;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -22,7 +19,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Set;
@@ -30,7 +26,7 @@ import java.util.stream.Collectors;
 
 public class NetworkToolItem extends Item {
     public NetworkToolItem() {
-        super(new Item.Properties().stacksTo(1).tab(SFMItems.TAB));
+        super(new Item.Properties().stacksTo(1));
     }
 
     @Override
@@ -48,10 +44,10 @@ public class NetworkToolItem extends Item {
 
     @Override
     public void appendHoverText(
-            ItemStack stack,
-            @Nullable Level level,
+            ItemStack pStack,
+            TooltipContext pContext,
             List<Component> lines,
-            TooltipFlag detail
+            TooltipFlag pTooltipFlag
     ) {
         lines.add(LocalizationKeys.NETWORK_TOOL_ITEM_TOOLTIP_1.getComponent().withStyle(ChatFormatting.GRAY));
         lines.add(LocalizationKeys.NETWORK_TOOL_ITEM_TOOLTIP_2.getComponent().withStyle(ChatFormatting.GRAY));
@@ -94,12 +90,13 @@ public class NetworkToolItem extends Item {
         setCapabilityProviderPositions(pStack, capabilityProviderPositions);
 
         // remove the data stored by older versions of the mod
-        pStack.getOrCreateTag().remove("networks");
+//        pStack.remove(SFMDataComponents.NETWORKS);
+//        pStack.getOrCreateTag().remove("networks");
     }
 
 
     public static boolean getOverlayEnabled(ItemStack stack) {
-        return !stack.getOrCreateTag().getBoolean("sfm:network_tool_overlay_disabled");
+        return !Boolean.FALSE.equals(stack.get(SFMDataComponents.OVERLAY_ENABLED));
     }
 
     public static void setOverlayEnabled(
@@ -107,9 +104,9 @@ public class NetworkToolItem extends Item {
             boolean value
     ) {
         if (value) {
-            stack.getOrCreateTag().remove("sfm:network_tool_overlay_disabled");
+            stack.remove(SFMDataComponents.OVERLAY_ENABLED);
         } else {
-            stack.getOrCreateTag().putBoolean("sfm:network_tool_overlay_disabled", true);
+            stack.set(SFMDataComponents.OVERLAY_ENABLED, false);
         }
     }
 
@@ -117,43 +114,22 @@ public class NetworkToolItem extends Item {
             ItemStack stack,
             Set<BlockPos> positions
     ) {
-        stack.getOrCreateTag().put(
-                "sfm:cable_positions",
-                CompressedBlockPosSet.from(positions).asTag()
-        );
+        stack.set(SFMDataComponents.CABLE_POSITIONS, CompressedBlockPosSet.from(positions));
     }
 
     public static Set<BlockPos> getCablePositions(ItemStack stack) {
-        if (stack.getOrCreateTag().get("sfm:cable_positions") instanceof ByteArrayTag byteArrayTag) {
-            // new format
-            return CompressedBlockPosSet.from(byteArrayTag).into();
-        }
-        // fallback to old format
-        return stack.getOrCreateTag().getList("sfm:cable_positions", 10).stream()
-                .map(CompoundTag.class::cast)
-                .map(NbtUtils::readBlockPos)
-                .collect(Collectors.toSet());
+        return stack.getOrDefault(SFMDataComponents.CABLE_POSITIONS, new CompressedBlockPosSet()).into();
     }
 
     public static void setCapabilityProviderPositions(
             ItemStack stack,
             Set<BlockPos> positions
     ) {
-        stack.getOrCreateTag().put(
-                "sfm:capability_provider_positions",
-                CompressedBlockPosSet.from(positions).asTag()
-        );
+        stack.set(SFMDataComponents.CAPABILITY_POSITIONS, CompressedBlockPosSet.from(positions));
     }
 
     public static Set<BlockPos> getCapabilityProviderPositions(ItemStack stack) {
-        if (stack.getOrCreateTag().get("sfm:capability_provider_positions") instanceof ByteArrayTag byteArrayTag) {
-            // new format
-            return CompressedBlockPosSet.from(byteArrayTag).into();
-        }
-        // fallback to old format
-        return stack.getOrCreateTag().getList("sfm:capability_provider_positions", 10).stream()
-                .map(CompoundTag.class::cast)
-                .map(NbtUtils::readBlockPos)
-                .collect(Collectors.toSet());
+        return stack.getOrDefault(SFMDataComponents.CAPABILITY_POSITIONS, new CompressedBlockPosSet()).into();
     }
+
 }

@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.containermenu;
 
 import ca.teamdman.sfm.common.blockentity.TestBarrelTankBlockEntity;
 import ca.teamdman.sfm.common.registry.SFMMenus;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -10,8 +10,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 public class TestBarrelTankContainerMenu extends AbstractContainerMenu {
     public final Container container;
@@ -51,13 +51,13 @@ public class TestBarrelTankContainerMenu extends AbstractContainerMenu {
     public TestBarrelTankContainerMenu(
             int windowId,
             Inventory inventory,
-            FriendlyByteBuf buf
+            RegistryFriendlyByteBuf buf
     ) {
         this(
                 windowId,
                 inventory,
                 new SimpleContainer(27),
-                buf.readFluidStack()
+                FluidStack.STREAM_CODEC.decode(buf)
         );
     }
 
@@ -76,10 +76,10 @@ public class TestBarrelTankContainerMenu extends AbstractContainerMenu {
 
     public static void encode(
             TestBarrelTankBlockEntity blockEntity,
-            FriendlyByteBuf buf
+            RegistryFriendlyByteBuf buf
     ) {
         buf.writeLong(blockEntity.getTank().getFluidAmount());
-        buf.writeFluidStack(blockEntity.getTank().getFluid());
+        FluidStack.STREAM_CODEC.encode(buf, blockEntity.getTank().getFluid());
     }
 
     @Override

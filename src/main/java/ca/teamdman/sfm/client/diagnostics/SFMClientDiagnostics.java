@@ -6,10 +6,9 @@ import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import net.minecraft.SharedConstants;
 import net.minecraft.client.ClientBrandRetriever;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.language.I18n;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.versions.forge.ForgeVersion;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.internal.versions.neoforge.NeoForgeVersion;
 
 import java.text.SimpleDateFormat;
 
@@ -42,7 +41,7 @@ public class SFMClientDiagnostics {
                     .append('\n');
 
             content.append("-- Forge Version: ")
-                    .append(ForgeVersion.getVersion())
+                    .append(NeoForgeVersion.getVersion())
                     .append('\n');
 
             //noinspection CodeBlock2Expr
@@ -56,7 +55,7 @@ public class SFMClientDiagnostics {
             if (!errors.isEmpty()) {
                 content.append("\n-- Errors\n");
                 for (var error : errors) {
-                    content.append("-- * ").append(I18n.get(error.getKey(), error.getArgs())).append("\n");
+                    content.append("-- * ").append(error.getString()).append("\n");
                 }
             }
 
@@ -64,7 +63,7 @@ public class SFMClientDiagnostics {
             if (!warnings.isEmpty()) {
                 content.append("\n-- Warnings\n");
                 for (var warning : warnings) {
-                    content.append("-- * ").append(I18n.get(warning.getKey(), warning.getArgs())).append("\n");
+                    content.append("-- * ").append(warning.getString()).append("\n");
                 }
             }
 

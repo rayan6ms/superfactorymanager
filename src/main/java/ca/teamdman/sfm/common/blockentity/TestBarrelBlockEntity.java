@@ -13,8 +13,7 @@ public class TestBarrelBlockEntity extends BarrelBlockEntity {
         super(pPos, pBlockState);
     }
 
-    //    @Override
-    @SuppressWarnings("unused") // 1.21.1 only
+    @Override
     public boolean isValidBlockState(BlockState blockState) {
         return SFMBlockEntities.TEST_BARREL_BLOCK_ENTITY.get().isValid(blockState);
     }

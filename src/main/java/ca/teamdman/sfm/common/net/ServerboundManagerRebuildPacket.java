@@ -6,7 +6,7 @@ import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 
 public record ServerboundManagerRebuildPacket(
@@ -21,14 +21,14 @@ public record ServerboundManagerRebuildPacket(
         @Override
         public void encode(
                 ServerboundManagerRebuildPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeVarInt(msg.windowId());
             friendlyByteBuf.writeBlockPos(msg.pos());
         }
 
         @Override
-        public ServerboundManagerRebuildPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ServerboundManagerRebuildPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ServerboundManagerRebuildPacket(
                     friendlyByteBuf.readVarInt(),
                     friendlyByteBuf.readBlockPos()

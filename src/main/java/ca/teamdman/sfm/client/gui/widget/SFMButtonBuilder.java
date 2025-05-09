@@ -4,6 +4,7 @@ import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.components.Button;
+import net.minecraft.client.gui.components.Tooltip;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.Nullable;
@@ -15,7 +16,7 @@ public class SFMButtonBuilder {
     private int width = 150;
     private int height = 20;
     private @Nullable Button.OnPress onPress = null;
-    private @MCVersionDependentBehaviour @Nullable Button.OnTooltip tooltip = null;
+    private @MCVersionDependentBehaviour @Nullable Tooltip tooltip = null;
 
     public SFMButtonBuilder setText(LocalizationEntry text) {
         return setText(text.getComponent());
@@ -58,18 +59,13 @@ public class SFMButtonBuilder {
     }
 
     @MCVersionDependentBehaviour
+    @SuppressWarnings("unused")
     public SFMButtonBuilder setTooltip(
             Screen screen,
             Font font,
             Component tooltip
     ) {
-        this.tooltip = (btn, pose, mx, my) -> screen.renderTooltip(
-                pose,
-                font.split(tooltip, Math.max(screen.width / 2 - 43, 170)
-                ),
-                mx,
-                my
-        );
+        this.tooltip = Tooltip.create(tooltip);
         return this;
     }
 

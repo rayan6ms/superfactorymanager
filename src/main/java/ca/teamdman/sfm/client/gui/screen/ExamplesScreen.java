@@ -6,8 +6,8 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.program_builder.ProgramBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -32,20 +32,15 @@ public class ExamplesScreen extends Screen {
     }
 
     @Override
-    public void render(
-            PoseStack pPoseStack,
-            int pMouseX,
-            int pMouseY,
-            float pPartialTick
-    ) {
-        this.renderBackground(pPoseStack);
-        this.renderBackground(pPoseStack);
-        this.renderBackground(pPoseStack);
-        super.render(pPoseStack, pMouseX, pMouseY, pPartialTick);
+    public void render(GuiGraphics graphics, int pMouseX, int pMouseY, float pPartialTick) {
+        this.renderTransparentBackground(graphics);
+        this.renderTransparentBackground(graphics);
+        this.renderTransparentBackground(graphics);
+        super.render(graphics, pMouseX, pMouseY, pPartialTick);
         MutableComponent warning1 = LocalizationKeys.EXAMPLES_GUI_WARNING_1.getComponent();
 
         SFMFontUtils.draw(
-                pPoseStack,
+                graphics,
                 this.font,
                 warning1,
                 this.width / 2 - this.font.width(warning1) / 2,
@@ -55,7 +50,7 @@ public class ExamplesScreen extends Screen {
         );
         MutableComponent warning2 = LocalizationKeys.EXAMPLES_GUI_WARNING_2.getComponent();
         SFMFontUtils.draw(
-                pPoseStack,
+                graphics,
                 this.font,
                 warning2,
                 this.width / 2 - this.font.width(warning2) / 2,
@@ -81,7 +76,7 @@ public class ExamplesScreen extends Screen {
                 String programString = reader.lines().collect(Collectors.joining("\n"));
                 if (programString.contains("$REPLACE_RESOURCE_TYPES_HERE$")) {
                     List<? extends String> disallowedResourceTypesForTransfer = SFMConfig.getOrDefault(SFMConfig.SERVER.disallowedResourceTypesForTransfer);
-                    var replacement = SFMResourceTypes.registry().getKeys()
+                    var replacement = SFMResourceTypes.registry().keySet()
                             .stream()
                             .map(ResourceLocation::getPath)
                             .map(e -> {

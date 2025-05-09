@@ -13,21 +13,37 @@ import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.runtime.IJeiRuntime;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.Rect2i;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.block.Blocks;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @JeiPlugin
 public class SFMJEIPlugin implements IModPlugin {
+    public @Nullable IJeiRuntime jeiRuntime = null;
+    public static @Nullable SFMJEIPlugin INSTANCE = null;
+
+    public SFMJEIPlugin() {
+        if (INSTANCE != null) {
+            throw new IllegalStateException("Tried to create multiple instances of SFMJEIPlugin");
+        }
+        INSTANCE = this;
+    }
+
+    public static @Nullable IJeiRuntime getJeiRuntime() {
+        return INSTANCE != null ? INSTANCE.jeiRuntime : null;
+    }
+
     @Override
     public ResourceLocation getPluginUid() {
-        return new ResourceLocation(SFM.MOD_ID, "sfm");
+        return ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "sfm");
     }
 
     @Override
@@ -58,8 +74,8 @@ public class SFMJEIPlugin implements IModPlugin {
         assert level != null;
         RecipeManager recipeManager = level.getRecipeManager();
         recipeManager.getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get()).forEach(r -> {
-            printingPressRecipes.add(r);
-            fallingAnvilRecipes.add(new FallingAnvilFormRecipe(r));
+            printingPressRecipes.add(r.value());
+            fallingAnvilRecipes.add(new FallingAnvilFormRecipe(r.value()));
         });
         fallingAnvilRecipes.add(new FallingAnvilDisenchantRecipe());
         fallingAnvilRecipes.add(new FallingAnvilExperienceShardRecipe());
@@ -85,5 +101,15 @@ public class SFMJEIPlugin implements IModPlugin {
                         .toList();
             }
         });
+    }
+
+    @Override
+    public void onRuntimeAvailable(IJeiRuntime jeiRuntime) {
+        this.jeiRuntime = jeiRuntime;
+    }
+
+    @Override
+    public void onRuntimeUnavailable() {
+        jeiRuntime = null;
     }
 }

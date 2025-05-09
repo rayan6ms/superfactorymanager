@@ -12,7 +12,7 @@ import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.SFMASTUtils;
 import ca.teamdman.sfml.ast.Number;
 import ca.teamdman.sfml.ast.*;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.antlr.v4.runtime.misc.Pair;
@@ -157,7 +157,7 @@ public record ServerboundOutputInspectionRequestPacket(
 
                                 // because these resource limits were generated from resource stacks
                                 // they should always be valid resource locations (not patterns)
-                                ResourceLocation resourceLimitLocation = new ResourceLocation(
+                                ResourceLocation resourceLimitLocation = ResourceLocation.fromNamespaceAndPath(
                                         resourceId.resourceNamespace,
                                         resourceId.resourceName
                                 );
@@ -270,14 +270,14 @@ public record ServerboundOutputInspectionRequestPacket(
         @Override
         public void encode(
                 ServerboundOutputInspectionRequestPacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeUtf(msg.programString, Program.MAX_PROGRAM_LENGTH);
             friendlyByteBuf.writeInt(msg.outputNodeIndex());
         }
 
         @Override
-        public ServerboundOutputInspectionRequestPacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ServerboundOutputInspectionRequestPacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ServerboundOutputInspectionRequestPacket(
                     friendlyByteBuf.readUtf(Program.MAX_PROGRAM_LENGTH),
                     friendlyByteBuf.readInt()

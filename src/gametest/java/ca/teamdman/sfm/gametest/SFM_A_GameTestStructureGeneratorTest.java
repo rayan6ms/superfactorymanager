@@ -10,7 +10,7 @@ import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.StructureBlockEntity;
 import net.minecraft.world.level.block.state.properties.StructureMode;
-import net.minecraftforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.GameTestHolder;
 
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Path;
@@ -34,8 +34,8 @@ public class SFM_A_GameTestStructureGeneratorTest extends SFMGameTestBase {
                     .getAllTestFunctions()
                     .stream()
                     // sfmmekanismcompatgametests.mek_chemtank_infusion_full
-                    .filter(testFunction -> testFunction.getTestName().startsWith("sfm"))
-                    .map(TestFunction::getStructureName)
+                    .filter(testFunction -> testFunction.testName().startsWith("sfm"))
+                    .map(TestFunction::structureName)
                     .map(structureName -> structureName.split("sfm:")[1])
                     .collect(Collectors.toSet());
             for (String structureName : structureNames) {
@@ -66,7 +66,7 @@ public class SFM_A_GameTestStructureGeneratorTest extends SFMGameTestBase {
                 Path structurePath = helper
                         .getLevel()
                         .getStructureManager()
-                        .getPathToGeneratedStructure(new ResourceLocation("minecraft", structureName), ".nbt");
+                        .createAndValidatePathToGeneratedStructure(ResourceLocation.fromNamespaceAndPath("minecraft", structureName), ".nbt");
 
                 // copy file
                 Path repoDir = structurePath
@@ -77,20 +77,24 @@ public class SFM_A_GameTestStructureGeneratorTest extends SFMGameTestBase {
                         .getParent()
                         .getParent()
                         .getParent()
+                        .getParent()
                         .getParent();
-                Path targetDir = repoDir.resolve("src/gametest/resources/data/sfm/structures");
+                Path targetDir = repoDir.resolve("src/gametest/resources/data/sfm/structure");
 //                    SFM.LOGGER.info("Copying {} to {}", structurePath, targetDir);
-                try {
+                Path dest = targetDir.resolve(structurePath.getFileName());
+                if (!java.nio.file.Files.exists(dest)) {
                     try {
-                        java.nio.file.Files.copy(
-                                structurePath,
-                                targetDir.resolve(structurePath.getFileName())
-                        );
-                    } catch (FileAlreadyExistsException e) {
-                        existingCount++;
+                        try {
+                            java.nio.file.Files.copy(
+                                    structurePath,
+                                    dest
+                            );
+                        } catch (FileAlreadyExistsException e) {
+                            existingCount++;
+                        }
+                    } catch (Exception e) {
+                        SFM.LOGGER.error("Failed to copy structure", e);
                     }
-                } catch (Exception e) {
-                    SFM.LOGGER.error("Failed to copy structure", e);
                 }
             }
             if (existingCount > 0) {

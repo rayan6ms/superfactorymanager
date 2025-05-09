@@ -1,5 +1,7 @@
 package ca.teamdman.sfm.common.util;
 
+import com.mojang.serialization.*;
+import com.mojang.serialization.codecs.RecordCodecBuilder;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet;
 import it.unimi.dsi.fastutil.longs.LongSet;
@@ -7,6 +9,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -17,7 +20,18 @@ import java.util.Set;
  */
 public class CompressedBlockPosSet {
     private final ArrayList<Volume> boundingVolumes = new ArrayList<>();
-
+    public static final Codec<CompressedBlockPosSet> CODEC = Volume.CODEC.codec().listOf().xmap(
+            posList -> {
+                CompressedBlockPosSet rtn = new CompressedBlockPosSet();
+                rtn.boundingVolumes.addAll(posList);
+                return rtn;
+            },
+            self -> self.boundingVolumes
+    );
+    public static final StreamCodec<FriendlyByteBuf, CompressedBlockPosSet> STREAM_CODEC = StreamCodec.of(
+            (buf, set) -> set.write(buf),
+            CompressedBlockPosSet::read
+    );
     /**
      * @param positions owned list of positions, this will be modified.
      * @return this
@@ -104,6 +118,19 @@ public class CompressedBlockPosSet {
             Direction direction,
             int extension
     ) {
+        public static final MapCodec<Volume> CODEC = RecordCodecBuilder
+                .mapCodec(
+                    builder -> builder.group(
+                        BlockPos.CODEC.fieldOf("start").forGetter(Volume::start),
+                        Direction.CODEC.fieldOf("direction").forGetter(Volume::direction),
+                        Codec.INT.fieldOf("extension").forGetter(Volume::extension)
+                    )
+                    .apply(builder, Volume::new)
+                );
+        public static final StreamCodec<FriendlyByteBuf, Volume> STREAM_CODEC = StreamCodec.of(
+                (buf, volume) -> volume.write(buf),
+                Volume::read
+        );
         public void write(FriendlyByteBuf buf) {
             buf.writeBlockPos(start);
             buf.writeEnum(direction);

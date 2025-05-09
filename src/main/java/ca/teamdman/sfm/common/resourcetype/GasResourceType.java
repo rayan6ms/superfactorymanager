@@ -5,18 +5,18 @@ import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasHandler;
+import mekanism.common.capabilities.Capabilities;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.CapabilityManager;
-import net.minecraftforge.common.capabilities.CapabilityToken;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
 public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, IGasHandler> {
-    public static final Capability<IGasHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
-    });
+    public static final BlockCapability<IGasHandler, @Nullable Direction> CAP = Capabilities.GAS.block();
 
     public GasResourceType() {
         super(CAP);
@@ -34,7 +34,7 @@ public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, I
 
     @Override
     public Stream<ResourceLocation> getTagsForStack(GasStack gasStack) {
-        return gasStack.getType().getTags().map(TagKey::location);
+        return gasStack.getChemical().getTags().map(TagKey::location);
     }
 
     @Override
@@ -84,13 +84,13 @@ public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, I
 
 
     @Override
-    public IForgeRegistry<Gas> getRegistry() {
-        return MekanismAPI.gasRegistry();
+    public Registry<Gas> getRegistry() {
+        return MekanismAPI.GAS_REGISTRY;
     }
 
     @Override
     public Gas getItem(GasStack gasStack) {
-        return gasStack.getType();
+        return gasStack.getChemical();
     }
 
     @Override

@@ -1,12 +1,15 @@
 package ca.teamdman.sfm.datagen;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.common.recipe.PrintingPressFinishedRecipe;
+import ca.teamdman.sfm.common.recipe.DiskResetRecipe;
+import ca.teamdman.sfm.common.recipe.LabelGunResetRecipe;
+import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMRecipeSerializers;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticRecipeDataGen;
-import net.minecraft.data.recipes.FinishedRecipe;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.RecipeProvider;
 import net.minecraft.data.recipes.SpecialRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -14,10 +17,8 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.Tags;
-import net.minecraftforge.data.event.GatherDataEvent;
-
-import java.util.function.Consumer;
+import net.neoforged.neoforge.common.Tags;
+import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
     public SFMRecipes(GatherDataEvent event) {
@@ -25,7 +26,7 @@ public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
     }
 
     @Override
-    protected void populate(Consumer<FinishedRecipe> writer) {
+    protected void populate(RecipeOutput writer) {
         beginShaped(SFMBlocks.CABLE_BLOCK.get(), 16)
                 .define('D', Tags.Items.DYES_BLACK)
                 .define('G', Items.LIGHT_WEIGHTED_PRESSURE_PLATE)
@@ -48,7 +49,7 @@ public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
                 .requires(SFMBlocks.FANCY_CABLE_BLOCK.get(), 1)
                 .unlockedBy("has_iron_ingot", RecipeProvider.has(Items.IRON_INGOT))
                 .unlockedBy("has_chest", RecipeProvider.has(Tags.Items.CHESTS))
-                .save(writer, new ResourceLocation(SFM.MOD_ID, "fancy_to_cable"));
+                .save(writer, ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "fancy_to_cable"));
 
         beginShaped(SFMBlocks.MANAGER_BLOCK.get(), 1)
                 .define('A', Tags.Items.CHESTS)
@@ -140,7 +141,7 @@ public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
 
         addPrintingPressRecipe(
                 writer,
-                new ResourceLocation("sfm", "written_book_copy"),
+                ResourceLocation.fromNamespaceAndPath("sfm", "written_book_copy"),
                 Ingredient.of(Items.WRITTEN_BOOK),
                 Ingredient.of(Tags.Items.DYES_BLACK),
                 Ingredient.of(Items.BOOK)
@@ -148,7 +149,7 @@ public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
 
         addPrintingPressRecipe(
                 writer,
-                new ResourceLocation("sfm", "enchanted_book_copy"),
+                ResourceLocation.fromNamespaceAndPath("sfm", "enchanted_book_copy"),
                 Ingredient.of(Items.ENCHANTED_BOOK),
                 Ingredient.of(SFMItems.EXPERIENCE_GOOP_ITEM.get()),
                 Ingredient.of(Items.BOOK)
@@ -156,7 +157,7 @@ public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
 
         addPrintingPressRecipe(
                 writer,
-                new ResourceLocation("sfm", "map_copy"),
+                ResourceLocation.fromNamespaceAndPath("sfm", "map_copy"),
                 Ingredient.of(Items.FILLED_MAP),
                 Ingredient.of(Tags.Items.DYES_BLACK),
                 Ingredient.of(Items.MAP)
@@ -164,27 +165,38 @@ public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
 
         addPrintingPressRecipe(
                 writer,
-                new ResourceLocation("sfm", "program_copy"),
+                ResourceLocation.fromNamespaceAndPath("sfm", "program_copy"),
                 Ingredient.of(SFMItems.DISK_ITEM.get()),
                 Ingredient.of(Tags.Items.DYES_BLACK),
                 Ingredient.of(SFMItems.DISK_ITEM.get())
         );
 
+        //noinspection DataFlowIssue
         SpecialRecipeBuilder
-                .special(SFMRecipeSerializers.DISK_RESET.get())
-                .save(writer, SFMRecipeSerializers.DISK_RESET.getId().getPath());
+                .special(DiskResetRecipe::new)
+                .save(writer, BuiltInRegistries.RECIPE_SERIALIZER.getKey(SFMRecipeSerializers.DISK_RESET.get()).getPath());
+        //noinspection DataFlowIssue
         SpecialRecipeBuilder
-                .special(SFMRecipeSerializers.LABEL_GUN_RESET.get())
-                .save(writer, SFMRecipeSerializers.LABEL_GUN_RESET.getId().getPath());
+                .special(LabelGunResetRecipe::new)
+                .save(writer, BuiltInRegistries.RECIPE_SERIALIZER.getKey(SFMRecipeSerializers.LABEL_GUN_RESET.get()).getPath());
     }
 
-    private void addPrintingPressRecipe(
-            Consumer<FinishedRecipe> consumer,
-            ResourceLocation id,
-            Ingredient form,
-            Ingredient ink,
-            Ingredient paper
-    ) {
-        consumer.accept(new PrintingPressFinishedRecipe(id, form, ink, paper));
-    }
+//    private void addPrintingPressRecipe(
+//            RecipeOutput output,
+//            ResourceLocation id,
+//            Ingredient form,
+//            Ingredient ink,
+//            Ingredient paper
+//    ) {
+//        output.accept(id, new PrintingPressRecipe(form, ink, paper), null);
+//    }
+private void addPrintingPressRecipe(
+        RecipeOutput consumer,
+        ResourceLocation id,
+        Ingredient form,
+        Ingredient ink,
+        Ingredient paper
+) {
+    consumer.accept(id, new PrintingPressRecipe(form, ink, paper), null);
+}
 }

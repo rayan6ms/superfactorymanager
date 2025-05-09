@@ -6,7 +6,6 @@ import ca.teamdman.sfm.client.ProgramTokenContextActions;
 import ca.teamdman.sfm.client.gui.widget.PickList;
 import ca.teamdman.sfm.client.gui.widget.PickListItem;
 import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
-import ca.teamdman.sfm.client.gui.widget.SFMExtendedButtonWithTooltip;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
@@ -20,23 +19,21 @@ import ca.teamdman.sfml.manipulation.ProgramStringManipulationUtils;
 import ca.teamdman.sfml.program_builder.ProgramBuildResult;
 import ca.teamdman.sfml.program_builder.ProgramBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
-import com.mojang.math.Matrix4f;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.GuiComponent;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.components.MultilineTextField;
 import net.minecraft.client.gui.components.Whence;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
-import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
@@ -270,15 +267,14 @@ public class ProgramEditorScreen extends Screen {
     }
 
     @Override
-    public void render(
-            PoseStack poseStack,
-            int mx,
-            int my,
-            float partialTicks
-    ) {
-        this.renderBackground(poseStack);
-        super.render(poseStack, mx, my, partialTicks);
-        this.renderTooltip(poseStack, mx, my);
+    @MCVersionDependentBehaviour
+    public void render(GuiGraphics graphics, int mx, int my, float partialTicks) {
+        this.renderTransparentBackground(graphics);
+        super.render(graphics, mx, my, partialTicks);
+    }
+
+    private static boolean shouldShowLineNumbers() {
+        return SFMConfig.getOrDefault(SFMConfig.CLIENT_PROGRAM_EDITOR.showLineNumbers);
     }
 
     protected void renderTooltip(
@@ -305,15 +301,11 @@ public class ProgramEditorScreen extends Screen {
             int my
     ) {
         // 1.19.2: manually render button tooltips
-        this.renderables
-                .stream()
-                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
-                .map(SFMExtendedButtonWithTooltip.class::cast)
-                .forEach(x -> x.renderToolTip(pose, mx, my));
-    }
-
-    private static boolean shouldShowLineNumbers() {
-        return SFMConfig.getOrDefault(SFMConfig.CLIENT_PROGRAM_EDITOR.showLineNumbers);
+//        this.renderables
+//                .stream()
+//                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
+//                .map(SFMExtendedButtonWithTooltip.class::cast)
+//                .forEach(x -> x.renderToolTip(pose, mx, my));
     }
 
     @Override
@@ -416,6 +408,7 @@ public class ProgramEditorScreen extends Screen {
     }
 
     protected class MyMultiLineEditBox extends MultiLineEditBox {
+        private int frame = 0;
         public MyMultiLineEditBox() {
             super(
                     ProgramEditorScreen.this.font,
@@ -453,18 +446,48 @@ public class ProgramEditorScreen extends Screen {
         @MCVersionDependentBehaviour
         @Override
         public boolean mouseClicked(
-                double mx,
-                double my,
-                int button
+                double pMouseX,
+                double pMouseY,
+                int pButton
         ) {
-            try {
-                // if mouse in bounds, translate to accommodate line numbers
-                if (mx >= this.x + 1 && mx <= this.x + this.width - 1) {
-                    mx -= getLineNumberWidth();
+            // Accommodate line numbers
+            if (pMouseX >= this.getX() + 1 && pMouseX <= this.getX() + this.width - 1) {
+                pMouseX -= getLineNumberWidth();
+            }
+
+            // we need to override the default behaviour because Mojang broke it
+            // if it's not scrolling, it should return false for cursor click movement
+            boolean rtn;
+            if (!this.visible) {
+                rtn = false;
+            } else {
+                //noinspection unused
+                boolean flag = this.withinContentAreaPoint(pMouseX, pMouseY);
+                boolean flag1 = this.scrollbarVisible()
+                                && pMouseX >= (double) (this.getX() + this.width)
+                                && pMouseX <= (double) (this.getX() + this.width + 8)
+                                && pMouseY >= (double) this.getY()
+                                && pMouseY < (double) (this.getY() + this.height);
+                if (flag1 && pButton == 0) {
+                    this.scrolling = true;
+                    rtn = true;
+                } else {
+                    //1.19.4 behaviour:
+                    //rtn=flag || flag1;
+                    // instead, we want to return false if we're not scrolling
+                    // (like how it was in 1.19.2)
+                    // https://bugs.mojang.com/browse/MC-262754
+                    rtn = false;
                 }
-                return super.mouseClicked(mx, my, button);
-            } catch (Exception e) {
-                SFM.LOGGER.error("Error in ProgramEditorScreen.MyMultiLineEditBox.mouseClicked", e);
+            }
+
+            if (rtn) {
+                return true;
+            } else if (this.withinContentAreaPoint(pMouseX, pMouseY) && pButton == 0) {
+                this.textField.setSelecting(Screen.hasShiftDown());
+                this.seekCursorScreen(pMouseX, pMouseY);
+                return true;
+            } else {
                 return false;
             }
         }
@@ -580,18 +603,13 @@ public class ProgramEditorScreen extends Screen {
         }
 
         @Override
-        protected void renderContents(
-                PoseStack poseStack,
-                int mx,
-                int my,
-                float partialTicks
-        ) {
-            Matrix4f matrix4f = poseStack.last().pose();
+        protected void renderContents(GuiGraphics graphics, int mx, int my, float partialTicks) {
+            Matrix4f matrix4f = graphics.pose().last().pose();
             if (!lastProgram.equals(this.textField.value())) {
                 rebuild(Screen.hasControlDown());
             }
             List<MutableComponent> lines = lastProgramWithSyntaxHighlighting;
-            boolean isCursorVisible = this.isFocused() && this.frame / 6 % 2 == 0;
+            boolean isCursorVisible = this.isFocused() && this.frame++ / 60 % 2 == 0;
             boolean isCursorAtEndOfLine = false;
             int cursorIndex = textField.cursor();
             int lineX = SFMScreenRenderUtils.getX(this) + this.innerPadding() + getLineNumberWidth();
@@ -610,7 +628,7 @@ public class ProgramEditorScreen extends Screen {
                 boolean cursorOnThisLine = isCursorVisible
                                            && cursorIndex >= charCount
                                            && cursorIndex <= charCount + lineLength;
-                var buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+                var buffer = graphics.bufferSource();
 
 
                 if (shouldShowLineNumbers()) {
@@ -677,7 +695,7 @@ public class ProgramEditorScreen extends Screen {
                     int highlightEndX = this.font.width(substring(componentColoured, 0, lineSelectionEnd));
 
                     SFMScreenRenderUtils.renderHighlight(
-                            poseStack,
+                            graphics,
                             lineX + highlightStartX,
                             lineY,
                             lineX + highlightEndX,
@@ -690,9 +708,9 @@ public class ProgramEditorScreen extends Screen {
             }
 
             if (isCursorAtEndOfLine) {
-                SFMFontUtils.draw(poseStack, this.font, "_", cursorX, cursorY, -1, true);
+                SFMFontUtils.draw(graphics, this.font, "_", cursorX, cursorY, -1, true);
             } else {
-                GuiComponent.fill(poseStack, cursorX, cursorY - 1, cursorX + 1, cursorY + 1 + 9, -1);
+                graphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + 1 + 9, -1);
             }
         }
     }

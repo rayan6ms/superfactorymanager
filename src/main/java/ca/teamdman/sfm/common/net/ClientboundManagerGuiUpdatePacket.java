@@ -5,7 +5,7 @@ import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ClientboundManagerGuiUpdatePacket(
         int windowId,
@@ -30,7 +30,7 @@ public record ClientboundManagerGuiUpdatePacket(
         @Override
         public void encode(
                 ClientboundManagerGuiUpdatePacket msg,
-                FriendlyByteBuf friendlyByteBuf
+                RegistryFriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeVarInt(msg.windowId());
             friendlyByteBuf.writeUtf(msg.program(), Program.MAX_PROGRAM_LENGTH);
@@ -39,7 +39,7 @@ public record ClientboundManagerGuiUpdatePacket(
         }
 
         @Override
-        public ClientboundManagerGuiUpdatePacket decode(FriendlyByteBuf friendlyByteBuf) {
+        public ClientboundManagerGuiUpdatePacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
             return new ClientboundManagerGuiUpdatePacket(
                     friendlyByteBuf.readVarInt(),
                     friendlyByteBuf.readUtf(Program.MAX_PROGRAM_LENGTH),

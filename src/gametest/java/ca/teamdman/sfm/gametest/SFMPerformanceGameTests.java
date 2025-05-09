@@ -14,8 +14,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BarrelBlockEntity;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,7 +25,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 @GameTestHolder(SFM.MOD_ID)
 @PrefixGameTestTemplate(value=true)
 public class SFMPerformanceGameTests extends SFMGameTestBase {
-    @GameTest(template = "25x3x25", batch = "laggy")
+    @GameTest(template = "25x3x25", batch = "laggy", skyAccess = true)
     public static void move_many_inventories(GameTestHelper helper) {
         // fill the platform with cables and barrels
         var sourceBlocks = new ArrayList<BlockPos>();
@@ -181,7 +181,7 @@ public class SFMPerformanceGameTests extends SFMGameTestBase {
      * - diamonds
      * The program should use a regular expression to match only ingots in the form *:*_ingot
      */
-    @GameTest(template = "25x3x25", batch = "laggy")
+    @GameTest(template = "25x3x25", batch = "laggy", skyAccess = true)
     public static void move_many_regex(GameTestHelper helper) {
         // fill the platform with cables and barrels
         var sourceBlocks = new ArrayList<BlockPos>();
@@ -288,7 +288,7 @@ public class SFMPerformanceGameTests extends SFMGameTestBase {
      * <p>
      * The program should use a regular expression to match only ingots in the form *:*_ingot
      */
-    @GameTest(template = "3x4x3", batch = "laggy")
+    @GameTest(template = "3x4x3", batch = "laggy", skyAccess = true)
     public static void move_regex_circle(GameTestHelper helper) {
         var managerPos = new BlockPos(1, 2, 1);
         var aPos = new BlockPos(1, 2, 0);
@@ -365,7 +365,7 @@ public class SFMPerformanceGameTests extends SFMGameTestBase {
      * Then I had a crafting station with its own adjacent gold barrel.
      * I wrote a program to keep that gold barrel stocked with essential ingredients.
      */
-    @GameTest(template = "25x4x25")
+    @GameTest(template = "25x4x25", skyAccess = true)
     public static void gather_supplies(GameTestHelper helper) {
         var items = new Item[]{
                 Items.GOLD_INGOT,

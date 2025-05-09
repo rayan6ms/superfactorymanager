@@ -6,28 +6,29 @@ import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMRecipeTypes;
+import it.unimi.dsi.fastutil.objects.Object2IntMap;
+import net.minecraft.core.Holder;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
+import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.AnvilBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
-import net.minecraftforge.event.entity.EntityLeaveLevelEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-@Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
 public class FallingAnvilHandler {
     @SubscribeEvent
     public static void onLeave(EntityLeaveLevelEvent event) {
@@ -42,7 +43,7 @@ public class FallingAnvilHandler {
                 }
                 Block block = level.getBlockState(landPosition.below()).getBlock();
                 if (block == Blocks.IRON_BLOCK) { // create a form
-                    List<PrintingPressRecipe> recipes = level
+                    var recipes = level
                             .getRecipeManager()
                             .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get());
                     List<ItemEntity> items = new ArrayList<>();
@@ -54,9 +55,9 @@ public class FallingAnvilHandler {
                     boolean didForm = false;
 
                     for (ItemEntity item : items) {
-                        for (PrintingPressRecipe recipe : recipes) {
+                        for (RecipeHolder<PrintingPressRecipe> recipe : recipes) {
                             // check if the item can be turned into a form
-                            if (recipe.FORM.test(item.getItem())) {
+                            if (recipe.value().form().test(item.getItem())) {
                                 didForm = true;
                                 item.setItem(FormItem.getForm(item.getItem()));
                                 break;
@@ -81,24 +82,22 @@ public class FallingAnvilHandler {
                             }
 
                             var item = e.getItem();
-                            var enchantments = EnchantedBookItem.getEnchantments(item);
+                            var enchantments = EnchantmentHelper.getEnchantmentsForCrafting(item);
 
                             long shardsForEnchantments = switch (SFMConfig.SERVER.levelsToShards.get()) {
                                 case JustOne -> 1;
                                 case EachOne -> enchantments.size();
                                 case SumLevels -> {
                                     int sum = 0;
-                                    for (int i = 0; i < enchantments.size(); i++) {
-                                        var ench = enchantments.getCompound(i);
-                                        sum += ench.getInt("lvl");
+                                    for (Object2IntMap.Entry<Holder<Enchantment>> holderEntry : enchantments.entrySet()) {
+                                        sum += holderEntry.getIntValue();
                                     }
                                     yield sum;
                                 }
                                 case SumLevelsScaledExponentially -> {
                                     int sum = 0;
-                                    for (int i = 0; i < enchantments.size(); i++) {
-                                        var ench = enchantments.getCompound(i);
-                                        int incr = 1 << Math.max(0, ench.getInt("lvl") - 1);
+                                    for (Object2IntMap.Entry<Holder<Enchantment>> holderEntry : enchantments.entrySet()) {
+                                        int incr = 1 << Math.max(0, holderEntry.getIntValue() - 1);
                                         if (sum + incr > 0) {
                                             sum += incr;
                                         } else {
@@ -139,7 +138,7 @@ public class FallingAnvilHandler {
                         }
                         List<ItemEntity> enchanted = new ArrayList<>(items.size());
                         for (ItemEntity e : items) {
-                            if (!e.getItem().getEnchantmentTags().isEmpty()) {
+                            if (!EnchantmentHelper.getEnchantmentsForCrafting(e.getItem()).isEmpty()) {
                                 enchanted.add(e);
                             }
                         }
@@ -148,18 +147,17 @@ public class FallingAnvilHandler {
                         for (ItemEntity enchItemEntity : enchanted) {
                             ItemStack enchStack = enchItemEntity.getItem();
                             int enchStackSize = enchStack.getCount();
-                            Map<Enchantment, Integer> enchantments = EnchantmentHelper.getEnchantments(enchStack);
-                            var enchIter = enchantments.entrySet().iterator();
+                            ItemEnchantments.Mutable enchantments = new ItemEnchantments.Mutable(EnchantmentHelper.getEnchantmentsForCrafting(enchStack));
+
+                            var enchIter = enchantments.keySet().iterator();
                             while (enchIter.hasNext()) {
-                                var entry = enchIter.next();
+                                var key = enchIter.next();
+                                var value = enchantments.getLevel(key);
                                 if (booksAvailable < enchStackSize) break;
 
                                 // Create an enchanted book with the enchantment
                                 ItemStack toSpawn = new ItemStack(Items.ENCHANTED_BOOK, enchStackSize);
-                                EnchantedBookItem.addEnchantment(
-                                        toSpawn,
-                                        new EnchantmentInstance(entry.getKey(), entry.getValue())
-                                );
+                                toSpawn.enchant(key, value);
                                 level.addFreshEntity(new ItemEntity(
                                         level,
                                         landPosition.getX(),
@@ -170,12 +168,10 @@ public class FallingAnvilHandler {
 
                                 // Remove the enchantment from the item
                                 enchIter.remove();
-                                EnchantmentHelper.setEnchantments(enchantments, enchStack);
+
                                 booksAvailable -= enchStackSize;
-                                if (enchantments.isEmpty()) {
-                                    break;
-                                }
                             }
+                            EnchantmentHelper.setEnchantments(enchStack, enchantments.toImmutable());
                         }
 
                         for (ItemEntity bookEntity : bookEntities) {

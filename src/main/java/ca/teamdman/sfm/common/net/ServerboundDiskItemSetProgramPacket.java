@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfml.ast.Program;
-import net.minecraft.network.FriendlyByteBuf;
+import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 
 public record ServerboundDiskItemSetProgramPacket(
@@ -17,14 +17,14 @@ public record ServerboundDiskItemSetProgramPacket(
         @Override
         public void encode(
                 ServerboundDiskItemSetProgramPacket msg,
-                FriendlyByteBuf buf
+                RegistryFriendlyByteBuf buf
         ) {
             buf.writeUtf(msg.programString, Program.MAX_PROGRAM_LENGTH);
             buf.writeEnum(msg.hand);
         }
 
         @Override
-        public ServerboundDiskItemSetProgramPacket decode(FriendlyByteBuf buf) {
+        public ServerboundDiskItemSetProgramPacket decode(RegistryFriendlyByteBuf buf) {
             return new ServerboundDiskItemSetProgramPacket(
                     buf.readUtf(Program.MAX_PROGRAM_LENGTH),
                     buf.readEnum(InteractionHand.class)

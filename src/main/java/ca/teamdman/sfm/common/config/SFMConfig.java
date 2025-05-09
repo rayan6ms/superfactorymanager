@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.common.config;
 
-import net.minecraftforge.common.ForgeConfigSpec;
-import net.minecraftforge.fml.ModLoadingContext;
-import net.minecraftforge.fml.config.ModConfig;
+import net.neoforged.fml.ModLoadingContext;
+import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 
 /*
@@ -35,31 +35,31 @@ then it should be server config
 
  */
 public class SFMConfig {
-    public static final ForgeConfigSpec SERVER_SPEC;
+    public static final ModConfigSpec SERVER_SPEC;
     public static final SFMServerConfig SERVER;
 
-    public static final ForgeConfigSpec CLIENT_SPEC;
+    public static final ModConfigSpec CLIENT_SPEC;
     public static final SFMClientConfig CLIENT;
 
-    public static final ForgeConfigSpec CLIENT_PROGRAM_EDITOR_SPEC;
+    public static final ModConfigSpec CLIENT_PROGRAM_EDITOR_SPEC;
     public static final SFMClientProgramEditorConfig CLIENT_PROGRAM_EDITOR;
 
     static {
         {
             var pair =
-                    new ForgeConfigSpec.Builder().configure(SFMServerConfig::new);
+                    new ModConfigSpec.Builder().configure(SFMServerConfig::new);
             SERVER_SPEC = pair.getRight();
             SERVER = pair.getLeft();
         }
         {
             var pair =
-                    new ForgeConfigSpec.Builder().configure(SFMClientConfig::new);
+                    new ModConfigSpec.Builder().configure(SFMClientConfig::new);
             CLIENT_SPEC = pair.getRight();
             CLIENT = pair.getLeft();
         }
         {
             var pair =
-                    new ForgeConfigSpec.Builder().configure(SFMClientProgramEditorConfig::new);
+                    new ModConfigSpec.Builder().configure(SFMClientProgramEditorConfig::new);
             CLIENT_PROGRAM_EDITOR_SPEC = pair.getRight();
             CLIENT_PROGRAM_EDITOR = pair.getLeft();
         }
@@ -68,7 +68,7 @@ public class SFMConfig {
     /**
      * Get a config value in a way that doesn't fail when running tests
      */
-    public static <T> T getOrDefault(ForgeConfigSpec.ConfigValue<T> configValue) {
+    public static <T> T getOrDefault(ModConfigSpec.ConfigValue<T> configValue) {
         try {
             return configValue.get();
         } catch (Exception e) {
@@ -78,7 +78,7 @@ public class SFMConfig {
     /**
      * Get a config value in a way that doesn't fail when running tests
      */
-    public static <T> T getOrFallback(ForgeConfigSpec.ConfigValue<T> configValue, T fallback) {
+    public static <T> T getOrFallback(ModConfigSpec.ConfigValue<T> configValue, T fallback) {
         try {
             return configValue.get();
         } catch (Exception e) {
@@ -87,8 +87,8 @@ public class SFMConfig {
     }
 
     public static void register(ModLoadingContext context) {
-        context.registerConfig(ModConfig.Type.SERVER, SFMConfig.SERVER_SPEC);
-        context.registerConfig(ModConfig.Type.CLIENT, SFMConfig.CLIENT_SPEC);
-        context.registerConfig(ModConfig.Type.CLIENT, SFMConfig.CLIENT_PROGRAM_EDITOR_SPEC, "sfm-client-program-editor.toml");
+        context.getActiveContainer().registerConfig(ModConfig.Type.SERVER, SFMConfig.SERVER_SPEC);
+        context.getActiveContainer().registerConfig(ModConfig.Type.CLIENT, SFMConfig.CLIENT_SPEC);
+        context.getActiveContainer().registerConfig(ModConfig.Type.CLIENT, SFMConfig.CLIENT_PROGRAM_EDITOR_SPEC, "sfm-client-program-editor.toml");
     }
 }

@@ -3,10 +3,9 @@ package ca.teamdman.sfm.common.block;
 import ca.teamdman.sfm.common.blockentity.TestBarrelTankBlockEntity;
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
-import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.Stored;
+import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleMenuProvider;
 import net.minecraft.world.entity.player.Player;
@@ -16,13 +15,18 @@ import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
+import org.apache.commons.lang3.NotImplementedException;
 import org.jetbrains.annotations.Nullable;
 
 public class TestBarrelTankBlock extends BaseEntityBlock {
     public TestBarrelTankBlock() {
-        super(Properties.of(Material.WOOD).strength(2.5F).sound(SoundType.WOOD));
+        super(Properties.of().sound(SoundType.WOOD).strength(2.5F).sound(SoundType.WOOD));
+    }
+
+    @Override
+    protected MapCodec<WaterTankBlock> codec() {
+        throw new NotImplementedException("This isn't used until 1.20.5 apparently");
     }
 
     @Override
@@ -39,15 +43,13 @@ public class TestBarrelTankBlock extends BaseEntityBlock {
         return SFMBlockEntities.TEST_BARREL_TANK_BLOCK_ENTITY.get().create(pPos, pState);
     }
 
-    @SuppressWarnings("deprecation")
     @Override
-    public InteractionResult use(
+    protected InteractionResult useWithoutItem(
             BlockState pState,
             Level pLevel,
-            @NotStored BlockPos pPos,
+            BlockPos pPos,
             Player pPlayer,
-            InteractionHand pHand,
-            BlockHitResult pHit
+            BlockHitResult pHitResult
     ) {
         if (pLevel.getBlockEntity(pPos) instanceof TestBarrelTankBlockEntity blockEntity) {
             pPlayer.openMenu(new SimpleMenuProvider(

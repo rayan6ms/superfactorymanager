@@ -14,6 +14,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.network.chat.Component;
@@ -22,13 +23,13 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.ScreenEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.client.event.ScreenEvent;
 import org.jetbrains.annotations.Nullable;
 
-@Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
+@EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
 public class ContainerScreenInspectorHandler {
     private static boolean visible = false;
     private static @Nullable AbstractContainerScreen<?> lastScreen = null;
@@ -65,12 +66,13 @@ public class ContainerScreenInspectorHandler {
             AbstractContainerMenu menu = screen.getMenu();
             int containerSlotCount = 0;
             int inventorySlotCount = 0;
-            PoseStack poseStack = event.getPoseStack();
+            GuiGraphics graphics = event.getGuiGraphics();
+            PoseStack poseStack = graphics.pose();
             poseStack.pushPose();
             poseStack.translate(0, 0, 350); // render text over the items but under the tooltips
 
             // draw the button
-            exportInspectorButton.render(poseStack, event.getMouseX(), event.getMouseY(), event.getPartialTick());
+            exportInspectorButton.render(graphics, event.getMouseX(), event.getMouseY(), event.getPartialTick());
 
 
             // draw index on each slot
@@ -86,7 +88,7 @@ public class ContainerScreenInspectorHandler {
                     containerSlotCount++;
                 }
                 SFMFontUtils.draw(
-                        poseStack,
+                        graphics,
                         font,
                         Component.literal(Integer.toString(slot.getSlotIndex())),
                         screen.getGuiLeft() + slot.x,
@@ -103,7 +105,7 @@ public class ContainerScreenInspectorHandler {
                         .withStyle(ChatFormatting.GOLD);
                 int offset = font.width(notice) / 2;
                 SFMFontUtils.draw(
-                        poseStack,
+                        graphics,
                         font,
                         notice,
                         screen.width / 2 - offset,
@@ -122,7 +124,7 @@ public class ContainerScreenInspectorHandler {
                 ).withStyle(ChatFormatting.GOLD);
                 int offset = font.width(notice) / 2;
                 SFMFontUtils.draw(
-                        poseStack,
+                        graphics,
                         font,
                         notice,
                         screen.width / 2 - offset,
@@ -134,7 +136,7 @@ public class ContainerScreenInspectorHandler {
 
             // draw text for slot totals
             SFMFontUtils.draw(
-                    poseStack,
+                    graphics,
                     font,
                     LocalizationKeys.CONTAINER_INSPECTOR_CONTAINER_SLOT_COUNT.getComponent(
                             Component.literal(String.valueOf(containerSlotCount)).withStyle(ChatFormatting.BLUE)
@@ -145,7 +147,7 @@ public class ContainerScreenInspectorHandler {
                     true
             );
             SFMFontUtils.draw(
-                    poseStack,
+                    graphics,
                     font,
                     LocalizationKeys.CONTAINER_INSPECTOR_INVENTORY_SLOT_COUNT.getComponent(
                             Component.literal(String.valueOf(inventorySlotCount)).withStyle(ChatFormatting.YELLOW)

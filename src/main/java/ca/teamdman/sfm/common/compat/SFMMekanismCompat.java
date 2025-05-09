@@ -5,12 +5,12 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.linting.IProgramLinter;
 import ca.teamdman.sfm.common.program.linting.MekanismSideConfigProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
-import ca.teamdman.sfm.common.resourcetype.*;
+import ca.teamdman.sfm.common.resourcetype.ChemicalResourceType;
+import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfml.ast.DirectionQualifier;
 import ca.teamdman.sfml.ast.IOStatement;
 import ca.teamdman.sfml.ast.ResourceIdentifier;
 import mekanism.api.RelativeSide;
-import mekanism.api.math.FloatingLong;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.tile.component.TileComponentConfig;
 import mekanism.common.tile.component.config.ConfigInfo;
@@ -20,12 +20,14 @@ import mekanism.common.util.UnitDisplayUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.registries.DeferredRegister;
+import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class SFMMekanismCompat {
@@ -33,22 +35,25 @@ public class SFMMekanismCompat {
         return switch (trans) {
             case ITEM -> SFMResourceTypes.ITEM.get();
             case FLUID -> SFMResourceTypes.FLUID.get();
-            case GAS -> {
-                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "gas");
-                yield SFMResourceTypes.registry().getValue(id);
-            }
-            case INFUSION -> {
-                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "infusion");
-                yield SFMResourceTypes.registry().getValue(id);
-            }
-            case PIGMENT -> {
-                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "pigment");
-                yield SFMResourceTypes.registry().getValue(id);
-            }
-            case SLURRY -> {
-                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "slurry");
-                yield SFMResourceTypes.registry().getValue(id);
-            }
+//            case GAS -> {
+//                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "gas");
+//                yield SFMResourceTypes.registry().get(id);
+//            }
+//            case INFUSION -> {
+//                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "infusion");
+//                yield SFMResourceTypes.registry().get(id);
+//            }
+//            case PIGMENT -> {
+//                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "pigment");
+//                yield SFMResourceTypes.registry().get(id);
+//            }
+//            case SLURRY -> {
+//                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "slurry");
+//                yield SFMResourceTypes.registry().get(id);
+//            }
+            case ENERGY -> SFMResourceTypes.FORGE_ENERGY.get();
+            case CHEMICAL -> SFMResourceTypes.registry()
+                    .get(ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "chemical"));
             default -> null;
         };
     }
@@ -67,8 +72,18 @@ public class SFMMekanismCompat {
         return transmissionTypes;
     }
 
-    public static FloatingLong createForgeEnergy(long amount) {
-        return UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertInPlaceFrom(FloatingLong.create(amount));
+    public static long createForgeEnergy(long amount) {
+        return UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(amount);
+    }
+
+    public static Set<Direction> getSides(ConfigInfo config, ISideConfiguration facing, Predicate<DataType> condition) {
+        Set<Direction> rtn = EnumSet.noneOf(Direction.class);
+        for (Map.Entry<RelativeSide, DataType> entry : config.getSideConfig()) {
+            if (condition.test(entry.getValue())) {
+                rtn.add(entry.getKey().getDirection(facing.getDirection()));
+            }
+        }
+        return rtn;
     }
 
     public static String gatherInspectionResults(BlockEntity blockEntity) {
@@ -95,7 +110,7 @@ public class SFMMekanismCompat {
                 continue;
             }
 
-            Set<Direction> outputSides = info.getSides(DataType::canOutput);
+            Set<Direction> outputSides = getSides(info, sideConfiguration, DataType::canOutput);
             if (!outputSides.isEmpty()) {
                 sb
                         .append("-- ")
@@ -136,27 +151,26 @@ public class SFMMekanismCompat {
     }
 
     public static void registerResourceTypes(DeferredRegister<ResourceType<?, ?, ?>> types) {
-        types.register(
-                "gas",
-                GasResourceType::new
+        types.register("chemical", ChemicalResourceType::new);
+        types.register("gas", ChemicalResourceType::new
         );
         types.register(
                 "infusion",
-                InfuseResourceType::new
+                ChemicalResourceType::new
         );
 
         types.register(
                 "pigment",
-                PigmentResourceType::new
+                ChemicalResourceType::new
         );
         types.register(
                 "slurry",
-                SlurryResourceType::new
+                ChemicalResourceType::new
         );
-        types.register(
-                "mekanism_energy",
-                MekanismEnergyResourceType::new
-        );
+//        types.register(
+//                "mekanism_energy",
+//                MekanismEnergyResourceType::new
+//        );
     }
 
     public static void registerProgramLinters(DeferredRegister<IProgramLinter> types) {

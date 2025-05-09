@@ -1,18 +1,20 @@
 package ca.teamdman.sfm.common.resourcetype;
 
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
+import net.minecraft.core.Direction;
+import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.registries.IForgeRegistry;
+import net.neoforged.neoforge.capabilities.BlockCapability;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public abstract class RegistryBackedResourceType<STACK,ITEM,CAP> extends ResourceType<STACK,ITEM,CAP> {
     private final Map<ITEM, ResourceLocation> registryKeyCache = new Object2ObjectOpenHashMap<>();
-    public RegistryBackedResourceType(Capability<CAP> CAPABILITY_KIND) {
+    public RegistryBackedResourceType(BlockCapability<CAP, @Nullable Direction> CAPABILITY_KIND) {
         super(CAPABILITY_KIND);
     }
 
@@ -37,19 +39,19 @@ public abstract class RegistryBackedResourceType<STACK,ITEM,CAP> extends Resourc
 
     @Override
     public Set<ResourceLocation> getRegistryKeys() {
-        return getRegistry().getKeys();
+        return getRegistry().keySet();
     }
 
     @Override
     public Collection<ITEM> getItems() {
-        return getRegistry().getValues();
+        return getRegistry().stream().collect(Collectors.toList());
     }
 
-    public abstract IForgeRegistry<ITEM> getRegistry();
+    public abstract Registry<ITEM> getRegistry();
 
     @Override
     public @Nullable ITEM getItemFromRegistryKey(ResourceLocation location) {
-        return getRegistry().getValue(location);
+        return getRegistry().get(location);
     }
 
     @Override
