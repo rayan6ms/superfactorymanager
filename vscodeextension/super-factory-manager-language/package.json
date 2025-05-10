@@ -7,6 +7,14 @@
   "author": {
     "name": "TeamDman"
   },
+  "contributors": [
+    {
+      "name": "TeamDman"
+    },
+    {
+      "name": "Titop54"
+    }
+  ],
   "version": "0.0.11",
   "icon": "media/controller.png",
   "main": "./out/extension.js",
