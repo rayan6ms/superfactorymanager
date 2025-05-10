@@ -165,7 +165,6 @@
   "dependencies": {
     "antlr4ts": "^0.5.0-alpha.4",
     "antlr4ts-cli": "^0.5.0-alpha.4",
-    "axios": "^1.7.7",
-    "super-factory-manager-language": "file:"
+    "axios": "^1.7.7"
   }
 }
