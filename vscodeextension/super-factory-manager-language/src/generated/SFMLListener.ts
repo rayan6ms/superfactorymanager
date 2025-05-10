@@ -27,9 +27,8 @@ import { WithNegationContext } from "./SFMLParser";
 import { WithConjunctionContext } from "./SFMLParser";
 import { WithDisjunctionContext } from "./SFMLParser";
 import { WithTagContext } from "./SFMLParser";
-import { TickContext } from "./SFMLParser";
-import { TicksContext } from "./SFMLParser";
-import { SecondsContext } from "./SFMLParser";
+import { IntervalSpaceContext } from "./SFMLParser";
+import { IntervalNoSpaceContext } from "./SFMLParser";
 import { ProgramContext } from "./SFMLParser";
 import { NameContext } from "./SFMLParser";
 import { TriggerContext } from "./SFMLParser";
@@ -39,14 +38,17 @@ import { StatementContext } from "./SFMLParser";
 import { ForgetStatementContext } from "./SFMLParser";
 import { InputStatementContext } from "./SFMLParser";
 import { OutputStatementContext } from "./SFMLParser";
-import { ResourceExclusionContext } from "./SFMLParser";
 import { InputResourceLimitsContext } from "./SFMLParser";
 import { OutputResourceLimitsContext } from "./SFMLParser";
-import { ResourceLimitsContext } from "./SFMLParser";
+import { ResourceLimitListContext } from "./SFMLParser";
 import { ResourceLimitContext } from "./SFMLParser";
 import { LimitContext } from "./SFMLParser";
 import { QuantityContext } from "./SFMLParser";
 import { RetentionContext } from "./SFMLParser";
+import { ResourceExclusionContext } from "./SFMLParser";
+import { ResourceIdContext } from "./SFMLParser";
+import { ResourceIdListContext } from "./SFMLParser";
+import { ResourceIdDisjunctionContext } from "./SFMLParser";
 import { WithContext } from "./SFMLParser";
 import { WithClauseContext } from "./SFMLParser";
 import { TagMatcherContext } from "./SFMLParser";
@@ -57,13 +59,11 @@ import { RangesetContext } from "./SFMLParser";
 import { RangeContext } from "./SFMLParser";
 import { IfStatementContext } from "./SFMLParser";
 import { BoolexprContext } from "./SFMLParser";
-import { ResourcecomparisonContext } from "./SFMLParser";
 import { ComparisonOpContext } from "./SFMLParser";
 import { SetOpContext } from "./SFMLParser";
 import { LabelAccessContext } from "./SFMLParser";
 import { RoundrobinContext } from "./SFMLParser";
 import { LabelContext } from "./SFMLParser";
-import { ResourceIdContext } from "./SFMLParser";
 import { IdentifierContext } from "./SFMLParser";
 import { StringContext } from "./SFMLParser";
 import { NumberContext } from "./SFMLParser";
@@ -387,43 +387,30 @@ export interface SFMLListener extends ParseTreeListener {
 	exitWithTag?: (ctx: WithTagContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `Tick`
+	 * Enter a parse tree produced by the `IntervalSpace`
 	 * labeled alternative in `SFMLParser.interval`.
 	 * @param ctx the parse tree
 	 */
-	enterTick?: (ctx: TickContext) => void;
+	enterIntervalSpace?: (ctx: IntervalSpaceContext) => void;
 	/**
-	 * Exit a parse tree produced by the `Tick`
+	 * Exit a parse tree produced by the `IntervalSpace`
 	 * labeled alternative in `SFMLParser.interval`.
 	 * @param ctx the parse tree
 	 */
-	exitTick?: (ctx: TickContext) => void;
+	exitIntervalSpace?: (ctx: IntervalSpaceContext) => void;
 
 	/**
-	 * Enter a parse tree produced by the `Ticks`
+	 * Enter a parse tree produced by the `IntervalNoSpace`
 	 * labeled alternative in `SFMLParser.interval`.
 	 * @param ctx the parse tree
 	 */
-	enterTicks?: (ctx: TicksContext) => void;
+	enterIntervalNoSpace?: (ctx: IntervalNoSpaceContext) => void;
 	/**
-	 * Exit a parse tree produced by the `Ticks`
+	 * Exit a parse tree produced by the `IntervalNoSpace`
 	 * labeled alternative in `SFMLParser.interval`.
 	 * @param ctx the parse tree
 	 */
-	exitTicks?: (ctx: TicksContext) => void;
-
-	/**
-	 * Enter a parse tree produced by the `Seconds`
-	 * labeled alternative in `SFMLParser.interval`.
-	 * @param ctx the parse tree
-	 */
-	enterSeconds?: (ctx: SecondsContext) => void;
-	/**
-	 * Exit a parse tree produced by the `Seconds`
-	 * labeled alternative in `SFMLParser.interval`.
-	 * @param ctx the parse tree
-	 */
-	exitSeconds?: (ctx: SecondsContext) => void;
+	exitIntervalNoSpace?: (ctx: IntervalNoSpaceContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `SFMLParser.program`.
@@ -525,17 +512,6 @@ export interface SFMLListener extends ParseTreeListener {
 	exitOutputStatement?: (ctx: OutputStatementContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `SFMLParser.resourceExclusion`.
-	 * @param ctx the parse tree
-	 */
-	enterResourceExclusion?: (ctx: ResourceExclusionContext) => void;
-	/**
-	 * Exit a parse tree produced by `SFMLParser.resourceExclusion`.
-	 * @param ctx the parse tree
-	 */
-	exitResourceExclusion?: (ctx: ResourceExclusionContext) => void;
-
-	/**
 	 * Enter a parse tree produced by `SFMLParser.inputResourceLimits`.
 	 * @param ctx the parse tree
 	 */
@@ -558,15 +534,15 @@ export interface SFMLListener extends ParseTreeListener {
 	exitOutputResourceLimits?: (ctx: OutputResourceLimitsContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `SFMLParser.resourceLimits`.
+	 * Enter a parse tree produced by `SFMLParser.resourceLimitList`.
 	 * @param ctx the parse tree
 	 */
-	enterResourceLimits?: (ctx: ResourceLimitsContext) => void;
+	enterResourceLimitList?: (ctx: ResourceLimitListContext) => void;
 	/**
-	 * Exit a parse tree produced by `SFMLParser.resourceLimits`.
+	 * Exit a parse tree produced by `SFMLParser.resourceLimitList`.
 	 * @param ctx the parse tree
 	 */
-	exitResourceLimits?: (ctx: ResourceLimitsContext) => void;
+	exitResourceLimitList?: (ctx: ResourceLimitListContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `SFMLParser.resourceLimit`.
@@ -611,6 +587,50 @@ export interface SFMLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitRetention?: (ctx: RetentionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `SFMLParser.resourceExclusion`.
+	 * @param ctx the parse tree
+	 */
+	enterResourceExclusion?: (ctx: ResourceExclusionContext) => void;
+	/**
+	 * Exit a parse tree produced by `SFMLParser.resourceExclusion`.
+	 * @param ctx the parse tree
+	 */
+	exitResourceExclusion?: (ctx: ResourceExclusionContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `SFMLParser.resourceId`.
+	 * @param ctx the parse tree
+	 */
+	enterResourceId?: (ctx: ResourceIdContext) => void;
+	/**
+	 * Exit a parse tree produced by `SFMLParser.resourceId`.
+	 * @param ctx the parse tree
+	 */
+	exitResourceId?: (ctx: ResourceIdContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `SFMLParser.resourceIdList`.
+	 * @param ctx the parse tree
+	 */
+	enterResourceIdList?: (ctx: ResourceIdListContext) => void;
+	/**
+	 * Exit a parse tree produced by `SFMLParser.resourceIdList`.
+	 * @param ctx the parse tree
+	 */
+	exitResourceIdList?: (ctx: ResourceIdListContext) => void;
+
+	/**
+	 * Enter a parse tree produced by `SFMLParser.resourceIdDisjunction`.
+	 * @param ctx the parse tree
+	 */
+	enterResourceIdDisjunction?: (ctx: ResourceIdDisjunctionContext) => void;
+	/**
+	 * Exit a parse tree produced by `SFMLParser.resourceIdDisjunction`.
+	 * @param ctx the parse tree
+	 */
+	exitResourceIdDisjunction?: (ctx: ResourceIdDisjunctionContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `SFMLParser.with`.
@@ -723,17 +743,6 @@ export interface SFMLListener extends ParseTreeListener {
 	exitBoolexpr?: (ctx: BoolexprContext) => void;
 
 	/**
-	 * Enter a parse tree produced by `SFMLParser.resourcecomparison`.
-	 * @param ctx the parse tree
-	 */
-	enterResourcecomparison?: (ctx: ResourcecomparisonContext) => void;
-	/**
-	 * Exit a parse tree produced by `SFMLParser.resourcecomparison`.
-	 * @param ctx the parse tree
-	 */
-	exitResourcecomparison?: (ctx: ResourcecomparisonContext) => void;
-
-	/**
 	 * Enter a parse tree produced by `SFMLParser.comparisonOp`.
 	 * @param ctx the parse tree
 	 */
@@ -787,17 +796,6 @@ export interface SFMLListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	exitLabel?: (ctx: LabelContext) => void;
-
-	/**
-	 * Enter a parse tree produced by `SFMLParser.resourceId`.
-	 * @param ctx the parse tree
-	 */
-	enterResourceId?: (ctx: ResourceIdContext) => void;
-	/**
-	 * Exit a parse tree produced by `SFMLParser.resourceId`.
-	 * @param ctx the parse tree
-	 */
-	exitResourceId?: (ctx: ResourceIdContext) => void;
 
 	/**
 	 * Enter a parse tree produced by `SFMLParser.identifier`.

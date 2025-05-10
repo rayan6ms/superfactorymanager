@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
 import * as fs from 'fs';
-
 import { getOpenCommand, SFMLTreeDataProvider } from './SFMLTreeDataProvider';
 
 //Note: it would be faster if we have already on the folder media or similar, but things can change
@@ -25,9 +24,9 @@ const tempFiles: Map<string, string> = new Map();
 export async function activityBar(context: vscode.ExtensionContext) 
 {
     const hasSFMLFiles = await checkSFMLFiles();
-    const treeDataProvider = new SFMLTreeDataProvider(context, 'https://api.github.com/repos/TeamDman/SuperFactoryManager/contents/src/main/resources/assets/sfm/template_programs', 1);
-    const treeDataProvider2 = new SFMLTreeDataProvider(context, 'https://api.github.com/repos/TeamDman/SuperFactoryManager/contents/examples', 1);
-    const treeDataProvider3 = new SFMLTreeDataProvider(context, '', 0);
+    const treeDataProvider = new SFMLTreeDataProvider(context, 'https://api.github.com/repos/TeamDman/SuperFactoryManager/contents/src/main/resources/assets/sfm/template_programs');
+    const treeDataProvider2 = new SFMLTreeDataProvider(context, 'https://api.github.com/repos/TeamDman/SuperFactoryManager/contents/examples');
+    const treeDataProvider3 = new SFMLTreeDataProvider(context);
     //If we dont have some .sfm or .sfml, we dont want to see the activity bar
     //Only when the extension activates, like some other extensions do (java extension or antlr one)
     //Dont ask why there 2 openFiles
@@ -61,6 +60,15 @@ export async function activityBar(context: vscode.ExtensionContext)
  */
 export async function checkSFMLFiles(): Promise<boolean> 
 {
+    const activeEditor = vscode.window.activeTextEditor;
+    if(activeEditor)
+    {
+        const currentFile = activeEditor.document;
+        if(currentFile.languageId === 'sfml' || currentFile.languageId === 'sfm')
+        {
+            return true;
+        }
+    }
     const workspaceFolders = vscode.workspace.workspaceFolders;
     if(workspaceFolders) //Sometimes we dont have anything on a workspace, so undefined and nothing
     {
