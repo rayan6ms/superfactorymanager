@@ -32,18 +32,18 @@ export async function activityBar(context: vscode.ExtensionContext)
     //Dont ask why there 2 openFiles
     if(hasSFMLFiles) 
     {
-        /*const view = vscode.window.createTreeView('examplesGames', {
+        const view = vscode.window.createTreeView('examplesGames', {
             treeDataProvider: treeDataProvider
-        });*/
+        });
         const view2 = vscode.window.createTreeView('examplegithub', {
             treeDataProvider: treeDataProvider2
         });
-        /*const viewExternal = vscode.window.createTreeView('examplesOthers',{
+        const viewExternal = vscode.window.createTreeView('examplesOthers',{
             treeDataProvider: treeDataProvider3
-        });*/
-        //context.subscriptions.push(view);
+        });
+        context.subscriptions.push(view);
         context.subscriptions.push(view2);
-        //context.subscriptions.push(viewExternal);
+        context.subscriptions.push(viewExternal);
     }
     else
     {
