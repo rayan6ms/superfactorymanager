@@ -20,9 +20,9 @@ public final class LocalizationKeys {
             "gui.sfm.text_editor.done_button.tooltip",
             "Shift+Enter to submit"
     );
-    public static final LocalizationEntry PROGRAM_EDIT_SCREEN_TOGGLE_LINE_NUMBERS_BUTTON_TOOLTIP = new LocalizationEntry(
-            "gui.sfm.text_editor.toggle_line_numbers_button.tooltip",
-            "Toggle line numbers"
+    public static final LocalizationEntry PROGRAM_EDIT_SCREEN_CONFIG_BUTTON_TOOLTIP = new LocalizationEntry(
+            "gui.sfm.text_editor.config_button.tooltip",
+            "Open editor config"
     );
     public static final LocalizationEntry SAVE_CHANGES_CONFIRM_SCREEN_TITLE = new LocalizationEntry(
             "gui.sfm.save_changes_confirm.title",
@@ -271,7 +271,7 @@ public final class LocalizationKeys {
     );
     public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_5 = new LocalizationEntry(
             () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.5",
-            () -> "Press " + "%s to toggle label view."
+            () -> "Press  %s to toggle label view."
     );
     public static final LocalizationEntry LABEL_GUN_VIEW_MODE_SHOW_ONLY_ACTIVE_AND_TARGETED = new LocalizationEntry(
             () -> "sfm.label_gun.view_mode.show_only_active_and_targeted",
@@ -312,6 +312,10 @@ public final class LocalizationKeys {
     public static final LocalizationEntry EXAMPLES_GUI_TITLE = new LocalizationEntry(
             "gui.sfm.title.program_template_picker",
             "Program Template Picker"
+    );
+    public static final LocalizationEntry INTELLISENSE_PICK_LIST_GUI_TITLE = new LocalizationEntry(
+            "gui.sfm.title.intellisense_pick_list",
+            "Intellisense Pick List"
     );
     public static final LocalizationEntry LABEL_GUN_GUI_LABEL_PLACEHOLDER = new LocalizationEntry(
             "gui.sfm.label_gun.placeholder",
@@ -677,9 +681,13 @@ public final class LocalizationKeys {
             "gui.sfm.container_inspector.mekanism_machine_outputs",
             "The following are based on the MACHINE'S output config"
     );
-    public static final LocalizationEntry CONTAINER_INSPECTOR_NOTICE = new LocalizationEntry(
-            "gui.sfm.container_inspector.notice",
+    public static final LocalizationEntry CONTAINER_INSPECTOR_NOTICE_1 = new LocalizationEntry(
+            "gui.sfm.container_inspector.notice.1",
             "GUI slots don't always correspond to automation slots!!!"
+    );
+    public static final LocalizationEntry CONTAINER_INSPECTOR_NOTICE_2 = new LocalizationEntry(
+            "gui.sfm.container_inspector.notice.2",
+            "Press %s to toggle this overlay."
     );
     public static final LocalizationEntry CONTAINER_INSPECTOR_CONTAINER_SLOT_COUNT = new LocalizationEntry(
             "gui.sfm.container_inspector.container_slot_count",
@@ -944,6 +952,35 @@ public final class LocalizationKeys {
             "chat.sfm.config_update_and_sync_result.internal_failure",
             "Something went wrong while updating the SFM config, I have no idea if changes were made. Check the server logs."
     );
+
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_SCREEN_TITLE = new LocalizationEntry(
+            "gui.sfm.program_editor_config.title",
+            "Program Editor Config"
+    );
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_LINE_NUMBERS = new LocalizationEntry(
+            "gui.sfm.program_editor_config.line_numbers",
+            "Line Numbers"
+    );
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_INTELLISENSE = new LocalizationEntry(
+            "gui.sfm.program_editor_config.intellisense",
+            "Intellisense"
+    );
+    public static final LocalizationEntry
+            PROGRAM_EDITOR_CONFIG_INTELLISENSE_OFF = new LocalizationEntry(
+            "gui.sfm.program_editor_config.intellisense.off",
+            "Off"
+    );
+    public static final LocalizationEntry
+            PROGRAM_EDITOR_CONFIG_INTELLISENSE_BASIC = new LocalizationEntry(
+            "gui.sfm.program_editor_config.intellisense.basic",
+            "Basic"
+    );
+    public static final LocalizationEntry
+            PROGRAM_EDITOR_CONFIG_INTELLISENSE_ADVANCED = new LocalizationEntry(
+            "gui.sfm.program_editor_config.intellisense.advanced",
+            "Advanced"
+    );
+
 
     public static List<LocalizationEntry> getEntries() {
         // use reflection to get all the public static LocalizationEntry fields

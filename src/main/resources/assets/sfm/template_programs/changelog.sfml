@@ -4,7 +4,21 @@ NAME "Changelog"
 -- Official SFM Donation Page:
 -- https://ko-fi.com/teamdman
 
----- 4.20.0-pre ----
+---- vNEXT ----
+-- Thank you SpruceMist for the GitHub sponsorship <3
+---- Check out the "Thank you!" example for more names <3
+
+---- 4.21.0 ----
+-- Add intellisense, disabled by default - backslash to accept suggestion
+-- Bottom left button in program edit screen now opens editor config
+-- Fix missing focus highlight from tab-navigation of buttons in manager screen
+-- Fix syntax highlighting for "SECOND" keyword
+-- Fix escaped quotes in strings containing the escaping backslash
+-- Add reminder when SFM crashes the game that there's a config to turn off managers
+-- Add hotkey reminder to ctrl+i overlay
+-- Fix disconnect issue when clearing facades from cables
+
+---- 4.20.0 ----
 -- Fix disks having no name when program has no name for 1.21+
 -- VSCode extension updates, thanks @Titop54 for the help <3
 -- Fix max program length ungraceful crash, thanks @Crazy

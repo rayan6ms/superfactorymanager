@@ -2,7 +2,7 @@ package ca.teamdman.sfm.client.jei;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.gui.screen.ManagerScreen;
-import ca.teamdman.sfm.client.gui.screen.SFMScreenUtils;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenRenderUtils;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMRecipeTypes;
@@ -77,8 +77,8 @@ public class SFMJEIPlugin implements IModPlugin {
                         .stream()
                         .filter(b -> b.visible)
                         .map(b -> new Rect2i(
-                                SFMScreenUtils.getX(b),
-                                SFMScreenUtils.getY(b),
+                                SFMScreenRenderUtils.getX(b),
+                                SFMScreenRenderUtils.getY(b),
                                 b.getWidth(),
                                 b.getHeight()
                         ))

@@ -1,9 +1,10 @@
 package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.ClientRaycastHelpers;
-import ca.teamdman.sfm.client.ClientScreenHelpers;
-import ca.teamdman.sfm.client.gui.ButtonBuilder;
+import ca.teamdman.sfm.client.ClientRayCastHelpers;
+import ca.teamdman.sfm.client.gui.screen.SFMFontUtils;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
+import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundContainerExportsInspectionRequestPacket;
@@ -31,12 +32,12 @@ import org.jetbrains.annotations.Nullable;
 public class ContainerScreenInspectorHandler {
     private static boolean visible = false;
     private static @Nullable AbstractContainerScreen<?> lastScreen = null;
-    private static final Button exportInspectorButton = new ButtonBuilder()
+    private static final Button exportInspectorButton = new SFMButtonBuilder()
             .setSize(100, 20)
             .setPosition(5, 50)
             .setText(LocalizationKeys.CONTAINER_INSPECTOR_SHOW_EXPORTS_BUTTON)
             .setOnPress((button) -> {
-                BlockEntity lookBlockEntity = ClientRaycastHelpers.getLookBlockEntity();
+                BlockEntity lookBlockEntity = ClientRayCastHelpers.getLookBlockEntity();
                 if (lastScreen != null && lookBlockEntity != null) {
                     SFMPackets.sendToServer(new ServerboundContainerExportsInspectionRequestPacket(
                             lastScreen.getMenu().containerId,
@@ -84,48 +85,75 @@ public class ContainerScreenInspectorHandler {
                     colour = 0xFFF;
                     containerSlotCount++;
                 }
-                font.draw(
+                SFMFontUtils.draw(
                         poseStack,
+                        font,
                         Component.literal(Integer.toString(slot.getSlotIndex())),
                         screen.getGuiLeft() + slot.x,
                         screen.getGuiTop() + slot.y,
-                        colour
+                        colour,
+                        false
+                );
+            }
+
+            // draw centered notices
+            {
+                var notice = LocalizationKeys.CONTAINER_INSPECTOR_NOTICE_1
+                        .getComponent()
+                        .withStyle(ChatFormatting.GOLD);
+                int offset = font.width(notice) / 2;
+                SFMFontUtils.draw(
+                        poseStack,
+                        font,
+                        notice,
+                        screen.width / 2 - offset,
+                        5,
+                        0xFFFFFF,
+                        true
+                );
+            }
+            {
+                var notice = LocalizationKeys.CONTAINER_INSPECTOR_NOTICE_2.getComponent(
+                        SFMKeyMappings.CONTAINER_INSPECTOR_KEY
+                                .get()
+                                .getTranslatedKeyMessage()
+                                .plainCopy()
+                                .withStyle(ChatFormatting.AQUA)
+                ).withStyle(ChatFormatting.GOLD);
+                int offset = font.width(notice) / 2;
+                SFMFontUtils.draw(
+                        poseStack,
+                        font,
+                        notice,
+                        screen.width / 2 - offset,
+                        16,
+                        0xFFFFFF,
+                        true
                 );
             }
 
             // draw text for slot totals
-            var notice = LocalizationKeys.CONTAINER_INSPECTOR_NOTICE.getComponent().withStyle(ChatFormatting.GOLD);
-            int offset = font.width(notice) / 2;
-            font.drawShadow(
+            SFMFontUtils.draw(
                     poseStack,
-                    notice,
-                    screen.width / 2f - offset,
-                    5,
-                    0xFFFFFF
-            );
-            font.drawShadow(
-                    poseStack,
-                    LocalizationKeys.CONTAINER_INSPECTOR_CONTAINER_SLOT_COUNT.getComponent(Component
-                                                                                                             .literal(
-                                                                                                                     String.valueOf(
-                                                                                                                             containerSlotCount))
-                                                                                                             .withStyle(
-                                                                                                                     ChatFormatting.BLUE)),
+                    font,
+                    LocalizationKeys.CONTAINER_INSPECTOR_CONTAINER_SLOT_COUNT.getComponent(
+                            Component.literal(String.valueOf(containerSlotCount)).withStyle(ChatFormatting.BLUE)
+                    ),
                     5,
                     25,
-                    0xFFFFFF
+                    0xFFFFFF,
+                    true
             );
-            font.drawShadow(
+            SFMFontUtils.draw(
                     poseStack,
-                    LocalizationKeys.CONTAINER_INSPECTOR_INVENTORY_SLOT_COUNT.getComponent(Component
-                                                                                                             .literal(
-                                                                                                                     String.valueOf(
-                                                                                                                             inventorySlotCount))
-                                                                                                             .withStyle(
-                                                                                                                     ChatFormatting.YELLOW)),
+                    font,
+                    LocalizationKeys.CONTAINER_INSPECTOR_INVENTORY_SLOT_COUNT.getComponent(
+                            Component.literal(String.valueOf(inventorySlotCount)).withStyle(ChatFormatting.YELLOW)
+                    ),
                     5,
                     40,
-                    0xFFFFFF
+                    0xFFFFFF,
+                    true
             );
             poseStack.popPose();
         }
@@ -152,7 +180,7 @@ public class ContainerScreenInspectorHandler {
                 if (hoveredSlot != null) {
                     ItemStack hoveredStack = hoveredSlot.getItem();
                     if (!hoveredStack.isEmpty()) {
-                        ClientScreenHelpers.showItemInspectorScreen(hoveredStack);
+                        SFMScreenChangeHelpers.showItemInspectorScreen(hoveredStack);
                     }
                 }
             }

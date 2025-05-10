@@ -14,7 +14,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.stream.Stream;
 
-public class InfuseResourceType extends ResourceType<InfusionStack, InfuseType, IInfusionHandler> {
+public class InfuseResourceType extends RegistryBackedResourceType<InfusionStack, InfuseType, IInfusionHandler> {
     public static final Capability<IInfusionHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
     });
 

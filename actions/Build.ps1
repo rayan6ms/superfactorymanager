@@ -35,12 +35,12 @@ d----          2024-04-14  1:39 PM                SuperFactoryManager 1.20.3
         --bind "ctrl-a:select-all,ctrl-d:deselect-all,ctrl-t:toggle-all" `
         --header "Pick versions to build"
     $chosen_objs = $repo_clones | Where-Object { $chosen -contains $_.Name }
-
+    $chosen_objs | Format-Table
     # Perform build
-    foreach ($repo in $chosen) {
+    foreach ($repo in $chosen_objs) {
         try {
             Push-Location $repo
-            Write-Host "Running build for $repo"
+            Write-Host -ForegroundColor Cyan "Running build for $repo"
             .\gradlew.bat build --no-daemon
             if ($? -eq $false) {
                 throw "Build failed for ${repo}"

@@ -12,7 +12,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.stream.Stream;
 
-public class FluidResourceType extends ResourceType<FluidStack, Fluid, IFluidHandler> {
+public class FluidResourceType extends RegistryBackedResourceType<FluidStack, Fluid, IFluidHandler> {
     public FluidResourceType() {
         super(ForgeCapabilities.FLUID_HANDLER);
     }

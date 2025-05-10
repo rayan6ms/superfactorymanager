@@ -29,9 +29,7 @@ public class SFMASTUtils {
         potential = resourceType.withCount(potential, toMove);
         STACK stack = potential;
 
-        return SFMResourceTypes.DEFERRED_TYPES
-                .get()
-                .getResourceKey(resourceType)
+        return SFMResourceTypes.registry().getResourceKey(resourceType)
                 .map(x -> {
                     //noinspection unchecked,rawtypes
                     return (ResourceKey<ResourceType<STACK, ITEM, CAP>>) (ResourceKey) x;
@@ -68,8 +66,8 @@ public class SFMASTUtils {
                 List.of(new Label(label)),
                 new DirectionQualifier(
                         direction == null
-                                ? EnumSet.noneOf(Direction.class)
-                                : EnumSet.of(direction)),
+                        ? EnumSet.noneOf(Direction.class)
+                        : EnumSet.of(direction)),
                 new NumberRangeSet(
                         new NumberRange[]{new NumberRange(slot, slot)}
                 ),
@@ -85,12 +83,10 @@ public class SFMASTUtils {
                         ResourceQuantity.IdExpansionBehaviour.NO_EXPAND
                 )
         );
-        ResourceLocation stackId = resourceType.getRegistryKey(stack);
+        ResourceLocation stackId = resourceType.getRegistryKeyForStack(stack);
         ResourceIdentifier<STACK, ITEM, CAP> resourceIdentifier = new ResourceIdentifier<>(
-                resourceTypeResourceKey.location().getNamespace(),
-                resourceTypeResourceKey.location().getPath(),
-                stackId.getNamespace(),
-                stackId.getPath()
+                resourceTypeResourceKey,
+                stackId
         );
         ResourceLimit resourceLimit = new ResourceLimit(
                 new ResourceIdSet(List.of(resourceIdentifier)),

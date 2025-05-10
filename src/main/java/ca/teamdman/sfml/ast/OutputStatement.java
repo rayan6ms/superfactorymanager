@@ -179,7 +179,7 @@ public class OutputStatement implements IOStatement {
                 .getLogger()
                 .info(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_END.get(
                         moved,
-                        destination.type.getRegistryKey(
+                        destination.type.getRegistryKeyForStack(
                                 extracted),
                         source,
                         destination
@@ -189,7 +189,7 @@ public class OutputStatement implements IOStatement {
         // THIS SHOULD NEVER HAPPEN
         // will void items if it does
         if (!destination.type.isEmpty(extractedRemainder)) {
-            ResourceLocation resourceTypeName = SFMResourceTypes.DEFERRED_TYPES.get().getKey(source.type);
+            ResourceLocation resourceTypeName = SFMResourceTypes.registry().getKey(source.type);
             String stackName = destination.type.getItem(potential).toString();
             Level level = context.getManager().getLevel();
             assert level != null;

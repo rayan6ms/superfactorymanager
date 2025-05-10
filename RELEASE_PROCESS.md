@@ -6,10 +6,13 @@ The following process is designed to catch the most obvious problems that may ar
 
 .\act.ps1
 Manual: Bump `mod_version` in gradle.properties
+Manual: Update heading in changelog.sfml
+Manual: Update thank_you.sfml
 Manual: Commit bump
 Action: Propagate changes
 Action: Run gameTestServer for all versions
 Action: runData for all versions
+Action: Propagate changes
 Action: Build
 Action: Wipe jars summary dir
 Action: Collect jars

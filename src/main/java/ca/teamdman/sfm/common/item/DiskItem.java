@@ -1,8 +1,9 @@
 package ca.teamdman.sfm.common.item;
 
 import ca.teamdman.sfm.client.ClientKeyHelpers;
-import ca.teamdman.sfm.client.ClientScreenHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
+import ca.teamdman.sfm.client.gui.screen.ProgramEditScreenOpenContext;
+import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
@@ -11,6 +12,7 @@ import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.program.linting.ProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.common.util.SFMTranslationUtils;
 import ca.teamdman.sfml.ast.Program;
@@ -28,8 +30,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -50,14 +50,28 @@ public class DiskItem extends Item {
                 .getString("sfm:program");
     }
 
-    public static void setProgram(ItemStack stack, String program) {
+    public static void setProgram(
+            ItemStack stack,
+            String program
+    ) {
+        program = program.replaceAll("\r", "");
         stack
                 .getOrCreateTag()
-                .putString("sfm:program", program.replaceAll("\r", ""));
-
+                .putString("sfm:program", program);
     }
 
-    public static @Nullable Program compileAndUpdateErrorsAndWarnings(ItemStack stack, @Nullable ManagerBlockEntity manager) {
+    public static void pruneIfDefault(ItemStack stack) {
+        if (getProgram(stack).isBlank() && LabelPositionHolder.from(stack).isEmpty()) {
+            for (String key : stack.getOrCreateTag().getAllKeys().toArray(String[]::new)) {
+                stack.removeTagKey(key);
+            }
+        }
+    }
+
+    public static @Nullable Program compileAndUpdateErrorsAndWarnings(
+            ItemStack stack,
+            @Nullable ManagerBlockEntity manager
+    ) {
         if (manager != null) {
             manager.logger.info(x -> x.accept(LocalizationKeys.PROGRAM_COMPILE_FROM_DISK_BEGIN.get()));
         }
@@ -65,7 +79,11 @@ public class DiskItem extends Item {
         Program.compile(
                 getProgram(stack),
                 successProgram -> {
-                    ArrayList<TranslatableContents> warnings = ProgramLinter.gatherWarnings(successProgram, LabelPositionHolder.from(stack), manager);
+                    ArrayList<TranslatableContents> warnings = ProgramLinter.gatherWarnings(
+                            successProgram,
+                            LabelPositionHolder.from(stack),
+                            manager
+                    );
 
                     // Log to disk
                     if (manager != null) {
@@ -112,7 +130,10 @@ public class DiskItem extends Item {
                 .toList();
     }
 
-    public static void setErrors(ItemStack stack, List<TranslatableContents> errors) {
+    public static void setErrors(
+            ItemStack stack,
+            List<TranslatableContents> errors
+    ) {
         stack
                 .getOrCreateTag()
                 .put(
@@ -135,7 +156,10 @@ public class DiskItem extends Item {
                         Collectors.toList());
     }
 
-    public static void setWarnings(ItemStack stack, List<TranslatableContents> warnings) {
+    public static void setWarnings(
+            ItemStack stack,
+            List<TranslatableContents> warnings
+    ) {
         stack
                 .getOrCreateTag()
                 .put(
@@ -153,7 +177,10 @@ public class DiskItem extends Item {
                 .getString("sfm:name");
     }
 
-    public static void setProgramName(ItemStack stack, String name) {
+    public static void setProgramName(
+            ItemStack stack,
+            String name
+    ) {
         if (stack.getItem() instanceof DiskItem) {
             stack
                     .getOrCreateTag()
@@ -162,24 +189,30 @@ public class DiskItem extends Item {
     }
 
     @Override
-    public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
+    public @NotNull InteractionResultHolder<ItemStack> use(
+            Level pLevel,
+            Player pPlayer,
+            InteractionHand pUsedHand
+    ) {
         var stack = pPlayer.getItemInHand(pUsedHand);
         if (pLevel.isClientSide) {
-            ClientScreenHelpers.showProgramEditScreen(
+            SFMScreenChangeHelpers.showProgramEditScreen(new ProgramEditScreenOpenContext(
                     getProgram(stack),
-                    programString -> SFMPackets.sendToServer(new ServerboundDiskItemSetProgramPacket(
-                                programString,
-                                pUsedHand
-                        ))
-            );
+                    LabelPositionHolder.from(stack),
+                    newProgramString -> SFMPackets.sendToServer(new ServerboundDiskItemSetProgramPacket(
+                            newProgramString,
+                            pUsedHand
+                    ))
+            ));
         }
         return InteractionResultHolder.sidedSuccess(stack, pLevel.isClientSide());
     }
 
     @Override
     public Component getName(ItemStack stack) {
-        if (FMLEnvironment.dist == Dist.CLIENT) {
-            if (ClientKeyHelpers.isKeyDownInScreenOrWorld(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY)) return super.getName(stack);
+        if (SFMEnvironmentUtils.isClient()) {
+            if (ClientKeyHelpers.isKeyDownInScreenOrWorld(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY))
+                return super.getName(stack);
         }
         var name = getProgramName(stack);
         if (name.isEmpty()) return super.getName(stack);
@@ -188,31 +221,32 @@ public class DiskItem extends Item {
 
     @Override
     public void appendHoverText(
-            ItemStack stack, @Nullable Level level, List<Component> lines, TooltipFlag detail
+            ItemStack stack,
+            @Nullable Level level,
+            List<Component> lines,
+            TooltipFlag detail
     ) {
-        if (stack.hasTag()) {
-            if (SFMItemUtils.isClientAndMoreInfoKeyPressed()) {
-                // show the program
-                var program = getProgram(stack);
-                if (!program.isEmpty()) {
-                    lines.add(SFMItemUtils.getRainbow(getName(stack).getString().length()));
-                    lines.addAll(ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(program, false));
-                }
-            } else {
-                lines.addAll(LabelPositionHolder.from(stack).asHoverText());
-                getErrors(stack)
-                        .stream()
-                        .map(MutableComponent::create)
-                        .map(line -> line.withStyle(ChatFormatting.RED))
-                        .forEach(lines::add);
-                getWarnings(stack)
-                        .stream()
-                        .map(MutableComponent::create)
-                        .map(line -> line.withStyle(ChatFormatting.YELLOW))
-                        .forEach(lines::add);
+        var program = getProgram(stack);
+        if (SFMItemUtils.isClientAndMoreInfoKeyPressed() && !program.isEmpty()) {
+            lines.add(SFMItemUtils.getRainbow(getName(stack).getString().length()));
+            lines.addAll(ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(program, false));
+        } else {
+            lines.addAll(LabelPositionHolder.from(stack).asHoverText());
+            getErrors(stack)
+                    .stream()
+                    .map(MutableComponent::create)
+                    .map(line -> line.withStyle(ChatFormatting.RED))
+                    .forEach(lines::add);
+            getWarnings(stack)
+                    .stream()
+                    .map(MutableComponent::create)
+                    .map(line -> line.withStyle(ChatFormatting.YELLOW))
+                    .forEach(lines::add);
+            if (!program.isEmpty()) {
                 SFMItemUtils.appendMoreInfoKeyReminderTextIfOnClient(lines);
             }
-        } else {
+        }
+        if (program.isEmpty()) {
             lines.add(LocalizationKeys.DISK_EDIT_IN_HAND_TOOLTIP.getComponent().withStyle(ChatFormatting.GRAY));
         }
     }

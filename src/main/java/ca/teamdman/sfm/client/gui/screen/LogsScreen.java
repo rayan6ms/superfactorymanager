@@ -1,11 +1,11 @@
 package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.ClientDiagnosticInfo;
 import ca.teamdman.sfm.client.ClientTranslationHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
-import ca.teamdman.sfm.client.gui.ButtonBuilder;
+import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
+import ca.teamdman.sfm.common.diagnostics.SFMDiagnostics;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.logging.TranslatableLogEvent;
 import ca.teamdman.sfm.common.net.ServerboundManagerClearLogsPacket;
@@ -182,7 +182,7 @@ public class LogsScreen extends Screen {
 
         this.levelButtons = new HashMap<>();
         for (var level : buttons) {
-            Button levelButton = new ButtonBuilder()
+            Button levelButton = new SFMButtonBuilder()
                     .setSize(buttonWidth, buttonHeight)
                     .setPosition(
                             startX + (buttonWidth + spacing) * buttonIndex,
@@ -208,7 +208,7 @@ public class LogsScreen extends Screen {
 
 
         this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(this.width / 2 - 200, this.height / 2 - 100 + 195)
                         .setSize(80, 20)
                         .setText(LocalizationKeys.LOGS_GUI_COPY_LOGS_BUTTON)
@@ -217,7 +217,7 @@ public class LogsScreen extends Screen {
                         .build()
         );
         this.addRenderableWidget(
-                new ButtonBuilder()
+                new SFMButtonBuilder()
                         .setPosition(this.width / 2 - 2 - 100, this.height / 2 - 100 + 195)
                         .setSize(200, 20)
                         .setText(CommonComponents.GUI_DONE)
@@ -227,7 +227,7 @@ public class LogsScreen extends Screen {
         );
         if (!isReadOnly()) {
             this.addRenderableWidget(
-                    new ButtonBuilder()
+                    new SFMButtonBuilder()
                             .setPosition(this.width / 2 - 2 + 115, this.height / 2 - 100 + 195)
                             .setSize(80, 20)
                             .setText(LocalizationKeys.LOGS_GUI_CLEAR_LOGS_BUTTON)
@@ -245,8 +245,7 @@ public class LogsScreen extends Screen {
 
     private void onCopyLogsClicked(Button button) {
         StringBuilder clip = new StringBuilder();
-        clip.append(ClientDiagnosticInfo.getDiagnosticInfo(
-                MENU.program,
+        clip.append(SFMDiagnostics.getDiagnosticsSummary(
                 MENU.getDisk()
         ));
         clip.append("\n-- LOGS --\n");
@@ -350,8 +349,8 @@ public class LogsScreen extends Screen {
             boolean isCursorVisible = this.isFocused() && this.frame / 6 % 2 == 0;
             boolean isCursorAtEndOfLine = false;
             int cursorIndex = textField.cursor();
-            int lineX = SFMScreenUtils.getX(this) + this.innerPadding();
-            int lineY = SFMScreenUtils.getY(this) + this.innerPadding();
+            int lineX = SFMScreenRenderUtils.getX(this) + this.innerPadding();
+            int lineY = SFMScreenRenderUtils.getY(this) + this.innerPadding();
             int charCount = 0;
             int cursorX = 0;
             int cursorY = 0;
@@ -375,8 +374,8 @@ public class LogsScreen extends Screen {
                     cursorY = lineY;
                     // we draw the raw before coloured in case of token recognition errors
                     // draw before cursor
-                    cursorX = SFMScreenUtils.drawInBatch(
-                            ProgramEditScreen.substring(componentColoured, 0, cursorIndex - charCount),
+                    cursorX = SFMFontUtils.drawInBatch(
+                            ProgramEditorScreen.substring(componentColoured, 0, cursorIndex - charCount),
                             font,
                             lineX,
                             lineY,
@@ -384,8 +383,8 @@ public class LogsScreen extends Screen {
                             false,
                             matrix4f,
                             buffer) - 1;
-                    SFMScreenUtils.drawInBatch(
-                            ProgramEditScreen.substring(componentColoured, cursorIndex - charCount, lineLength),
+                    SFMFontUtils.drawInBatch(
+                            ProgramEditorScreen.substring(componentColoured, cursorIndex - charCount, lineLength),
                             font,
                             cursorX,
                             lineY,
@@ -394,7 +393,7 @@ public class LogsScreen extends Screen {
                             matrix4f,
                             buffer);
                 } else {
-                    SFMScreenUtils.drawInBatch(
+                    SFMFontUtils.drawInBatch(
                             componentColoured,
                             font,
                             lineX,
@@ -411,18 +410,18 @@ public class LogsScreen extends Screen {
                     int lineSelectionStart = Math.max(selectionStart - charCount, 0);
                     int lineSelectionEnd = Math.min(selectionEnd - charCount, lineLength);
 
-                    int highlightStartX = this.font.width(ProgramEditScreen.substring(
+                    int highlightStartX = this.font.width(ProgramEditorScreen.substring(
                             componentColoured,
                             0,
                             lineSelectionStart
                     ));
-                    int highlightEndX = this.font.width(ProgramEditScreen.substring(
+                    int highlightEndX = this.font.width(ProgramEditorScreen.substring(
                             componentColoured,
                             0,
                             lineSelectionEnd
                     ));
 
-                    this.renderHighlight(
+                    SFMScreenRenderUtils.renderHighlight(
                             poseStack,
                             lineX + highlightStartX,
                             lineY,
@@ -436,7 +435,15 @@ public class LogsScreen extends Screen {
             }
 
             if (isCursorAtEndOfLine) {
-                this.font.drawShadow(poseStack, "_", cursorX, cursorY, -1);
+                SFMFontUtils.draw(
+                        poseStack,
+                        this.font,
+                        "_",
+                        cursorX,
+                        cursorY,
+                        -1,
+                        true
+                );
             } else {
                 GuiComponent.fill(poseStack, cursorX, cursorY - 1, cursorX + 1, cursorY + 1 + 9, -1);
             }

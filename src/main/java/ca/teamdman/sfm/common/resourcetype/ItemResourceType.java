@@ -14,7 +14,7 @@ import net.minecraftforge.registries.IForgeRegistry;
 
 import java.util.stream.Stream;
 
-public class ItemResourceType extends ResourceType<ItemStack, Item, IItemHandler> {
+public class ItemResourceType extends RegistryBackedResourceType<ItemStack, Item, IItemHandler> {
     public ItemResourceType() {
         super(ForgeCapabilities.ITEM_HANDLER);
     }

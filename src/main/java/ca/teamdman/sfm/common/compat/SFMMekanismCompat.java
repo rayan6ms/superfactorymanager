@@ -33,18 +33,22 @@ public class SFMMekanismCompat {
         return switch (trans) {
             case ITEM -> SFMResourceTypes.ITEM.get();
             case FLUID -> SFMResourceTypes.FLUID.get();
-            case GAS -> SFMResourceTypes.DEFERRED_TYPES
-                    .get()
-                    .getValue(new ResourceLocation(SFM.MOD_ID, "gas"));
-            case INFUSION -> SFMResourceTypes.DEFERRED_TYPES
-                    .get()
-                    .getValue(new ResourceLocation(SFM.MOD_ID, "infusion"));
-            case PIGMENT -> SFMResourceTypes.DEFERRED_TYPES
-                    .get()
-                    .getValue(new ResourceLocation(SFM.MOD_ID, "pigment"));
-            case SLURRY -> SFMResourceTypes.DEFERRED_TYPES
-                    .get()
-                    .getValue(new ResourceLocation(SFM.MOD_ID, "slurry"));
+            case GAS -> {
+                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "gas");
+                yield SFMResourceTypes.registry().getValue(id);
+            }
+            case INFUSION -> {
+                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "infusion");
+                yield SFMResourceTypes.registry().getValue(id);
+            }
+            case PIGMENT -> {
+                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "pigment");
+                yield SFMResourceTypes.registry().getValue(id);
+            }
+            case SLURRY -> {
+                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "slurry");
+                yield SFMResourceTypes.registry().getValue(id);
+            }
             default -> null;
         };
     }
@@ -80,7 +84,7 @@ public class SFMMekanismCompat {
                 continue;
             }
 
-            var maybeResourceTypeKe = SFMResourceTypes.DEFERRED_TYPES.get().getResourceKey(resourceType);
+            var maybeResourceTypeKe = SFMResourceTypes.registry().getResourceKey(resourceType);
             if (maybeResourceTypeKe.isEmpty()) {
                 continue;
             }

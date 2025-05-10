@@ -233,8 +233,8 @@ public record ServerboundOutputInspectionRequestPacket(
     ) {
         ResourceType<STACK, ITEM, CAP> resourceType = limitedInputSlot.type;
         //noinspection OptionalGetWithoutIsPresent
-        ResourceKey<ResourceType<STACK, ITEM, CAP>> resourceTypeResourceKey = SFMResourceTypes.DEFERRED_TYPES
-                .get()
+        ResourceKey<ResourceType<STACK, ITEM, CAP>> resourceTypeResourceKey = SFMResourceTypes
+                .registry()
                 .getResourceKey(limitedInputSlot.type)
                 .map(x -> {
                     //noinspection unchecked,rawtypes
@@ -250,12 +250,10 @@ public record ServerboundOutputInspectionRequestPacket(
                 new ResourceQuantity(new Number(amount), ResourceQuantity.IdExpansionBehaviour.NO_EXPAND),
                 ResourceQuantity.MAX_QUANTITY
         );
-        ResourceLocation stackId = resourceType.getRegistryKey(stack);
+        ResourceLocation stackId = resourceType.getRegistryKeyForStack(stack);
         ResourceIdentifier<STACK, ITEM, CAP> resourceIdentifier = new ResourceIdentifier<>(
-                resourceTypeResourceKey.location().getNamespace(),
-                resourceTypeResourceKey.location().getPath(),
-                stackId.getNamespace(),
-                stackId.getPath()
+                resourceTypeResourceKey,
+                stackId
         );
         return new ResourceLimit(
                 new ResourceIdSet(List.of(resourceIdentifier)),
@@ -293,7 +291,7 @@ public record ServerboundOutputInspectionRequestPacket(
         ) {
             context.compileAndThen(
                     msg.programString,
-                    (program, player, managerBlockEntity) -> program.builder()
+                    (program, player, managerBlockEntity) -> program.astBuilder()
                             .getNodeAtIndex(msg.outputNodeIndex)
                             .filter(OutputStatement.class::isInstance)
                             .map(OutputStatement.class::cast)
