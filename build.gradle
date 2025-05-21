@@ -400,6 +400,14 @@ dependencies {
 
     implementation fg.deobf("curse.maven:flux-networks-248020:4620438") // Flux-Networks-1.19.2-7.1.4
     implementation fg.deobf("curse.maven:project-e-226410:4860858") // ProjectE-1.19.2-PE1.1.0.jar
+
+
+    runtimeOnly fg.deobf("curse.maven:dank-storage-335673:4395369") // dankstorage-1.19.2-5.1.6.jar
+
+    runtimeOnly fg.deobf("curse.maven:tinkers-construct-74072:6044827") // Tinkers' Construct 3.8.5.58 for 1.19.2
+    runtimeOnly fg.deobf("curse.maven:mantle-74924:6044700") // Mantle 1.10.48 for 1.19.2
+
+
 }
 
 // This block of code expands all declared replace properties in the specified resource tar+gets.
