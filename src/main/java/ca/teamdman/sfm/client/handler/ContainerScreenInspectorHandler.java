@@ -77,6 +77,7 @@ public class ContainerScreenInspectorHandler {
             Font font = Minecraft.getInstance().font;
             for (var slot : menu.slots) {
                 int colour;
+                // TODO: can we reference-compare this to the capabilities to find out if this matches any of the inventories exposed for automation?
                 if (slot.container instanceof Inventory) {
                     //noinspection DataFlowIssue
                     colour = ChatFormatting.YELLOW.getColor();
