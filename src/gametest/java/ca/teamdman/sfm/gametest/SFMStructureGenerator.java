@@ -1,0 +1,70 @@
+package ca.teamdman.sfm.gametest;
+
+import ca.teamdman.sfm.SFM;
+import net.minecraft.core.BlockPos;
+import net.minecraft.core.Vec3i;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import static java.util.regex.Pattern.compile;
+
+public class SFMStructureGenerator {
+    /*
+    TODO:
+    - Delete all .nbt structures that are now replaceable with this code
+    - Remove the structure generator test
+    - Create test for mekanism fluid tank INPUT RETAIN 30000, see https://discord.com/channels/967118679370264627/1372589927090487458
+    - Create test for INPUT RETAIN 100 using dank in dock
+    (the above tests should fail)
+    see line 105 TODO comment in ca.teamdman.sfml.ast.OutputStatement
+     */
+    public static Optional<StructureTemplate> generateStructureTemplate(ResourceLocation id) {
+        SFM.LOGGER.info("Constructing structure template for {}", id);
+        StructureTemplate template = new StructureTemplate();
+        template.setAuthor("TeamDman");
+        template.size = extractSizeFromTemplateId(id);
+
+        List<StructureTemplate.StructureBlockInfo> infos = new ArrayList<>();
+        for (int x = 0; x < template.size.getX(); x++) {
+            int y = 0;
+            for (int z = 0; z < template.size.getZ(); z++) {
+                BlockPos pos = new BlockPos(x, y, z);
+                StructureTemplate.StructureBlockInfo blockInfo = new StructureTemplate.StructureBlockInfo(
+                        pos,
+                        Blocks.POLISHED_ANDESITE.defaultBlockState(),
+                        null
+                );
+                infos.add(blockInfo);
+            }
+        }
+        template.palettes.add(new StructureTemplate.Palette(infos));
+        return Optional.of(template);
+    }
+
+    private static Vec3i extractSizeFromTemplateId(
+            ResourceLocation id
+    ) {
+        int x = 1;
+        int y = 1;
+        int z = 1;
+        // "sfm:sometest.1x3x4"
+        // "sfm:1x3x4"
+        var path = id.getPath();
+        if (path.contains(".")) {
+            path = path.split("\\.")[1];
+        }
+        var regex = "([0-9]+)x([0-9]+)x([0-9]+)";
+        var matcher = compile(regex).matcher(path);
+        if (matcher.find()) {
+            x = Integer.parseInt(matcher.group(1));
+            y = Integer.parseInt(matcher.group(2));
+            z = Integer.parseInt(matcher.group(3));
+        }
+        return new Vec3i(x, y, z);
+    }
+}
