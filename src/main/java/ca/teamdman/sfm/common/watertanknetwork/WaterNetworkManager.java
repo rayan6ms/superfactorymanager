@@ -17,6 +17,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.level.ChunkEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -152,6 +153,12 @@ public class WaterNetworkManager {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         var chunk = event.getChunk();
         purgeChunk(level, chunk);
+    }
+
+    @SubscribeEvent
+    public static void onLevelUnload(LevelEvent.Unload event) {
+        if (!(event.getLevel() instanceof ServerLevel level)) return;
+        NETWORKS.remove(level);
     }
 
     public static void purgeChunk(

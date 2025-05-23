@@ -4,20 +4,30 @@
   "description": "Adds language support for the Super Factory Manager Language.",
   "repository": "https://github.com/TeamDman/SuperFactoryManager",
   "publisher": "TeamDman",
-  "version": "0.0.10",
+  "author": {
+    "name": "TeamDman"
+  },
+  "contributors": [
+    {
+      "name": "TeamDman"
+    },
+    {
+      "name": "Titop54"
+    }
+  ],
+  "version": "0.0.12",
   "icon": "media/controller.png",
   "main": "./out/extension.js",
   "engines": {
-    "vscode": "^1.0.0"
+    "vscode": "^1.0.0",
+    "node": ">=20.0.0"
   },
   "categories": [
     "Programming Languages"
   ],
   "activationEvents": [
-    "onLanguage:sfm",
-    "onLanguage:sfml"
+    "onLanguage:sfm"
   ],
-
   "contributes": {
     "languages": [
       {
@@ -59,21 +69,24 @@
         {
           "id": "examplesGames",
           "name": "Examples in-game",
-          "when": "sfml.isActivated"
+          "when": "sfml.isActivated",
+          "icon": "/media/controller.png"
         },
         {
           "id": "examplegithub",
           "name": "Examples Github",
-          "when": "sfml.isActivated"
+          "when": "sfml.isActivated",
+          "icon": "/media/controller.png"
         },
         {
           "id": "examplesOthers",
           "name": "External examples",
-          "when": "sfml.isActivated && sfml.thereAreFiles"
+          "when": "sfml.isActivated && sfml.thereAreFiles",
+          "icon": "/media/controller.png"
         }
       ]
     },
-    "configuration":[
+    "configuration": [
       {
         "title": "Super Factory Manager Language",
         "properties": {
@@ -145,9 +158,9 @@
     ]
   },
   "devDependencies": {
-    "@types/node": "^22.5.4",
+    "@types/node": "^22.15.17",
     "@types/vscode": "^1.0.0",
-    "typescript": "^5.5.4"
+    "typescript": "^5.8.3"
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
