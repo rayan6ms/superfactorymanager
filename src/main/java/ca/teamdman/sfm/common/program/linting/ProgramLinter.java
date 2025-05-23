@@ -212,12 +212,13 @@ public class ProgramLinter {
 //                    .getReferencedTransmissionTypes(statement);
 //            Predicate<DataType> dataTypePredicate;
 //            if (ioStatement instanceof InputStatement) {
-//                dataTypePredicate = DataType::canOutput;
+//                dataTypePredicate = dataType -> dataType.canOutput() || dataType == DataType.EXTRA;
 //            } else if (ioStatement instanceof OutputStatement) {
 //                dataTypePredicate = dataType -> dataType == DataType.INPUT
 //                                                || dataType == DataType.INPUT_OUTPUT
 //                                                || dataType == DataType.INPUT_1
-//                                                || dataType == DataType.INPUT_2;
+//                                                || dataType == DataType.INPUT_2
+//                                                || dataType == DataType.EXTRA;
 //            } else {
 //                throw new IllegalStateException("Unexpected value: " + ioStatement);
 //            }

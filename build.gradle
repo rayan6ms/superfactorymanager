@@ -7,8 +7,8 @@ plugins {
     id 'antlr'
     id 'org.parchmentmc.librarian.forgegradle' version '1.+'
     id 'application'
+    id 'org.spongepowered.mixin' version '0.7.+'
 }
-
 
 sourceSets {
     main {
@@ -244,6 +244,13 @@ minecraft {
     }
 }
 
+mixin {
+    add sourceSets.gametest, "sfm.mixins.refmap.json"
+    config "sfm.mixins.json"
+
+//    debug.verbose = true
+//    debug.export = true
+}
 
 repositories {
     // Put repositories for dependencies here
@@ -288,6 +295,9 @@ dependencies {
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     //noinspection VulnerableLibrariesLocal
     minecraft "net.minecraftforge:forge:${minecraft_version}-${neo_version}"
+
+    // Apply Mixin AP
+    gametestAnnotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime

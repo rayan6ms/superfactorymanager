@@ -27,9 +27,8 @@ import { WithNegationContext } from "./SFMLParser";
 import { WithConjunctionContext } from "./SFMLParser";
 import { WithDisjunctionContext } from "./SFMLParser";
 import { WithTagContext } from "./SFMLParser";
-import { TickContext } from "./SFMLParser";
-import { TicksContext } from "./SFMLParser";
-import { SecondsContext } from "./SFMLParser";
+import { IntervalSpaceContext } from "./SFMLParser";
+import { IntervalNoSpaceContext } from "./SFMLParser";
 import { ProgramContext } from "./SFMLParser";
 import { NameContext } from "./SFMLParser";
 import { TriggerContext } from "./SFMLParser";
@@ -39,14 +38,17 @@ import { StatementContext } from "./SFMLParser";
 import { ForgetStatementContext } from "./SFMLParser";
 import { InputStatementContext } from "./SFMLParser";
 import { OutputStatementContext } from "./SFMLParser";
-import { ResourceExclusionContext } from "./SFMLParser";
 import { InputResourceLimitsContext } from "./SFMLParser";
 import { OutputResourceLimitsContext } from "./SFMLParser";
-import { ResourceLimitsContext } from "./SFMLParser";
+import { ResourceLimitListContext } from "./SFMLParser";
 import { ResourceLimitContext } from "./SFMLParser";
 import { LimitContext } from "./SFMLParser";
 import { QuantityContext } from "./SFMLParser";
 import { RetentionContext } from "./SFMLParser";
+import { ResourceExclusionContext } from "./SFMLParser";
+import { ResourceIdContext } from "./SFMLParser";
+import { ResourceIdListContext } from "./SFMLParser";
+import { ResourceIdDisjunctionContext } from "./SFMLParser";
 import { WithContext } from "./SFMLParser";
 import { WithClauseContext } from "./SFMLParser";
 import { TagMatcherContext } from "./SFMLParser";
@@ -57,13 +59,11 @@ import { RangesetContext } from "./SFMLParser";
 import { RangeContext } from "./SFMLParser";
 import { IfStatementContext } from "./SFMLParser";
 import { BoolexprContext } from "./SFMLParser";
-import { ResourcecomparisonContext } from "./SFMLParser";
 import { ComparisonOpContext } from "./SFMLParser";
 import { SetOpContext } from "./SFMLParser";
 import { LabelAccessContext } from "./SFMLParser";
 import { RoundrobinContext } from "./SFMLParser";
 import { LabelContext } from "./SFMLParser";
-import { ResourceIdContext } from "./SFMLParser";
 import { IdentifierContext } from "./SFMLParser";
 import { StringContext } from "./SFMLParser";
 import { NumberContext } from "./SFMLParser";
@@ -270,28 +270,20 @@ export interface SFMLVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitWithTag?: (ctx: WithTagContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `Tick`
+	 * Visit a parse tree produced by the `IntervalSpace`
 	 * labeled alternative in `SFMLParser.interval`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitTick?: (ctx: TickContext) => Result;
+	visitIntervalSpace?: (ctx: IntervalSpaceContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by the `Ticks`
+	 * Visit a parse tree produced by the `IntervalNoSpace`
 	 * labeled alternative in `SFMLParser.interval`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitTicks?: (ctx: TicksContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by the `Seconds`
-	 * labeled alternative in `SFMLParser.interval`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitSeconds?: (ctx: SecondsContext) => Result;
+	visitIntervalNoSpace?: (ctx: IntervalNoSpaceContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `SFMLParser.program`.
@@ -357,13 +349,6 @@ export interface SFMLVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitOutputStatement?: (ctx: OutputStatementContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `SFMLParser.resourceExclusion`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitResourceExclusion?: (ctx: ResourceExclusionContext) => Result;
-
-	/**
 	 * Visit a parse tree produced by `SFMLParser.inputResourceLimits`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -378,11 +363,11 @@ export interface SFMLVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitOutputResourceLimits?: (ctx: OutputResourceLimitsContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `SFMLParser.resourceLimits`.
+	 * Visit a parse tree produced by `SFMLParser.resourceLimitList`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
 	 */
-	visitResourceLimits?: (ctx: ResourceLimitsContext) => Result;
+	visitResourceLimitList?: (ctx: ResourceLimitListContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `SFMLParser.resourceLimit`.
@@ -411,6 +396,34 @@ export interface SFMLVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitRetention?: (ctx: RetentionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `SFMLParser.resourceExclusion`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitResourceExclusion?: (ctx: ResourceExclusionContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `SFMLParser.resourceId`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitResourceId?: (ctx: ResourceIdContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `SFMLParser.resourceIdList`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitResourceIdList?: (ctx: ResourceIdListContext) => Result;
+
+	/**
+	 * Visit a parse tree produced by `SFMLParser.resourceIdDisjunction`.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	visitResourceIdDisjunction?: (ctx: ResourceIdDisjunctionContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `SFMLParser.with`.
@@ -483,13 +496,6 @@ export interface SFMLVisitor<Result> extends ParseTreeVisitor<Result> {
 	visitBoolexpr?: (ctx: BoolexprContext) => Result;
 
 	/**
-	 * Visit a parse tree produced by `SFMLParser.resourcecomparison`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitResourcecomparison?: (ctx: ResourcecomparisonContext) => Result;
-
-	/**
 	 * Visit a parse tree produced by `SFMLParser.comparisonOp`.
 	 * @param ctx the parse tree
 	 * @return the visitor result
@@ -523,13 +529,6 @@ export interface SFMLVisitor<Result> extends ParseTreeVisitor<Result> {
 	 * @return the visitor result
 	 */
 	visitLabel?: (ctx: LabelContext) => Result;
-
-	/**
-	 * Visit a parse tree produced by `SFMLParser.resourceId`.
-	 * @param ctx the parse tree
-	 * @return the visitor result
-	 */
-	visitResourceId?: (ctx: ResourceIdContext) => Result;
 
 	/**
 	 * Visit a parse tree produced by `SFMLParser.identifier`.
