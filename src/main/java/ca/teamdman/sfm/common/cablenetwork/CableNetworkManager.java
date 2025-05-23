@@ -14,6 +14,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraftforge.event.level.ChunkEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -262,6 +263,13 @@ public class CableNetworkManager {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         var chunk = event.getChunk();
         purgeChunkFromCableNetworks(level, chunk);
+    }
+
+    @SubscribeEvent
+    public static void onLevelUnload(LevelEvent.Unload event) {
+        if (!(event.getLevel() instanceof ServerLevel level)) return;
+        NETWORKS_BY_LEVEL.remove(level);
+        NETWORKS_BY_CABLE_POSITION.remove(level);
     }
 
     public static void purgeChunkFromCableNetworks(ServerLevel level, ChunkAccess chunkAccess) {

@@ -10,7 +10,6 @@ plugins {
     id 'application'
 }
 
-
 sourceSets {
     main {
         resources {
@@ -249,6 +248,13 @@ minecraft {
     }
 }
 
+mixin {
+    add sourceSets.gametest, "sfm.mixins.refmap.json"
+    config "sfm.mixins.json"
+
+//    debug.verbose = true
+//    debug.export = true
+}
 
 repositories {
     // Put repositories for dependencies here
@@ -292,6 +298,9 @@ dependencies {
     // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
     // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
     minecraft "net.neoforged:forge:${minecraft_version}-${neo_version}"
+
+    // Apply Mixin AP
+    gametestAnnotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
     // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
