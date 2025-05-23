@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.SFMClientChatHelper;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundManagerLogDesireUpdatePacket;
@@ -115,8 +116,7 @@ public class SFMScreenChangeHelpers {
             Minecraft minecraft = Minecraft.getInstance();
             minecraft.keyboardHandler.setClipboard(content);
             SFM.LOGGER.info("Copied {} characters to clipboard", content.length());
-            assert minecraft.player != null;
-            minecraft.player.sendSystemMessage(
+            SFMClientChatHelper.sendChatMessage(
                     LocalizationKeys.ITEM_INSPECTOR_COPIED_TO_CLIPBOARD.getComponent(
                             Component.literal(String.valueOf(content.length())).withStyle(ChatFormatting.AQUA)
                     )

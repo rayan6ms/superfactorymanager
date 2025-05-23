@@ -39,11 +39,11 @@ sourceSets {
         java {
             exclude "ca/teamdman/sfm/client/jei/**"
             exclude "ca/teamdman/sfm/common/resourcetype/exclude/**"
-//            exclude "ca/teamdman/sfm/common/compat/SFMMekanismCompat.java"
+            exclude "ca/teamdman/sfm/common/compat/SFMMekanismCompat.java"
         }
         java {
             exclude "ca/teamdman/sfm/common/capabilityprovidermapper/ae2/**"
-//            exclude "ca/teamdman/sfm/common/program/linting/MekanismSideConfigProgramLinter.java"
+            exclude "ca/teamdman/sfm/common/program/linting/MekanismSideConfigProgramLinter.java"
         }
         java {
             exclude "ca/teamdman/sfm/common/block/TunnelledManagerBlock.java"
@@ -53,11 +53,12 @@ sourceSets {
             exclude "ca/teamdman/sfm/common/block/BatteryBlock.java"
             exclude "ca/teamdman/sfm/common/blockentity/BatteryBlockEntity.java"
         }
-        //// @MCVersionDependentBehaviour
-//        java {
-//            exclude "ca/teamdman/sfm/common/compat/SFMMekanismCompat.java"
-//        }
+        // @MCVersionDependentBehaviour
         java {
+            exclude "ca/teamdman/sfm/common/compat/SFMMekanismCompat.java"
+        }
+        java {
+            exclude "ca/teamdman/sfm/common/resourcetype/ChemicalResourceType.java"
             exclude "ca/teamdman/sfm/common/resourcetype/GasResourceType.java"
             exclude "ca/teamdman/sfm/common/resourcetype/InfuseResourceType.java"
             exclude "ca/teamdman/sfm/common/resourcetype/MekanismEnergyResourceType.java"
@@ -176,7 +177,7 @@ runs {
         systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
     }
 
-    data {
+    clientData {
         modSource project.sourceSets.datagen
         // example of overriding the workingDirectory set in configureEach above, uncomment if you want to use it
         // workingDirectory project.file('run-data')
@@ -266,10 +267,10 @@ dependencies {
 //    runtimeOnly "curse.maven:easy-villagers-400514:5153632" // Easy Villagers 1.20.4-1.1.4
 
 
-    implementation "curse.maven:mekanism-268560:5656332" // Mekanism-1.21.1-10.7.4.60.jar
-    implementation "mekanism:Mekanism:1.21.1-10.7.4.60:api"
-
-    implementation "curse.maven:spark-361579:5759671" // spark-1.10.109-neoforge.jar
+//    implementation "curse.maven:mekanism-268560:5656332" // Mekanism-1.21.1-10.7.4.60.jar
+//    implementation "mekanism:Mekanism:1.21.1-10.7.4.60:api"
+//
+//    implementation "curse.maven:spark-361579:5759671" // spark-1.10.109-neoforge.jar
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

@@ -5,6 +5,7 @@ import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.util.SFMARGBColorUtils;
 import ca.teamdman.sfm.common.util.SFMHandUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
@@ -13,7 +14,6 @@ import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.LayeredDraw;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 
 public class NetworkToolReminderOverlay implements LayeredDraw.Layer {
@@ -48,7 +48,7 @@ public class NetworkToolReminderOverlay implements LayeredDraw.Layer {
                 reminder,
                 x,
                 y,
-                FastColor.ARGB32.color(255, 172, 208, 255),
+                SFMARGBColorUtils.color(255, 172, 208, 255),
                 true
         );
     }

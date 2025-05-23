@@ -1,13 +1,12 @@
 package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.SFMClientChatHelper;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.gui.screen.TomlEditScreenOpenContext;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.config.SFMConfigReadWriter;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ClientboundClientConfigCommandPacket(
@@ -65,10 +64,7 @@ public record ClientboundClientConfigCommandPacket(
 
         public static void handleNewClientConfig(String newConfigToml) {
             SFMConfigReadWriter.ConfigSyncResult configSyncResult = SFMConfigReadWriter.updateClientConfig(newConfigToml);
-            LocalPlayer player = Minecraft.getInstance().player;
-            if (player != null) {
-                player.sendSystemMessage(configSyncResult.component());
-            }
+            SFMClientChatHelper.sendChatMessage(configSyncResult.component());
         }
     }
 }

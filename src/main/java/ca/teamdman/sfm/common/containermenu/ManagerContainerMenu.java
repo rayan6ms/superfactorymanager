@@ -88,7 +88,7 @@ public class ManagerContainerMenu extends AbstractContainerMenu {
                 buf.readUtf(Program.MAX_PROGRAM_LENGTH),
                 buf.readUtf(ServerboundManagerSetLogLevelPacket.MAX_LOG_LEVEL_NAME_LENGTH),
                 buf.readEnum(ManagerBlockEntity.State.class),
-                buf.readLongArray(null, ManagerBlockEntity.TICK_TIME_HISTORY_SIZE),
+                buf.readFixedSizeLongArray(new long[ManagerBlockEntity.TICK_TIME_HISTORY_SIZE]),
                 new ArrayDeque<>()
         );
     }

@@ -7,6 +7,7 @@ import ca.teamdman.sfm.common.item.NetworkToolItem;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.HelpsWithMinecraftVersionIndependence;
 import ca.teamdman.sfm.common.util.NotStored;
+import ca.teamdman.sfm.common.util.SFMARGBColorUtils;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import com.google.common.collect.HashMultimap;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -24,7 +25,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
@@ -77,9 +77,9 @@ public class ItemWorldRenderer {
                     .createCompositeState(true)
     );
 
-    private static final int capabilityColor = FastColor.ARGB32.color(100, 100, 0, 255);
-    private static final int capabilityColorLimitedView = FastColor.ARGB32.color(100, 0, 100, 255);
-    private static final int cableColor = FastColor.ARGB32.color(100, 100, 255, 0);
+    private static final int capabilityColor = SFMARGBColorUtils.color(100, 100, 0, 255);
+    private static final int capabilityColorLimitedView = SFMARGBColorUtils.color(100, 0, 100, 255);
+    private static final int cableColor = SFMARGBColorUtils.color(100, 100, 255, 0);
     private static final VBOCache vboCache = new VBOCache();
 
     @SubscribeEvent

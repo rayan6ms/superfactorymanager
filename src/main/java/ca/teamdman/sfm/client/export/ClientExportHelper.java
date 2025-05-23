@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.client.export;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.SFMClientChatHelper;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -95,7 +96,7 @@ public class ClientExportHelper {
         }
         SFM.LOGGER.info("Exported item data to {}", itemFile);
         assert Minecraft.getInstance().player != null;
-        Minecraft.getInstance().player.sendSystemMessage(Component.literal(String.format(
+        SFMClientChatHelper.sendChatMessage(Component.literal(String.format(
                 "Exported %d items to \"%s\"",
                 items.size(),
                 itemFile.getAbsolutePath()
