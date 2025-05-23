@@ -67,6 +67,7 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
             BlockState pNewState,
             boolean pIsMoving
     ) {
+        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         WaterNetworkManager.onActiveStateChanged(pLevel, pPos, pNewState);
     }
 

@@ -105,7 +105,7 @@ public class OutputStatement implements IOStatement {
         );
         toMove -= promised_to_leave_in_this_slot;
         // how many more need we are obligated to leave to satisfy the remainder of the RETAIN limit
-        long remainingObligation = source.tracker.getRemainingRetentionObligation(resourceType, potential);
+        long remainingObligation = source.tracker.getRemainingRetentionObligation(resourceType, potential); // TODO: this calculation should happen earlier, when we are seeing how much is in the inventory
         remainingObligation = Long.min(toMove, remainingObligation);
         toMove -= remainingObligation;
 

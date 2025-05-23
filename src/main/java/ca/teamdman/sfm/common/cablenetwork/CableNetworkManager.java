@@ -16,6 +16,7 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.event.level.ChunkEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -261,6 +262,13 @@ public class CableNetworkManager {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         var chunk = event.getChunk();
         purgeChunkFromCableNetworks(level, chunk);
+    }
+
+    @SubscribeEvent
+    public static void onLevelUnload(LevelEvent.Unload event) {
+        if (!(event.getLevel() instanceof ServerLevel level)) return;
+        NETWORKS_BY_LEVEL.remove(level);
+        NETWORKS_BY_CABLE_POSITION.remove(level);
     }
 
     public static void purgeChunkFromCableNetworks(ServerLevel level, ChunkAccess chunkAccess) {

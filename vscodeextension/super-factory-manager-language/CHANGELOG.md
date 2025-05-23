@@ -1,5 +1,29 @@
 # Changelog
 
+## [0.0.12]
+
+### Changes on code
+
+- **Unification of snippets**
+  - Basically, only one big file with all snippets and easier to mantain
+
+- **Changes**
+  - It will only trigger snippets when needed and will show IntelliSense (suggestions) when not
+
+## [0.0.10 - 0.0.11]
+
+### Changes on code
+
+- **Error checking / Warning checking**
+  - Solved issue that it triggered on non-sfml files
+  - Update parser to include the lastest .g4
+
+- **SFMLTreeDataProvider**
+  - Simplify the class
+
+- **SFML.g4**
+  - Update to lastest
+
 ## [0.0.9]
 
 ### Added

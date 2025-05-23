@@ -113,51 +113,51 @@ public final class LocalizationKeys {
             "%d different facade states across %d blocks that will be overwritten."
     );
     public static final LocalizationEntry CONFIRM_FUNNY_YES_1 = new LocalizationEntry(
-            "gui.sfm.comfirm.funny.yes.1",
+            "gui.sfm.confirm.funny.yes.1",
             "Yeah, sure, why not."
     );
     public static final LocalizationEntry CONFIRM_FUNNY_YES_2 = new LocalizationEntry(
-            "gui.sfm.comfirm.funny.yes.2",
+            "gui.sfm.confirm.funny.yes.2",
             "Sure, what could go wrong."
     );
     public static final LocalizationEntry CONFIRM_FUNNY_YES_3 = new LocalizationEntry(
-            "gui.sfm.comfirm.funny.yes.3",
+            "gui.sfm.confirm.funny.yes.3",
             "Yup, go ahead."
     );
     public static final LocalizationEntry CONFIRM_FUNNY_YES_4 = new LocalizationEntry(
-            "gui.sfm.comfirm.funny.yes.4",
+            "gui.sfm.confirm.funny.yes.4",
             "Go for it."
     );
     public static final LocalizationEntry CONFIRM_FUNNY_YES_5 = new LocalizationEntry(
-            "gui.sfm.comfirm.funny.yes.5",
+            "gui.sfm.confirm.funny.yes.5",
             "lol do it"
     );
     public static final LocalizationEntry CONFIRM_FUNNY_YES_6 = new LocalizationEntry(
-            "gui.sfm.comfirm.funny.yes.6",
+            "gui.sfm.confirm.funny.yes.6",
             "Apply the change."
     );
     public static final LocalizationEntry CONFIRM_FUNNY_NO_1 = new LocalizationEntry(
-            "gui.sfm.comfirm.funny.no.1",
+            "gui.sfm.confirm.funny.no.1",
             "Nah, changed my mind"
     );
     public static final LocalizationEntry CONFIRM_FUNNY_NO_2 = new LocalizationEntry(
-            "gui.sfm.comfirm.funny.no.2",
+            "gui.sfm.confirm.funny.no.2",
             "Holy guacamole, no"
     );
     public static final LocalizationEntry CONFIRM_FUNNY_NO_3 = new LocalizationEntry(
-            "gui.sfm.comfirm.funny.no.3",
+            "gui.sfm.confirm.funny.no.3",
             "no no no no no"
     );
     public static final LocalizationEntry CONFIRM_FUNNY_NO_4 = new LocalizationEntry(
-            "gui.sfm.comfirm.funny.no.4",
+            "gui.sfm.confirm.funny.no.4",
             "Nope, not today"
     );
     public static final LocalizationEntry CONFIRM_FUNNY_NO_5 = new LocalizationEntry(
-            "gui.sfm.comfirm.funny.no.5",
+            "gui.sfm.confirm.funny.no.5",
             "ABORT ABORT ABORT"
     );
     public static final LocalizationEntry CONFIRM_FUNNY_NO_6 = new LocalizationEntry(
-            "gui.sfm.comfirm.funny.no.6",
+            "gui.sfm.confirm.funny.no.6",
             "Never mind"
     );
     public static final LocalizationEntry PROGRAM_WARNING_RESOURCE_EACH_WITHOUT_PATTERN = new LocalizationEntry(
