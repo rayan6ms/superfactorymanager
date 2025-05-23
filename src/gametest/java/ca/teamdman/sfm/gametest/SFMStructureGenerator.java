@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.gametest;
 
-import ca.teamdman.sfm.SFM;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.resources.ResourceLocation;
@@ -24,7 +23,6 @@ public class SFMStructureGenerator {
     see line 105 TODO comment in ca.teamdman.sfml.ast.OutputStatement
      */
     public static Optional<StructureTemplate> generateStructureTemplate(ResourceLocation id) {
-        SFM.LOGGER.info("Constructing structure template for {}", id);
         StructureTemplate template = new StructureTemplate();
         template.setAuthor("TeamDman");
         template.size = extractSizeFromTemplateId(id);
