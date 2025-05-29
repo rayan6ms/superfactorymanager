@@ -231,6 +231,7 @@
   "program.sfm.warnings.unknown_resource_id": "未找到资源 \"%s\"。",
   "program.sfm.warnings.unused_input_label": "语句 \"%s\" 在 %s 从 \"%s\" 输入 \"%s\"，但没有后续输出语句消耗 \"%s\"。",
   "program.sfm.warnings.unused_label": "标签 \"%s\" 在代码中使用但未在世界中分配。",
+  "sfm.error.bad_translation_argument": "无法为键 \"{}\" 创建可翻译内容，错误：{}",
   "sfm.label_gun.view_mode.show_only_active_and_targeted": "显示带有活动标签的方块。在GUI中或使用 %s 切换模式",
   "sfm.label_gun.view_mode.show_only_targeted": "仅显示目标方块标签。在GUI中或使用 %s 切换模式",
   "sfm.network_tool.reminder_overlay": "使用 %s 切换网络工具覆盖层"
