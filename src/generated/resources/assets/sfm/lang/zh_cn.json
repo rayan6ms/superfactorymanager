@@ -67,7 +67,7 @@
   "gui.sfm.logs.empty_capability": "收到空功能 %s %s 方向=%s",
   "gui.sfm.logs.missing_adjacent_cable": "未找到 %s 的相邻线缆",
   "gui.sfm.logs.missing_capability_provider": "未找到 %s %s 方向=%s 的功能提供者",
-  "gui.sfm.logs.no_content": "你好，世界！\n使用此屏幕顶部的按钮更改日志级别。\n详细日志级别将在单次程序执行后重置。\n记录可能会使语句执行时间更长。\n滚动有点奇怪，我正在修复。\n只绘制几百行以减少延迟。\n暂时使用复制按钮在更好的编辑器中查看。",
+  "gui.sfm.logs.no_content": "Ahoy, world!\n使用此屏幕顶部的按钮更改日志级别。\n详细日志级别将在单次程序执行后重置。\n记录可能会使语句执行时间更长。\n滚动有点奇怪，我正在修复。\n只绘制几百行以减少延迟。\n暂时使用复制按钮以在更好的编辑器中查看。",
   "gui.sfm.logs.title": "日志",
   "gui.sfm.manager.button.copy_to_clipboard": "复制到剪贴板",
   "gui.sfm.manager.button.discord": "Discord",
