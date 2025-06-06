@@ -186,6 +186,13 @@ runs {
     }
 }
 
+//mixin {
+//    add sourceSets.gametest, "sfm.mixins.refmap.json"
+//    config "sfm.mixins.json"
+//
+////    debug.verbose = true
+////    debug.export = true
+//}
 
 repositories {
     // Put repositories for dependencies here

@@ -4,6 +4,15 @@ NAME "Changelog"
 -- Official SFM Donation Page:
 -- https://ko-fi.com/teamdman
 
+---- vNEXT ----
+-- Thank you SpruceMist for the GitHub sponsorship <3
+---- Check out the "Thank you!" example for more names <3
+-- Clear network managers when level unloads, fixes #287
+-- Fix typo in localization key "gui.sfm.comfirm", fixes #274
+-- Fix water tank block entities not being cleaned up, fixes #290
+---- Thanks @Linguardium for the bug report!
+-- Fix `SECOND` keyword (singular) not multiplying by 20, fixes #244
+
 ---- 4.21.0 ----
 -- Add intellisense, disabled by default - backslash to accept suggestion
 -- Bottom left button in program edit screen now opens editor config

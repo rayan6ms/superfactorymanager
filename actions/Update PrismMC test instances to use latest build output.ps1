@@ -23,6 +23,7 @@ $instances = @{
     "C:\Users\TeamD\AppData\Roaming\PrismLauncher\instances\sfm test 1.20.3" = "1.20.3"
     "C:\Users\TeamD\AppData\Roaming\PrismLauncher\instances\sfm test 1.20.4" = "1.20.4"
     "C:\Users\TeamD\AppData\Roaming\PrismLauncher\instances\sfm test 1.21.0" = "1.21"
+    "C:\Users\TeamD\AppData\Roaming\PrismLauncher\instances\sfm test 1.21.1" = "1.21.1"
 }
 foreach ($instance in $instances.GetEnumerator()) {
     $jar = Get-JarForVersion -version $instance.Value

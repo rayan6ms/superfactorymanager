@@ -1,4 +1,8 @@
 grammar SFML;
+
+//Need to get rip of the @header when copying
+
+//go to SFMLLexer.ts after going antlr command on the package.json and solve the 2 issues
 @lexer::members {
     public boolean INCLUDE_UNUSED = false; // we want syntax highlighting to not break on unexpected tokens
 }
@@ -15,10 +19,8 @@ trigger : EVERY interval DO block END           #TimerTrigger
         | EVERY REDSTONE PULSE DO block END     #PulseTrigger
         ;
 
-interval: TICK             #Tick
-        | number TICKS     #Ticks
-        | number SECONDS   #Seconds
-        ;
+interval: NUMBER? GLOBAL? (PLUS NUMBER)? (TICKS | TICK | SECONDS | SECOND)      # IntervalSpace
+        | NUMBER_WITH_G_SUFFIX (PLUS NUMBER)? (TICKS | TICK | SECONDS | SECOND) # IntervalNoSpace;
 
 //
 // BLOCK STATEMENT
@@ -141,7 +143,7 @@ label           : (identifier)   #RawLabel
                 | string                  #StringLabel
                 ;
 
-identifier : (IDENTIFIER | REDSTONE) ;
+identifier : (IDENTIFIER | REDSTONE | GLOBAL | SECOND | SECONDS) ;
 
 // GENERAL
 string: STRING ;
@@ -184,7 +186,6 @@ GE        : G E ;
 GE_SYMBOL : '>=' ;
 
 // IO LOGIC
-MOVE    : M O V E ;
 FROM    : F R O M ;
 TO      : T O ;
 INPUT   : I N P U T ;
@@ -219,17 +220,20 @@ WEST    : W E S T ;
 SIDE    : S I D E ;
 
 
-// TRIGGERS
-TICKS           : T I C K S ;
-TICK           : T I C K ;
-SECONDS         : S E C O N D S ;
+// TIMER TRIGGERS
+TICKS   : T I C K S ;
+TICK    : T I C K ;
+SECONDS : S E C O N D S ;
+SECOND  : S E C O N D ;
+GLOBAL  : (G L O B A L) | G;
+PLUS    : '+' | P L U S;
+
 // REDSTONE TRIGGER
 REDSTONE        : R E D S T O N E ;
 PULSE           : P U L S E;
+
 // PROGRAM SYMBOLS
 DO              : D O ;
-WORLD           : W O R L D ;
-PROGRAM         : P R O G R A M ;
 END             : E N D ;
 NAME            : N A M E ;
 
@@ -245,8 +249,9 @@ LPAREN  : '(';
 RPAREN  : ')';
 
 
-IDENTIFIER      : [a-zA-Z_*][a-zA-Z0-9_*]* | '*';
-NUMBER          : [0-9]+ ;
+NUMBER_WITH_G_SUFFIX    : [0-9]+[gG] ;
+NUMBER                  : [0-9]+ ;
+IDENTIFIER              : [a-zA-Z_*][a-zA-Z0-9_*]* | '*'; // Note that the * in the square brackets is a literl
 
 STRING : '"' (~'"'|'\\"')* '"' ;
 
