@@ -6,7 +6,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SFMTestSpec {
-    private final List<TestBlockDef<?>> blocks = new ArrayList<>();
+    private final List<SFMTestBlockEntitySpec<?>> blocks = new ArrayList<>();
     private @Nullable String program = null;
     private final List<String> preConditions = new ArrayList<>();
     private final List<String> postConditions = new ArrayList<>();
@@ -16,7 +16,7 @@ public class SFMTestSpec {
         return this;
     }
 
-    public SFMTestSpec addBlock(TestBlockDef<?> def) {
+    public SFMTestSpec addBlock(SFMTestBlockEntitySpec<?> def) {
         this.blocks.add(def);
         return this;
     }
@@ -35,7 +35,7 @@ public class SFMTestSpec {
         return program;
     }
 
-    public List<TestBlockDef<?>> blocks() {
+    public List<SFMTestBlockEntitySpec<?>> blocks() {
         return blocks;
     }
 
