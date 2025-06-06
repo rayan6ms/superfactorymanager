@@ -5,7 +5,6 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.gametest.SFMGameTestBase;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleTransportStorage;
 import com.buuz135.industrial.utils.BlockUtils;
@@ -18,10 +17,13 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.gametest.GameTestHolder;
 import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 @SuppressWarnings({"DuplicatedCode", "DataFlowIssue"})
 @GameTestHolder(SFM.MOD_ID)
 @PrefixGameTestTemplate(value=false)
-public class SFMIndustrialForegoingCompatGameTests extends SFMGameTestBase {
+public class SFMIndustrialForegoingCompatGameTests {
     @GameTest(template = "3x2x1")
     public static void industrialforegoing_blackhole_empty(GameTestHelper helper) {
         // designate positions
