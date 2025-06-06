@@ -28,8 +28,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 
-public abstract class SFMGameTestBase {
-
+public class SFMGameTestMethodHelpers {
     public static ItemStack enchant(
             ItemStack stack,
             Enchantment enchantment,
@@ -39,7 +38,7 @@ public abstract class SFMGameTestBase {
         return stack;
     }
 
-    protected static void assertTrue(
+    public static void assertTrue(
             boolean condition,
             String message
     ) {
@@ -48,7 +47,7 @@ public abstract class SFMGameTestBase {
         }
     }
 
-    protected static Program compile(String code) {
+    public static Program compile(String code) {
         AtomicReference<Program> rtn = new AtomicReference<>();
         Program.compile(
                 code,
@@ -63,7 +62,7 @@ public abstract class SFMGameTestBase {
         return rtn.get();
     }
 
-    protected static void succeedIfManagerDidThingWithoutLagging(
+    public static void succeedIfManagerDidThingWithoutLagging(
             GameTestHelper helper,
             ManagerBlockEntity manager,
             Runnable assertion
@@ -81,13 +80,13 @@ public abstract class SFMGameTestBase {
         );
     }
 
-    protected static void assertManagerDidThingWithoutLagging(
+    public static void assertManagerDidThingWithoutLagging(
             GameTestHelper helper,
             ManagerBlockEntity manager,
             Runnable assertion,
             Runnable onSuccess
     ) {
-        SFMGameTestBase.assertManagerRunning(manager); // the program should already be compiled so we can monkey patch it
+        SFMGameTestMethodHelpers.assertManagerRunning(manager); // the program should already be compiled so we can monkey patch it
         manager.enableRebuildProgramLock();
         var hasExecuted = new AtomicBoolean(false);
         var startTime = new AtomicLong();
@@ -148,7 +147,7 @@ public abstract class SFMGameTestBase {
                         triggers.remove(startTimerTrigger);
                         triggers.remove(endTimerTrigger);
                         assertion.run();
-                        SFMGameTestBase.assertTrue(
+                        SFMGameTestMethodHelpers.assertTrue(
                                 endTime.get() - startTime.get() < 80_000_000,
                                 "Program took too long to run: took " + NumberFormat
                                         .getInstance(Locale.getDefault())
@@ -160,15 +159,15 @@ public abstract class SFMGameTestBase {
                 }));
     }
 
-    protected static void assertManagerRunning(ManagerBlockEntity manager) {
-        SFMGameTestBase.assertTrue(manager.getDisk() != null, "No disk in manager");
-        SFMGameTestBase.assertTrue(
+    public static void assertManagerRunning(ManagerBlockEntity manager) {
+        SFMGameTestMethodHelpers.assertTrue(manager.getDisk() != null, "No disk in manager");
+        SFMGameTestMethodHelpers.assertTrue(
                 manager.getState() == ManagerBlockEntity.State.RUNNING,
                 "Program did not start running " + DiskItem.getErrors(manager.getDisk())
         );
     }
 
-    protected static int count(
+    public static int count(
             Container chest,
             @Nullable Item item
     ) {
@@ -179,7 +178,7 @@ public abstract class SFMGameTestBase {
                 .sum();
     }
 
-    protected static int count(
+    public static int count(
             IItemHandler chest,
             @Nullable Item item
     ) {
@@ -190,17 +189,17 @@ public abstract class SFMGameTestBase {
                 .sum();
     }
 
-    protected static IItemHandler getItemHandler(
+    public static IItemHandler getItemHandler(
             GameTestHelper helper,
             @NotStored BlockPos pos
     ) {
         BlockEntity blockEntity = helper
                 .getBlockEntity(pos);
-        SFMGameTestBase.assertTrue(blockEntity != null, "No block entity found at " + pos);
+        SFMGameTestMethodHelpers.assertTrue(blockEntity != null, "No block entity found at " + pos);
         Optional<IItemHandler> found = blockEntity
                 .getCapability(Capabilities.ITEM_HANDLER)
                 .resolve();
-        SFMGameTestBase.assertTrue(found.isPresent(), "No item handler found at " + pos);
+        SFMGameTestMethodHelpers.assertTrue(found.isPresent(), "No item handler found at " + pos);
         return found.get();
     }
 }
