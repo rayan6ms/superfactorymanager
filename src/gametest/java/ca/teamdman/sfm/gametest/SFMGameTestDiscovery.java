@@ -3,10 +3,10 @@ package ca.teamdman.sfm.gametest;
 import ca.teamdman.sfm.SFM;
 import net.minecraft.gametest.framework.GameTestGenerator;
 import net.minecraft.gametest.framework.TestFunction;
-import net.minecraftforge.fml.ModList;
-import net.minecraftforge.forgespi.language.ModFileScanData;
-import net.minecraftforge.gametest.GameTestHolder;
-import net.minecraftforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.fml.ModList;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
+import net.neoforged.neoforgespi.language.ModFileScanData;
 import org.objectweb.asm.Type;
 
 import java.util.ArrayList;
