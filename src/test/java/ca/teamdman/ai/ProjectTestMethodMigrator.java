@@ -22,6 +22,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/*
+I was stupid and only ran this on 1.19.2 then deleted the old tests and forward propagated.
+Instead, should have retained the old tests and re-ran this script for each version to ensure we copied the differences between versions instead of me having to copy them manually.
+ */
 @SuppressWarnings({"CallToPrintStackTrace", "CodeBlock2Expr"})
 public class ProjectTestMethodMigrator {
 
