@@ -40,6 +40,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import org.apache.logging.log4j.Level;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -64,6 +65,7 @@ import java.util.stream.IntStream;
 // https://github.com/XFactHD/FramedBlocks/blob/1.19.4/src/main/java/xfacthd/framedblocks/api/test/TestUtils.java#L65-L87
 @SuppressWarnings({"DataFlowIssue", "deprecation", "OptionalGetWithoutIsPresent"})
 @GameTestHolder(SFM.MOD_ID)
+@PrefixGameTestTemplate(value=false)
 public class SFMCorrectnessGameTests extends SFMGameTestBase {
     /**
      * Ensure that the manager state gets updated as the disk is inserted and the program is set
