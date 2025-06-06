@@ -1,10 +1,12 @@
 package ca.teamdman.sfm.gametest;
 
-import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 
 public abstract class SFMGameTestDefinition {
     public abstract String template();
+    public String templateModId() {
+        return "sfm";
+    }
 
     public abstract void testMethod(SFMGameTestHelper gameTestHelper);
 
@@ -13,7 +15,7 @@ public abstract class SFMGameTestDefinition {
     }
 
     public String testName() {
-        return toSnakeCase(getClass().getSimpleName());
+        return toSnakeCase(getClass().getSimpleName().replaceAll("GameTest$", ""));
     }
 
     public int maxTicks() {
@@ -29,15 +31,7 @@ public abstract class SFMGameTestDefinition {
     }
 
     public TestFunction intoTestFunction() {
-        return new TestFunction(
-                batchName(),
-                testName(),
-                template(),
-                maxTicks(),
-                setupTicks(),
-                required(),
-                (GameTestHelper helper) -> this.testMethod(new SFMGameTestHelper(helper))
-        );
+        return new SFMDelegatedTestFunction(this);
     }
 
     private String toSnakeCase(String input) {
