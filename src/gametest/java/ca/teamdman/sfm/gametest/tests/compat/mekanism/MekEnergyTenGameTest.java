@@ -28,7 +28,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManager
         "ArraysAsListWithZeroOrOneArgument"
 })
 @SFMGameTest
-public class MekEnergyOneGameTest extends SFMGameTestDefinition {
+public class MekEnergyTenGameTest extends SFMGameTestDefinition {
 
     @Override
     public String template() {
@@ -54,7 +54,7 @@ public class MekEnergyOneGameTest extends SFMGameTestDefinition {
         manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
         manager.setProgram("""
                                    EVERY 20 TICKS DO
-                                     INPUT 1 forge_energy:forge:energy FROM a NORTH SIDE
+                                     INPUT 10 forge_energy:forge:energy FROM a NORTH SIDE
                                      OUTPUT forge_energy:forge:energy TO b TOP SIDE
                                    END
                                    """.stripIndent());
@@ -73,11 +73,11 @@ public class MekEnergyOneGameTest extends SFMGameTestDefinition {
                             .getEnergy(0)
                             .equals(FloatingLong
                                             .create(100)
-                                            .subtract(UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(1))),
+                                            .subtract(UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(10))),
                     "Contents did not depart"
             );
             assertTrue(
-                    right.getEnergy(0).equals(UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(1)),
+                    right.getEnergy(0).equals(UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(10)),
                     "Contents did not arrive"
             );
 
