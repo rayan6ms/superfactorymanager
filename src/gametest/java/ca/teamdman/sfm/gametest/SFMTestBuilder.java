@@ -16,7 +16,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public abstract class SFMTestBuilder extends SFMGameTestBase {
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+
+public abstract class SFMTestBuilder {
     protected final GameTestHelper helper;
     protected @Nullable ManagerBlockEntity manager;
     protected Map<String, IItemHandler> chests = new HashMap<>();
