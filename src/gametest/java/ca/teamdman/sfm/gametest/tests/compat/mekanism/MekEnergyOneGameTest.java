@@ -13,8 +13,7 @@ import mekanism.common.util.UnitDisplayUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
 
 /**
  * Migrated from SFMMekanismCompatGameTests.mek_energy_one
@@ -43,9 +42,9 @@ public class MekEnergyOneGameTest extends SFMGameTestDefinition {
 
         // set up the world
         helper.setBlock(leftPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
-        var left = ((TileEntityEnergyCube) helper.getBlockEntity(leftPos));
+        TileEntityEnergyCube left = getAndPrepMekTile(helper,leftPos);
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
-        var right = ((TileEntityEnergyCube) helper.getBlockEntity(rightPos));
+        TileEntityEnergyCube right = getAndPrepMekTile(helper,rightPos);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
