@@ -6,7 +6,6 @@ import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
-import ca.teamdman.sfm.gametest.SFMGameTestBase;
 import cofh.thermal.expansion.block.entity.machine.MachineFurnaceTile;
 import cofh.thermal.expansion.block.entity.machine.MachineInsolatorTile;
 import mekanism.common.registries.MekanismBlocks;
@@ -28,10 +27,12 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+
 @SuppressWarnings({"DataFlowIssue"})
 @GameTestHolder(SFM.MOD_ID)
 @PrefixGameTestTemplate(value=false)
-public class SFMThermalCompatGameTests extends SFMGameTestBase {
+public class SFMThermalCompatGameTests{
 
     @GameTest(template = "25x3x25", timeoutTicks = 20 * 20)
     public static void thermal_furnace_array(GameTestHelper helper) {
