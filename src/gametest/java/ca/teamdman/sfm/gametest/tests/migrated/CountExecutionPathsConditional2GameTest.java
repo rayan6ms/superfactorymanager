@@ -11,6 +11,8 @@ import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.MutableComponent;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -82,7 +84,11 @@ public class CountExecutionPathsConditional2GameTest extends SFMGameTestDefiniti
         assertTrue(warnings.isEmpty(), "expected 0 warning, got " + warnings.size());
 
         // count the execution paths
-        GatherWarningsProgramBehaviour simulation = new GatherWarningsProgramBehaviour(warnings::addAll);
+        GatherWarningsProgramBehaviour simulation = new GatherWarningsProgramBehaviour(x -> {
+            for (TranslatableContents problem : x) {
+                warnings.add(MutableComponent.create(problem));
+            }
+        });
         program.tick(ProgramContext.createSimulationContext(
                 program,
                 labelPositionHolder,

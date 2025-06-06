@@ -11,6 +11,14 @@ import ca.teamdman.sfml.ast.Block;
 import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.ast.Trigger;
 import it.unimi.dsi.fastutil.Pair;
+import mekanism.api.RelativeSide;
+import mekanism.common.lib.transmitter.TransmissionType;
+import mekanism.common.tile.TileEntityBin;
+import mekanism.common.tile.base.TileEntityMekanism;
+import mekanism.common.tile.component.TileComponentConfig;
+import mekanism.common.tile.component.config.ConfigInfo;
+import mekanism.common.tile.component.config.DataType;
+import mekanism.common.tile.prefab.TileEntityConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
@@ -25,6 +33,9 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
@@ -276,4 +287,28 @@ public class SFMGameTestMethodHelpers {
             falling_anvil_xp_shard_inner(helper, numBooks, configToRestore, pos, enchBook, iter);
         });
     }
+
+    @SuppressWarnings("unchecked")
+    public static <T extends TileEntityMekanism> T getAndPrepMekTile(GameTestHelper helper, BlockPos mekanismPos) {
+        var tile = helper.getBlockEntity(mekanismPos);
+        if (tile instanceof TileEntityConfigurableMachine mek) {
+            set_all_io(mek.getConfig());
+            return (T) mek;
+        } else if (tile instanceof TileEntityBin bin) {
+        }
+        return (T) tile;
+    }
+
+    public static void set_all_io(TileComponentConfig config) {
+        for (TransmissionType type : TransmissionType.values()) {
+            ConfigInfo info = config.getConfig(type);
+            if (info != null) {
+                for (RelativeSide side : RelativeSide.values()) {
+                    info.setDataType(DataType.INPUT_OUTPUT, side);
+                    config.sideChanged(type, side);
+                }
+            }
+        }
+    }
+
 }

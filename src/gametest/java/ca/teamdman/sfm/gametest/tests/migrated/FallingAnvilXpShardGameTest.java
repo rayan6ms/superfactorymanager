@@ -7,8 +7,10 @@ import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
@@ -40,11 +42,19 @@ public class FallingAnvilXpShardGameTest extends SFMGameTestDefinition {
     public void testMethod(SFMGameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 2, 1), Blocks.OBSIDIAN);
         var pos = helper.absoluteVec(new Vec3(1.5, 3.5, 1.5));
-        ItemStack enchBook = EnchantedBookItem.createForEnchantment(new EnchantmentInstance(
-                Enchantments.SHARPNESS,
-                4
-        ));
-        EnchantedBookItem.addEnchantment(enchBook, new EnchantmentInstance(Enchantments.BLOCK_EFFICIENCY, 2));
+        ItemStack enchBook = new ItemStack(Items.ENCHANTED_BOOK);
+        enchBook.enchant(helper
+                                 .getLevel()
+                                 .registryAccess()
+                                 .registry(Registries.ENCHANTMENT)
+                                 .get()
+                                 .getHolder(Enchantments.SHARPNESS).get(), 4);
+        enchBook.enchant(helper
+                                 .getLevel()
+                                 .registryAccess()
+                                 .registry(Registries.ENCHANTMENT)
+                                 .get()
+                                 .getHolder(Enchantments.EFFICIENCY).get(), 2);
 
         var cases = List.of(
                 Pair.of(LevelsToShards.JustOne, 1),
