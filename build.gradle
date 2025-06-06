@@ -47,10 +47,10 @@ sourceSets {
     gametest {
         java {
             srcDir "src/gametest/java"
-            exclude "ca/teamdman/sfm/gametest/ai/**"
-            exclude "ca/teamdman/sfm/gametest/compat/multiple/**"
-            exclude "ca/teamdman/sfm/gametest/compat/thermal/**"
-            exclude "ca/teamdman/sfm/gametest/compat/industrialforegoing/**"
+            exclude "ca/teamdman/sfm/gametest/tests/ai/**"
+            exclude "ca/teamdman/sfm/gametest/tests/compat/multiple/**"
+            exclude "ca/teamdman/sfm/gametest/tests/compat/thermal/**"
+            exclude "ca/teamdman/sfm/gametest/tests/compat/industrialforegoing/**"
 
         }
         compileClasspath += main.output
