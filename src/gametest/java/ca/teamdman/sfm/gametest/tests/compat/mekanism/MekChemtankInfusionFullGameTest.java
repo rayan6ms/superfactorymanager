@@ -15,8 +15,8 @@ import mekanism.common.tile.TileEntityChemicalTank;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.getAndPrepMekTile;
 
 /**
  * Migrated from SFMMekanismCompatGameTests.mek_chemtank_infusion_full
@@ -45,9 +45,9 @@ public class MekChemtankInfusionFullGameTest extends SFMGameTestDefinition {
 
         // set up the world
         helper.setBlock(leftPos, MekanismBlocks.ULTIMATE_CHEMICAL_TANK.getBlock());
-        var leftTank = ((TileEntityChemicalTank) helper.getBlockEntity(leftPos));
+        TileEntityChemicalTank leftTank = getAndPrepMekTile(helper, leftPos);
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_CHEMICAL_TANK.getBlock());
-        var rightTank = ((TileEntityChemicalTank) helper.getBlockEntity(rightPos));
+        TileEntityChemicalTank rightTank = getAndPrepMekTile(helper, rightPos);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
