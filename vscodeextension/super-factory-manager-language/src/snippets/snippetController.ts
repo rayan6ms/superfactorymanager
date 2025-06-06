@@ -1,6 +1,5 @@
 import * as vscode from 'vscode';
-import { basicSnippet, energySnippet, everySnippet, ifElseIfSnippet, ifElseSnippet, ifSnippet, inputSnippet, outputSnippet } from './WithoutPrefix';
-import { basicSnippet2, energySnippet2, everySnippet2, ifElseIfSnippet2, ifElseSnippet2, ifSnippet2, inputSnippet2, outputSnippet2 } from './Prefix';
+import { combinedSnippets } from './Snippets';
 
 /**
  * Handle everything related to snippets completion.
@@ -11,30 +10,8 @@ export function registerSnippets(context: vscode.ExtensionContext) {
     
     //Register all snippets, depends on if you have a prefix or not
     const registerSnippetProviders = (snippetPrefix: string) => {
-        //Ive tested something more compact, but vscode didnt like it :/
-        //Had to use the ugly way
         clearSnippetProviders()
-        if(snippetPrefix.trim() === ''){
-            registeredProviders.push(everySnippet());
-            registeredProviders.push(ifSnippet());
-            registeredProviders.push(ifElseSnippet());
-            registeredProviders.push(ifElseIfSnippet());
-            registeredProviders.push(inputSnippet());
-            registeredProviders.push(outputSnippet());
-            registeredProviders.push(basicSnippet());
-            registeredProviders.push(energySnippet());
-        }
-        else
-        {
-            registeredProviders.push(everySnippet2(snippetPrefix));
-            registeredProviders.push(ifSnippet2(snippetPrefix));
-            registeredProviders.push(ifElseSnippet2(snippetPrefix));
-            registeredProviders.push(ifElseIfSnippet2(snippetPrefix));
-            registeredProviders.push(inputSnippet2(snippetPrefix));
-            registeredProviders.push(outputSnippet2(snippetPrefix));
-            registeredProviders.push(basicSnippet2(snippetPrefix));
-            registeredProviders.push(energySnippet2(snippetPrefix));
-        }
+        registeredProviders.push(combinedSnippets(snippetPrefix));
         registeredProviders.forEach(provider => context.subscriptions.push(provider));
     };
 
@@ -53,9 +30,8 @@ export function registerSnippets(context: vscode.ExtensionContext) {
         registeredProviders = [];
     };
 
-    const configuration = vscode.workspace.getConfiguration('sfml');
-    const snippetPrefix = configuration.get<string>('SnippetActivation') || ' '; // Si no hay prefijo, usa espacio por defecto
-    const snippetsEnabled = configuration.get<boolean>('enableSnippets'); // Check if snippets are enabled
+    const snippetPrefix = vscode.workspace.getConfiguration('sfml').get<string>('SnippetActivation') || ' '; // If there isnt one, use a default one
+    const snippetsEnabled = vscode.workspace.getConfiguration('sfml').get<boolean>('enableSnippets'); // Check if snippets are enabled
 
     if(snippetsEnabled) 
     {

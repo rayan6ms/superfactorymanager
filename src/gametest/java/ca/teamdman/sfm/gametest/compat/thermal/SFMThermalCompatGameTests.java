@@ -23,12 +23,14 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.gametest.GameTestHolder;
+import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 
 @SuppressWarnings({"DataFlowIssue"})
 @GameTestHolder(SFM.MOD_ID)
+@PrefixGameTestTemplate(value=false)
 public class SFMThermalCompatGameTests extends SFMGameTestBase {
 
     @GameTest(template = "25x3x25", timeoutTicks = 20 * 20)
@@ -199,9 +201,16 @@ public class SFMThermalCompatGameTests extends SFMGameTestBase {
         // create the program
         var program = """
                     NAME "thermal phyto array test"
+                    
+                    EVERY TICK DO
+                        INPUT forge_energy:forge:energy FROM power NORTH SIDE
+                        OUTPUT forge_energy:forge:energy TO phytos
+                    END
+                    
                     EVERY 20 TICKS DO
                         INPUT *seed* FROM seeds
                         OUTPUT RETAIN 2 EACH *seed* TO phytos TOP SIDE SLOTS 0
+                        OUTPUT RETAIN 2 *seed* TO EACH phytos TOP SIDE SLOTS 0
                     FORGET
                         INPUT FROM seeds
                         OUTPUT RETAIN 2 phytogro TO EACH phytos TOP SIDE SLOTS 1
@@ -209,7 +218,7 @@ public class SFMThermalCompatGameTests extends SFMGameTestBase {
                         INPUT fluid:: FROM water TOP SIDE
                         OUTPUT fluid:: TO phytos TOP SIDE
                     FORGET
-                        INPUT FROM phytos BOTTOM SIDE SLOTS 2-5
+                        INPUT FROM phytos BOTTOM SIDE
                         OUTPUT TO results TOP SIDE
                     FORGET
                         INPUT forge_energy:forge:energy FROM power NORTH SIDE
@@ -229,6 +238,7 @@ public class SFMThermalCompatGameTests extends SFMGameTestBase {
         // load the program
         manager.setProgram(program.stripIndent());
         succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+            SFM.LOGGER.warn("TODO: finish implementing thermal_phyto_array test");
         });
     }
 }

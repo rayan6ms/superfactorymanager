@@ -25,6 +25,7 @@ public class TestBarrelBlock extends BarrelBlock {
             boolean pIsMoving
     ) {
         if (!pState.is(pNewState.getBlock())) {
+            // remove the block entity manually to prevent the items from dropping on the ground
             pLevel.removeBlockEntity(pPos);
             super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         }
