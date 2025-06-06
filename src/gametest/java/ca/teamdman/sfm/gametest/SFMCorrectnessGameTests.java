@@ -51,6 +51,8 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+
 // https://github.dev/CompactMods/CompactMachines
 // https://github.com/SocketMods/BaseDefense/blob/3b3cb4af26f4553c3438417cbb95f0d3fb707751/build.gradle#L74
 // https://github.com/sinkillerj/ProjectE/blob/mc1.16.x/build.gradle#L54
@@ -63,61 +65,7 @@ import java.util.stream.IntStream;
 @SuppressWarnings({"DataFlowIssue", "deprecation", "OptionalGetWithoutIsPresent"})
 @GameTestHolder(SFM.MOD_ID)
 @PrefixGameTestTemplate(value=false)
-public class SFMCorrectnessGameTests extends SFMGameTestBase {
-    /**
-     * Ensure that the manager state gets updated as the disk is inserted and the program is set
-     */
-    @GameTest(template = "1x2x1")
-    public static void manager_state_update(GameTestHelper helper) {
-        helper.setBlock(new BlockPos(0, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
-        ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(new BlockPos(0, 2, 0));
-        assertTrue(manager.getState() == ManagerBlockEntity.State.NO_DISK, "Manager did not start with no disk");
-        assertTrue(manager.getDisk() == null, "Manager did not start with no disk");
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
-        assertTrue(manager.getState() == ManagerBlockEntity.State.NO_PROGRAM, "Disk did not start with no program");
-        manager.setProgram("""
-                                       EVERY 20 TICKS DO
-                                           INPUT FROM a
-                                           OUTPUT TO b
-                                       END
-                                   """.stripTrailing().stripIndent());
-        assertManagerRunning(manager);
-        helper.succeed();
-    }
-
-    @GameTest(template = "3x2x1")
-    public static void move_1_stack(GameTestHelper helper) {
-        helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
-        BlockPos rightPos = new BlockPos(0, 2, 0);
-        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
-        BlockPos leftPos = new BlockPos(2, 2, 0);
-        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
-
-        var rightChest = getItemHandler(helper, rightPos);
-        var leftChest = getItemHandler(helper, leftPos);
-
-        leftChest.insertItem(0, new ItemStack(Blocks.DIRT, 64), false);
-
-        ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(new BlockPos(1, 2, 0));
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
-        manager.setProgram("""
-                                       EVERY 20 TICKS DO
-                                           INPUT FROM a
-                                           OUTPUT TO b
-                                       END
-                                   """.stripTrailing().stripIndent());
-
-        // set the labels
-        LabelPositionHolder.empty()
-                .add("a", helper.absolutePos(leftPos))
-                .add("b", helper.absolutePos(rightPos))
-                .save(Objects.requireNonNull(manager.getDisk()));
-
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
-            assertTrue(leftChest.getStackInSlot(0).isEmpty(), "Dirt did not move");
-            assertTrue(rightChest.getStackInSlot(0).getCount() == 64, "Dirt did not move");
-        });
-    }
+public class SFMCorrectnessGameTests{
 
     @GameTest(template = "3x2x1")
     public static void move_full_chest(GameTestHelper helper) {
