@@ -70,7 +70,7 @@ public class MekEnergyTenGameTest extends SFMGameTestDefinition {
             assertTrue(
                     left
                             .getEnergy(0)
-                    == UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(10),
+                    == UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(30),
                     "Contents did not depart"
             );
             assertTrue(
