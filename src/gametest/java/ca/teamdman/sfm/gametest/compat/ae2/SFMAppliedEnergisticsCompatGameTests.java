@@ -8,7 +8,6 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.gametest.SFMGameTestBase;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
@@ -24,10 +23,12 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 
 import java.util.stream.Stream;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
+
 @SuppressWarnings({"OptionalGetWithoutIsPresent", "DataFlowIssue"})
 @GameTestHolder(SFM.MOD_ID)
 @PrefixGameTestTemplate(value=false)
-public class SFMAppliedEnergisticsCompatGameTests extends SFMGameTestBase {
+public class SFMAppliedEnergisticsCompatGameTests  {
 
     @GameTest(template = "7x3x3", timeoutTicks = 20 * 20)
     public static void ae2_inscribers(GameTestHelper helper) {
