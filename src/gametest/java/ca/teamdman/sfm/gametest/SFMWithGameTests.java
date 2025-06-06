@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.neoforged.neoforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
 import java.util.Arrays;
 import java.util.function.BiConsumer;
@@ -22,6 +23,7 @@ import java.util.function.BiConsumer;
         "ArraysAsListWithZeroOrOneArgument"
 })
 @GameTestHolder(SFM.MOD_ID)
+@PrefixGameTestTemplate(value=false)
 public class SFMWithGameTests extends SFMGameTestBase {
     /// Some tests assume that some items have certain tags.
     ///

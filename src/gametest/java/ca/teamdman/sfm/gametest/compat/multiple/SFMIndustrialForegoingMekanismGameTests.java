@@ -36,6 +36,7 @@ import java.util.Objects;
 
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 @GameTestHolder(SFM.MOD_ID)
+@PrefixGameTestTemplate(value=false)
 public class SFMIndustrialForegoingMekanismGameTests extends SFMGameTestBase {
     @SuppressWarnings("DanglingJavadoc")
     @GameTest(template = "3x4x3", timeoutTicks = 200)

@@ -26,6 +26,7 @@ import java.util.ArrayDeque;
 import java.util.Objects;
 
 @GameTestHolder(SFM.MOD_ID)
+@PrefixGameTestTemplate(value=false)
 public class SFMThermalMekanismGameTests extends SFMGameTestBase {
     @GameTest(template = "3x4x3")
     public static void resource_loss_regression(GameTestHelper helper) {
