@@ -4,6 +4,7 @@
   "package": "ca.teamdman.sfm.mixins",
   "compatibilityLevel": "JAVA_17",
   "mixins": [
+    "GameTestInfoMixin",
     "StructureTemplateManagerMixin"
   ],
   "client": [
