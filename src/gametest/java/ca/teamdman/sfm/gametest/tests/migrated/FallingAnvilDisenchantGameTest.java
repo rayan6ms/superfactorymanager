@@ -5,6 +5,7 @@ import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
@@ -48,8 +49,18 @@ public class FallingAnvilDisenchantGameTest extends SFMGameTestDefinition {
                         0, 0, 0
                 ));
         var axe = new ItemStack(Items.GOLDEN_AXE);
-        axe.enchant(Enchantments.BLOCK_EFFICIENCY, 3);
-        axe.enchant(Enchantments.SHARPNESS, 2);
+        axe.enchant(helper
+                            .getLevel()
+                            .registryAccess()
+                            .registry(Registries.ENCHANTMENT)
+                            .get()
+                            .getHolder(Enchantments.EFFICIENCY).get(), 3);
+        axe.enchant(helper
+                            .getLevel()
+                            .registryAccess()
+                            .registry(Registries.ENCHANTMENT)
+                            .get()
+                            .getHolder(Enchantments.SHARPNESS).get(), 2);
         helper.getLevel().addFreshEntity(new ItemEntity(
                 helper.getLevel(),
                 pos.x, pos.y, pos.z,
@@ -72,7 +83,12 @@ public class FallingAnvilDisenchantGameTest extends SFMGameTestDefinition {
                     .anyMatch(e -> SFMItemUtils.isSameItemSameTags(
                             e.getItem(),
                             EnchantedBookItem.createForEnchantment(new EnchantmentInstance(
-                                    Enchantments.BLOCK_EFFICIENCY,
+                                    helper
+                                            .getLevel()
+                                            .registryAccess()
+                                            .registry(Registries.ENCHANTMENT)
+                                            .get()
+                                            .getHolder(Enchantments.EFFICIENCY).get(),
                                     3
                             ))
                     ));
@@ -80,7 +96,15 @@ public class FallingAnvilDisenchantGameTest extends SFMGameTestDefinition {
                     .stream()
                     .anyMatch(e -> SFMItemUtils.isSameItemSameTags(
                             e.getItem(),
-                            EnchantedBookItem.createForEnchantment(new EnchantmentInstance(Enchantments.SHARPNESS, 2))
+                            EnchantedBookItem.createForEnchantment(new EnchantmentInstance(
+                                    helper
+                                            .getLevel()
+                                            .registryAccess()
+                                            .registry(Registries.ENCHANTMENT)
+                                            .get()
+                                            .getHolder(Enchantments.SHARPNESS).get(),
+                                    2
+                            ))
                     ));
             boolean foundRemainingBooks = found
                                                   .stream()

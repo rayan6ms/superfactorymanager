@@ -9,10 +9,11 @@ import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import mekanism.common.registries.MekanismBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -63,13 +64,13 @@ public class ManyLavaCauldronsGameTest extends SFMGameTestDefinition {
 
         // set up the manager
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
-        ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
+        ManagerBlockEntity manager = helper.getBlockEntity(managerPos);
         manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
 
         // create the program
         var program = """
                     NAME "many inventory lag test"
-                                
+                
                     EVERY 20 TICKS DO
                         INPUT fluid:*:* FROM source
                         OUTPUT fluid:*:* TO dest TOP SIDE
@@ -92,9 +93,8 @@ public class ManyLavaCauldronsGameTest extends SFMGameTestDefinition {
             ));
             int found = destBlocks
                     .stream()
-                    .map(helper::getBlockEntity)
-                    .map(be -> be.getCapability(ForgeCapabilities.FLUID_HANDLER))
-                    .map(x -> x.orElse(null))
+                    .map(helper::absolutePos)
+                    .map(pos -> helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, pos, Direction.DOWN))
                     .peek(Objects::requireNonNull)
                     .map(x -> x.getFluidInTank(0))
                     .mapToInt(FluidStack::getAmount)

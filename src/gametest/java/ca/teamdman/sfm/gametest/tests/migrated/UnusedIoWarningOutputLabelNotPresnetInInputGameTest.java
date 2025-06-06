@@ -10,6 +10,7 @@ import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Objects;
@@ -50,7 +51,7 @@ public class UnusedIoWarningOutputLabelNotPresnetInInputGameTest extends SFMGame
         helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
         // place manager
-        ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(new BlockPos(1, 2, 0));
+        ManagerBlockEntity manager = helper.getBlockEntity(new BlockPos(1, 2, 0));
         manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
         LabelPositionHolder.empty()
                 .add("bruh", helper.absolutePos(leftPos))
@@ -65,9 +66,11 @@ public class UnusedIoWarningOutputLabelNotPresnetInInputGameTest extends SFMGame
         // assert expected warnings
         var warnings = DiskItem.getWarnings(Objects.requireNonNull(manager.getDisk()));
         assertTrue(warnings.size() == 1, "expected 1 warning, got " + warnings.size());
-        assertTrue(warnings
-                           .get(0)
-                           .getKey()
+        assertTrue((
+                           (TranslatableContents) warnings
+                                   .getFirst()
+                                   .getContents()
+                   ).getKey()
                            .equals(LocalizationKeys.PROGRAM_WARNING_OUTPUT_RESOURCE_TYPE_NOT_FOUND_IN_INPUTS
                                            .key()
                                            .get()), "expected output without matching input warning");

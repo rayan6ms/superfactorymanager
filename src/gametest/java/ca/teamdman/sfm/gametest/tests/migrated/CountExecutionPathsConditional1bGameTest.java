@@ -10,6 +10,7 @@ import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertManagerRunning;
@@ -69,12 +70,15 @@ public class CountExecutionPathsConditional1bGameTest extends SFMGameTestDefinit
         // assert expected warnings
         var warnings = DiskItem.getWarnings(manager.getDisk());
         assertTrue(warnings.size() == 1, "expected 1 warning, got " + warnings.size());
-        assertTrue(warnings
-                           .get(0)
-                           .getKey()
-                           .equals(LocalizationKeys.PROGRAM_WARNING_UNUSED_INPUT_LABEL // should be unused input
-                                           .key()
-                                           .get()), "expected output without matching input warning");
+        assertTrue(
+                (
+                        (TranslatableContents) warnings
+                                .getFirst()
+                                .getContents()
+                ).getKey()
+                        .equals(LocalizationKeys.PROGRAM_WARNING_UNUSED_INPUT_LABEL // should be unused input
+                                        .key()
+                                        .get()), "expected output without matching input warning");
         helper.succeed();
     }
 }

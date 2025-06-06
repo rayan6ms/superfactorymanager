@@ -40,7 +40,7 @@ public class MoveWithTagMineableGameTest extends SFMGameTestDefinition {
                                     END
                                     """)
                 .preContents("left", Arrays.asList(
-                        enchant(new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100), // Slot 0
+                        enchant(helper, new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100), // Slot 0
                         new ItemStack(Items.DIRT, 64),                                       // Slot 1
                         new ItemStack(Items.STONE, 64)                                       // Slot 2
                 ))
@@ -50,7 +50,7 @@ public class MoveWithTagMineableGameTest extends SFMGameTestDefinition {
                         new ItemStack(Items.STONE, 64)      // Slot 2 (Stone remains)
                 ))
                 .postContents("right", Arrays.asList(
-                        enchant(new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100), // Slot 0
+                        enchant(helper, new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100), // Slot 0
                         new ItemStack(Items.DIRT, 64)                                        // Slot 1
                         // The rest are empty by default
                 ))

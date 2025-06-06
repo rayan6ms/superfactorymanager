@@ -7,14 +7,12 @@ import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
-import mekanism.api.math.FloatingLong;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.TileEntityEnergyCube;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
 
 /**
  * Migrated from SFMMekanismCompatGameTests.mek_energy_some
@@ -35,17 +33,16 @@ public class MekEnergySomeGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
-        // designate positions
+    public void testMethod(SFMGameTestHelper helper) {        // designate positions
         var leftPos = new BlockPos(2, 2, 0);
         var rightPos = new BlockPos(0, 2, 0);
         var managerPos = new BlockPos(1, 2, 0);
 
         // set up the world
         helper.setBlock(leftPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
-        var left = ((TileEntityEnergyCube) helper.getBlockEntity(leftPos));
+        TileEntityEnergyCube left = getAndPrepMekTile(helper,leftPos);
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
-        var right = ((TileEntityEnergyCube) helper.getBlockEntity(rightPos));
+        TileEntityEnergyCube right = getAndPrepMekTile(helper,rightPos);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
@@ -64,12 +61,11 @@ public class MekEnergySomeGameTest extends SFMGameTestDefinition {
                 .add("b", helper.absolutePos(rightPos))
                 .save(manager.getDisk());
 
-        left.setEnergy(0, FloatingLong.create(1_000));
-        right.setEnergy(0, FloatingLong.create(1_000));
+        left.setEnergy(0, 1_000);
+        right.setEnergy(0, 1_000);
         succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
-            assertTrue(left.getEnergy(0).equals(FloatingLong.ZERO), "Contents did not depart");
-            assertTrue(right.getEnergy(0).equals(FloatingLong.create(2_000)), "Contents did not arrive");
-
+            assertTrue(left.getEnergy(0) == 0, "Contents did not depart");
+            assertTrue(right.getEnergy(0) == 2_000, "Contents did not arrive");
         });
     }
 }
