@@ -6,7 +6,6 @@ import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.gametest.SFMGameTestBase;
 import ca.teamdman.sfm.gametest.declarative.SFMDeclarativeTestBuilder;
 import ca.teamdman.sfm.gametest.declarative.SFMTestSpec;
 import ca.teamdman.sfm.gametest.declarative.TestBlockDef;
@@ -48,10 +47,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 @SuppressWarnings({"DuplicatedCode", "DataFlowIssue"})
 @GameTestHolder(SFM.MOD_ID)
 @PrefixGameTestTemplate(value=false)
-public class SFMMekanismCompatGameTests extends SFMGameTestBase {
+public class SFMMekanismCompatGameTests {
     private static void set_all_io(TileComponentConfig config) {
         for (TransmissionType type : TransmissionType.values()) {
             ConfigInfo info = config.getConfig(type);

@@ -12,9 +12,12 @@ import net.minecraft.world.item.ItemStack;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.getItemHandler;
+
 @GameTestHolder(SFM.MOD_ID)
 @PrefixGameTestTemplate(value=false)
-public class SFMProgramLinterGameTests extends SFMGameTestBase {
+public class SFMProgramLinterGameTests  {
     @GameTest(template = "3x2x1")
     public static void mekanism_null_io_direction(GameTestHelper helper) {
         helper.succeed();
