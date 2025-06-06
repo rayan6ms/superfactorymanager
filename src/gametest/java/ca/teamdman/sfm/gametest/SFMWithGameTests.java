@@ -14,6 +14,9 @@ import net.minecraftforge.gametest.PrefixGameTestTemplate;
 import java.util.Arrays;
 import java.util.function.BiConsumer;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.enchant;
+
 @SuppressWarnings({
         "RedundantSuppression",
         "DataFlowIssue",
@@ -24,7 +27,7 @@ import java.util.function.BiConsumer;
 })
 @GameTestHolder(SFM.MOD_ID)
 @PrefixGameTestTemplate(value=false)
-public class SFMWithGameTests extends SFMGameTestBase {
+public class SFMWithGameTests {
     /// Some tests assume that some items have certain tags.
     ///
     /// To avoid problems between versions, we will validate those assumptions here.
