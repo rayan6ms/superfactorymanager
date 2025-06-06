@@ -9,10 +9,11 @@ import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import mekanism.common.registries.MekanismBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.FluidStack;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
 
 import java.util.ArrayList;
 import java.util.Objects;
@@ -92,9 +93,8 @@ public class ManyLavaCauldronsGameTest extends SFMGameTestDefinition {
             ));
             int found = destBlocks
                     .stream()
-                    .map(helper::getBlockEntity)
-                    .map(be -> be.getCapability(ForgeCapabilities.FLUID_HANDLER))
-                    .map(x -> x.orElse(null))
+                    .map(helper::absolutePos)
+                    .map(pos -> helper.getLevel().getCapability(Capabilities.FluidHandler.BLOCK, pos, Direction.DOWN))
                     .peek(Objects::requireNonNull)
                     .map(x -> x.getFluidInTank(0))
                     .mapToInt(FluidStack::getAmount)
