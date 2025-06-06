@@ -1,0 +1,3 @@
+For cleaning up when the `/test clear` didn't finish the job
+
+/fill ~-22 ~ ~-22 ~22 ~5 ~22 air
