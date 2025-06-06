@@ -7,6 +7,7 @@ import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
@@ -40,11 +41,23 @@ public class FallingAnvilXpShardManyGameTest extends SFMGameTestDefinition {
     public void testMethod(SFMGameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 2, 1), Blocks.OBSIDIAN);
         var pos = helper.absoluteVec(new Vec3(1.5, 3.5, 1.5));
-        ItemStack enchBook = EnchantedBookItem.createForEnchantment(new EnchantmentInstance(
-                Enchantments.SHARPNESS,
+        ItemStack enchantedBook = EnchantedBookItem.createForEnchantment(new EnchantmentInstance(
+                helper
+                        .getLevel()
+                        .registryAccess()
+                        .registry(Registries.ENCHANTMENT)
+                        .get()
+                        .getHolder(Enchantments.SHARPNESS)
+                        .get(),
                 4
         ));
-        EnchantedBookItem.addEnchantment(enchBook, new EnchantmentInstance(Enchantments.BLOCK_EFFICIENCY, 2));
+        enchantedBook.enchant(helper
+                                      .getLevel()
+                                      .registryAccess()
+                                      .registry(Registries.ENCHANTMENT)
+                                      .get()
+                                      .getHolder(Enchantments.EFFICIENCY)
+                                      .get(), 2);
 
         var cases = List.of(
                 Pair.of(LevelsToShards.JustOne, 10),
@@ -54,6 +67,6 @@ public class FallingAnvilXpShardManyGameTest extends SFMGameTestDefinition {
         );
 
         var currentConfig = SFMConfig.SERVER.levelsToShards.get();
-        falling_anvil_xp_shard_inner(helper, 10, currentConfig, pos, enchBook, cases.iterator());
+        falling_anvil_xp_shard_inner(helper, 10, currentConfig, pos, enchantedBook, cases.iterator());
     }
 }

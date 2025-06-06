@@ -6,6 +6,7 @@ import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
@@ -40,7 +41,13 @@ public class FallingAnvilEnchantmentFormGameTest extends SFMGameTestDefinition {
         helper.setBlock(new BlockPos(1, 2, 1), Blocks.IRON_BLOCK);
         var pos = helper.absoluteVec(new Vec3(1.5, 3.5, 1.5));
         ItemStack reference = EnchantedBookItem.createForEnchantment(new EnchantmentInstance(
-                Enchantments.SHARPNESS,
+                helper
+                        .getLevel()
+                        .registryAccess()
+                        .registry(Registries.ENCHANTMENT)
+                        .get()
+                        .getHolder(Enchantments.SHARPNESS)
+                        .get(),
                 3
         ));
         helper

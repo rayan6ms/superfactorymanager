@@ -1,6 +1,8 @@
 package ca.teamdman.sfm.gametest;
 
+import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
+import net.minecraft.world.level.block.Rotation;
 
 public abstract class SFMGameTestDefinition {
     public abstract String template();
@@ -31,7 +33,20 @@ public abstract class SFMGameTestDefinition {
     }
 
     public TestFunction intoTestFunction() {
-        return new SFMDelegatedTestFunction(this);
+        return new TestFunction(
+                this.batchName(),
+                "new_" + this.testName(), // TODO: remove prefix
+                this.templateModId() + ":" + this.template(),
+                Rotation.NONE,
+                this.maxTicks(),
+                this.setupTicks(),
+                this.required(),
+                false,
+                1,
+                1,
+                false,
+                (GameTestHelper helper) -> this.testMethod(new SFMGameTestHelper(helper))
+        );
     }
 
     private String toSnakeCase(String input) {

@@ -7,11 +7,11 @@ import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
-import mekanism.api.math.FloatingLong;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tier.EnergyCubeTier;
 import mekanism.common.tile.TileEntityEnergyCube;
 import mekanism.common.tile.multiblock.TileEntityInductionPort;
+import mekanism.common.util.UnitDisplayUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.world.item.ItemStack;
@@ -19,8 +19,7 @@ import net.minecraft.world.level.block.Block;
 
 import java.util.List;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
 
 /**
  * Migrated from SFMMekanismCompatGameTests.mek_induction
@@ -74,8 +73,10 @@ public class MekInductionGameTest extends SFMGameTestDefinition {
         // set up the energy source
         helper.setBlock(powerCubePos, MekanismBlocks.CREATIVE_ENERGY_CUBE.getBlock());
 
-        TileEntityEnergyCube powerCube = (TileEntityEnergyCube) helper.getBlockEntity(powerCubePos);
+        TileEntityEnergyCube powerCube = getAndPrepMekTile(helper, powerCubePos);
         powerCube.setEnergy(0, EnergyCubeTier.CREATIVE.getMaxEnergy());
+//        powerCube.getConfig().setupIOConfig(TransmissionType.ENERGY,powerCube.getEnergyContainer(), RelativeSide.TOP, true);
+//        powerCube.getConfig().
 
         // set up the manager
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
@@ -83,13 +84,13 @@ public class MekInductionGameTest extends SFMGameTestDefinition {
         manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
 
         // create the program
-        long incr = 10_000_000_000L;
-        var startingAmount = FloatingLong.create(0L);
+        long incr = 1_000_000_000L;
+        long startingAmount = 0L;
         var program = """
                     NAME "induction matrix test"
                     EVERY 20 TICKS DO
-                        INPUT %d mekanism_energy:: FROM source NORTH SIDE
-                        OUTPUT mekanism_energy:: TO dest NORTH SIDE
+                        INPUT %d fe:: FROM source TOP SIDE
+                        OUTPUT fe:: TO dest NORTH SIDE
                     END
                 """.formatted(incr);
 
@@ -112,14 +113,14 @@ public class MekInductionGameTest extends SFMGameTestDefinition {
                 throw new GameTestAssertException("Induction matrix did not form");
             }
 
-            var expected = startingAmount.add(incr);
-            FloatingLong energy = inductionPort.getEnergy(0);
-            boolean success = energy.equals(expected);
+            var expected = startingAmount + incr;
+            long joules = inductionPort.getEnergy(0);
+            long energy = UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertTo(joules);
+            boolean success = energy == expected;
             assertTrue(
                     success,
-                    "Expected energy did not match"
+                    "Expected energy did not match, got " + energy + " expected " + expected
             );
-
         });
     }
 }

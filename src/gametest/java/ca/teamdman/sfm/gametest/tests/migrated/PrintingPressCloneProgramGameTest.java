@@ -14,6 +14,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
@@ -43,49 +44,33 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
 
     @Override
     public void testMethod(SFMGameTestHelper helper) {
+        // Positions
         var printingPos = new BlockPos(1, 2, 1);
         var pistonPos = new BlockPos(1, 4, 1);
         var woodPos = new BlockPos(0, 4, 1);
         var buttonPos = new BlockPos(0, 4, 0);
         var chestPos = new BlockPos(0, 2, 1);
 
+        // Place blocks
         helper.setBlock(printingPos, SFMBlocks.PRINTING_PRESS_BLOCK.get());
         helper.setBlock(pistonPos, Blocks.PISTON.defaultBlockState().setValue(DirectionalBlock.FACING, Direction.DOWN));
         helper.setBlock(woodPos, Blocks.OAK_PLANKS);
         helper.setBlock(buttonPos, Blocks.STONE_BUTTON);
         helper.setBlock(chestPos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
+        // Get helper objects
         var printingPress = (PrintingPressBlockEntity) helper.getBlockEntity(printingPos);
-        Player player = helper.makeMockPlayer();
+        Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+
+        // Place ink
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(Items.BLACK_DYE));
-        BlockState pressState = helper.getBlockState(printingPos);
-        pressState.getBlock().use(
-                pressState,
-                helper.getLevel(),
-                helper.absolutePos(printingPos),
-                player,
-                InteractionHand.MAIN_HAND,
-                new BlockHitResult(
-                        new Vec3(0.5, 0.5, 0.5),
-                        Direction.UP,
-                        helper.absolutePos(printingPos),
-                        false
-                )
-        );
+        helper.useBlock(printingPos, player);
+
+        // Place paper
         player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(SFMItems.DISK_ITEM.get()));
-        pressState.getBlock().use(
-                pressState,
-                helper.getLevel(),
-                helper.absolutePos(printingPos),
-                player,
-                InteractionHand.MAIN_HAND,
-                new BlockHitResult(
-                        new Vec3(0.5, 0.5, 0.5),
-                        Direction.UP,
-                        helper.absolutePos(printingPos),
-                        false
-                )
-        );
+        helper.useBlock(printingPos, player);
+
+        // Place form
         var disk = new ItemStack(SFMItems.DISK_ITEM.get());
         DiskItem.setProgram(disk, """
                     EVERY 20 TICKS DO
@@ -93,61 +78,35 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
                         OUTPUT TO a SLOTS 2
                     END
                 """.stripTrailing().stripIndent());
-        player.setItemInHand(InteractionHand.MAIN_HAND, FormItem.getForm(disk));
-        pressState.getBlock().use(
-                pressState,
-                helper.getLevel(),
-                helper.absolutePos(printingPos),
-                player,
-                InteractionHand.MAIN_HAND,
-                new BlockHitResult(
-                        new Vec3(0.5, 0.5, 0.5),
-                        Direction.UP,
-                        helper.absolutePos(printingPos),
-                        false
-                )
-        );
+        ItemStack form = FormItem.getForm(disk);
+        player.setItemInHand(InteractionHand.MAIN_HAND, form);
+        helper.useBlock(printingPos, player);
 
-        BlockState buttonState = helper.getBlockState(buttonPos);
-        buttonState.getBlock().use(
-                buttonState,
-                helper.getLevel(),
-                helper.absolutePos(buttonPos),
-                player,
-                InteractionHand.MAIN_HAND,
-                new BlockHitResult(
-                        new Vec3(0.5, 0.5, 0.5),
-                        Direction.UP,
-                        helper.absolutePos(printingPos),
-                        false
-                )
-        );
+        // Activate printing press
+        helper.useBlock(buttonPos, player);
 
+        // Completion criteria
         helper.runAfterDelay(5, () -> {
-            pressState.getBlock().use(
-                    pressState,
-                    helper.getLevel(),
-                    helper.absolutePos(printingPos),
-                    player,
-                    InteractionHand.MAIN_HAND,
-                    new BlockHitResult(
-                            new Vec3(0.5, 0.5, 0.5),
-                            Direction.UP,
-                            helper.absolutePos(printingPos),
-                            false
-                    )
-            );
+            // Pull out result
+            helper.useBlock(printingPos, player);
             ItemStack held = player.getMainHandItem();
-            if (held.is(SFMItems.DISK_ITEM.get()) && DiskItem.getProgram(held).equals(DiskItem.getProgram(disk))) {
-                var chest = getItemHandler(helper, chestPos);
-                chest.insertItem(0, held, false);
-                assertTrue(printingPress.getInk().isEmpty(), "Ink was not consumed");
-                assertTrue(printingPress.getPaper().isEmpty(), "Paper was not consumed");
-                assertTrue(!printingPress.getForm().isEmpty(), "Form should not be consumed");
-                helper.succeed();
-            } else {
+
+            // Fail if result is not a perfect clone of the disk
+            if (!held.is(SFMItems.DISK_ITEM.get()) || !DiskItem.getProgram(held).equals(DiskItem.getProgram(disk))) {
                 helper.fail("Disk was not cloned");
             }
+
+            // Place result in chest
+            var chest = getItemHandler(helper, chestPos);
+            chest.insertItem(0, held, false);
+
+            // Assert ingredient transformations
+            assertTrue(printingPress.getInk().isEmpty(), "Ink was not consumed");
+            assertTrue(printingPress.getPaper().isEmpty(), "Paper was not consumed");
+            assertTrue(!printingPress.getForm().isEmpty(), "Form should not be consumed");
+
+            // Succeed test
+            helper.succeed();
         });
     }
 }

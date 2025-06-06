@@ -12,9 +12,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
@@ -49,21 +49,13 @@ public class MultiFluidGameTest extends SFMGameTestDefinition {
         helper.setBlock(b1Pos, MekanismBlocks.BASIC_FLUID_TANK.getBlock());
         helper.setBlock(b2Pos, MekanismBlocks.BASIC_FLUID_TANK.getBlock());
         var a1 = helper
-                .getBlockEntity(a1Pos)
-                .getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.NORTH)
-                .orElse(null);
+                .getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(a1Pos), Direction.UP);
         var a2 = helper
-                .getBlockEntity(a2Pos)
-                .getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.NORTH)
-                .orElse(null);
+                .getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(a2Pos), Direction.UP);
         var b1 = helper
-                .getBlockEntity(b1Pos)
-                .getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.NORTH)
-                .orElse(null);
+                .getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(b1Pos), Direction.UP);
         var b2 = helper
-                .getBlockEntity(b2Pos)
-                .getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.NORTH)
-                .orElse(null);
+                .getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(b2Pos), Direction.UP);
 
         a1.fill(new FluidStack(Fluids.WATER, 3000), IFluidHandler.FluidAction.EXECUTE);
         a2.fill(new FluidStack(Fluids.LAVA, 3000), IFluidHandler.FluidAction.EXECUTE);

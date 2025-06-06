@@ -7,7 +7,6 @@ import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
-import mekanism.api.math.FloatingLong;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.TileEntityEnergyCube;
 import mekanism.common.util.UnitDisplayUtils;
@@ -65,19 +64,17 @@ public class MekEnergyOneGameTest extends SFMGameTestDefinition {
                 .add("b", helper.absolutePos(rightPos))
                 .save(manager.getDisk());
 
-        left.setEnergy(0, FloatingLong.create(100));
-        right.setEnergy(0, FloatingLong.ZERO);
+        left.setEnergy(0, 100);
+        right.setEnergy(0, 0);
         succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
             assertTrue(
                     left
                             .getEnergy(0)
-                            .equals(FloatingLong
-                                            .create(100)
-                                            .subtract(UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(1))),
+                    == UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(1),
                     "Contents did not depart"
             );
             assertTrue(
-                    right.getEnergy(0).equals(UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(1)),
+                    right.getEnergy(0) == UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(1),
                     "Contents did not arrive"
             );
 

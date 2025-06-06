@@ -40,7 +40,7 @@ public class MoveWithoutTagMineableGameTest extends SFMGameTestDefinition {
                                     END
                                     """)
                 .preContents("left", Arrays.asList(
-                        enchant(new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100),
+                        enchant(helper, new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100),
                         new ItemStack(Items.DIRT, 64),
                         new ItemStack(Items.STONE, 64)
                 ))
@@ -50,7 +50,7 @@ public class MoveWithoutTagMineableGameTest extends SFMGameTestDefinition {
                         new ItemStack(Items.STONE, 64)
                 ))
                 .postContents("right", Arrays.asList(
-                        enchant(new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100),
+                        enchant(helper, new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100),
                         new ItemStack(Items.DIRT, 64)
                 ))
                 .run();
