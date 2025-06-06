@@ -58,7 +58,7 @@ public class SFMDeclarativeTestBuilder {
         return BoundingBox.encapsulatingPositions(
                         spec.blocks()
                                 .stream()
-                                .map(TestBlockDef::posRelativeToManager)
+                                .map(SFMTestBlockEntitySpec::posRelativeToManager)
                                 .toList()
                 )
                 .map(bounds -> {
@@ -71,13 +71,13 @@ public class SFMDeclarativeTestBuilder {
     }
 
     private void placeBlocks(@NotStored BlockPos managerPos) {
-        for (TestBlockDef<?> blockDef : spec.blocks()) {
+        for (SFMTestBlockEntitySpec<?> blockDef : spec.blocks()) {
             placeBlock(blockDef, managerPos);
         }
     }
 
     private <T extends BlockEntity> void placeBlock(
-            TestBlockDef<T> def,
+            SFMTestBlockEntitySpec<T> def,
             @NotStored BlockPos managerPos
     ) {
         BlockPos blockPos = managerPos.offset(def.posRelativeToManager());
@@ -164,7 +164,7 @@ public class SFMDeclarativeTestBuilder {
             ManagerBlockEntity manager
     ) {
         LabelPositionHolder labelHolder = LabelPositionHolder.empty();
-        for (TestBlockDef<?> def : spec.blocks()) {
+        for (SFMTestBlockEntitySpec<?> def : spec.blocks()) {
             // Actually add the label to the holder
             BlockPos absolutePos = helper.absolutePos(managerPos.offset(def.posRelativeToManager()));
             labelHolder.add(def.label(), absolutePos);
