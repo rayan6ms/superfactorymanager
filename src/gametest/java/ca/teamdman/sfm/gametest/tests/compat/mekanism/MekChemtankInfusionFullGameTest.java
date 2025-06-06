@@ -7,16 +7,15 @@ import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
-import mekanism.api.chemical.infuse.InfusionStack;
+import mekanism.api.chemical.ChemicalStack;
 import mekanism.common.registries.MekanismBlocks;
-import mekanism.common.registries.MekanismInfuseTypes;
+import mekanism.common.registries.MekanismChemicals;
 import mekanism.common.tier.ChemicalTankTier;
 import mekanism.common.tile.TileEntityChemicalTank;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
 
 /**
  * Migrated from SFMMekanismCompatGameTests.mek_chemtank_infusion_full
@@ -45,9 +44,9 @@ public class MekChemtankInfusionFullGameTest extends SFMGameTestDefinition {
 
         // set up the world
         helper.setBlock(leftPos, MekanismBlocks.ULTIMATE_CHEMICAL_TANK.getBlock());
-        var leftTank = ((TileEntityChemicalTank) helper.getBlockEntity(leftPos));
+        TileEntityChemicalTank leftTank = getAndPrepMekTile(helper, leftPos);
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_CHEMICAL_TANK.getBlock());
-        var rightTank = ((TileEntityChemicalTank) helper.getBlockEntity(rightPos));
+        TileEntityChemicalTank rightTank = getAndPrepMekTile(helper, rightPos);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
@@ -67,17 +66,17 @@ public class MekChemtankInfusionFullGameTest extends SFMGameTestDefinition {
                 .save(manager.getDisk());
 
         // ensure it can move into a nearly full tank
-        leftTank.getInfusionTank().setStack(new InfusionStack(MekanismInfuseTypes.REDSTONE.get(), 2_000_000L));
+        leftTank.getChemicalTank().setStack(new ChemicalStack(MekanismChemicals.REDSTONE.get(), 2_000_000L));
         rightTank
-                .getInfusionTank()
-                .setStack(new InfusionStack(
-                        MekanismInfuseTypes.REDSTONE.get(),
+                .getChemicalTank()
+                .setStack(new ChemicalStack(
+                        MekanismChemicals.REDSTONE.get(),
                         ChemicalTankTier.ULTIMATE.getStorage() - 1_000_000L
                 ));
         succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
-            assertTrue(leftTank.getInfusionTank().getStack().getAmount() == 1_000_000L, "Contents did not depart");
+            assertTrue(leftTank.getChemicalTank().getStack().getAmount() == 1_000_000L, "Contents did not depart");
             assertTrue(
-                    rightTank.getInfusionTank().getStack().getAmount() == ChemicalTankTier.ULTIMATE.getStorage(),
+                    rightTank.getChemicalTank().getStack().getAmount() == ChemicalTankTier.ULTIMATE.getStorage(),
                     "Contents did not arrive"
             );
         });
