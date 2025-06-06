@@ -6,7 +6,6 @@ import ca.teamdman.sfm.common.logging.TranslatableLogEvent;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.gametest.SFMGameTestBase;
 import cofh.thermal.expansion.block.entity.machine.MachineInsolatorTile;
 import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.TileEntityBin;
@@ -25,9 +24,12 @@ import org.apache.logging.log4j.Level;
 import java.util.ArrayDeque;
 import java.util.Objects;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 @GameTestHolder(SFM.MOD_ID)
 @PrefixGameTestTemplate(value=false)
-public class SFMThermalMekanismGameTests extends SFMGameTestBase {
+public class SFMThermalMekanismGameTests  {
     @GameTest(template = "3x4x3")
     public static void resource_loss_regression(GameTestHelper helper) {
         var managerPos = new BlockPos(1, 2, 1);

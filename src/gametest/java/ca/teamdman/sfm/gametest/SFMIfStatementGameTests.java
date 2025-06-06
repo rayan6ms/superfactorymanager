@@ -27,6 +27,8 @@ import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 import java.util.ArrayList;
 import java.util.List;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+
 @SuppressWarnings({
         "RedundantSuppression",
         "DataFlowIssue",
@@ -36,7 +38,7 @@ import java.util.List;
 })
 @GameTestHolder(SFM.MOD_ID)
 @PrefixGameTestTemplate(value=false)
-public class SFMIfStatementGameTests extends SFMGameTestBase {
+public class SFMIfStatementGameTests {
 
     @GameTest(template = "3x2x1")
     public static void comparison_gt(GameTestHelper helper) {

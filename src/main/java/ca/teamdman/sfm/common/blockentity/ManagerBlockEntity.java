@@ -194,7 +194,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     public void setProgram(String program) {
         var disk = getDisk();
         if (disk != null) {
-            DiskItem.setProgram(disk, program);
+            DiskItem.setProgram(disk, program.stripTrailing().stripIndent());
             rebuildProgramAndUpdateDisk();
             setChanged();
         }

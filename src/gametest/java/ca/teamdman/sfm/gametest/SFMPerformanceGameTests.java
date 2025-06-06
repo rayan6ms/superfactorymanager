@@ -21,11 +21,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 @SuppressWarnings({"DataFlowIssue", "DuplicatedCode", "DefaultAnnotationParam"})
 @GameTestHolder(SFM.MOD_ID)
 @PrefixGameTestTemplate(value=false)
-public class SFMPerformanceGameTests extends SFMGameTestBase {
-    @GameTest(template = "25x3x25", batch = "laggy", skyAccess = true)
+public class SFMPerformanceGameTests {
+    @GameTest(template = "25x3x25", batch = "laggy")
     public static void move_many_inventories(GameTestHelper helper) {
         // fill the platform with cables and barrels
         var sourceBlocks = new ArrayList<BlockPos>();

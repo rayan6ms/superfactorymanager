@@ -7,7 +7,6 @@ import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.util.NotStored;
-import ca.teamdman.sfm.gametest.SFMGameTestBase;
 import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.BoolExpr;
 import ca.teamdman.sfml.ast.IfStatement;
@@ -26,7 +25,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-public class SFMDeclarativeTestBuilder extends SFMGameTestBase {
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
+public class SFMDeclarativeTestBuilder {
     private final GameTestHelper helper;
     private final SFMTestSpec spec;
     private int conditionIndex = 0;

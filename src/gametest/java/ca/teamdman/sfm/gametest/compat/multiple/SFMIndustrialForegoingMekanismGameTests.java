@@ -5,7 +5,6 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.gametest.SFMGameTestBase;
 import com.buuz135.industrial.block.resourceproduction.tile.WashingFactoryTile;
 import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleResourceProduction;
@@ -37,7 +36,7 @@ import java.util.Objects;
 @SuppressWarnings("OptionalGetWithoutIsPresent")
 @GameTestHolder(SFM.MOD_ID)
 @PrefixGameTestTemplate(value=false)
-public class SFMIndustrialForegoingMekanismGameTests extends SFMGameTestBase {
+public class SFMIndustrialForegoingMekanismGameTests {
     @SuppressWarnings("DanglingJavadoc")
     @GameTest(template = "3x4x3", timeoutTicks = 200)
     public static void meat_fluid(GameTestHelper helper) {

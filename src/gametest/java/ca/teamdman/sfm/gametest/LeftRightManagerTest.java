@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestHelper;
 
 public class LeftRightManagerTest extends SFMTestBuilder {
-
     public LeftRightManagerTest(GameTestHelper helper) {
         super(helper);
     }
