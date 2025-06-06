@@ -46,6 +46,7 @@ import java.util.Objects;
 
 @SuppressWarnings({"DuplicatedCode", "DataFlowIssue"})
 @GameTestHolder(SFM.MOD_ID)
+@PrefixGameTestTemplate(value=false)
 public class SFMMekanismCompatGameTests extends SFMGameTestBase {
     @GameTest(template = "3x2x1")
     public static void mek_chemtank_infusion_empty(GameTestHelper helper) {
