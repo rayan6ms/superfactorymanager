@@ -28,11 +28,11 @@
 			},
 			{
 				"name": "variable.parameter.sfml",
-				"match": "(?i)(?<=INPUT\\s)(.*?)\\s+(?=FROM|EXCEPT|RETAIN)"
+				"match": "(?i)(?<=INPUT\\s)(.*?)\\s+(?=FROM|EXCEPT|RETAIN|WITH|WITHOUT)"
 			},
 			{
 				"name": "variable.parameter.sfml",
-				"match": "(?i)(?<=OUTPUT\\s)(.*?)\\s+(?=TO|EXCEPT|RETAIN)"
+				"match": "(?i)(?<=OUTPUT\\s)(.*?)\\s+(?=TO|EXCEPT|RETAIN|WITH|WITHOUT)"
 			},
 
 			{
@@ -54,7 +54,7 @@
 
 			{
 				"name": "keyword.control.sfml",
-				"match": "(?i)\\b(EXCEPT|MOVE|FROM|TO|INPUT|OUTPUT|WHERE|SLOTS|RETAIN|EACH|TOP|BOTTOM|NORTH|EAST|SOUTH|WEST|SIDE|SELF|SECONDS|EVERY|PULSE|WORLD|PROGRAM)\\b"
+				"match": "(?i)\\b(EXCEPT|MOVE|FROM|TO|INPUT|OUTPUT|WHERE|SLOTS|RETAIN|EACH|TOP|BOTTOM|NORTH|EAST|SOUTH|WEST|SIDE|SELF|SECONDS|EVERY|PULSE|WORLD|PROGRAM|WITH|WITHOUT)\\b"
 			},
 
 			{

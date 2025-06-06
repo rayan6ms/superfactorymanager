@@ -218,7 +218,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         } else {
             ticks = Integer.parseInt(firstNumber.getText());
         }
-        if (ctx.SECONDS() != null) {
+        if (ctx.SECONDS() != null || ctx.SECOND() != null) {
             ticks *= 20;
         }
 
@@ -243,7 +243,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         String firstNumber = ctx.NUMBER_WITH_G_SUFFIX().getText();
         String front = firstNumber.substring(0, firstNumber.length() - 1);
         int ticks = Integer.parseInt(front);
-        if (ctx.SECONDS() != null) {
+        if (ctx.SECONDS() != null || ctx.SECOND() != null) {
             ticks *= 20;
         }
 

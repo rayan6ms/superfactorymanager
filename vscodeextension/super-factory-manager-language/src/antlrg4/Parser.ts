@@ -15,7 +15,10 @@ export const diagnosticCollectionErrors = vscode.languages.createDiagnosticColle
  * It will clear any existing errors, so we do not have any duplicate
  * @param document File which is saved or being used
  */
-export function handleDocument(document: vscode.TextDocument) {
+export function handleDocument(document: vscode.TextDocument)
+{   
+    if(document.languageId !== "sfm" && document.languageId !== "sfml") return;
+
     const text = document.getText();
     const diagnostics: vscode.Diagnostic[] = [];
     const enableErrorChecking = vscode.workspace.getConfiguration('sfml').get('enableErrorChecking', true);
