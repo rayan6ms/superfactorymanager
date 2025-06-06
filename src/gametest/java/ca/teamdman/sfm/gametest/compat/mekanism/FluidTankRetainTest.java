@@ -3,7 +3,8 @@ package ca.teamdman.sfm.gametest.compat.mekanism;
 import ca.teamdman.sfm.SFM;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraftforge.gametest.GameTestHolder;
+import net.neoforged.neoforge.gametest.GameTestHolder;
+
 
 @GameTestHolder(SFM.MOD_ID)
 public class FluidTankRetainTest {
