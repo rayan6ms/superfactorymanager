@@ -63,8 +63,8 @@ sourceSets {
     gametest {
         java {
             srcDir "src/gametest/java"
-            exclude "ca/teamdman/sfm/gametest/compat/**"
-            exclude "ca/teamdman/sfm/gametest/ai/**"
+            exclude "ca/teamdman/sfm/gametest/tests/compat/**"
+            exclude "ca/teamdman/sfm/gametest/tests/ai/**"
         }
         compileClasspath += main.output
         resources {
