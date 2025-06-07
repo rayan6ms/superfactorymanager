@@ -35,6 +35,7 @@ public class SFMGameTestHelper extends GameTestHelper {
     ) {
         BlockEntity blockEntity = getBlockEntity(pos);
         SFMGameTestMethodHelpers.assertTrue(blockEntity != null, "No block entity found at " + pos);
+        @SuppressWarnings("DataFlowIssue")
         Optional<IFluidHandler> found = blockEntity
                 .getCapability(Capabilities.FLUID_HANDLER, direction)
                 .resolve();
@@ -48,6 +49,7 @@ public class SFMGameTestHelper extends GameTestHelper {
     ) {
         BlockEntity blockEntity = getBlockEntity(pos);
         SFMGameTestMethodHelpers.assertTrue(blockEntity != null, "No block entity found at " + pos);
+        @SuppressWarnings("DataFlowIssue")
         Optional<IItemHandler> found = blockEntity
                 .getCapability(Capabilities.ITEM_HANDLER, direction)
                 .resolve();
