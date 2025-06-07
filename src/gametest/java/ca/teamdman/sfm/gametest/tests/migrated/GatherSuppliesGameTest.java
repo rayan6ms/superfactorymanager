@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 
 /**
  * Migrated from SFMPerformanceGameTests.gather_supplies
@@ -39,7 +39,7 @@ public class GatherSuppliesGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         var items = new Item[]{
                 Items.GOLD_INGOT,
                 Items.GOLD_BLOCK,
@@ -208,7 +208,7 @@ public class GatherSuppliesGameTest extends SFMGameTestDefinition {
         // load the program
         manager.setProgram(program);
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             // the inventory should be stocked with a stack of each item
             BarrelBlockEntity barrel = (BarrelBlockEntity) helper.getBlockEntity(new BlockPos(0, 2, 0));
             for (Item item : items) {

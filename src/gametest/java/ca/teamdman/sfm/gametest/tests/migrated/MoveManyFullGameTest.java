@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.entity.BarrelBlockEntity;
 import java.util.ArrayList;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 
 /**
  * Migrated from SFMPerformanceGameTests.move_many_full
@@ -42,7 +42,7 @@ public class MoveManyFullGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         // fill the platform with cables and barrels
         var sourceBlocks = new ArrayList<BlockPos>();
         var destBlocks = new ArrayList<BlockPos>();
@@ -93,7 +93,7 @@ public class MoveManyFullGameTest extends SFMGameTestDefinition {
                 "Program did not start running " + DiskItem.getErrors(manager.getDisk())
         );
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             // ensure all the source chests are full
             sourceBlocks.forEach(pos -> {
                 BarrelBlockEntity barrel = (BarrelBlockEntity) helper.getBlockEntity(pos);

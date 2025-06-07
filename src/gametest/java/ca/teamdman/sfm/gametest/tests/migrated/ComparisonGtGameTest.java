@@ -12,7 +12,8 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 /**
  * Migrated from SFMIfStatementGameTests.comparison_gt
@@ -33,7 +34,7 @@ public class ComparisonGtGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         var leftPos = new BlockPos(2, 2, 0);
         var rightPos = new BlockPos(0, 2, 0);
         var managerPos = new BlockPos(1, 2, 0);
@@ -82,7 +83,7 @@ public class ComparisonGtGameTest extends SFMGameTestDefinition {
                 .add("right", helper.absolutePos(rightPos))
                 .save(manager.getDisk());
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             int leftDiamondCount = count(left, Items.DIAMOND);
             int leftIronCount = count(left, Items.IRON_INGOT);
             int leftStickCount = count(left, Items.STICK);

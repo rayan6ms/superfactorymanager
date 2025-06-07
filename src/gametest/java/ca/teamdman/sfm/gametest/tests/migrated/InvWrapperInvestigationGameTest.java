@@ -31,7 +31,7 @@ public class InvWrapperInvestigationGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         try {
             for (int stackSize : new int[]{200, 64}) {
                 InvWrapper inv = new InvWrapper(new SimpleContainer(1));

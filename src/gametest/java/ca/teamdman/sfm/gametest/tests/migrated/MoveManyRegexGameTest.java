@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 
 /**
  * Migrated from SFMPerformanceGameTests.move_many_regex
@@ -43,7 +43,7 @@ public class MoveManyRegexGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         // fill the platform with cables and barrels
         var sourceBlocks = new ArrayList<BlockPos>();
         var destBlocks = new ArrayList<BlockPos>();
@@ -102,7 +102,7 @@ public class MoveManyRegexGameTest extends SFMGameTestDefinition {
 
         // load the program
         manager.setProgram(program);
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             // ensure the source chests only have the non-ingot items
             sourceBlocks.forEach(pos -> {
                 BarrelBlockEntity barrel = (BarrelBlockEntity) helper.getBlockEntity(pos);

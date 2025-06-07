@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.Blocks;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /**
  * Migrated from SFMCorrectnessGameTests.move_full_chest
@@ -36,7 +36,7 @@ public class MoveFullChestGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
         BlockPos rightPos = new BlockPos(0, 2, 0);
         helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
@@ -44,9 +44,9 @@ public class MoveFullChestGameTest extends SFMGameTestDefinition {
         helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
 
-        var leftChest = getItemHandler(helper, leftPos);
+        var leftChest = helper.getItemHandler(leftPos);
 
-        var rightChest = getItemHandler(helper, rightPos);
+        var rightChest = helper.getItemHandler(rightPos);
 
         for (int i = 0; i < leftChest.getSlots(); i++) {
             leftChest.insertItem(i, new ItemStack(Blocks.DIRT, 64), false);
@@ -66,7 +66,7 @@ public class MoveFullChestGameTest extends SFMGameTestDefinition {
                 .add("b", helper.absolutePos(rightPos))
                 .save(Objects.requireNonNull(manager.getDisk()));
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             assertTrue(
                     IntStream.range(0, leftChest.getSlots()).allMatch(slot -> leftChest.getStackInSlot(slot).isEmpty()),
                     "Dirt did not leave"
