@@ -10,9 +10,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.GameTestInfo;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.common.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
@@ -36,7 +36,7 @@ public class SFMGameTestHelper extends GameTestHelper {
         BlockEntity blockEntity = getBlockEntity(pos);
         SFMGameTestMethodHelpers.assertTrue(blockEntity != null, "No block entity found at " + pos);
         Optional<IFluidHandler> found = blockEntity
-                .getCapability(ForgeCapabilities.FLUID_HANDLER, direction)
+                .getCapability(Capabilities.FLUID_HANDLER, direction)
                 .resolve();
         SFMGameTestMethodHelpers.assertTrue(found.isPresent(), "No fluid handler found at " + pos);
         return found.get();
@@ -49,7 +49,7 @@ public class SFMGameTestHelper extends GameTestHelper {
         BlockEntity blockEntity = getBlockEntity(pos);
         SFMGameTestMethodHelpers.assertTrue(blockEntity != null, "No block entity found at " + pos);
         Optional<IItemHandler> found = blockEntity
-                .getCapability(ForgeCapabilities.ITEM_HANDLER, direction)
+                .getCapability(Capabilities.ITEM_HANDLER, direction)
                 .resolve();
         SFMGameTestMethodHelpers.assertTrue(found.isPresent(), "No item handler found at " + pos);
         return found.get();
