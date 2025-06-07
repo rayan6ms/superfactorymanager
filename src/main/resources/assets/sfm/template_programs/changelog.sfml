@@ -12,6 +12,17 @@ NAME "Changelog"
 -- Fix water tank block entities not being cleaned up, fixes #290
 ---- Thanks @Linguardium for the bug report!
 -- Fix `SECOND` keyword (singular) not multiplying by 20, fixes #244
+-- Split game tests to multiple files
+-- Implement custom game test registration logic with dynamic structure generator
+-- Fix peekExtractPotential to return stackInSlot instead of extract(MAX) for more accurate count of oversized inventories
+-- Add facades inheriting light level of the block they are appearing as, closes #309
+---- Thanks @TheVoos for the suggestion!
+-- Fix RETAIN behaving incorrectly, fixes #306, #200, #297, #199, #181
+EVERY 20 TICKS DO
+    INPUT RETAIN 300 FROM dank BOTTOM SIDE -- would refuse to pull, now fixed
+    OUTPUT TO chest
+END
+
 
 ---- 4.21.0 ----
 -- Add intellisense, disabled by default - backslash to accept suggestion

@@ -7,7 +7,6 @@ import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
 import ca.teamdman.sfm.common.facade.FacadeSpreadLogic;
-import ca.teamdman.sfm.common.facade.FacadeTransparency;
 import ca.teamdman.sfm.common.net.ServerboundFacadePacket;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
@@ -21,18 +20,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.material.Material;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.Nullable;
 
 public class CableBlock extends Block implements ICableBlock, IFacadableBlock {
-    public CableBlock() {
-        super(Block.Properties
-                      .of(Material.METAL)
-                      .destroyTime(1f)
-                      .sound(SoundType.METAL));
+    public CableBlock(Properties properties) {
+        super(properties);
     }
 
     @SuppressWarnings("deprecation")
@@ -112,8 +105,7 @@ public class CableBlock extends Block implements ICableBlock, IFacadableBlock {
     @Override
     public BlockState getStateForPlacementByFacadePlan(
             LevelAccessor level,
-            @NotStored BlockPos pos,
-            @Nullable FacadeTransparency facadeTransparency
+            @NotStored BlockPos pos
     ) {
         return defaultBlockState();
     }

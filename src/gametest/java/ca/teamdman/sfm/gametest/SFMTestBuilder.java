@@ -9,17 +9,17 @@ import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
-import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 public abstract class SFMTestBuilder {
-    protected final GameTestHelper helper;
+    protected final SFMGameTestHelper helper;
     protected @Nullable ManagerBlockEntity manager;
     protected Map<String, IItemHandler> chests = new HashMap<>();
     protected Map<String, BlockPos> positions = new HashMap<>();
@@ -28,7 +28,7 @@ public abstract class SFMTestBuilder {
     protected List<Runnable> postConditions = new ArrayList<>();
     protected List<Runnable> preConditions = new ArrayList<>();
 
-    public SFMTestBuilder(GameTestHelper helper) {
+    public SFMTestBuilder(SFMGameTestHelper helper) {
         this.helper = helper;
     }
 
@@ -87,8 +87,7 @@ public abstract class SFMTestBuilder {
         }
         assert manager != null;
         labelHolder.save(Objects.requireNonNull(manager.getDisk()));
-        assertManagerDidThingWithoutLagging(
-                helper,
+        helper.assertManagerDidThingWithoutLagging(
                 manager,
                 () -> {
                     // first, assertions as normal
@@ -222,7 +221,7 @@ public abstract class SFMTestBuilder {
             @Stored BlockPos pos
     ) {
         helper.setBlock(pos, SFMBlocks.TEST_BARREL_BLOCK.get());
-        IItemHandler chest = getItemHandler(helper, pos);
+        IItemHandler chest = helper.getItemHandler(pos);
         chests.put(name, chest);
         positions.put(name, pos);
         labelHolder.add(name, helper.absolutePos(pos));

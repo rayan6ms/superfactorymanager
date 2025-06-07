@@ -11,7 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.getItemHandler;
+
 
 /**
  * Migrated from SFMProgramLinterGameTests.disk_name
@@ -32,10 +32,10 @@ public class DiskNameGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         BlockPos chestPos = new BlockPos(0, 2, 0);
         helper.setBlock(chestPos, SFMBlocks.TEST_BARREL_BLOCK.get());
-        var chest = getItemHandler(helper, chestPos);
+        var chest = helper.getItemHandler(chestPos);
 
         {
             ItemStack disk = new ItemStack(SFMItems.DISK_ITEM.get());

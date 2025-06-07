@@ -35,7 +35,7 @@ public class SharedQuantitySharedRetentionInputResourceTracker implements IInput
     @Override
     public <STACK, ITEM, CAP> long getRetentionObligationForSlot(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack,
+            STACK key,
             @NotStored BlockPos pos,
             int slot
     ) {
@@ -49,7 +49,7 @@ public class SharedQuantitySharedRetentionInputResourceTracker implements IInput
     @Override
     public <STACK, ITEM, CAP> long getRemainingRetentionObligation(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack
+            STACK key
     ) {
         return resource_limit.limit().retention().number().value() - retention_obligation_progress;
     }
@@ -57,15 +57,15 @@ public class SharedQuantitySharedRetentionInputResourceTracker implements IInput
     @Override
     public <STACK, ITEM, CAP> void trackRetentionObligation(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack,
+            STACK key,
             int slot,
             @NotStored BlockPos pos,
-            long promise
+            long dedicatingToObligation
     ) {
-        this.retention_obligation_progress += promise;
+        this.retention_obligation_progress += dedicatingToObligation;
         this.retention_obligations_by_pos_by_slot
                 .computeIfAbsent(pos.asLong(), k -> new Int2LongArrayMap())
-                .merge(slot, promise, Long::sum);
+                .merge(slot, dedicatingToObligation, Long::sum);
     }
 
     @Override

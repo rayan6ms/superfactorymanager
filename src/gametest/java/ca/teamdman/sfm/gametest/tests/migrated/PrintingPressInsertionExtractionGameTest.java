@@ -37,7 +37,7 @@ public class PrintingPressInsertionExtractionGameTest extends SFMGameTestDefinit
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         var pos = new BlockPos(0, 2, 0);
         helper.setBlock(pos, SFMBlocks.PRINTING_PRESS_BLOCK.get());
         var printingPress = (PrintingPressBlockEntity) helper.getBlockEntity(pos);
