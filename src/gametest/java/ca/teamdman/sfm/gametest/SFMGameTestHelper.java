@@ -2,6 +2,7 @@ package ca.teamdman.sfm.gametest;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.program.ProgramContext;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfml.ast.Block;
 import ca.teamdman.sfml.ast.Trigger;
@@ -31,6 +32,7 @@ public class SFMGameTestHelper extends GameTestHelper {
         super(helper.testInfo);
     }
 
+    @MCVersionDependentBehaviour
     public IFluidHandler getFluidHandler(
             @NotStored BlockPos pos,
             @Nullable Direction direction
@@ -41,6 +43,7 @@ public class SFMGameTestHelper extends GameTestHelper {
         return found;
     }
 
+    @MCVersionDependentBehaviour
     public IItemHandler getItemHandler(
             @NotStored BlockPos pos,
             @Nullable Direction direction
