@@ -28,7 +28,6 @@ import net.minecraft.world.item.Items;
 import net.neoforged.common.capabilities.ForgeCapabilities;
 import net.neoforged.fluids.FluidStack;
 import net.neoforged.fluids.capability.IFluidHandler;
-import net.neoforged.gametest.GameTestHolder;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
@@ -57,7 +56,7 @@ public class MeatFluidGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         BlockPos managerPos = new BlockPos(1, 2, 0);
         BlockPos leftTankPos = new BlockPos(2, 2, 0);
         BlockPos rightTankPos = new BlockPos(0, 2, 0);

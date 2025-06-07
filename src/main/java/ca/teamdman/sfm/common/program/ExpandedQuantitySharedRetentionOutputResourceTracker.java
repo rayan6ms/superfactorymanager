@@ -60,23 +60,23 @@ public class ExpandedQuantitySharedRetentionOutputResourceTracker implements IOu
     @Override
     public <STACK, ITEM, CAP> void updateRetentionObservation(
             ResourceType<STACK, ITEM, CAP> type,
-            STACK stack
+            STACK observed
     ) {
-        if (matchesStack(stack)) {
-            retention_obligation_progress += type.getAmount(stack);
+        if (matchesStack(observed)) {
+            retention_obligation_progress += type.getAmount(observed);
         }
     }
 
     @Override
     public <STACK, ITEM, CAP> long getMaxTransferable(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack
+            STACK key
     ) {
         long max_transfer = resource_limit.limit().quantity().number().value();
         long transferred_for_item = 0;
         var transferred_for_resource_type = transferred_by_item.get(resourceType);
         if (transferred_for_resource_type != null) {
-            ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
+            ResourceLocation item_id = resourceType.getRegistryKeyForStack(key);
             transferred_for_item = transferred_for_resource_type.getLong(item_id);
         }
         long unusedQuantity = max_transfer - transferred_for_item;
@@ -90,10 +90,10 @@ public class ExpandedQuantitySharedRetentionOutputResourceTracker implements IOu
     @Override
     public <STACK, ITEM, CAP> void trackTransfer(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack,
+            STACK key,
             long amount
     ) {
-        ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
+        ResourceLocation item_id = resourceType.getRegistryKeyForStack(key);
         transferred_by_item.computeIfAbsent(resourceType, k -> new Object2LongOpenHashMap<>())
                 .addTo(item_id, amount);
         retention_obligation_progress += amount;

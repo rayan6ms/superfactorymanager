@@ -14,7 +14,7 @@ import net.minecraft.world.item.Items;
 
 import java.util.Objects;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /**
  * Migrated from SFMCorrectnessGameTests.sfm_v4_12_0_changelog
@@ -35,15 +35,15 @@ public class SfmV4120ChangelogGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
         BlockPos rightPos = new BlockPos(0, 2, 0);
         helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
         BlockPos leftPos = new BlockPos(2, 2, 0);
         helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
-        var rightChest = getItemHandler(helper, rightPos);
-        var leftChest = getItemHandler(helper, leftPos);
+        var rightChest = helper.getItemHandler(rightPos);
+        var leftChest = helper.getItemHandler(leftPos);
 
         Item[] items = new Item[]{
                 Items.NETHERITE_INGOT,
@@ -86,7 +86,7 @@ public class SfmV4120ChangelogGameTest extends SFMGameTestDefinition {
                 .add("b", helper.absolutePos(rightPos))
                 .save(Objects.requireNonNull(manager.getDisk()));
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             Item[] expected = new Item[]{
                     Items.NETHERITE_INGOT,
                     Items.GOLD_INGOT,

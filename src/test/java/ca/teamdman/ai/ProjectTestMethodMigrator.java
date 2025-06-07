@@ -273,6 +273,7 @@ public class ProjectTestMethodMigrator {
         return body;
     }
 
+    @SuppressWarnings("OptionalUsedAsFieldOrParameterType")
     private static class TestMethodInfo {
         Path originalFile;
         String originalPackage;

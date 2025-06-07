@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.entity.BarrelBlockEntity;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 
 /**
  * Migrated from SFMPerformanceGameTests.move_regex_circle
@@ -38,7 +38,7 @@ public class MoveRegexCircleGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         var managerPos = new BlockPos(1, 2, 1);
         var aPos = new BlockPos(1, 2, 0);
         var bPos = new BlockPos(2, 2, 1);
@@ -102,7 +102,7 @@ public class MoveRegexCircleGameTest extends SFMGameTestDefinition {
         // load the program
         manager.setProgram(program);
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
 
         });
     }

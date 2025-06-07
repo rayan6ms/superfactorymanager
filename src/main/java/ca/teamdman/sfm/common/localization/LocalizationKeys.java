@@ -535,7 +535,7 @@ public final class LocalizationKeys {
     );
     public static final LocalizationEntry LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_CACHE_MISS = new LocalizationEntry(
             "log.sfm.statement.tick.io.gather_slots.cache_miss",
-            "Cache miss - this is the first time this statement is being gathered"
+            "Statement cache miss - this is the first time this statement is being gathered"
     );
     public static final LocalizationEntry LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_EACH = new LocalizationEntry(
             "log.sfm.statement.tick.io.gather_slots.each",

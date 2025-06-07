@@ -35,7 +35,7 @@ public class FallingAnvilProgramFormGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 2, 1), Blocks.IRON_BLOCK);
         var pos = helper.absoluteVec(new Vec3(1.5, 3.5, 1.5));
         ItemStack disk = new ItemStack(SFMItems.DISK_ITEM.get());

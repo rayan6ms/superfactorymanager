@@ -16,7 +16,8 @@ import net.minecraft.world.level.block.LayeredCauldronBlock;
 
 import java.util.Objects;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertManagerRunning;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /**
  * Migrated from SFMCorrectnessGameTests.regression_crash_type_mixing
@@ -37,7 +38,7 @@ public class RegressionCrashTypeMixingGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         // fill in the blocks needed for the test
         BlockPos managerPos = new BlockPos(1, 2, 1);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
@@ -79,7 +80,7 @@ public class RegressionCrashTypeMixingGameTest extends SFMGameTestDefinition {
                                    """.stripTrailing().stripIndent());
 
         assertManagerRunning(manager);
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             helper.assertBlock(front, b -> b == Blocks.CAULDRON, "cauldron didn't empty");
             helper.assertBlockState(
                     back,
