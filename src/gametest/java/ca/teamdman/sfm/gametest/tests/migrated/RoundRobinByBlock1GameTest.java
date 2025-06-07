@@ -14,7 +14,8 @@ import net.minecraft.world.level.block.Blocks;
 
 import java.util.Objects;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 /**
  * Migrated from SFMCorrectnessGameTests.round_robin_by_block_1
@@ -35,7 +36,7 @@ public class RoundRobinByBlock1GameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         BlockPos managerPos = new BlockPos(1, 2, 1);
         BlockPos sourcePos = new BlockPos(1, 3, 1);
         BlockPos dest1Pos = new BlockPos(2, 2, 1);
@@ -47,11 +48,11 @@ public class RoundRobinByBlock1GameTest extends SFMGameTestDefinition {
         helper.setBlock(dest2Pos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
 
-        var sourceInv = getItemHandler(helper, sourcePos);
+        var sourceInv = helper.getItemHandler(sourcePos);
 
-        var dest1Inv = getItemHandler(helper, dest1Pos);
+        var dest1Inv = helper.getItemHandler(dest1Pos);
 
-        var dest2Inv = getItemHandler(helper, dest2Pos);
+        var dest2Inv = helper.getItemHandler(dest2Pos);
 
         for (int i = 0; i < sourceInv.getSlots(); i++) {
             sourceInv.insertItem(i, new ItemStack(Blocks.DIRT, 64), false);
@@ -74,7 +75,7 @@ public class RoundRobinByBlock1GameTest extends SFMGameTestDefinition {
                 .add("dest", helper.absolutePos(dest2Pos))
                 .save(Objects.requireNonNull(manager.getDisk()));
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             assertTrue(count(sourceInv, Items.DIRT) == 64 * (27 - 2), "source count bad");
             int count1 = count(dest1Inv, Items.DIRT);
             int count2 = count(dest2Inv, Items.DIRT);

@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.Blocks;
 
 import java.util.Objects;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /**
  * Migrated from SFMCorrectnessGameTests.forget_input_count_state
@@ -34,15 +34,15 @@ public class ForgetInputCountStateGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
         BlockPos rightPos = new BlockPos(0, 2, 0);
         helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
         BlockPos leftPos = new BlockPos(2, 2, 0);
         helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
-        var rightChest = getItemHandler(helper, rightPos);
-        var leftChest = getItemHandler(helper, leftPos);
+        var rightChest = helper.getItemHandler(rightPos);
+        var leftChest = helper.getItemHandler(leftPos);
 
         leftChest.insertItem(0, new ItemStack(Blocks.DIRT, 64), false);
 
@@ -64,7 +64,7 @@ public class ForgetInputCountStateGameTest extends SFMGameTestDefinition {
                 .add("z", helper.absolutePos(rightPos))
                 .save(Objects.requireNonNull(manager.getDisk()));
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             assertTrue(leftChest.getStackInSlot(0).getCount() == 64 - 10, "did not remain");
             assertTrue(rightChest.getStackInSlot(0).getCount() == 10, "did not arrive");
 

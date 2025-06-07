@@ -57,7 +57,7 @@ public class MeatFluidGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         BlockPos managerPos = new BlockPos(1, 2, 0);
         BlockPos leftTankPos = new BlockPos(2, 2, 0);
         BlockPos rightTankPos = new BlockPos(0, 2, 0);

@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.Block;
 import java.util.List;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 
 /**
  * Migrated from SFMMekanismCompatGameTests.mek_induction
@@ -41,7 +41,12 @@ public class MekInductionGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public String batchName() {
+        return "mek";
+    }
+
+    @Override
+    public void run(SFMGameTestHelper helper) {
         // designate positions
         var managerPos = new BlockPos(1, 3, 0);
         var powerCubePos = new BlockPos(1, 2, 0);
@@ -107,7 +112,7 @@ public class MekInductionGameTest extends SFMGameTestDefinition {
 
         // launch the program
         manager.setProgram(program);
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             if (!inductionPort.getMultiblock().isFormed()) {
                 throw new GameTestAssertException("Induction matrix did not form");
             }

@@ -12,7 +12,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 /**
  * Migrated from SFMIfStatementGameTests.move_if_powered
@@ -33,7 +34,7 @@ public class MoveIfPoweredGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         BlockPos managerPos = new BlockPos(1, 2, 1);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         BlockPos leftPos = managerPos.east();
@@ -47,8 +48,8 @@ public class MoveIfPoweredGameTest extends SFMGameTestDefinition {
         helper.setBlock(leverPos, Blocks.LEVER);
         helper.pullLever(leverPos);
 
-        var rightChest = getItemHandler(helper, rightPos);
-        var leftChest = getItemHandler(helper, leftPos);
+        var rightChest = helper.getItemHandler(rightPos);
+        var leftChest = helper.getItemHandler(leftPos);
 
         leftChest.insertItem(0, new ItemStack(Items.DIRT, 64), false);
         leftChest.insertItem(1, new ItemStack(Items.DIRT, 64), false);
@@ -74,7 +75,7 @@ public class MoveIfPoweredGameTest extends SFMGameTestDefinition {
                 .add("right", helper.absolutePos(rightPos))
                 .save(manager.getDisk());
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             assertTrue(count(leftChest, null) == 0, "everything should depart");
             assertTrue(count(rightChest, Items.GOLD_NUGGET) == 64, "gold nuggets should arrive");
             assertTrue(count(rightChest, Items.IRON_INGOT) == 64, "iron ingots should arrive");

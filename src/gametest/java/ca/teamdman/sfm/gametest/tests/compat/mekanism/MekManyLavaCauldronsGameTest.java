@@ -18,7 +18,7 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 
 /**
  * Migrated from SFMMekanismCompatGameTests.many_lava_cauldrons
@@ -31,7 +31,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManager
         "ArraysAsListWithZeroOrOneArgument"
 })
 @SFMGameTest
-public class ManyLavaCauldronsGameTest extends SFMGameTestDefinition {
+public class MekManyLavaCauldronsGameTest extends SFMGameTestDefinition {
 
     @Override
     public String template() {
@@ -39,7 +39,12 @@ public class ManyLavaCauldronsGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public String batchName() {
+        return "mek";
+    }
+
+    @Override
+    public void run(SFMGameTestHelper helper) {
         // designate positions
         var sourceBlocks = new ArrayList<BlockPos>();
         var destBlocks = new ArrayList<BlockPos>();
@@ -84,7 +89,7 @@ public class ManyLavaCauldronsGameTest extends SFMGameTestDefinition {
 
         // load the program
         manager.setProgram(program);
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             sourceBlocks.forEach(pos -> helper.assertBlock(
                     pos,
                     Blocks.CAULDRON::equals,

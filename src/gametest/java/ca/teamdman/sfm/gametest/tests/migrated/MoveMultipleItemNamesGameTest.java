@@ -13,7 +13,7 @@ import net.minecraft.world.item.Items;
 
 import java.util.Objects;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /**
  * Migrated from SFMCorrectnessGameTests.move_multiple_item_names
@@ -34,15 +34,15 @@ public class MoveMultipleItemNamesGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
         BlockPos rightPos = new BlockPos(0, 2, 0);
         helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
         BlockPos leftPos = new BlockPos(2, 2, 0);
         helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
-        var leftChest = getItemHandler(helper, leftPos);
-        var rightChest = getItemHandler(helper, rightPos);
+        var leftChest = helper.getItemHandler(leftPos);
+        var rightChest = helper.getItemHandler(rightPos);
 
         leftChest.insertItem(0, new ItemStack(Items.IRON_INGOT, 64), false);
         leftChest.insertItem(1, new ItemStack(Items.STONE, 64), false);
@@ -68,7 +68,7 @@ public class MoveMultipleItemNamesGameTest extends SFMGameTestDefinition {
                 .add("b", helper.absolutePos(rightPos))
                 .save(Objects.requireNonNull(manager.getDisk()));
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             assertTrue(leftChest.getStackInSlot(0).getCount() == 64 - 2, "Iron ingots did not retain");
             assertTrue(leftChest.getStackInSlot(1).getCount() == 64 - 10, "Stone did not retain");
             assertTrue(rightChest.getStackInSlot(0).getCount() == 2, "Iron ingots did not move");

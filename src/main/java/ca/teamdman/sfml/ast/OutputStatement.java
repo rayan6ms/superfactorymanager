@@ -69,64 +69,58 @@ public class OutputStatement implements IOStatement {
 
         // find out what we can pull out
         // should never be empty by the time we get here
-        STACK potential = source.peekExtractPotential();
+        STACK extractPotential = source.peekExtractPotential();
+        long extractPotentialAmount = resourceType.getAmount(extractPotential);
+
         // ensure the output slot allows this item
-        if (!destination.tracker.matchesStack(potential)) {
+        if (!destination.tracker.matchesStack(extractPotential)) {
             context
                     .getLogger()
                     .trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_DESTINATION_TRACKER_REJECT.get()));
             return;
         }
 
-        // find out how much we can fit
-        STACK potentialRemainder = destination.insert(potential, true);
-
-        // how many can we move before accounting for limits
-        long toMove = source.type.getAmountDifference(potential, potentialRemainder);
-        if (toMove <= 0) {
-            context
-                    .getLogger()
-                    .trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_ZERO_SIMULATED_MOVEMENT.get(
-                            potentialRemainder,
-                            potential
-                    )));
-            return;
-        }
+        // begin counting how much we can move
+        long amountAvailableToMove = extractPotentialAmount;
 
         // how many have we promised to RETAIN in this slot
         long promised_to_leave_in_this_slot = source.tracker.getRetentionObligationForSlot(
                 resourceType,
-                potential,
+                extractPotential,
                 source.pos,
                 source.slot
         );
-        toMove -= promised_to_leave_in_this_slot;
-        // how many more need we are obligated to leave to satisfy the remainder of the RETAIN limit
-        long remainingObligation = source.tracker.getRemainingRetentionObligation(resourceType, potential); // TODO: this calculation should happen earlier, when we are seeing how much is in the inventory
-        remainingObligation = Long.min(toMove, remainingObligation);
-        toMove -= remainingObligation;
+        amountAvailableToMove -= promised_to_leave_in_this_slot;
+
+        // how much remains until our RETAIN is satisfied
+        long remainingObligation = source.tracker.getRemainingRetentionObligation(resourceType, extractPotential);
+
+        // how much can we allocate towards satisfying the obligation
+        long dedicatingToObligation = Math.min(remainingObligation, amountAvailableToMove);
+        amountAvailableToMove -= dedicatingToObligation;
 
         // update the obligation tracker
-        if (remainingObligation > 0) {
+        if (dedicatingToObligation > 0) {
             source.tracker.trackRetentionObligation(
                     resourceType,
-                    potential,
+                    extractPotential,
                     source.slot,
                     source.pos,
-                    remainingObligation
+                    dedicatingToObligation
             );
+            context
+                    .getLogger()
+                    .trace(x -> {
+                        long newRemainingObligation = remainingObligation - dedicatingToObligation;
+                        x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_RETENTION_OBLIGATION.get(
+                                promised_to_leave_in_this_slot,
+                                newRemainingObligation
+                        ));
+                    });
         }
 
-        long logRemainingObligation = remainingObligation;
-        context
-                .getLogger()
-                .trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_RETENTION_OBLIGATION.get(
-                        promised_to_leave_in_this_slot,
-                        logRemainingObligation
-                )));
-
         // if we can't move anything after our retention obligations, we're done
-        if (toMove <= 0) {
+        if (amountAvailableToMove <= 0) {
             context
                     .getLogger()
                     .trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_RETENTION_OBLIGATION_NO_MOVE.get()));
@@ -134,34 +128,67 @@ public class OutputStatement implements IOStatement {
             return;
         }
 
+        // how many can we move before accounting for limits
+        STACK potentialRemainder = destination.insert(extractPotential, true);
+        long amountThatFitsInDestination = resourceType.getAmountDifference(extractPotential, potentialRemainder);
+        if (amountThatFitsInDestination < 0) {
+            throw new IllegalStateException(
+                    "Potential insertion remainder amount exceeded the insertion amount! This should never happen. "
+                    + "Tried inserting "
+                    + extractPotential
+                    + " into "
+                    + destination
+                    + " but got "
+                    + potentialRemainder
+                    + " remainder"
+                    + " (diff="
+                    + amountThatFitsInDestination
+                    + ")."
+            );
+        } else if (amountThatFitsInDestination == 0) {
+            context
+                    .getLogger()
+                    .trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_ZERO_SIMULATED_MOVEMENT.get(
+                            potentialRemainder,
+                            extractPotential
+                    )));
+            return;
+        }
+
+        // we can only move as much as the destination can fit
+        amountAvailableToMove = Math.min(amountThatFitsInDestination, amountAvailableToMove);
+
         // apply output constraints
-        long destinationMaxTransferable = destination.tracker.getMaxTransferable(resourceType, potential);
-        toMove = Math.min(toMove, destinationMaxTransferable);
+        long destinationAmountLimit = destination.tracker.getMaxTransferable(resourceType, extractPotential);
+        amountAvailableToMove = Math.min(amountAvailableToMove, destinationAmountLimit);
 
         // apply input constraints
-        long sourceMaxTransferable = source.tracker.getMaxTransferable(resourceType, potential);
-        toMove = Math.min(toMove, sourceMaxTransferable);
+        long sourceAmountLimit = source.tracker.getMaxTransferable(resourceType, extractPotential);
+        amountAvailableToMove = Math.min(amountAvailableToMove, sourceAmountLimit);
 
-        // apply resource constraints
-        long maxStackSize = resourceType.getMaxStackSize(potential); // this is cap-agnostic, so source/dest doesn't matter
-        toMove = Math.min(toMove, maxStackSize);
+        // apply stack size constraints
+        long maxStackSize = resourceType.getMaxStackSize(extractPotential); // this is cap-agnostic, so source/dest doesn't matter
+        amountAvailableToMove = Math.min(amountAvailableToMove, maxStackSize);
+        {
+            long logToMove = amountAvailableToMove;
+            context
+                    .getLogger()
+                    .trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_STACK_LIMIT_NEW_TO_MOVE.get(
+                            destinationAmountLimit,
+                            sourceAmountLimit,
+                            maxStackSize,
+                            logToMove
+                    )));
+        }
 
-        long logToMove = toMove;
-        context
-                .getLogger()
-                .trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_STACK_LIMIT_NEW_TO_MOVE.get(
-                        destinationMaxTransferable,
-                        sourceMaxTransferable,
-                        maxStackSize,
-                        logToMove
-                )));
-        if (toMove <= 0) {
+        // check if we can move anything at all
+        if (amountAvailableToMove <= 0) {
             context.getLogger().trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_ZERO_TO_MOVE.get()));
             return;
         }
 
         // extract item for real
-        STACK extracted = source.extract(toMove);
+        STACK extracted = source.extract(amountAvailableToMove);
         context
                 .getLogger()
                 .debug(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_EXTRACTED.get(extracted, source)));
@@ -179,8 +206,7 @@ public class OutputStatement implements IOStatement {
                 .getLogger()
                 .info(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_END.get(
                         moved,
-                        destination.type.getRegistryKeyForStack(
-                                extracted),
+                        resourceType.getRegistryKeyForStack(extracted),
                         source,
                         destination
                 )));
@@ -188,9 +214,9 @@ public class OutputStatement implements IOStatement {
         // If remainder exists, someone lied.
         // THIS SHOULD NEVER HAPPEN
         // will void items if it does
-        if (!destination.type.isEmpty(extractedRemainder)) {
-            ResourceLocation resourceTypeName = SFMResourceTypes.registry().getKey(source.type);
-            String stackName = destination.type.getItem(potential).toString();
+        if (!resourceType.isEmpty(extractedRemainder)) {
+            ResourceLocation resourceTypeName = SFMResourceTypes.registry().getKey(resourceType);
+            String stackName = resourceType.getItem(extractPotential).toString();
             Level level = context.getManager().getLevel();
             assert level != null;
             StringBuilder report = new StringBuilder();
@@ -199,15 +225,32 @@ public class OutputStatement implements IOStatement {
             report.append("    ").append(currentLine).append("\n");
             report.append("=== Summary ===\n");
             int width = -32;
-            report.append(String.format("%"+width+"s", "Simulated extraction")).append(": ").append(potential).append("\n");
             report
-                    .append(String.format("%"+width+"s", "Simulated insertion remainder")).append(": ")
+                    .append(String.format("%" + width + "s", "Simulated extraction"))
+                    .append(": ")
+                    .append(extractPotential)
+                    .append("\n");
+            report
+                    .append(String.format("%" + width + "s", "Simulated insertion remainder"))
+                    .append(": ")
                     .append(potentialRemainder)
-                    .append(" (moved=").append(resourceType.getAmountDifference(potential, potentialRemainder)).append(")")
+                    .append(" (moved=")
+                    .append(resourceType.getAmountDifference(extractPotential, potentialRemainder))
+                    .append(")")
                     .append(" <-- the output block lied here\n");
-            report.append(String.format("%"+width+"s", "Actual extraction")).append(": ").append(extracted).append("\n");
-            report.append(String.format("%"+width+"s", "Actual insertion")).append(": ").append(moved).append(" ").append(stackName).append("\n");
-            report.append(String.format("%"+width+"s", "Actual insertion remainder")).append(": ")
+            report
+                    .append(String.format("%" + width + "s", "Actual extraction"))
+                    .append(": ")
+                    .append(extracted)
+                    .append("\n");
+            report
+                    .append(String.format("%" + width + "s", "Actual insertion"))
+                    .append(": ")
+                    .append(moved)
+                    .append(" ")
+                    .append(stackName)
+                    .append("\n");
+            report.append(String.format("%" + width + "s", "Actual insertion remainder")).append(": ")
                     .append(extractedRemainder)
                     .append(" (")
                     .append(resourceTypeName)
@@ -233,49 +276,17 @@ public class OutputStatement implements IOStatement {
             context.getLogger().error(x -> x.accept(LOG_PROGRAM_VOIDED_RESOURCES.get(report.toString())));
             if (SFMConfig.SERVER.logResourceLossToConsole.get()) {
                 report.append("\nThis can be silenced in the SFM config.\n");
-                report.append("Operators can use `/sfm config edit` to open a GUI to change the SFM config while the game is running.\n");
-                report.append("This can be caused by output inventory logic encountering an integer overflow when moving large quantities of items.\n");
-                report.append("The SFM issue tracker can be found at ").append(SFM.ISSUE_TRACKER_URL).append(" because this shouldn't be happening lol");
+                report.append(
+                        "Operators can use `/sfm config edit` to open a GUI to change the SFM config while the game is running.\n");
+                report.append(
+                        "This can be caused by output inventory logic encountering an integer overflow when moving large quantities of items.\n");
+                report
+                        .append("The SFM issue tracker can be found at ")
+                        .append(SFM.ISSUE_TRACKER_URL)
+                        .append(" because this shouldn't be happening lol");
                 SFM.LOGGER.error(report.toString());
             }
         }
-    }
-
-    private static <STACK, ITEM, CAP> void addSlotDetailsToReport(
-            StringBuilder report,
-            LimitedSlot<STACK, ITEM, CAP> slot,
-            Level level
-    ) {
-        report.append("Slot: ").append(slot.getSlot()).append("\n");
-        report.append("Position: ").append(slot.getPos()).append("\n");
-        report.append("Direction: ").append(slot.getDirection()).append("\n");
-        report
-                .append("Capability: ")
-                .append(slot.getHandler())
-                .append(" (")
-                .append(slot.getHandler().getClass().getName())
-                .append(")\n");
-        BlockEntity inputBlockEntity = level.getBlockEntity(slot.getPos());
-        if (inputBlockEntity != null) {
-            ResourceLocation inputBlockEntityType = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(inputBlockEntity.getType());
-            report
-                    .append("Block Entity: ")
-                    .append(inputBlockEntity.getClass().getName())
-                    .append(" (")
-                    .append(inputBlockEntityType)
-                    .append(")\n");
-        } else {
-            report.append("Block Entity: null\n");
-        }
-        BlockState blockState = level.getBlockState(slot.getPos());
-        ResourceLocation blockType = BuiltInRegistries.BLOCK.getKey(blockState.getBlock());
-        report
-                .append("Block: ")
-                .append(blockState.getBlock().getClass().getName())
-                .append(" (")
-                .append(blockType)
-                .append(")\n");
-        report.append("Block State: ").append(blockState).append("\n");
     }
 
     /**
@@ -528,6 +539,43 @@ public class OutputStatement implements IOStatement {
         sb.append(each ? "EACH " : "");
         sb.append(labelAccess);
         return sb.toString();
+    }
+
+    private static <STACK, ITEM, CAP> void addSlotDetailsToReport(
+            StringBuilder report,
+            LimitedSlot<STACK, ITEM, CAP> slot,
+            Level level
+    ) {
+        report.append("Slot: ").append(slot.getSlot()).append("\n");
+        report.append("Position: ").append(slot.getPos()).append("\n");
+        report.append("Direction: ").append(slot.getDirection()).append("\n");
+        report
+                .append("Capability: ")
+                .append(slot.getHandler())
+                .append(" (")
+                .append(slot.getHandler().getClass().getName())
+                .append(")\n");
+        BlockEntity inputBlockEntity = level.getBlockEntity(slot.getPos());
+        if (inputBlockEntity != null) {
+            ResourceLocation inputBlockEntityType = ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(inputBlockEntity.getType());
+            report
+                    .append("Block Entity: ")
+                    .append(inputBlockEntity.getClass().getName())
+                    .append(" (")
+                    .append(inputBlockEntityType)
+                    .append(")\n");
+        } else {
+            report.append("Block Entity: null\n");
+        }
+        BlockState blockState = level.getBlockState(slot.getPos());
+        ResourceLocation blockType = ForgeRegistries.BLOCKS.getKey(blockState.getBlock());
+        report
+                .append("Block: ")
+                .append(blockState.getBlock().getClass().getName())
+                .append(" (")
+                .append(blockType)
+                .append(")\n");
+        report.append("Block State: ").append(blockState).append("\n");
     }
 
     private <STACK, ITEM, CAP> void gatherSlotsForCap(

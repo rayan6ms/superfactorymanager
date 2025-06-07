@@ -28,7 +28,7 @@ public class ProgramCrlfLineEndingsConversionGameTest extends SFMGameTestDefinit
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         var managerPos = new BlockPos(0, 2, 0);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);

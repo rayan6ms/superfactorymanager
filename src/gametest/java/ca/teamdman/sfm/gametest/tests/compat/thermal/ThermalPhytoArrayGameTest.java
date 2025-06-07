@@ -25,8 +25,8 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.getItemHandler;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
+
 
 /**
  * Migrated from SFMThermalCompatGameTests.thermal_phyto_array
@@ -52,7 +52,7 @@ public class ThermalPhytoArrayGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         // designate positions
         var phytoPositions = new ArrayList<BlockPos>();
         var resultChestPositions = new ArrayList<BlockPos>();
@@ -116,7 +116,7 @@ public class ThermalPhytoArrayGameTest extends SFMGameTestDefinition {
                     };
             int slot = 0;
             for (Item item : items) {
-                getItemHandler(helper, pos).insertItem(slot++, new ItemStack(item, 64), false);
+                helper.getItemHandler(pos).insertItem(slot++, new ItemStack(item, 64), false);
             }
         }
 
@@ -164,7 +164,7 @@ public class ThermalPhytoArrayGameTest extends SFMGameTestDefinition {
 
         // load the program
         manager.setProgram(program.stripIndent());
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             SFM.LOGGER.warn("TODO: finish implementing thermal_phyto_array test");
         });
     }

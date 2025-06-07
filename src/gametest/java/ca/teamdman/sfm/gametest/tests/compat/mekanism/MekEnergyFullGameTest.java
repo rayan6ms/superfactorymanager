@@ -14,7 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 
 /**
  * Migrated from SFMMekanismCompatGameTests.mek_energy_full
@@ -35,7 +35,12 @@ public class MekEnergyFullGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public String batchName() {
+        return "mek";
+    }
+
+    @Override
+    public void run(SFMGameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
         var rightPos = new BlockPos(0, 2, 0);
@@ -66,7 +71,7 @@ public class MekEnergyFullGameTest extends SFMGameTestDefinition {
 
         left.setEnergy(0, EnergyCubeTier.ULTIMATE.getMaxEnergy());
         right.setEnergy(0, EnergyCubeTier.ULTIMATE.getMaxEnergy().subtract(1_000));
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             assertTrue(
                     left.getEnergy(0).equals(EnergyCubeTier.ULTIMATE.getMaxEnergy().subtract(1_000)),
                     "Contents did not depart"
