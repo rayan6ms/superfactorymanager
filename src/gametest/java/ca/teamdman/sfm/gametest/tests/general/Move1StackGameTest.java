@@ -19,7 +19,7 @@ public class Move1StackGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         var test = new LeftRightManagerTest(helper);
         test.setProgram("""
                                     EVERY 20 TICKS DO

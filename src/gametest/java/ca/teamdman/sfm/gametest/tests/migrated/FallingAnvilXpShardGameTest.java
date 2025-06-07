@@ -8,10 +8,8 @@ import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
@@ -39,7 +37,7 @@ public class FallingAnvilXpShardGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 2, 1), Blocks.OBSIDIAN);
         var pos = helper.absoluteVec(new Vec3(1.5, 3.5, 1.5));
         ItemStack enchBook = new ItemStack(Items.ENCHANTED_BOOK);

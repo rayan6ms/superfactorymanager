@@ -7,13 +7,13 @@ import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.util.NotStored;
+import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.BoolExpr;
 import ca.teamdman.sfml.ast.IfStatement;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
-import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
@@ -25,15 +25,15 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 
 public class SFMDeclarativeTestBuilder {
-    private final GameTestHelper helper;
+    private final SFMGameTestHelper helper;
     private final SFMTestSpec spec;
     private int conditionIndex = 0;
 
     public SFMDeclarativeTestBuilder(
-            GameTestHelper helper,
+            SFMGameTestHelper helper,
             SFMTestSpec spec
     ) {
         this.helper = helper;
@@ -46,8 +46,7 @@ public class SFMDeclarativeTestBuilder {
         ManagerBlockEntity manager = setupManager(managerPos);
         labelBlocks(managerPos, manager);
         runPreConditions(manager);
-        succeedIfManagerDidThingWithoutLagging(
-                helper,
+        helper.succeedIfManagerDidThingWithoutLagging(
                 manager,
                 () -> runPostConditions(manager)
         );

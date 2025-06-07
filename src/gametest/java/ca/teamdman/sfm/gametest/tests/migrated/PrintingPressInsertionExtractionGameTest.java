@@ -8,14 +8,11 @@ import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
@@ -38,7 +35,7 @@ public class PrintingPressInsertionExtractionGameTest extends SFMGameTestDefinit
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         var pos = new BlockPos(0, 2, 0);
         helper.setBlock(pos, SFMBlocks.PRINTING_PRESS_BLOCK.get());
         var printingPress = (PrintingPressBlockEntity) helper.getBlockEntity(pos);

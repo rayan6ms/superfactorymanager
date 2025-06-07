@@ -12,7 +12,8 @@ import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 /**
  * Migrated from SFMIfStatementGameTests.has_or
@@ -33,7 +34,7 @@ public class HasOrGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         var leftPos = new BlockPos(2, 2, 0);
         var rightPos = new BlockPos(0, 2, 0);
         var managerPos = new BlockPos(1, 2, 0);
@@ -63,7 +64,7 @@ public class HasOrGameTest extends SFMGameTestDefinition {
                 .add("right", helper.absolutePos(rightPos))
                 .save(manager.getDisk());
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             // left should be empty
             assertTrue(count(left, Items.DIAMOND) == 0, "left should have no diamonds");
             assertTrue(count(left, Items.IRON_INGOT) == 0, "left should have no iron ingots");

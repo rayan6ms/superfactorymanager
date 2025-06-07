@@ -32,7 +32,12 @@ public class MekCubeGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public String batchName() {
+        return "mek";
+    }
+
+    @Override
+    public void run(SFMGameTestHelper helper) {
         SFMTestSpec spec = new SFMTestSpec()
                 .setProgram("""
                                         EVERY 20 TICKS DO

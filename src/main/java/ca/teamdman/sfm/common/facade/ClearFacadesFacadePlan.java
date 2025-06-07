@@ -23,8 +23,7 @@ public record ClearFacadesFacadePlan(
                         .getNonFacadeBlock()
                         .getStateForPlacementByFacadePlan(
                                 level,
-                                pos,
-                                null
+                                pos
                         );
                 level.setBlock(pos, nextBlockState, Block.UPDATE_IMMEDIATE | Block.UPDATE_CLIENTS);
             } else {

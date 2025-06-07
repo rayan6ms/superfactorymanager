@@ -2,7 +2,6 @@ package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.block.shape.ShapeCache;
 import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
-import ca.teamdman.sfm.common.facade.FacadeTransparency;
 import ca.teamdman.sfm.common.registry.SFMBlockCapabilities;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.util.NotStored;
@@ -54,8 +53,8 @@ public class FancyCableBlock extends CableBlock implements IFacadableBlock {
             Direction.DOWN, DOWN
     );
 
-    public FancyCableBlock() {
-        super();
+    public FancyCableBlock(Properties properties) {
+        super(properties);
         registerDefaultState(
                 defaultBlockState()
                         .setValue(NORTH, false)
@@ -124,8 +123,7 @@ public class FancyCableBlock extends CableBlock implements IFacadableBlock {
     @Override
     public BlockState getStateForPlacementByFacadePlan(
             LevelAccessor level,
-            @NotStored BlockPos pos,
-            @Nullable FacadeTransparency facadeTransparency
+            @NotStored BlockPos pos
     ) {
         return getState(defaultBlockState(), level, pos);
     }

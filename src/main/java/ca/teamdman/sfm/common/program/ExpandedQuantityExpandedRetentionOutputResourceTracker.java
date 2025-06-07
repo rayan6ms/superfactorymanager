@@ -64,25 +64,25 @@ public class ExpandedQuantityExpandedRetentionOutputResourceTracker implements I
     @Override
     public <STACK, ITEM, CAP> void updateRetentionObservation(
             ResourceType<STACK, ITEM, CAP> type,
-            STACK stack
+            STACK observed
     ) {
-        if (matchesStack(stack)) {
-            ResourceLocation item_id = type.getRegistryKeyForStack(stack);
+        if (matchesStack(observed)) {
+            ResourceLocation item_id = type.getRegistryKeyForStack(observed);
             retention_obligations_by_item.computeIfAbsent(type, k -> new Object2LongOpenHashMap<>())
-                    .addTo(item_id, type.getAmount(stack));
+                    .addTo(item_id, type.getAmount(observed));
         }
     }
 
     @Override
     public <STACK, ITEM, CAP> long getMaxTransferable(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack
+            STACK key
     ) {
         long max_transfer = resource_limit.limit().quantity().number().value();
         long transferred_for_item = 0;
         var transferred_for_resource_type = transferred_by_item.get(resourceType);
         if (transferred_for_resource_type != null) {
-            ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
+            ResourceLocation item_id = resourceType.getRegistryKeyForStack(key);
             transferred_for_item = transferred_for_resource_type.getLong(item_id);
         }
         long unusedQuantity = max_transfer - transferred_for_item;
@@ -91,7 +91,7 @@ public class ExpandedQuantityExpandedRetentionOutputResourceTracker implements I
         long retained_for_item = 0;
         var retained_for_resource_type = retention_obligations_by_item.get(resourceType);
         if (retained_for_resource_type != null) {
-            ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
+            ResourceLocation item_id = resourceType.getRegistryKeyForStack(key);
             retained_for_item = retained_for_resource_type.getLong(item_id);
         }
         long remainingRetentionRoom = max_retain - retained_for_item;
@@ -102,10 +102,10 @@ public class ExpandedQuantityExpandedRetentionOutputResourceTracker implements I
     @Override
     public <STACK, ITEM, CAP> void trackTransfer(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack,
+            STACK key,
             long amount
     ) {
-        ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
+        ResourceLocation item_id = resourceType.getRegistryKeyForStack(key);
         transferred_by_item.computeIfAbsent(resourceType, k -> new Object2LongOpenHashMap<>())
                 .addTo(item_id, amount);
         retention_obligations_by_item.computeIfAbsent(resourceType, k -> new Object2LongOpenHashMap<>())

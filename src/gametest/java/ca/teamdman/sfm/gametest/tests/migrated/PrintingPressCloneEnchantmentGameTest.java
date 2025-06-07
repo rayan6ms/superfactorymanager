@@ -4,7 +4,6 @@ import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -21,12 +20,9 @@ import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DirectionalBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.getItemHandler;
+
 
 /**
  * Migrated from SFMCorrectnessGameTests.printing_press_clone_enchantment
@@ -47,7 +43,7 @@ public class PrintingPressCloneEnchantmentGameTest extends SFMGameTestDefinition
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         // Positions
         var printingPos = new BlockPos(1, 2, 1);
         var pistonPos = new BlockPos(1, 4, 1);
@@ -104,7 +100,7 @@ public class PrintingPressCloneEnchantmentGameTest extends SFMGameTestDefinition
             }
 
             // Place result in chest
-            var chest = getItemHandler(helper, chestPos);
+            var chest = helper.getItemHandler(chestPos);
             chest.insertItem(0, held, false);
 
             // Assert ingredient transformations
