@@ -15,7 +15,8 @@ import net.minecraft.world.item.Items;
 
 import java.util.Objects;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertManagerRunning;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /**
  * Migrated from SFMCorrectnessGameTests.cable_spiral
@@ -36,7 +37,7 @@ public class CableSpiralGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         BlockPos start = new BlockPos(0, 2, 0);
         BlockPos end = new BlockPos(12, 2, 12);
 
@@ -85,7 +86,7 @@ public class CableSpiralGameTest extends SFMGameTestDefinition {
                                    """.stripTrailing().stripIndent());
 
         assertManagerRunning(manager);
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             // ensure item arrived
             assertTrue(endChest.getItem(0).getCount() == 64, "Items did not move");
             // ensure item left

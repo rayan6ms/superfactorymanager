@@ -13,7 +13,7 @@ import net.minecraft.world.item.Items;
 
 import java.util.Objects;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /**
  * Migrated from SFMCorrectnessGameTests.each_src_quantity_retain
@@ -34,15 +34,15 @@ public class EachSrcQuantityRetainGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
         BlockPos rightPos = new BlockPos(0, 2, 0);
         helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
         BlockPos leftPos = new BlockPos(2, 2, 0);
         helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
-        var rightChest = getItemHandler(helper, rightPos);
-        var leftChest = getItemHandler(helper, leftPos);
+        var rightChest = helper.getItemHandler(rightPos);
+        var leftChest = helper.getItemHandler(leftPos);
 
         leftChest.insertItem(0, new ItemStack(Items.IRON_INGOT, 2), false);
         leftChest.insertItem(1, new ItemStack(Items.GOLD_INGOT, 2), false);
@@ -64,7 +64,7 @@ public class EachSrcQuantityRetainGameTest extends SFMGameTestDefinition {
                 .add("b", helper.absolutePos(rightPos))
                 .save(Objects.requireNonNull(manager.getDisk()));
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             // two of the four ingots should have moved
             // for now we assume that gold will move since it is in the higher slot
             assertTrue(count(leftChest, Items.IRON_INGOT) == 2, "Iron moved");

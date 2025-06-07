@@ -45,7 +45,7 @@ public class Ae2InscribersGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         var managerPos = new BlockPos(0, 2, 1);
 
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());

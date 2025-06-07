@@ -31,7 +31,7 @@ public class ValidateTagsGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         BiConsumer<Item, String> assertTag = (item, findTag) -> {
             boolean hasTag = SFMResourceTypes.ITEM
                     .get()

@@ -13,7 +13,7 @@ import net.minecraft.world.item.Items;
 
 import java.util.Objects;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /**
  * Migrated from SFMCorrectnessGameTests.regression_input_retain_b_shared_shared
@@ -34,7 +34,7 @@ public class RegressionInputRetainBSharedSharedGameTest extends SFMGameTestDefin
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         BlockPos managerPos = new BlockPos(1, 2, 1);
         BlockPos aPos = new BlockPos(2, 2, 1);
         BlockPos b1Pos = new BlockPos(4, 2, 1);
@@ -51,10 +51,10 @@ public class RegressionInputRetainBSharedSharedGameTest extends SFMGameTestDefin
             helper.setBlock(new BlockPos(1 + i, 2, 2), SFMBlocks.CABLE_BLOCK.get());
         }
 
-        var a = getItemHandler(helper, aPos);
-        var b1 = getItemHandler(helper, b1Pos);
-        var b2 = getItemHandler(helper, b2Pos);
-        var b3 = getItemHandler(helper, b3Pos);
+        var a = helper.getItemHandler(aPos);
+        var b1 = helper.getItemHandler(b1Pos);
+        var b2 = helper.getItemHandler(b2Pos);
+        var b3 = helper.getItemHandler(b3Pos);
 
         for (int i = 0; i < 5; i++) {
             b1.insertItem(i, new ItemStack(Items.DIRT, 64), false);
@@ -79,7 +79,7 @@ public class RegressionInputRetainBSharedSharedGameTest extends SFMGameTestDefin
                 .add("b", helper.absolutePos(b3Pos))
                 .save(Objects.requireNonNull(manager.getDisk()));
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             // There should be exactly 5 dirt across all b
             // The rest should be in a
             assertTrue(count(a, Items.DIRT) == 64 * 3 * 5 - 5, "dirt should arrive in a");

@@ -51,7 +51,7 @@ public class SharedQuantityExpandedRetentionInputResourceTracker implements IInp
     @Override
     public <STACK, ITEM, CAP> long getRetentionObligationForSlot(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack,
+            STACK key,
             @NotStored BlockPos pos,
             int slot
     ) {
@@ -59,7 +59,7 @@ public class SharedQuantityExpandedRetentionInputResourceTracker implements IInp
         if (posEntry != null) {
             var resourceTypeEntry = posEntry.get(slot);
             if (resourceTypeEntry != null) {
-                ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
+                ResourceLocation item_id = resourceType.getRegistryKeyForStack(key);
                 var itemEntry = resourceTypeEntry.get(resourceType);
                 if (itemEntry != null) {
                     return itemEntry.getLong(item_id);
@@ -72,14 +72,14 @@ public class SharedQuantityExpandedRetentionInputResourceTracker implements IInp
     @Override
     public <STACK, ITEM, CAP> long getRemainingRetentionObligation(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack
+            STACK key
     ) {
         long retention = resource_limit.limit().retention().number().value();
         long progress = 0;
         // don't use getOrDefault to avoid allocations
         var entry = retention_obligations_by_item.get(resourceType);
         if (entry != null) {
-            ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
+            ResourceLocation item_id = resourceType.getRegistryKeyForStack(key);
             if (entry.containsKey(item_id)) {
                 progress = entry.getLong(item_id);
             }
@@ -90,19 +90,19 @@ public class SharedQuantityExpandedRetentionInputResourceTracker implements IInp
     @Override
     public <STACK, ITEM, CAP> void trackRetentionObligation(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack,
+            STACK key,
             int slot,
             @NotStored BlockPos pos,
-            long promise
+            long dedicatingToObligation
     ) {
-        ResourceLocation item_id = resourceType.getRegistryKeyForStack(stack);
+        ResourceLocation item_id = resourceType.getRegistryKeyForStack(key);
         retention_obligations_by_item.computeIfAbsent(resourceType, k -> new Object2LongOpenHashMap<>())
-                .addTo(item_id, promise);
+                .addTo(item_id, dedicatingToObligation);
         retention_obligations_by_pos_by_slot_by_item
                 .computeIfAbsent(pos.asLong(), k -> new Int2ObjectArrayMap<>())
                 .computeIfAbsent(slot, k -> new Object2ObjectOpenHashMap<>())
                 .computeIfAbsent(resourceType, k -> new Object2LongOpenHashMap<>())
-                .addTo(item_id, promise);
+                .addTo(item_id, dedicatingToObligation);
     }
 
     @Override

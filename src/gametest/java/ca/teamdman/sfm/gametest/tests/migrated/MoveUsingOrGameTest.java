@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.Blocks;
 
 import java.util.Objects;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /**
  * Migrated from SFMCorrectnessGameTests.move_using_or
@@ -35,15 +35,15 @@ public class MoveUsingOrGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
         BlockPos rightPos = new BlockPos(0, 2, 0);
         helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
         BlockPos leftPos = new BlockPos(2, 2, 0);
         helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
-        var rightChest = getItemHandler(helper, rightPos);
-        var leftChest = getItemHandler(helper, leftPos);
+        var rightChest = helper.getItemHandler(rightPos);
+        var leftChest = helper.getItemHandler(leftPos);
 
         leftChest.insertItem(0, new ItemStack(Blocks.DIRT, 64), false);
         leftChest.insertItem(1, new ItemStack(Blocks.STONE, 64), false);
@@ -67,7 +67,7 @@ public class MoveUsingOrGameTest extends SFMGameTestDefinition {
                 .add("b", helper.absolutePos(rightPos))
                 .save(Objects.requireNonNull(manager.getDisk()));
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             // count of stone + dirt in left must be 64*2-5
             int leftStoneDirt = count(leftChest, Items.STONE) + count(leftChest, Items.DIRT);
             assertTrue(leftStoneDirt == 64 * 2 - 5, "stone and dirt should depart");

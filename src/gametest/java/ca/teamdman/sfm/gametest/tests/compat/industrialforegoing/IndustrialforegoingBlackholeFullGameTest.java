@@ -16,7 +16,7 @@ import net.minecraft.world.item.Items;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 
 /**
  * Migrated from SFMIndustrialForegoingCompatGameTests.industrialforegoing_blackhole_full
@@ -37,7 +37,7 @@ public class IndustrialforegoingBlackholeFullGameTest extends SFMGameTestDefinit
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
         var rightPos = new BlockPos(0, 2, 0);
@@ -76,7 +76,7 @@ public class IndustrialforegoingBlackholeFullGameTest extends SFMGameTestDefinit
         );
         assertTrue(right.insertItem(0, new ItemStack(Items.COAL, 1), false).isEmpty(), "couldn't prep right");
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             // black hole units have voiding=true by default
             // the final insertion operation that causes the thing to fill will cause the items that don't fit to be voided
             // this test should cause a stack of 64 to be used to insert even though only 1 is needed to finish filling

@@ -69,6 +69,7 @@ sourceSets {
             exclude "ca/teamdman/sfm/gametest/tests/compat/industrialforegoing/**"
             exclude "ca/teamdman/sfm/gametest/tests/compat/ae2/**"
             exclude "ca/teamdman/sfm/gametest/tests/compat/mekanism/**"
+            exclude "ca/teamdman/sfm/gametest/tests/compat/dank/**"
         }
         compileClasspath += main.output
         resources {

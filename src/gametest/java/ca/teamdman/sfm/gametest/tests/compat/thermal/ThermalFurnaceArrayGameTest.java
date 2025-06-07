@@ -19,8 +19,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.getItemHandler;
 
 /**
  * Migrated from SFMThermalCompatGameTests.thermal_furnace_array
@@ -46,7 +44,7 @@ public class ThermalFurnaceArrayGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         // designate positions
         var furnacePositions = new ArrayList<BlockPos>();
         var resultChestPositions = new ArrayList<BlockPos>();
@@ -87,7 +85,7 @@ public class ThermalFurnaceArrayGameTest extends SFMGameTestDefinition {
             helper.setBlock(pos, SFMBlocks.TEST_BARREL_BLOCK.get());
             ingredientChestPositions.add(pos);
             for (int slot = 0; slot < 27; slot++) {
-                getItemHandler(helper, pos).insertItem(slot, new ItemStack(Items.CHICKEN, 64), false);
+                helper.getItemHandler(pos).insertItem(slot, new ItemStack(Items.CHICKEN, 64), false);
             }
         }
 
@@ -125,7 +123,7 @@ public class ThermalFurnaceArrayGameTest extends SFMGameTestDefinition {
         helper.succeedWhen(() -> {
             // the result chests must be full of cooked chicken
             for (BlockPos resultChestPosition : resultChestPositions) {
-                boolean hasEnoughChicken = count(getItemHandler(helper, resultChestPosition), Items.COOKED_CHICKEN)
+                boolean hasEnoughChicken = count(helper.getItemHandler(resultChestPosition), Items.COOKED_CHICKEN)
                                            >= 64 * 27;
                 if (!hasEnoughChicken) {
                     helper.fail("Not enough cooked chicken in chest at " + resultChestPosition);

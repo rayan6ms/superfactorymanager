@@ -21,7 +21,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.getItemHandler;
+
 
 /**
  * Migrated from SFMCorrectnessGameTests.printing_press_clone_program
@@ -42,7 +42,7 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         var printingPos = new BlockPos(1, 2, 1);
         var pistonPos = new BlockPos(1, 4, 1);
         var woodPos = new BlockPos(0, 4, 1);
@@ -139,7 +139,7 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
             );
             ItemStack held = player.getMainHandItem();
             if (held.is(SFMItems.DISK_ITEM.get()) && DiskItem.getProgram(held).equals(DiskItem.getProgram(disk))) {
-                var chest = getItemHandler(helper, chestPos);
+                var chest = helper.getItemHandler(chestPos);
                 chest.insertItem(0, held, false);
                 assertTrue(printingPress.getInk().isEmpty(), "Ink was not consumed");
                 assertTrue(printingPress.getPaper().isEmpty(), "Paper was not consumed");

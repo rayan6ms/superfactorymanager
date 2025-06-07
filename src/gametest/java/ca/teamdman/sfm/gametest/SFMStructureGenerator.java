@@ -13,15 +13,6 @@ import java.util.Optional;
 import static java.util.regex.Pattern.compile;
 
 public class SFMStructureGenerator {
-    /*
-    TODO:
-    - Delete all .nbt structures that are now replaceable with this code
-    - Remove the structure generator test
-    - Create test for mekanism fluid tank INPUT RETAIN 30000, see https://discord.com/channels/967118679370264627/1372589927090487458
-    - Create test for INPUT RETAIN 100 using dank in dock
-    (the above tests should fail)
-    see line 105 TODO comment in ca.teamdman.sfml.ast.OutputStatement
-     */
     public static Optional<StructureTemplate> generateStructureTemplate(ResourceLocation id) {
         StructureTemplate template = new StructureTemplate();
         template.setAuthor("TeamDman");
