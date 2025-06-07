@@ -14,7 +14,7 @@ import net.minecraft.world.item.Items;
 import java.util.Objects;
 import java.util.stream.IntStream;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /**
  * Migrated from SFMCorrectnessGameTests.move_slots
@@ -35,15 +35,15 @@ public class MoveSlotsGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
         BlockPos rightPos = new BlockPos(0, 2, 0);
         helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
         BlockPos leftPos = new BlockPos(2, 2, 0);
         helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
-        var rightChest = getItemHandler(helper, rightPos);
-        var leftChest = getItemHandler(helper, leftPos);
+        var rightChest = helper.getItemHandler(rightPos);
+        var leftChest = helper.getItemHandler(leftPos);
 
         leftChest.insertItem(0, new ItemStack(Items.DIAMOND, 5), false);
         leftChest.insertItem(1, new ItemStack(Items.DIAMOND, 5), false);
@@ -66,7 +66,7 @@ public class MoveSlotsGameTest extends SFMGameTestDefinition {
                 .add("b", helper.absolutePos(rightPos))
                 .save(Objects.requireNonNull(manager.getDisk()));
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             assertTrue(leftChest.getStackInSlot(0).isEmpty(), "slot 0 did not leave");
             assertTrue(leftChest.getStackInSlot(1).isEmpty(), "slot 1 did not leave");
             assertTrue(leftChest.getStackInSlot(3).isEmpty(), "slot 3 did not leave");

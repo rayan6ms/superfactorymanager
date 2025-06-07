@@ -16,18 +16,18 @@ public interface IOutputResourceTracker {
 
     <STACK, ITEM, CAP> void updateRetentionObservation(
             ResourceType<STACK, ITEM, CAP> type,
-            STACK stack
+            STACK observed
     );
 
     <STACK, ITEM, CAP> void trackTransfer(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack,
+            STACK key,
             long amount
     );
 
     <STACK, ITEM, CAP> long getMaxTransferable(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack
+            STACK key
     );
 
     default boolean matchesCapabilityType(Object capability) {

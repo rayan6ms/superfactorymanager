@@ -13,8 +13,8 @@ import net.minecraft.world.level.block.Blocks;
 
 import java.util.Objects;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.getItemHandler;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
+
 
 /**
  * Migrated from SFMCorrectnessGameTests.round_robin_no_blocks_crash_regression
@@ -35,7 +35,7 @@ public class RoundRobinNoBlocksCrashRegressionGameTest extends SFMGameTestDefini
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         BlockPos leftPos = new BlockPos(2, 2, 0);
         BlockPos managerPos = new BlockPos(1, 2, 0);
         BlockPos rightPos = new BlockPos(0, 2, 0);
@@ -44,7 +44,7 @@ public class RoundRobinNoBlocksCrashRegressionGameTest extends SFMGameTestDefini
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
-        var leftChest = getItemHandler(helper, leftPos);
+        var leftChest = helper.getItemHandler(leftPos);
         leftChest.insertItem(0, new ItemStack(Blocks.DIRT, 64), false);
 
         ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
@@ -62,6 +62,6 @@ public class RoundRobinNoBlocksCrashRegressionGameTest extends SFMGameTestDefini
                 .save(Objects.requireNonNull(manager.getDisk()));
 
         // it should not crash
-        succeedIfManagerDidThingWithoutLagging(helper, manager, helper::succeed);
+        helper.succeedIfManagerDidThingWithoutLagging(manager, helper::succeed);
     }
 }

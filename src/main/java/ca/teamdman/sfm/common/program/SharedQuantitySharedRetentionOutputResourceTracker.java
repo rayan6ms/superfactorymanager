@@ -55,17 +55,17 @@ public class SharedQuantitySharedRetentionOutputResourceTracker implements IOutp
     @Override
     public <STACK, ITEM, CAP> void updateRetentionObservation(
             ResourceType<STACK, ITEM, CAP> type,
-            STACK stack
+            STACK observed
     ) {
-        if (matchesStack(stack)) {
-            retention_obligation_progress += type.getAmount(stack);
+        if (matchesStack(observed)) {
+            retention_obligation_progress += type.getAmount(observed);
         }
     }
 
     @Override
     public <STACK, ITEM, CAP> void trackTransfer(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack,
+            STACK key,
             long amount
     ) {
         transferred += amount;
@@ -78,7 +78,7 @@ public class SharedQuantitySharedRetentionOutputResourceTracker implements IOutp
     @Override
     public <STACK, ITEM, CAP> long getMaxTransferable(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack
+            STACK key
     ) {
         long max_transfer = resource_limit.limit().quantity().number().value();
         long unusedQuantity = max_transfer - transferred;

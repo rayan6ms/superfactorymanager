@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.Blocks;
 
 import java.util.Objects;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 @SuppressWarnings({"DataFlowIssue"})
 @SFMGameTest
@@ -24,7 +24,7 @@ public class Move1StackDirectGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         // declare positions
         BlockPos managerPos = new BlockPos(1, 2, 0);
         BlockPos rightPos = new BlockPos(0, 2, 0);
@@ -36,8 +36,8 @@ public class Move1StackDirectGameTest extends SFMGameTestDefinition {
         helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
         // get handlers
-        var rightChest = getItemHandler(helper, rightPos);
-        var leftChest = getItemHandler(helper, leftPos);
+        var rightChest = helper.getItemHandler(rightPos);
+        var leftChest = helper.getItemHandler(leftPos);
 
         // prepare resources
         leftChest.insertItem(0, new ItemStack(Blocks.DIRT, 64), false);
@@ -61,7 +61,7 @@ public class Move1StackDirectGameTest extends SFMGameTestDefinition {
                 .save(Objects.requireNonNull(manager.getDisk()));
 
         // schedule success check
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             assertTrue(leftChest.getStackInSlot(0).isEmpty(), "Dirt did not move");
             assertTrue(rightChest.getStackInSlot(0).getCount() == 64, "Dirt did not move");
         });
