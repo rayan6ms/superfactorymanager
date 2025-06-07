@@ -3,11 +3,10 @@ package ca.teamdman.sfm.gametest;
 
 import ca.teamdman.sfm.common.util.NotStored;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTestHelper;
 
 @SuppressWarnings("unused")
 public class LeftRightTopManagerTest extends LeftRightManagerTest {
-    public LeftRightTopManagerTest(GameTestHelper helper) {
+    public LeftRightTopManagerTest(SFMGameTestHelper helper) {
         super(helper);
     }
 

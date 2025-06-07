@@ -2,10 +2,9 @@ package ca.teamdman.sfm.gametest;
 
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
-import net.minecraft.gametest.framework.GameTestHelper;
 
 public class LeftRightManagerTest extends SFMTestBuilder {
-    public LeftRightManagerTest(GameTestHelper helper) {
+    public LeftRightManagerTest(SFMGameTestHelper helper) {
         super(helper);
     }
 

@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.Blocks;
 import java.util.Objects;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertManagerRunning;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 
 /**
  * Migrated from SFMCorrectnessGameTests.CauldronLavaMovement
@@ -35,7 +35,7 @@ public class CauldronLavaMovementGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         // fill in the blocks needed for the test
         helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
         BlockPos left = new BlockPos(2, 2, 0);
@@ -66,7 +66,7 @@ public class CauldronLavaMovementGameTest extends SFMGameTestDefinition {
         manager.setProgram(program);
 
         assertManagerRunning(manager);
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             helper.assertBlock(left, b -> b == Blocks.CAULDRON, "cauldron didn't empty");
             helper.assertBlockState(right, s -> s.getBlock() == Blocks.LAVA_CAULDRON, () -> "cauldron didn't fill");
 

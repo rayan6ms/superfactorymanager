@@ -8,7 +8,7 @@ public abstract class SFMGameTestDefinition {
         return "sfm";
     }
 
-    public abstract void testMethod(SFMGameTestHelper gameTestHelper);
+    public abstract void run(SFMGameTestHelper helper);
 
     public String batchName() {
         return "defaultBatch";

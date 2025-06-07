@@ -19,14 +19,14 @@ public class SFMDelegatedTestFunction extends TestFunction {
                 definition.required(),
                 1,
                 1,
-                (GameTestHelper helper) -> definition.testMethod(new SFMGameTestHelper(helper))
+                (GameTestHelper helper) -> definition.run(new SFMGameTestHelper(helper))
         );
         this.definition = definition;
     }
 
     @Override
     public void run(GameTestHelper pGameTestHelper) {
-        definition.testMethod(new SFMGameTestHelper(pGameTestHelper));
+        definition.run(new SFMGameTestHelper(pGameTestHelper));
     }
 
     @Override
