@@ -7,6 +7,7 @@ import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
+import com.mojang.serialization.Codec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -14,6 +15,7 @@ import net.minecraft.world.item.Items;
 import java.util.Objects;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 /**
  * Migrated from SFMCorrectnessGameTests.regression_input_retain_b_expanded_shared
@@ -27,6 +29,8 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 })
 @SFMGameTest
 public class RegressionInputRetainBExpandedSharedGameTest extends SFMGameTestDefinition {
+    public static final Codec<RegressionInputRetainBExpandedSharedGameTest> CODEC = Codec.unit(
+            RegressionInputRetainBExpandedSharedGameTest::new);
 
     @Override
     public String template() {

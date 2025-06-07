@@ -9,6 +9,7 @@ import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -556,7 +557,7 @@ public class OutputStatement implements IOStatement {
                 .append(")\n");
         BlockEntity inputBlockEntity = level.getBlockEntity(slot.getPos());
         if (inputBlockEntity != null) {
-            ResourceLocation inputBlockEntityType = ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(inputBlockEntity.getType());
+            ResourceLocation inputBlockEntityType = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(inputBlockEntity.getType());
             report
                     .append("Block Entity: ")
                     .append(inputBlockEntity.getClass().getName())
@@ -567,7 +568,7 @@ public class OutputStatement implements IOStatement {
             report.append("Block Entity: null\n");
         }
         BlockState blockState = level.getBlockState(slot.getPos());
-        ResourceLocation blockType = ForgeRegistries.BLOCKS.getKey(blockState.getBlock());
+        ResourceLocation blockType = BuiltInRegistries.BLOCK.getKey(blockState.getBlock());
         report
                 .append("Block: ")
                 .append(blockState.getBlock().getClass().getName())

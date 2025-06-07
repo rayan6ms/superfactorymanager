@@ -9,14 +9,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.GameTestInfo;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.LongStream;
@@ -33,26 +35,20 @@ public class SFMGameTestHelper extends GameTestHelper {
             @NotStored BlockPos pos,
             @Nullable Direction direction
     ) {
-        BlockEntity blockEntity = getBlockEntity(pos);
-        SFMGameTestMethodHelpers.assertTrue(blockEntity != null, "No block entity found at " + pos);
-        Optional<IFluidHandler> found = blockEntity
-                .getCapability(ForgeCapabilities.FLUID_HANDLER, direction)
-                .resolve();
-        SFMGameTestMethodHelpers.assertTrue(found.isPresent(), "No fluid handler found at " + pos);
-        return found.get();
+        var found = getLevel()
+                .getCapability(Capabilities.FluidHandler.BLOCK, absolutePos(pos), direction);
+        SFMGameTestMethodHelpers.assertTrue(found != null, "No fluid handler found at " + pos);
+        return found;
     }
 
     public IItemHandler getItemHandler(
             @NotStored BlockPos pos,
             @Nullable Direction direction
     ) {
-        BlockEntity blockEntity = getBlockEntity(pos);
-        SFMGameTestMethodHelpers.assertTrue(blockEntity != null, "No block entity found at " + pos);
-        Optional<IItemHandler> found = blockEntity
-                .getCapability(ForgeCapabilities.ITEM_HANDLER, direction)
-                .resolve();
-        SFMGameTestMethodHelpers.assertTrue(found.isPresent(), "No item handler found at " + pos);
-        return found.get();
+        var found = getLevel()
+                .getCapability(Capabilities.ItemHandler.BLOCK, absolutePos(pos), direction);
+        SFMGameTestMethodHelpers.assertTrue(found != null, "No item handler found at " + pos);
+        return found;
     }
 
     public IItemHandler getItemHandler(

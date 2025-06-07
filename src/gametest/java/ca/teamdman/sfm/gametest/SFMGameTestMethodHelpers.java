@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.gametest;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.config.SFMServerConfig;
@@ -48,8 +47,11 @@ public class SFMGameTestMethodHelpers {
             String message
     ) {
         if (!condition) {
+            @SuppressWarnings("UnnecessaryLocalVariable")
             var toThrow = new GameTestAssertException(message);
-            SFM.LOGGER.error("Assertion failed: {}", message, toThrow);
+            // Uncomment below for detailed location information
+            // Note that the tests fail every tick using this until they succeed, so you will see logs that make things look like tests are failing if this is uncommented
+//            SFM.LOGGER.error("Assertion failed: {}", message, toThrow);
             throw toThrow;
         }
     }
