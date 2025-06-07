@@ -31,7 +31,7 @@ public class MoveWithoutTagMineableGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         new LeftRightManagerTest(helper)
                 .setProgram("""
                                     EVERY 20 TICKS DO

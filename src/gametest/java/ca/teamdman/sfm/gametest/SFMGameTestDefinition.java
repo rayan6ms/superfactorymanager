@@ -10,7 +10,7 @@ public abstract class SFMGameTestDefinition {
         return "sfm";
     }
 
-    public abstract void testMethod(SFMGameTestHelper gameTestHelper);
+    public abstract void run(SFMGameTestHelper helper);
 
     public String batchName() {
         return "defaultBatch";
@@ -45,7 +45,7 @@ public abstract class SFMGameTestDefinition {
                 1,
                 1,
                 false,
-                (GameTestHelper helper) -> this.testMethod(new SFMGameTestHelper(helper))
+                (GameTestHelper helper) -> this.run(new SFMGameTestHelper(helper))
         );
     }
 

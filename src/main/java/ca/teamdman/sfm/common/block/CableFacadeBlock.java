@@ -8,10 +8,10 @@ import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
-import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.LightBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -21,9 +21,17 @@ import org.jetbrains.annotations.Nullable;
 
 
 public class CableFacadeBlock extends CableBlock implements EntityBlock, IFacadableBlock {
-    public CableFacadeBlock() {
-        super();
-        registerDefaultState(getStateDefinition().any().setValue(FacadeTransparency.FACADE_TRANSPARENCY_PROPERTY, FacadeTransparency.OPAQUE));
+    public CableFacadeBlock(Properties properties) {
+        super(properties.lightLevel(LightBlock.LIGHT_EMISSION));
+        registerDefaultState(
+                getStateDefinition()
+                        .any()
+                        .setValue(
+                                FacadeTransparency.FACADE_TRANSPARENCY_PROPERTY,
+                                FacadeTransparency.OPAQUE
+                        )
+                        .setValue(LightBlock.LEVEL, 0)
+        );
     }
 
     @Override
@@ -67,20 +75,7 @@ public class CableFacadeBlock extends CableBlock implements EntityBlock, IFacada
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(FacadeTransparency.FACADE_TRANSPARENCY_PROPERTY);
-    }
-
-    @Override
-    public BlockState getStateForPlacementByFacadePlan(
-            LevelAccessor level,
-            @NotStored BlockPos pos,
-            @Nullable FacadeTransparency facadeTransparency
-    ) {
-        BlockState blockState = super.getStateForPlacementByFacadePlan(level, pos, facadeTransparency);
-        if (facadeTransparency == null) {
-            return blockState;
-        }
-        return blockState.setValue(FacadeTransparency.FACADE_TRANSPARENCY_PROPERTY, facadeTransparency);
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
+        createFacadeBlockStateDefinition(builder);
     }
 }

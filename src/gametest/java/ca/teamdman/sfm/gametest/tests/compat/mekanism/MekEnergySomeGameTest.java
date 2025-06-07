@@ -12,7 +12,8 @@ import mekanism.common.tile.TileEntityEnergyCube;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.getAndPrepMekTile;
 
 /**
  * Migrated from SFMMekanismCompatGameTests.mek_energy_some
@@ -33,7 +34,12 @@ public class MekEnergySomeGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {        // designate positions
+    public String batchName() {
+        return "mek";
+    }
+
+    @Override
+    public void run(SFMGameTestHelper helper) {        // designate positions
         var leftPos = new BlockPos(2, 2, 0);
         var rightPos = new BlockPos(0, 2, 0);
         var managerPos = new BlockPos(1, 2, 0);
@@ -63,7 +69,7 @@ public class MekEnergySomeGameTest extends SFMGameTestDefinition {
 
         left.setEnergy(0, 1_000);
         right.setEnergy(0, 1_000);
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             assertTrue(left.getEnergy(0) == 0, "Contents did not depart");
             assertTrue(right.getEnergy(0) == 2_000, "Contents did not arrive");
         });

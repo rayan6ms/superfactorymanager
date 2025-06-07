@@ -12,12 +12,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluids;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
 
 /**
  * Migrated from SFMMekanismCompatGameTests.multi_fluid
@@ -30,7 +28,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManager
         "ArraysAsListWithZeroOrOneArgument"
 })
 @SFMGameTest
-public class MultiFluidGameTest extends SFMGameTestDefinition {
+public class MekMultiFluidGameTest extends SFMGameTestDefinition {
 
     @Override
     public String template() {
@@ -38,7 +36,12 @@ public class MultiFluidGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public String batchName() {
+        return "mek";
+    }
+
+    @Override
+    public void run(SFMGameTestHelper helper) {
         var a1Pos = new BlockPos(2, 2, 1);
         var a2Pos = new BlockPos(1, 2, 0);
         var b1Pos = new BlockPos(1, 2, 2);
@@ -48,14 +51,10 @@ public class MultiFluidGameTest extends SFMGameTestDefinition {
         helper.setBlock(a2Pos, MekanismBlocks.BASIC_FLUID_TANK.getBlock());
         helper.setBlock(b1Pos, MekanismBlocks.BASIC_FLUID_TANK.getBlock());
         helper.setBlock(b2Pos, MekanismBlocks.BASIC_FLUID_TANK.getBlock());
-        var a1 = helper
-                .getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(a1Pos), Direction.UP);
-        var a2 = helper
-                .getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(a2Pos), Direction.UP);
-        var b1 = helper
-                .getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(b1Pos), Direction.UP);
-        var b2 = helper
-                .getLevel().getCapability(Capabilities.FluidHandler.BLOCK, helper.absolutePos(b2Pos), Direction.UP);
+        var a1 = helper.getFluidHandler(a1Pos, Direction.NORTH);
+        var a2 = helper.getFluidHandler(a2Pos, Direction.NORTH);
+        var b1 = helper.getFluidHandler(b1Pos, Direction.NORTH);
+        var b2 = helper.getFluidHandler(b2Pos, Direction.NORTH);
 
         a1.fill(new FluidStack(Fluids.WATER, 3000), IFluidHandler.FluidAction.EXECUTE);
         a2.fill(new FluidStack(Fluids.LAVA, 3000), IFluidHandler.FluidAction.EXECUTE);
@@ -78,7 +77,7 @@ public class MultiFluidGameTest extends SFMGameTestDefinition {
                 .add("b", helper.absolutePos(b2Pos))
                 .save(manager.getDisk());
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             assertTrue(a1.getFluidInTank(0).isEmpty(), "a1 did not empty");
             assertTrue(a2.getFluidInTank(0).isEmpty(), "a2 did not empty");
             assertTrue(b1.getFluidInTank(0).getFluid() == Fluids.WATER, "b1 did not fill with water");

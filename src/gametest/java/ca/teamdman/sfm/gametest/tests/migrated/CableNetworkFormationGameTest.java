@@ -34,7 +34,7 @@ public class CableNetworkFormationGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         // create a row of cables
         for (int i = 0; i < 10; i++) {
             helper.setBlock(new BlockPos(i, 2, 0), SFMBlocks.CABLE_BLOCK.get());
