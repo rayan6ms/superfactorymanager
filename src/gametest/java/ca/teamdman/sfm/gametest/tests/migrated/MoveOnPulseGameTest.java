@@ -18,7 +18,7 @@ import org.apache.logging.log4j.Level;
 import java.util.Objects;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 
 /**
  * Migrated from SFMCorrectnessGameTests.move_on_pulse
@@ -39,7 +39,7 @@ public class MoveOnPulseGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         var managerPos = new BlockPos(1, 2, 1);
         var buttonPos = managerPos.offset(Direction.NORTH.getNormal());
         var leftPos = new BlockPos(2, 2, 1);
@@ -78,7 +78,7 @@ public class MoveOnPulseGameTest extends SFMGameTestDefinition {
         manager.setLogLevel(Level.TRACE);
         assertTrue(manager.logger.getLogLevel() == Level.TRACE, "Log level should be trace");
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             assertTrue(left.getItem(0).isEmpty(), "Iron should depart");
             assertTrue(right.getItem(0).getCount() == 64, "Iron should arrive");
         });

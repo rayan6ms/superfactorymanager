@@ -17,22 +17,22 @@ public interface IInputResourceTracker {
 
     <STACK, ITEM, CAP> long getRetentionObligationForSlot(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack,
+            STACK key,
             BlockPos pos,
             int slot
     );
 
     <STACK, ITEM, CAP> long getRemainingRetentionObligation(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack
+            STACK key
     );
 
     <STACK, ITEM, CAP> void trackRetentionObligation(
             ResourceType<STACK, ITEM, CAP> resourceType,
-            STACK stack,
+            STACK key,
             int slot,
             BlockPos pos,
-            long promise
+            long dedicatingToObligation
     );
 
     /**

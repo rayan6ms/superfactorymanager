@@ -23,7 +23,7 @@ public class MekanismNullIoDirectionGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         helper.succeed();
         // TODO: Ensure there's a warning when interacting with a mekanism machine without a direction specified
         /*

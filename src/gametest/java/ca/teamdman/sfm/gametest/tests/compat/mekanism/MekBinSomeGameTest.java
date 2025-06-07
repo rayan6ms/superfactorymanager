@@ -14,7 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 
 /**
  * Migrated from SFMMekanismCompatGameTests.mek_bin_some
@@ -35,7 +35,12 @@ public class MekBinSomeGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public String batchName() {
+        return "mek";
+    }
+
+    @Override
+    public void run(SFMGameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
         var rightPos = new BlockPos(0, 2, 0);
@@ -66,7 +71,7 @@ public class MekBinSomeGameTest extends SFMGameTestDefinition {
 
         left.getBinSlot().setStack(new ItemStack(Items.DIAMOND, 100));
         right.getBinSlot().setStack(new ItemStack(Items.DIAMOND, 100));
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             assertTrue(left.getBinSlot().getCount() == 100 - 64, "Contents did not depart");
             assertTrue(right.getBinSlot().getCount() == 100 + 64, "Contents did not arrive");
             assertTrue(right.getBinSlot().getStack().getItem() == Items.DIAMOND, "Contents wrong type");

@@ -13,7 +13,7 @@ import mekanism.common.util.UnitDisplayUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.*;
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.getAndPrepMekTile;
 
 /**
@@ -35,7 +35,12 @@ public class MekEnergyTenGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public String batchName() {
+        return "mek";
+    }
+
+    @Override
+    public void run(SFMGameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
         var rightPos = new BlockPos(0, 2, 0);
@@ -66,7 +71,7 @@ public class MekEnergyTenGameTest extends SFMGameTestDefinition {
 
         left.setEnergy(0, 100);
         right.setEnergy(0, 0);
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             assertTrue(
                     left
                             .getEnergy(0)

@@ -17,12 +17,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DirectionalBlock;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.getItemHandler;
+
 
 /**
  * Migrated from SFMCorrectnessGameTests.printing_press_clone_program
@@ -43,7 +40,7 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         // Positions
         var printingPos = new BlockPos(1, 2, 1);
         var pistonPos = new BlockPos(1, 4, 1);
@@ -97,7 +94,7 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
             }
 
             // Place result in chest
-            var chest = getItemHandler(helper, chestPos);
+            var chest = helper.getItemHandler(chestPos);
             chest.insertItem(0, held, false);
 
             // Assert ingredient transformations

@@ -31,7 +31,7 @@ public class DiskItemClientsideRegressionGameTest extends SFMGameTestDefinition 
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         var stack = new ItemStack(SFMItems.DISK_ITEM.get());
         stack.getDisplayName();
         stack.getHoverName();

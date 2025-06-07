@@ -25,7 +25,7 @@ import java.util.ArrayDeque;
 import java.util.Objects;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 
 /**
  * Migrated from SFMThermalMekanismGameTests.resource_loss_regression
@@ -46,7 +46,7 @@ public class ResourceLossRegressionGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         var managerPos = new BlockPos(1, 2, 1);
         var buttonPos = managerPos.offset(Direction.NORTH.getNormal());
         var leftPos = new BlockPos(2, 2, 1);
@@ -92,7 +92,7 @@ public class ResourceLossRegressionGameTest extends SFMGameTestDefinition {
         manager.setLogLevel(Level.ERROR);
         assertTrue(manager.logger.getLogLevel() == Level.ERROR, "Log level should be trace");
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             ItemStack phytoInputStack = phyto.getItemInv().get(0);
             assertTrue(phytoInputStack.getItem() == Items.WHEAT_SEEDS, "Item should be wheat seeds");
             assertTrue(phytoInputStack.getCount() == 64, "Item should be 64 wheat seeds");

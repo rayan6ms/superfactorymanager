@@ -14,7 +14,7 @@ import net.minecraft.world.item.Items;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.succeedIfManagerDidThingWithoutLagging;
+
 
 /**
  * Migrated from SFMIndustrialForegoingCompatGameTests.industrialforegoing_blackhole_some
@@ -35,7 +35,7 @@ public class IndustrialforegoingBlackholeSomeGameTest extends SFMGameTestDefinit
     }
 
     @Override
-    public void testMethod(SFMGameTestHelper helper) {
+    public void run(SFMGameTestHelper helper) {
         // designate positions
         var leftPos = new BlockPos(2, 2, 0);
         var rightPos = new BlockPos(0, 2, 0);
@@ -70,7 +70,7 @@ public class IndustrialforegoingBlackholeSomeGameTest extends SFMGameTestDefinit
         assertTrue(right.insertItem(0, new ItemStack(Items.COAL, 5000 - 64), false).isEmpty(), "couldn't prep left");
         assertTrue(right.insertItem(0, new ItemStack(Items.COAL, 64), false).isEmpty(), "couldn't prep right");
 
-        succeedIfManagerDidThingWithoutLagging(helper, manager, () -> {
+        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             assertTrue(left.getStackInSlot(0).getCount() == 5_000 - 64, "Contents did not depart properly");
             assertTrue(right.getStackInSlot(0).getCount() == 5_000 + 64, "Contents did not arrive");
 
