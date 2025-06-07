@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.gametest.tests.compat.mekanism;
+package ca.teamdman.sfm.gametest.tests.compat.multiple;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.program.LabelPositionHolder;
@@ -26,7 +26,7 @@ import static net.minecraftforge.fluids.capability.IFluidHandler.FluidAction.EXE
         "ArraysAsListWithZeroOrOneArgument"
 })
 @SFMGameTest
-public class MekFluidTankRetainRegressionGameTest extends SFMGameTestDefinition {
+public class FluidTankRetainRegressionGameTest extends SFMGameTestDefinition {
 
     @Override
     public String template() {
