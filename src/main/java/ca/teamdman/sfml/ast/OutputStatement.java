@@ -130,8 +130,7 @@ public class OutputStatement implements IOStatement {
 
         // how many can we move before accounting for limits
         STACK potentialRemainder = destination.insert(extractPotential, true);
-        long potentialRemainderAmount = resourceType.getAmount(potentialRemainder);
-        long amountThatFitsInDestination = extractPotentialAmount - potentialRemainderAmount;
+        long amountThatFitsInDestination = resourceType.getAmountDifference(extractPotential, potentialRemainder);
         if (amountThatFitsInDestination < 0) {
             throw new IllegalStateException(
                     "Potential insertion remainder amount exceeded the insertion amount! This should never happen. "
