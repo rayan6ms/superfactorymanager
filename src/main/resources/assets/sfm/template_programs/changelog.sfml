@@ -12,6 +12,8 @@ NAME "Changelog"
 -- Fix water tank block entities not being cleaned up, fixes #290
 ---- Thanks @Linguardium for the bug report!
 -- Fix `SECOND` keyword (singular) not multiplying by 20, fixes #244
+-- Add facades inheriting light level of the block they are appearing as, #309
+---- Thanks @TheVoos for the suggestion!
 
 ---- 4.21.0 ----
 -- Add intellisense, disabled by default - backslash to accept suggestion
