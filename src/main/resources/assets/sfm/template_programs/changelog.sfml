@@ -22,7 +22,8 @@ EVERY 20 TICKS DO
     INPUT RETAIN 300 FROM dank BOTTOM SIDE -- would refuse to pull, now fixed
     OUTPUT TO chest
 END
-
+-- Fix label gun GUI text edit box limiting labels to 32 characters
+-- Increased max label length from 80 to 256
 
 ---- 4.21.0 ----
 -- Add intellisense, disabled by default - backslash to accept suggestion
