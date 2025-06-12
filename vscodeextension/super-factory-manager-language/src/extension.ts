@@ -3,6 +3,7 @@ import { registerSnippets } from './snippets/snippetController';
 import { activityBar, deleteTempFiles } from './activitybar/ActivityBar';
 import { handleDocument} from './antlrg4/Parser';
 import { checkInputOutput } from './antlrg4/Warning';
+import { activateTooltip } from './tooltip/tooltip';
 
 /**
  * Main method to call everything we need
@@ -18,6 +19,8 @@ export function activate(context: vscode.ExtensionContext) {
         checkInputOutput(document);
     });
     context.subscriptions.push(checking);
+
+    activateTooltip(context);
 }
 
 export function deactivate() {
