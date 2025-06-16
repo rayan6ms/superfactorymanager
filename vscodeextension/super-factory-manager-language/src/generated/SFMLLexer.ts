@@ -127,7 +127,7 @@ export class SFMLLexer extends Lexer {
 		undefined, undefined, undefined, undefined, undefined, "','", "':'", "'/'", 
 		"'-'", "'('", "')'",
 	];
-	private static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
+	public static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
 		undefined, "IF", "THEN", "ELSE", "HAS", "OVERALL", "SOME", "ONE", "LONE", 
 		"TRUE", "FALSE", "NOT", "AND", "OR", "GT", "GT_SYMBOL", "LT", "LT_SYMBOL", 
 		"EQ", "EQ_SYMBOL", "LE", "LE_SYMBOL", "GE", "GE_SYMBOL", "FROM", "TO", 
