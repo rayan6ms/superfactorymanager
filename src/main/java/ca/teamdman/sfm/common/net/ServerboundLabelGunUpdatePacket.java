@@ -8,7 +8,7 @@ public record ServerboundLabelGunUpdatePacket(
         String label,
         InteractionHand hand
 ) implements SFMPacket {
-    public static final int MAX_LABEL_LENGTH = 80;
+    public static final int MAX_LABEL_LENGTH = 256;
 
     public static class Daddy implements SFMPacketDaddy<ServerboundLabelGunUpdatePacket> {
         @Override

@@ -4,8 +4,10 @@ This extension provides syntax highlighting for the Super Factory Manager Langua
 
 ## Features
 
-- **Syntax highlighting:** For SFM code, similar to in-game text editor.
+- **Syntax highlighting:** For SFM code, similar to in-game text editor (well, a bit of a lie, not exact same colors).
 Colors depends on the theme you are using
+
+- **Tooltips:** Show a brief description of what that keyword does and some examples, at least 1. Hover over a keyword to discover
 
 - **Snippets:** Basic functionalities that improves code writing, like every snippet or energy snippet.
 For now, the following snippets are available: basic, energy, input, output, if, ifelse, ifelseif, every.
