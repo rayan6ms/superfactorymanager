@@ -25,6 +25,7 @@ END
 -- Fix label gun GUI text edit box limiting labels to 32 characters
 -- Increased max label length from 80 to 256
 -- VSCode extension improvements, thanks @Titop54 for the help <3
+-- Fix "/ by zero exception" in program edit screen
 
 ---- 4.21.0 ----
 -- Add intellisense, disabled by default - backslash to accept suggestion
