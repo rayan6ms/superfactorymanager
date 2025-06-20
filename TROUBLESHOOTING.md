@@ -47,6 +47,26 @@ Cursed error but seems to have been quelled for now.
 Today, 2025-01-10: I was happily using IDEA Ultimate edition 2024.3 but had to switch to IntelliJ IDEA Community Edition and I tried version `2024.3.1.1` but re-encountered the above error.
 Downgrading to IntelliJ IDEA Community Edition `2023.3.8` has restored my ability to use the IntelliJ run configurations to launch the game in debug mode.
 
+---
+
+https://discord.com/channels/313125603924639766/1116211620415283201/1382018596934520903
+Mikerooni — 2025-06-10 11:28 AM
+Does anyone else get this error when trying to launch in debug mode using IntelliJ?
+
+Exception in thread "main" java.lang.VerifyError: Catch type is not a subclass of Throwable in exception handler 47
+Exception Details:
+Location:
+cpw/mods/bootstraplauncher/BootstrapLauncher.loadLegacyClassPath()Ljava/util/List; @47: astore_2
+Reason:
+Type 'java/io/IOException' (constant pool 328) is not assignable to 'java/lang/Throwable'
+
+
+I don't even know what could be causing this - it's an extremely weird error...
+It doesn't happen when running normally... only in debug mode
+Hold on, I might be on to something...
+Okay so it seems to have to do with using -XX:+AllowEnhancedClassRedefinition as an additional JVM arg - but how else would I be able to hot-reload class definition changes 🫠
+
+---
 
 ## General things to try when something isn't working
 
