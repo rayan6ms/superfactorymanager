@@ -501,6 +501,11 @@ public class ProgramEditorScreen extends Screen {
         }
 
         @Override
+        protected int getMaxScrollAmount() {
+            return Math.max(1, super.getMaxScrollAmount()); // Fix #307: divide by zero exception
+        }
+
+        @Override
         public boolean mouseDragged(
                 double mx,
                 double my,
@@ -513,6 +518,12 @@ public class ProgramEditorScreen extends Screen {
             if (mx >= thisX + 1 && mx <= thisX + this.width - 1) {
                 mx -= getLineNumberWidth();
             }
+
+            // Fix for division by zero error in AbstractScrollWidget.mouseDragged
+            if (this.height == this.getScrollBarHeight()) {
+                return false;
+            }
+
             return super.mouseDragged(mx, my, button, dx, dy);
         }
 
@@ -716,4 +727,3 @@ public class ProgramEditorScreen extends Screen {
         }
     }
 }
-
