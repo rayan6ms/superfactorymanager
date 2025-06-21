@@ -1,5 +1,25 @@
 # Changelog
 
+## [0.0.13]
+
+### Changes on code
+
+- **Snippets**
+  - Changed to always activate intellisense even if it has no snippet to only activate (forced) when it has at least 1 snippet
+
+- **Syntax**
+  - We still have that bad regex setup, but only for tooltip
+
+### Added
+
+- **Tooltips**
+  - On key words, like input, output, ... it will show a small resume of what it does and some examples, with colors!
+  Thanks to the clangd (<https://github.com/clangd/vscode-clangd/tree/master>) extension for the idea!
+
+- **COLORS!!!**
+  - And fully customizable (<https://code.visualstudio.com/api/language-extensions/semantic-highlight-guide#theming>), now, with a lot of colors, for free.
+  Some still relies on that regex setup, but only a few keyword and until semantic Tokens are on
+
 ## [0.0.12]
 
 ### Changes on code

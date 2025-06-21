@@ -111,8 +111,12 @@ export function combinedSnippets(prefix: string): vscode.Disposable {
                         });
                     }
                 }
-                setTimeout(() => vscode.commands.executeCommand('editor.action.triggerSuggest'), 50);
-                return completions.length ? completions : undefined;
+                if(completions.length > 0)
+                {
+                    setTimeout(() => vscode.commands.executeCommand('editor.action.triggerSuggest'), 50);
+                    return completions;
+                }
+                return undefined;
             }
         },
         trigger //e, v, i, f, n, p, u, o, t, b, a, s, r or prefix
