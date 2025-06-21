@@ -496,9 +496,10 @@ public class ProgramEditorScreen extends Screen {
             }
 
             // Fix for division by zero error in AbstractScrollWidget.mouseDragged
-            if (this.height == this.getScrollBarHeight()) {
-                return false;
-            }
+            // // this is disabled for now because this fix completely turns off click to select
+//            if (this.height == this.getScrollBarHeight()) {
+//                return false;
+//            }
 
             return super.mouseDragged(mx, my, button, dx, dy);
         }
