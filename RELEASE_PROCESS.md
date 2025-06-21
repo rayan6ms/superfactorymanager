@@ -5,14 +5,15 @@ The following process is designed to catch the most obvious problems that may ar
 ```pwsh
 
 .\act.ps1
+Manual: Update GitHub milestone name
 Manual: Bump `mod_version` in gradle.properties
 Manual: Update heading in changelog.sfml
 Manual: Update thank_you.sfml
 Manual: Commit bump
 Action: Propagate changes
-Action: Run gameTestServer for all versions
 Action: runData for all versions
 Action: Propagate changes
+Action: Run gameTestServer for all versions
 Action: Build
 Action: Wipe jars summary dir
 Action: Collect jars
@@ -71,4 +72,7 @@ Description= <<
     ```
 >>
 Attach=latest jar for each mc version
+
+Close GitHub milestone
+Create new vNext milestone
 ```
