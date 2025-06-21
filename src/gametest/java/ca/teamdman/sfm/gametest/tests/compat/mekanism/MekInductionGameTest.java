@@ -90,7 +90,7 @@ public class MekInductionGameTest extends SFMGameTestDefinition {
         manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
 
         // create the program
-        long incr = Integer.MAX_VALUE;
+        long incr = Integer.MAX_VALUE - 1; // minus one to avoid a rounding error
         long startingAmount = 0L;
         var program = """
                     NAME "induction matrix test"
