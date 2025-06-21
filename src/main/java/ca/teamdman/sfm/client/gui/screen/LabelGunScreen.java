@@ -50,7 +50,7 @@ public class LabelGunScreen extends Screen {
         ));
         this.labelField.setResponder(this::onTextUpdated);
         this.labelField.setSuggestion(LocalizationKeys.LABEL_GUN_GUI_LABEL_EDIT_PLACEHOLDER.getString());
-
+        this.labelField.setMaxLength(ServerboundLabelGunUpdatePacket.MAX_LABEL_LENGTH);
         this.setInitialFocus(labelField);
         this.setFocused(labelField);
         this.labelField.setFocused(true);
