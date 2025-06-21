@@ -41,8 +41,8 @@ authors = "${mod_authors}" #optional
 # The description text for the mod (multi line!) (#mandatory)
 description = '''${mod_description}'''
 
-[[mixins]]
-config="sfm.mixins.json"
+[[mixins]] # needed for 1.20.2+
+config="sfm.mixins.gametest.json"
 
 # A dependency - use the . to indicate dependency for a specific modid. Dependencies are optional.
 [[dependencies.${ mod_id }]] #optional
