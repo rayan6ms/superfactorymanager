@@ -143,7 +143,7 @@ runs {
         // systemProperty 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
         // Enable JetBrains runtime hotswap support
-        jvmArguments '-XX:+AllowEnhancedClassRedefinition', '-XX:+IgnoreUnrecognizedVMOptions', '-XX:+AllowRedefinitionToAddDeleteMethods'
+        jvmArguments '-XX:+IgnoreUnrecognizedVMOptions', '-XX:+AllowRedefinitionToAddDeleteMethods' // ,'-XX:+AllowEnhancedClassRedefinition'
 
         modSource project.sourceSets.main
     }

@@ -1,16 +1,14 @@
 // Generated from ./syntaxes/SFML.g4 by ANTLR 4.9.0-SNAPSHOT
 
 
-import { ATN } from "antlr4ts/atn/ATN";
-import { ATNDeserializer } from "antlr4ts/atn/ATNDeserializer";
-import { CharStream } from "antlr4ts/CharStream";
-import { Lexer } from "antlr4ts/Lexer";
-import { LexerATNSimulator } from "antlr4ts/atn/LexerATNSimulator";
-import { NotNull } from "antlr4ts/Decorators";
-import { Override } from "antlr4ts/Decorators";
-import { RuleContext } from "antlr4ts/RuleContext";
-import { Vocabulary } from "antlr4ts/Vocabulary";
-import { VocabularyImpl } from "antlr4ts/VocabularyImpl";
+import {ATN} from "antlr4ts/atn/ATN";
+import {ATNDeserializer} from "antlr4ts/atn/ATNDeserializer";
+import {CharStream} from "antlr4ts/CharStream";
+import {Lexer} from "antlr4ts/Lexer";
+import {LexerATNSimulator} from "antlr4ts/atn/LexerATNSimulator";
+import {RuleContext} from "antlr4ts/RuleContext";
+import {Vocabulary} from "antlr4ts/Vocabulary";
+import {VocabularyImpl} from "antlr4ts/VocabularyImpl";
 
 import * as Utils from "antlr4ts/misc/Utils";
 
@@ -127,7 +125,7 @@ export class SFMLLexer extends Lexer {
 		undefined, undefined, undefined, undefined, undefined, "','", "':'", "'/'", 
 		"'-'", "'('", "')'",
 	];
-	private static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
+	public static readonly _SYMBOLIC_NAMES: Array<string | undefined> = [
 		undefined, "IF", "THEN", "ELSE", "HAS", "OVERALL", "SOME", "ONE", "LONE", 
 		"TRUE", "FALSE", "NOT", "AND", "OR", "GT", "GT_SYMBOL", "LT", "LT_SYMBOL", 
 		"EQ", "EQ_SYMBOL", "LE", "LE_SYMBOL", "GE", "GE_SYMBOL", "FROM", "TO", 
