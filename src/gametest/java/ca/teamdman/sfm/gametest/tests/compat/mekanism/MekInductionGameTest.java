@@ -90,12 +90,12 @@ public class MekInductionGameTest extends SFMGameTestDefinition {
         manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
 
         // create the program
-        long incr = 1_000_000_000L;
+        long incr = Integer.MAX_VALUE - 1; // minus one to avoid a rounding error
         long startingAmount = 0L;
         var program = """
                     NAME "induction matrix test"
                     EVERY 20 TICKS DO
-                        INPUT %d fe:: FROM source TOP SIDE
+                        INPUT %d fe:: FROM source NORTH SIDE
                         OUTPUT fe:: TO dest NORTH SIDE
                     END
                 """.formatted(incr);
