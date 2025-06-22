@@ -152,8 +152,6 @@ runs {
         modSource project.sourceSets.gametest
         // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
         systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
-
-//        programArguments "--mixin.config", "sfm.mixins.gametest.json"
     }
 
     client_teamy {
@@ -171,7 +169,6 @@ runs {
         modSource project.sourceSets.gametest
         systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
         programArgument '--nogui'
-//        programArguments "--mixin.config", "sfm.mixins.gametest.json"
     }
 
     // This run config launches GameTestServer and runs all registered gametests, then exits.
@@ -180,7 +177,6 @@ runs {
     gameTestServer {
         modSource project.sourceSets.gametest
         systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
-//        programArguments "--mixin.config", "sfm.mixins.gametest.json"
     }
 
     clientData {
@@ -193,8 +189,12 @@ runs {
     }
 }
 
+// this is handled in mods.toml from 1.20.2+
 //mixin {
-//    add sourceSets.gametest, "sfm.mixins.refmap.json"
+//    add sourceSets.main, "sfm.mixins.refmap.main.json"
+//    add sourceSets.gametest, "sfm.mixins.refmap.gametest.json"
+//    add sourceSets.datagen, "sfm.mixins.refmap.datagen.json"
+//    config "sfm.mixins.json"
 //    debug.verbose = true
 //}
 
