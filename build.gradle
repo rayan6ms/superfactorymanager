@@ -144,8 +144,6 @@ minecraft {
             // https://discord.com/channels/313125603924639766/983834532904042537/1089449308048343090
             jvmArgs '-XX:+IgnoreUnrecognizedVMOptions', '-XX:+AllowRedefinitionToAddDeleteMethods'
 
-            args "--mixin.config", "sfm.mixins.gametest.json"
-
             mods {
                 "${mod_id}" {
                     source sourceSets.main
@@ -174,8 +172,6 @@ minecraft {
 
             jvmArgs '-XX:+IgnoreUnrecognizedVMOptions', '-XX:+AllowRedefinitionToAddDeleteMethods'
 
-            args "--mixin.config", "sfm.mixins.gametest.json"
-
             mods {
                 "${mod_id}" {
                     source sourceSets.main
@@ -200,8 +196,6 @@ minecraft {
             property 'mixin.env.refMapRemappingFile', "${buildDir}/createSrgToMcp/output.srg"
 
             jvmArgs '-XX:+IgnoreUnrecognizedVMOptions', '-XX:+AllowRedefinitionToAddDeleteMethods'
-
-            args "--mixin.config", "sfm.mixins.gametest.json"
 
             mods {
                 "${mod_id}" {
@@ -239,7 +233,10 @@ minecraft {
 }
 
 mixin {
-    add sourceSets.gametest, "sfm.mixins.refmap.json"
+    add sourceSets.main, "sfm.mixins.refmap.main.json"
+    add sourceSets.gametest, "sfm.mixins.refmap.gametest.json"
+    add sourceSets.datagen, "sfm.mixins.refmap.datagen.json"
+    config "sfm.mixins.json"
     debug.verbose = true
 }
 
