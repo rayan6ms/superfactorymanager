@@ -417,6 +417,16 @@ dependencies {
     runtimeOnly fg.deobf("curse.maven:tinkers-construct-74072:6044827") // Tinkers' Construct 3.8.5.58 for 1.19.2
     runtimeOnly fg.deobf("curse.maven:mantle-74924:6044700") // Mantle 1.10.48 for 1.19.2
 
+    runtimeOnly fg.deobf("curse.maven:sodium-394468:3957319")// Sodium 0.4.4+mc1.19.2
+
+//    runtimeOnly fg.deobf("curse.maven:borderless-window-378979:3906414")// Borderless Window 1.19.3 // doesn't work :P
+
+    runtimeOnly fg.deobf("curse.maven:quark-243121:4812006")// Quark-3.4-418.jar
+    runtimeOnly fg.deobf("curse.maven:AutoRegLib-250363:4100299")// AutoRegLib-1.8.2-55.jar
+
+    runtimeOnly fg.deobf("curse.maven:ok-zoomer-631278:4081277")// okzoomer-forge-1.19-2.1.1.jar
+
+
 
 }
 
