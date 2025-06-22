@@ -22,11 +22,16 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 /// [Moving fluid with retain from Fluid Drawer to Industrial Foregoing Latex Processing Unit](https://discord.com/channels/967118679370264627/1372589927090487458)
-/// https://github.com/TeamDman/SuperFactoryManager/issues/181 - SFM broken with dank storages
-/// https://github.com/TeamDman/SuperFactoryManager/issues/199 - Issue when using RETAIN and inserting to create depot from functional storage drawers
-/// https://github.com/TeamDman/SuperFactoryManager/issues/200 - RETAIN behaves very oddly
-/// https://github.com/TeamDman/SuperFactoryManager/issues/297 - Add test using retain on input fluid tank
-/// https://github.com/TeamDman/SuperFactoryManager/issues/306 - Bug: RETAIN on INPUT not working with numbers over 64.
+/// <br/>
+/// [SFM broken with dank storages](https://github.com/TeamDman/SuperFactoryManager/issues/181)
+/// <br/>
+/// [Issue when using RETAIN and inserting to create depot from functional storage drawers](https://github.com/TeamDman/SuperFactoryManager/issues/199)
+/// <br/>
+/// [RETAIN behaves very oddly](https://github.com/TeamDman/SuperFactoryManager/issues/200)
+/// <br/>
+/// [Add test using retain on input fluid tank](https://github.com/TeamDman/SuperFactoryManager/issues/297)
+/// <br/>
+/// [Bug: RETAIN on INPUT not working with numbers over 64.](https://github.com/TeamDman/SuperFactoryManager/issues/306)
 @SuppressWarnings("DataFlowIssue")
 @SFMGameTest
 public class DankInputRetainRegressionGameTest extends SFMGameTestDefinition {
