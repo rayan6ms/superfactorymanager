@@ -1,5 +1,5 @@
 {
-  "required": true,
+  "required": false,
   "minVersion": "0.8.3",
   "package": "ca.teamdman.sfm.mixins",
   "compatibilityLevel": "JAVA_17",
