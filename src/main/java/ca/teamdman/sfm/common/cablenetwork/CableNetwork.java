@@ -61,7 +61,7 @@ public class CableNetwork {
         var cables = SFMStreamUtils.<BlockPos, BlockPos>getRecursiveStream((current, next, results) -> {
             results.accept(current);
             BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
-            for (Direction d : SFMDirections.DIRECTIONS) {
+            for (Direction d : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
                 target.set(current).move(d);
                 if (other.containsCablePosition(target)) {
                     next.accept(target.immutable());
@@ -78,7 +78,7 @@ public class CableNetwork {
         BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
         LongSet seenCapabilityPositions = new LongOpenHashSet();
         for (BlockPos cablePos : cables) {
-            for (Direction direction : SFMDirections.DIRECTIONS) {
+            for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
                 target.set(cablePos).move(direction);
                 // the same block may be touching multiple cables in the network
                 boolean firstVisit = seenCapabilityPositions.add(target.asLong());
@@ -96,7 +96,7 @@ public class CableNetwork {
         return SFMStreamUtils.getRecursiveStream((current, next, results) -> {
             results.accept(current);
             BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
-            for (Direction d : SFMDirections.DIRECTIONS) {
+            for (Direction d : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
                 target.set(current).move(d);
                 if (isCable(level, target)) {
                     next.accept(target.immutable());
@@ -132,7 +132,7 @@ public class CableNetwork {
      */
     public boolean isAdjacentToCable(@NotStored BlockPos pos) {
         BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
-        for (Direction direction : SFMDirections.DIRECTIONS) {
+        for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
             target.set(pos).move(direction);
             if (containsCablePosition(target)) {
                 return true;
@@ -247,7 +247,7 @@ public class CableNetwork {
         CABLE_POSITIONS.remove(cablePos.asLong());
         List<CableNetwork> branches = new ArrayList<>();
         BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
-        for (Direction direction : SFMDirections.DIRECTIONS) {
+        for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
             target.set(cablePos).move(direction);
             if (!containsCablePosition(target)) continue;
             // make sure that a branch network doesn't already contain this cable

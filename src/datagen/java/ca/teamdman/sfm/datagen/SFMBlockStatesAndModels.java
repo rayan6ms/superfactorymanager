@@ -166,7 +166,7 @@ public class SFMBlockStatesAndModels extends MCVersionAgnosticBlockStatesAndMode
                 .end();
 
         // Parts (connections)
-        for (Direction direction : SFMDirections.DIRECTIONS) {
+        for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
             var rotX = 0;
             var rotY = 0;
 

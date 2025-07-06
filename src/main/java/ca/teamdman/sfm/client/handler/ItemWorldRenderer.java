@@ -482,7 +482,7 @@ public class ItemWorldRenderer {
                 poseStack.pushPose();
                 poseStack.translate(blockPos.getX(), blockPos.getY(), blockPos.getZ());
                 Matrix4f matrix4f = poseStack.last().pose();
-                for (Direction face : SFMDirections.DIRECTIONS) {
+                for (Direction face : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
                     if (!positions.contains(blockPos.relative(face))) {
                         writeFaceVertices(bufferBuilder, matrix4f, face, r, g, b, a);
                     }
