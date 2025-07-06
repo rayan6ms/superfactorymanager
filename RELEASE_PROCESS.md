@@ -76,4 +76,5 @@ Attach=latest jar for each mc version
 
 Close GitHub milestone
 Create new vNext milestone
+Remove "Fixed awaiting release" label from issues
 ```
