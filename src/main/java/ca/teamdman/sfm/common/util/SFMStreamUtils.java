@@ -2,10 +2,7 @@ package ca.teamdman.sfm.common.util;
 
 import net.minecraft.core.BlockPos;
 
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -64,6 +61,10 @@ public class SFMStreamUtils {
             }
         }
         return builder.build();
+    }
+
+    public static Stream<BlockPos> get3DNeighbours(@Stored BlockPos pos) {
+        return Arrays.stream(SFMDirections.DIRECTIONS).map(d -> pos.offset(d.getNormal()));
     }
 
     public interface RecursiveBuilder<T, R> {
