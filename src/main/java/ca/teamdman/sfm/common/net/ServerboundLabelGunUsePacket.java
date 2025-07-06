@@ -116,10 +116,19 @@ public record ServerboundLabelGunUsePacket(
                     // get the block type of the target position
                     Block targetBlock = level.getBlockState(pos).getBlock();
 
+                    // Set to track positions that fail the isAdjacentToCable filter
+                    Set<BlockPos> skippedPositions = new HashSet<>();
+
                     // predicate to check if a position is adjacent to a cable
-                    Predicate<BlockPos> isAdjacentToCable = p -> Arrays
-                            .stream(SFMDirections.DIRECTIONS)
-                            .anyMatch(d -> cablePositions.contains(p.offset(d.getNormal())));
+                    Predicate<BlockPos> isAdjacentToCable = p -> {
+                        boolean isAdjacent = Arrays
+                                .stream(SFMDirections.DIRECTIONS)
+                                .anyMatch(d -> cablePositions.contains(p.offset(d.getNormal())));
+                        if (!isAdjacent) {
+                            skippedPositions.add(p);
+                        }
+                        return isAdjacent;
+                    };
 
                     // get positions of all connected blocks of the same type
                     List<BlockPos> positions = SFMStreamUtils
@@ -131,6 +140,11 @@ public record ServerboundLabelGunUsePacket(
                                         .forEach(nextQueue);
                             }, pos)
                             .toList();
+
+                    // Notify user if any blocks were skipped because they aren't touching cables
+                    if (!skippedPositions.isEmpty()) {
+                        sender.sendSystemMessage(LocalizationKeys.LABEL_GUN_CHAT_SKIPPED_BLOCKS.getComponent(skippedPositions.size()));
+                    }
 
                     // check if any of the positions are missing the label
                     var existing = new HashSet<>(gunLabels.getPositions(activeLabel));

@@ -225,6 +225,10 @@ public final class LocalizationKeys {
             () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".chat.pushed",
             () -> "Pushed labels to the manager."
     );
+    public static final LocalizationEntry LABEL_GUN_CHAT_SKIPPED_BLOCKS = new LocalizationEntry(
+            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".chat.skipped_blocks",
+            () -> "Skipped %d blocks not touching cables"
+    );
     public static final LocalizationEntry NETWORK_TOOL_ITEM_TOOLTIP_1 = new LocalizationEntry(
             () -> SFMItems.NETWORK_TOOL_ITEM.get().getDescriptionId() + ".tooltip.1",
             () -> "Shows cables through walls when held."

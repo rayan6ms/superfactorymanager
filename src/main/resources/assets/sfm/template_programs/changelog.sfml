@@ -8,6 +8,7 @@ NAME "Changelog"
 
 
 ---- vNext ----
+-- Add notification in chat when blocks are skipped with ctrl+click because they aren't touching cables
 -- Ensure programs with labels longer than the max fail to compile (since the max is maybe only checked when packets involved?)
 -- Silence mixin warnings
 ---- Thanks @Uncandango for the motivation!
