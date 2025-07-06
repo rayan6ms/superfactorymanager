@@ -5,6 +5,7 @@ The following process is designed to catch the most obvious problems that may ar
 ```pwsh
 
 .\act.ps1
+Manual: Update known_issues.sfml
 Manual: Update GitHub milestone name
 Manual: Bump `mod_version` in gradle.properties
 Manual: Update heading in changelog.sfml
