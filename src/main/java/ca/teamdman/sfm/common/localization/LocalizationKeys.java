@@ -869,6 +869,10 @@ public final class LocalizationKeys {
             "key.sfm.label_gun.pull_modifier",
             "Label Gun Pull Modifier"
     );
+    public static final LocalizationEntry LABEL_GUN_TARGET_MANAGER_MODIFIER_KEY = new LocalizationEntry(
+            "key.sfm.label_gun.target_manager_modifier",
+            "Label Gun Target Manager Modifier"
+    );
     public static final LocalizationEntry SFM_KEY_CATEGORY = new LocalizationEntry(
             "key.categories.sfm",
             "Super Factory Manager"

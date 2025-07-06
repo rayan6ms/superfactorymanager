@@ -122,13 +122,15 @@ public class LabelGunItem extends Item {
             boolean contiguous = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_CONTIGUOUS_MODIFIER_KEY);
             boolean clear = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_CLEAR_MODIFIER_KEY);
             boolean pull = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_PULL_MODIFIER_KEY);
+            boolean targetManager = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_TARGET_MANAGER_MODIFIER_KEY);
             SFMPackets.sendToServer(new ServerboundLabelGunUsePacket(
                     ctx.getHand(),
                     ctx.getClickedPos(),
                     contiguous,
                     pickBlock,
                     clear,
-                    pull
+                    pull,
+                    targetManager
             ));
             if (pickBlock) {
                 // we don't want to toggle the overlay if we're using pick-block

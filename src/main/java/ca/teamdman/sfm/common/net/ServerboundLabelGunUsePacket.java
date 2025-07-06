@@ -23,7 +23,8 @@ public record ServerboundLabelGunUsePacket(
         boolean isContiguousModifierActive,
         boolean isPickBlockModifierActive,
         boolean isClearModifierActive,
-        boolean isPullModifierActive
+        boolean isPullModifierActive,
+        boolean isTargetManagerModifierActive
 ) implements SFMPacket {
     public static class Daddy implements SFMPacketDaddy<ServerboundLabelGunUsePacket> {
         @Override
@@ -42,6 +43,7 @@ public record ServerboundLabelGunUsePacket(
             buf.writeBoolean(msg.isPickBlockModifierActive);
             buf.writeBoolean(msg.isClearModifierActive);
             buf.writeBoolean(msg.isPullModifierActive);
+            buf.writeBoolean(msg.isTargetManagerModifierActive);
         }
 
         @Override
@@ -49,6 +51,7 @@ public record ServerboundLabelGunUsePacket(
             return new ServerboundLabelGunUsePacket(
                     buf.readEnum(InteractionHand.class),
                     buf.readBlockPos(),
+                    buf.readBoolean(),
                     buf.readBoolean(),
                     buf.readBoolean(),
                     buf.readBoolean(),
@@ -75,8 +78,8 @@ public record ServerboundLabelGunUsePacket(
             var gunLabels = LabelPositionHolder.from(stack).toOwned();
             var pos = msg.pos;
 
-            // target is a manager, perform push or pull action
-            if (level.getBlockEntity(pos) instanceof ManagerBlockEntity manager) {
+            // If not targeting manager modifier, do normal push/pull
+            if (!msg.isTargetManagerModifierActive && level.getBlockEntity(pos) instanceof ManagerBlockEntity manager) {
                 var disk = manager.getDisk();
                 if (disk != null) {
                     if (msg.isPullModifierActive) {
