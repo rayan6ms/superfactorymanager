@@ -40,6 +40,22 @@ public final class LocalizationKeys {
             "gui.sfm.save_changes_confirm.no_button",
             "Continue editing"
     );
+    public static final LocalizationEntry REMOVE_SINGLE_LABEL_CONFIRM_SCREEN_TITLE = new LocalizationEntry(
+            "gui.sfm.remove_single_label_confirm.title",
+            "Remove label: %s"
+    );
+    public static final LocalizationEntry REMOVE_SINGLE_LABEL_CONFIRM_SCREEN_MESSAGE = new LocalizationEntry(
+            "gui.sfm.remove_single_label_confirm.message",
+            "Are you sure you want to remove the label \"%s\" from %d blocks?"
+    );
+    public static final LocalizationEntry REMOVE_SINGLE_LABEL_CONFIRM_SCREEN_YES_BUTTON = new LocalizationEntry(
+            "gui.sfm.remove_single_label_confirm.yes_button",
+            "Proceed, remove it"
+    );
+    public static final LocalizationEntry REMOVE_SINGLE_LABEL_CONFIRM_SCREEN_NO_BUTTON = new LocalizationEntry(
+            "gui.sfm.remove_single_label_confirm.no_button",
+            "Make no changes"
+    );
     public static final LocalizationEntry MANAGER_RESET_CONFIRM_SCREEN_TITLE = new LocalizationEntry(
             "gui.sfm.manager.reset_confirm_screen.title",
             "Reset disk?"
