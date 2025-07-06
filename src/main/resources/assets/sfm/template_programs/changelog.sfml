@@ -9,6 +9,9 @@ NAME "Changelog"
 
 ---- vNext ----
 -- Ensure programs with labels longer than the max fail to compile (since the max is maybe only checked when packets involved?)
+-- Silence mixin warnings
+---- Thanks @Uncandango for the motivation!
+-- Clean up known_issues.sfml
 
 ---- 4.22.0 ----
 -- Thank you SpruceMist for the GitHub sponsorship <3
