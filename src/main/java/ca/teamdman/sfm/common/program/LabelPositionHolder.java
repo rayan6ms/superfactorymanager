@@ -142,6 +142,7 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
             String label,
             Collection<BlockPos> positions
     ) {
+        if (label.isBlank()) return this;
         getPositionsMut(label).addAll(positions);
         return this;
     }
@@ -195,6 +196,7 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
             String label,
             BlockPos position
     ) {
+        if (label.isBlank()) return this;
         getPositionsMut(label).add(position);
         return this;
     }

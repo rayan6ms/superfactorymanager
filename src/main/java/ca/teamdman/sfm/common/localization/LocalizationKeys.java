@@ -849,6 +849,14 @@ public final class LocalizationKeys {
             "key.sfm.label_gun.pick_block_modifier",
             "Label Gun Pick Block Modifier"
     );
+    public static final LocalizationEntry LABEL_GUN_CONTIGUOUS_MODIFIER_KEY = new LocalizationEntry(
+            "key.sfm.label_gun.contiguous_modifier",
+            "Label Gun Contiguous Modifier"
+    );
+    public static final LocalizationEntry LABEL_GUN_CLEAR_MODIFIER_KEY = new LocalizationEntry(
+            "key.sfm.label_gun.clear_modifier",
+            "Label Gun Clear Modifier"
+    );
     public static final LocalizationEntry LABEL_GUN_NEXT_LABEL_KEY = new LocalizationEntry(
             "key.sfm.label_gun.next_label",
             "Label Gun Next Label"
@@ -856,6 +864,10 @@ public final class LocalizationKeys {
     public static final LocalizationEntry LABEL_GUN_PREVIOUS_LABEL_KEY = new LocalizationEntry(
             "key.sfm.label_gun.previous_label",
             "Label Gun Previous Label"
+    );
+    public static final LocalizationEntry LABEL_GUN_PULL_MODIFIER_KEY = new LocalizationEntry(
+            "key.sfm.label_gun.pull_modifier",
+            "Label Gun Pull Modifier"
     );
     public static final LocalizationEntry SFM_KEY_CATEGORY = new LocalizationEntry(
             "key.categories.sfm",
