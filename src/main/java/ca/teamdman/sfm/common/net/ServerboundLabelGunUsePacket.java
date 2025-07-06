@@ -17,6 +17,9 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import static ca.teamdman.sfm.common.util.SFMStreamUtils.get3DNeighbours;
+import static ca.teamdman.sfm.common.util.SFMStreamUtils.get3DNeighboursIncludingKittyCorner;
+
 public record ServerboundLabelGunUsePacket(
         InteractionHand hand,
         BlockPos pos,
@@ -115,16 +118,19 @@ public record ServerboundLabelGunUsePacket(
             List<BlockPos> targets;
             if (msg.isContiguousModifierActive) {
                 // find all cable positions so that we only include inventories adjacent to a cable
-                Set<BlockPos> cablePositions = CableNetworkManager
-                        .getNetworksForLevel(level)
+                Set<BlockPos> cablePositions = get3DNeighbours(pos)
+                        .map(suspected_cable_pos -> CableNetworkManager.getOrRegisterNetworkFromCablePosition(
+                                level,
+                                suspected_cable_pos
+                        ))
+                        .filter(Optional::isPresent)
+                        .map(Optional::get)
                         .flatMap(CableNetwork::getCablePositions)
                         .collect(Collectors.toSet());
 
                 Set<BlockPos> warnBecauseNoCableNeighbour = new HashSet<>();
                 Predicate<BlockPos> isAdjacentToCable = p -> {
-                    boolean isAdjacent = Arrays
-                            .stream(SFMDirections.DIRECTIONS)
-                            .anyMatch(d -> cablePositions.contains(p.offset(d.getNormal())));
+                    boolean isAdjacent = get3DNeighbours(p).anyMatch(cablePositions::contains);
                     if (!isAdjacent) {
                         warnBecauseNoCableNeighbour.add(p);
                     }
@@ -133,7 +139,7 @@ public record ServerboundLabelGunUsePacket(
                 targets = SFMStreamUtils.<BlockPos, BlockPos>getRecursiveStream(
                                 (current, nextQueue, results) -> {
                                     results.accept(current);
-                                    SFMStreamUtils.get3DNeighboursIncludingKittyCorner(current)
+                                    get3DNeighboursIncludingKittyCorner(current)
                                             .filter(p -> level.getBlockState(p).getBlock() == targetBlock)
                                             .filter(isAdjacentToCable)
                                             .forEach(nextQueue);
@@ -151,51 +157,41 @@ public record ServerboundLabelGunUsePacket(
                 targets = List.of(pos);
             }
 
-            // Implement the behavior based on the permutation of modifiers
-            if (msg.isPickBlockModifierActive && msg.isClearModifierActive && msg.isContiguousModifierActive) {
-                // pick.yes, clear.yes, contig.yes => remove the SELECTED label from the contiguous blocks
-                targets.forEach(p -> gunLabels.remove(activeLabel, p));
-            } else if (!msg.isPickBlockModifierActive && msg.isClearModifierActive && msg.isContiguousModifierActive) {
-                // pick.no, clear.yes, contig.yes => remove ALL labels from the contiguous blocks
-                targets.forEach(gunLabels::removeAll);
-            } else if (msg.isPickBlockModifierActive && !msg.isClearModifierActive && msg.isContiguousModifierActive) {
-                // pick.yes, clear.no, contig.yes => collect all labels from contiguous blocks and pick the next label in the list to become active
-                Set<String> allLabels = new HashSet<>();
-                targets.forEach(p -> allLabels.addAll(gunLabels.getLabels(p)));
+            if (msg.isClearModifierActive) {
+                // we are removing labels
+                if (msg.isPickBlockModifierActive) {
 
-                if (!allLabels.isEmpty()) {
-                    var labelsList = new ArrayList<>(allLabels);
-                    labelsList.sort(Comparator.naturalOrder());
-                    var index = (labelsList.indexOf(activeLabel) + 1) % labelsList.size();
-                    var nextLabel = labelsList.get(index);
-                    LabelGunItem.setActiveLabel(stack, nextLabel);
+                    targets.forEach(p -> gunLabels.remove(activeLabel, p));
+                } else {
+                    targets.forEach(gunLabels::removeAll);
                 }
-            } else if (msg.isPickBlockModifierActive && !msg.isClearModifierActive && !msg.isContiguousModifierActive) {
-                // pick.yes, clear.no, contig.no => collect labels from just the target block and set the next label
-                var labels = new ArrayList<>(gunLabels.getLabels(pos));
-                labels.sort(Comparator.naturalOrder());
-                if (labels.isEmpty()) return;
-                var index = (labels.indexOf(activeLabel) + 1) % labels.size();
-                var nextLabel = labels.get(index);
-                LabelGunItem.setActiveLabel(stack, nextLabel);
-            } else if (!msg.isPickBlockModifierActive && !msg.isClearModifierActive && msg.isContiguousModifierActive) {
-                // pick.no, clear.no, contig.yes => collect contig blocks, if any missing label, make all blocks have label, otherwise remove label from all those blocks
-                if (!activeLabel.isEmpty()) {
-                    var existing = new HashSet<>(gunLabels.getPositions(activeLabel));
-                    boolean anyMissing = targets.stream().anyMatch(p -> !existing.contains(p));
+            } else {
+                if (msg.isPickBlockModifierActive) {
+                    // pick the next label in the list to become active
+                    Set<String> allLabels = new HashSet<>();
+                    targets.forEach(p -> allLabels.addAll(gunLabels.getLabels(p)));
 
-                    // apply or strip label from all positions
-                    if (anyMissing) {
-                        gunLabels.addAll(activeLabel, targets);
-                    } else {
-                        targets.forEach(p -> gunLabels.remove(activeLabel, p));
+                    if (!allLabels.isEmpty()) {
+                        var labelsList = new ArrayList<>(allLabels);
+                        labelsList.sort(Comparator.naturalOrder());
+                        var index = (labelsList.indexOf(activeLabel) + 1) % labelsList.size();
+                        var nextLabel = labelsList.get(index);
+                        LabelGunItem.setActiveLabel(stack, nextLabel);
+                    }
+                } else {
+                    // if any missing label, make all blocks have label, otherwise remove label from all those blocks
+                    if (!activeLabel.isEmpty()) {
+                        var existing = new HashSet<>(gunLabels.getPositions(activeLabel));
+                        boolean anyMissing = targets.stream().anyMatch(p -> !existing.contains(p));
+
+                        // apply or strip label from all positions
+                        if (anyMissing) {
+                            gunLabels.addAll(activeLabel, targets);
+                        } else {
+                            targets.forEach(p -> gunLabels.remove(activeLabel, p));
+                        }
                     }
                 }
-            } else if (!msg.isPickBlockModifierActive
-                       && !msg.isClearModifierActive
-                       && !msg.isContiguousModifierActive) {
-                // pick.no, clear.no, contig.no => toggle the label for just the target block
-                gunLabels.toggle(activeLabel, pos);
             }
 
             // write changes to label gun stack

@@ -12,6 +12,7 @@ NAME "Changelog"
 -- Add hotkeys for label gun clear behaviour (shift)
 -- Add hotkeys for label gun pull behaviour (shift)
 -- Add hotkeys for label gun target manager behaviour (label the manager instead of pushing)
+-- Fix contiguous label assignment not working on world load/when adjacent cables not noticed into network
 -- Add notification in chat when blocks are skipped with ctrl+click because they aren't touching cables
 -- Ensure programs with labels longer than the max fail to compile (since the max is maybe only checked when packets involved?)
 -- Silence mixin warnings
