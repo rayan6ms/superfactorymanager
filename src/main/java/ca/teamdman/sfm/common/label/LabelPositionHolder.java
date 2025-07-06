@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.common.program;
+package ca.teamdman.sfm.common.label;
 
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.CompressedBlockPosSet;
@@ -116,18 +116,6 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
         } else {
             return positionsForLabel.contains(pos);
         }
-    }
-
-    public LabelPositionHolder toggle(
-            String label,
-            BlockPos pos
-    ) {
-        if (contains(label, pos)) {
-            remove(label, pos);
-        } else {
-            add(label, pos);
-        }
-        return this;
     }
 
     public Set<BlockPos> getPositions(String label) {
