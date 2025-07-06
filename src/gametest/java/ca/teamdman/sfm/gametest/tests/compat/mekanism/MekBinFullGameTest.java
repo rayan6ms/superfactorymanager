@@ -29,16 +29,11 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 })
 @SFMGameTest
 public class MekBinFullGameTest extends SFMGameTestDefinition {
-
     @Override
     public String template() {
         return "3x2x1";
     }
 
-    @Override
-    public String batchName() {
-        return "mek";
-    }
 
     @Override
     public void run(SFMGameTestHelper helper) {

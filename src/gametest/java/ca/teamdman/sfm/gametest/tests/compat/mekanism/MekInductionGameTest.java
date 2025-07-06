@@ -41,11 +41,6 @@ public class MekInductionGameTest extends SFMGameTestDefinition {
     }
 
     @Override
-    public String batchName() {
-        return "mek";
-    }
-
-    @Override
     public void run(SFMGameTestHelper helper) {
         // designate positions
         var managerPos = new BlockPos(1, 3, 0);

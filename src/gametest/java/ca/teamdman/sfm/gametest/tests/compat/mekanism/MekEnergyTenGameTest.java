@@ -35,10 +35,6 @@ public class MekEnergyTenGameTest extends SFMGameTestDefinition {
         return "3x2x1";
     }
 
-    @Override
-    public String batchName() {
-        return "mek";
-    }
 
     @Override
     public void run(SFMGameTestHelper helper) {

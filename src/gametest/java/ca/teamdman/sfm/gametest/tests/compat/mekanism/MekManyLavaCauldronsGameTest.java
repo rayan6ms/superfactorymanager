@@ -38,10 +38,6 @@ public class MekManyLavaCauldronsGameTest extends SFMGameTestDefinition {
         return "25x3x25";
     }
 
-    @Override
-    public String batchName() {
-        return "mek";
-    }
 
     @Override
     public void run(SFMGameTestHelper helper) {

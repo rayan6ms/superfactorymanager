@@ -35,10 +35,6 @@ public class MekMultiFluidGameTest extends SFMGameTestDefinition {
         return "3x4x3";
     }
 
-    @Override
-    public String batchName() {
-        return "mek";
-    }
 
     @Override
     public void run(SFMGameTestHelper helper) {
