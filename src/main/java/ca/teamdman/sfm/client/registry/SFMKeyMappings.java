@@ -110,7 +110,7 @@ public class SFMKeyMappings {
             KeyConflictContext.IN_GAME,
             KeyModifier.NONE,
             InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_RIGHT_SHIFT,
+            GLFW.GLFW_KEY_LEFT_SHIFT,
             LocalizationKeys.SFM_KEY_CATEGORY.key().get()
     ));
 
