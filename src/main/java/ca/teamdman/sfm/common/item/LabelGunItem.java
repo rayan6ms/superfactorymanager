@@ -1,14 +1,14 @@
 package ca.teamdman.sfm.common.item;
 
 import ca.teamdman.sfm.client.ClientKeyHelpers;
+import ca.teamdman.sfm.client.ClientLabelGunWarningHelper;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.handler.LabelGunKeyMappingHandler;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunUsePacket;
-import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -116,13 +116,14 @@ public class LabelGunItem extends Item {
             UseOnContext ctx
     ) {
         var level = ctx.getLevel();
-        if (level.isClientSide && ctx.getPlayer() != null) {
+        Player player = ctx.getPlayer();
+        if (level.isClientSide && player != null) {
             boolean pickBlock = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_PICK_BLOCK_MODIFIER_KEY);
             boolean contiguous = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_CONTIGUOUS_MODIFIER_KEY);
             boolean clear = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_CLEAR_MODIFIER_KEY);
             boolean pull = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_PULL_MODIFIER_KEY);
             boolean targetManager = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_TARGET_MANAGER_MODIFIER_KEY);
-            SFMPackets.sendToServer(new ServerboundLabelGunUsePacket(
+            ServerboundLabelGunUsePacket msg = new ServerboundLabelGunUsePacket(
                     ctx.getHand(),
                     ctx.getClickedPos(),
                     contiguous,
@@ -130,7 +131,8 @@ public class LabelGunItem extends Item {
                     clear,
                     pull,
                     targetManager
-            ));
+            );
+            ClientLabelGunWarningHelper.sendLabelGunUsePacketFromClientWithConfirmationIfNecessary(msg, player);
             if (pickBlock) {
                 // we don't want to toggle the overlay if we're using pick-block
                 LabelGunKeyMappingHandler.setExternalDebounce();

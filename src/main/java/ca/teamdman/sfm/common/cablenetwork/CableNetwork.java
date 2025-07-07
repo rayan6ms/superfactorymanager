@@ -89,6 +89,7 @@ public class CableNetwork {
         }
     }
 
+    /// This assumes that the start position is a cable block
     public static Stream<BlockPos> discoverCables(
             Level level,
             @NotStored BlockPos startPos
