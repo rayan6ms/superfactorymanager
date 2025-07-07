@@ -18,6 +18,7 @@ public class SFMBlockStatesAndModels extends MCVersionAgnosticBlockStatesAndMode
         super(event, SFM.MOD_ID);
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Override
     protected void registerStatesAndModels() {
         simpleBlock(SFMBlocks.MANAGER_BLOCK.get(), models().cubeBottomTop(
