@@ -6,9 +6,9 @@ import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.diagnostics.SFMDiagnostics;
 import ca.teamdman.sfm.common.item.DiskItem;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.*;
-import ca.teamdman.sfm.common.program.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfml.ast.Program;
@@ -21,7 +21,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.ConfirmLinkScreen;
-import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.client.player.LocalPlayer;
@@ -29,9 +28,9 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
+import org.apache.logging.log4j.Level;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
-import org.apache.logging.log4j.Level;
 
 import java.text.DecimalFormat;
 import java.util.List;
@@ -271,9 +270,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                         .setSize(12, 14)
                         .setText(Component.literal("!"))
                         .setOnPress(button -> onDiagButtonClicked())
-                        .setTooltip(this, font, isReadOnly()
-                                                ? MANAGER_GUI_WARNING_BUTTON_TOOLTIP_READ_ONLY
-                                                : MANAGER_GUI_WARNING_BUTTON_TOOLTIP)
+                        .setTooltip(
+                                this, font, isReadOnly()
+                                            ? MANAGER_GUI_WARNING_BUTTON_TOOLTIP_READ_ONLY
+                                            : MANAGER_GUI_WARNING_BUTTON_TOOLTIP
+                        )
                         .build()
         );
         updateVisibilities();
@@ -325,20 +326,14 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
             performReset();
             return;
         }
-        ConfirmScreen confirmScreen = new ConfirmScreen(
-                proceed -> {
-                    SFMScreenChangeHelpers.popScreen(); // Close confirm screen
-                    if (proceed) {
-                        performReset();
-                    }
-                },
+        SFMScreenChangeHelpers.setOrPushScreen(new SFMConfirmationScreen(
+                this::performReset,
                 LocalizationKeys.MANAGER_RESET_CONFIRM_SCREEN_TITLE.getComponent(),
                 LocalizationKeys.MANAGER_RESET_CONFIRM_SCREEN_MESSAGE.getComponent(),
                 LocalizationKeys.MANAGER_RESET_CONFIRM_SCREEN_YES_BUTTON.getComponent(),
-                LocalizationKeys.MANAGER_RESET_CONFIRM_SCREEN_NO_BUTTON.getComponent()
-        );
-        SFMScreenChangeHelpers.setOrPushScreen(confirmScreen);
-        confirmScreen.setDelay(20);
+                LocalizationKeys.MANAGER_RESET_CONFIRM_SCREEN_NO_BUTTON.getComponent(),
+                20
+        ));
     }
 
     private void onRebuildButtonClicked() {
@@ -436,21 +431,14 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
             sendProgram(clipboardContents);
             return;
         }
-
-        ConfirmScreen confirmScreen = new ConfirmScreen(
-                proceed -> {
-                    SFMScreenChangeHelpers.popScreen(); // Close confirm screen
-                    if (proceed) {
-                        sendProgram(clipboardContents);
-                    }
-                },
+        SFMScreenChangeHelpers.setOrPushScreen(new SFMConfirmationScreen(
+                () -> sendProgram(clipboardContents),
                 LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_TITLE.getComponent(),
                 LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_MESSAGE.getComponent(),
                 LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_YES_BUTTON.getComponent(),
-                LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_NO_BUTTON.getComponent()
-        );
-        SFMScreenChangeHelpers.setOrPushScreen(confirmScreen);
-        confirmScreen.setDelay(20);
+                LocalizationKeys.MANAGER_PASTE_CONFIRM_SCREEN_NO_BUTTON.getComponent(),
+                20
+        ));
     }
 
     @MCVersionDependentBehaviour

@@ -3,7 +3,7 @@ package ca.teamdman.sfm.common.program.linting;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import ca.teamdman.sfm.common.item.DiskItem;
-import ca.teamdman.sfm.common.program.LabelPositionHolder;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlockCapabilities;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.network.chat.contents.TranslatableContents;

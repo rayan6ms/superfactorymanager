@@ -63,7 +63,7 @@ public record WaterNetwork(
                 if (!blockState.getOptionalValue(WaterTankBlock.IN_WATER).orElse(false)) return;
             }
             results.accept(blockEntity);
-            for (Direction d : SFMDirections.DIRECTIONS) {
+            for (Direction d : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
                 next.accept(current.offset(d.getNormal()));
             }
         }, start);
@@ -78,7 +78,7 @@ public record WaterNetwork(
             if (blockEntity == null) return;
             results.accept(blockEntity);
             BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
-            for (Direction d : SFMDirections.DIRECTIONS) {
+            for (Direction d : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
                 target.set(current).move(d);
                 next.accept(target.asLong());
             }
@@ -109,7 +109,7 @@ public record WaterNetwork(
         members.remove(pos.asLong());
         List<WaterNetwork> branches = new ArrayList<>();
         BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
-        for (Direction direction : SFMDirections.DIRECTIONS) {
+        for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
             target.set(pos).move(direction);
             long targetKey = target.asLong();
             if (!members.containsKey(targetKey)) continue;

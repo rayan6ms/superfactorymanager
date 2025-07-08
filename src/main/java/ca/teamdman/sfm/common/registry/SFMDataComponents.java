@@ -3,7 +3,7 @@ package ca.teamdman.sfm.common.registry;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.component.ItemStackBox;
 import ca.teamdman.sfm.common.item.LabelGunItem;
-import ca.teamdman.sfm.common.program.LabelPositionHolder;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.CompressedBlockPosSet;
 import com.mojang.serialization.Codec;
 import net.minecraft.core.component.DataComponentType;

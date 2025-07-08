@@ -4,20 +4,20 @@ import ca.teamdman.sfm.common.item.LabelGunItem;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.InteractionHand;
 
-public record ServerboundLabelGunUpdatePacket(
+public record ServerboundLabelGunSetActiveLabelPacket(
         String label,
         InteractionHand hand
 ) implements SFMPacket {
     public static final int MAX_LABEL_LENGTH = 256;
 
-    public static class Daddy implements SFMPacketDaddy<ServerboundLabelGunUpdatePacket> {
+    public static class Daddy implements SFMPacketDaddy<ServerboundLabelGunSetActiveLabelPacket> {
         @Override
         public PacketDirection getPacketDirection() {
             return PacketDirection.SERVERBOUND;
         }
         @Override
         public void encode(
-                ServerboundLabelGunUpdatePacket msg,
+                ServerboundLabelGunSetActiveLabelPacket msg,
                 RegistryFriendlyByteBuf buf
         ) {
             buf.writeUtf(msg.label, MAX_LABEL_LENGTH);
@@ -25,8 +25,8 @@ public record ServerboundLabelGunUpdatePacket(
         }
 
         @Override
-        public ServerboundLabelGunUpdatePacket decode(RegistryFriendlyByteBuf buf) {
-            return new ServerboundLabelGunUpdatePacket(
+        public ServerboundLabelGunSetActiveLabelPacket decode(RegistryFriendlyByteBuf buf) {
+            return new ServerboundLabelGunSetActiveLabelPacket(
                     buf.readUtf(MAX_LABEL_LENGTH),
                     buf.readEnum(InteractionHand.class)
             );
@@ -34,7 +34,7 @@ public record ServerboundLabelGunUpdatePacket(
 
         @Override
         public void handle(
-                ServerboundLabelGunUpdatePacket msg,
+                ServerboundLabelGunSetActiveLabelPacket msg,
                 SFMPacketHandlingContext context
         ) {
             var sender = context.sender();
@@ -48,8 +48,8 @@ public record ServerboundLabelGunUpdatePacket(
         }
 
         @Override
-        public Class<ServerboundLabelGunUpdatePacket> getPacketClass() {
-            return ServerboundLabelGunUpdatePacket.class;
+        public Class<ServerboundLabelGunSetActiveLabelPacket> getPacketClass() {
+            return ServerboundLabelGunSetActiveLabelPacket.class;
         }
     }
 
