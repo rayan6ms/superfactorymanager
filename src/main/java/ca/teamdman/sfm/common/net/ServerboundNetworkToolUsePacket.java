@@ -69,7 +69,7 @@ public record ServerboundNetworkToolUsePacket(
                 payload.append(state).append("\n");
 
                 List<CableNetwork> foundNetworks = new ArrayList<>();
-                for (Direction direction : SFMDirections.DIRECTIONS) {
+                for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
                     BlockPos cablePosition = pos.relative(direction);
                     CableNetworkManager
                             .getOrRegisterNetworkFromCablePosition(level, cablePosition)
@@ -107,11 +107,11 @@ public record ServerboundNetworkToolUsePacket(
                     }
                 }
 
-                Direction[] directions = new Direction[SFMDirections.DIRECTIONS.length + 1];
+                Direction[] directions = new Direction[SFMDirections.DIRECTIONS_WITHOUT_NULL.length + 1];
                 directions[0] = msg.blockFace;
                 directions[1] = null;
                 int assignmentIndex = 2;
-                for (Direction direction : SFMDirections.DIRECTIONS) {
+                for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
                     if (direction == msg.blockFace) continue;
                     directions[assignmentIndex++] = direction;
                 }

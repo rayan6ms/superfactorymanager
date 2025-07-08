@@ -194,7 +194,7 @@ public class WaterNetworkManager {
     ) {
         Set<WaterNetwork> rtn = new HashSet<>();
         BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
-        for (Direction direction : SFMDirections.DIRECTIONS) {
+        for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
             target.set(pos).move(direction);
             Optional<WaterNetwork> network = getNetwork(level, target);
             network.ifPresent(rtn::add);

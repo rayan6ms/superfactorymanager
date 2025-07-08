@@ -2,7 +2,7 @@ package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.item.LabelGunItem;
-import ca.teamdman.sfm.common.net.ServerboundLabelGunUpdatePacket;
+import ca.teamdman.sfm.common.net.ServerboundLabelGunSetActiveLabelPacket;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
@@ -27,7 +27,7 @@ public class LabelGunScrollSwitcher {
         if (!(gun.getItem() instanceof LabelGunItem)) return;
 
         var next = LabelGunItem.getNextLabel(gun, event.getScrollDeltaY() < 0 ? -1 : 1);
-        SFMPackets.sendToServer(new ServerboundLabelGunUpdatePacket(
+        SFMPackets.sendToServer(new ServerboundLabelGunSetActiveLabelPacket(
                 next,
                 hand
         ));
