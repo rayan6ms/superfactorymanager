@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.gametest.tests.compat.multiple;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
-import ca.teamdman.sfm.common.program.LabelPositionHolder;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -33,10 +33,6 @@ public class FluidTankRetainRegressionGameTest extends SFMGameTestDefinition {
         return "3x2x1";
     }
 
-    @Override
-    public String batchName() {
-        return "mek";
-    }
 
     @Override
     public void run(SFMGameTestHelper helper) {

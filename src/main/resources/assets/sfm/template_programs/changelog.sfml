@@ -1,8 +1,23 @@
 NAME "Changelog"
--- Official SFM Discord:
+-- SFM Discord:
 -- https://discord.gg/5mbUY3mu6m
--- Official SFM Donation Page:
--- https://ko-fi.com/teamdman
+-- SFM Donations:
+-- https://github.com/sponsors/TeamDman
+-- SFM submit new issue:
+-- https://github.com/TeamDman/SuperFactoryManager/issues/new
+
+
+---- vNext ----
+-- Add hotkeys for label gun contiguous behaviour (ctrl)
+-- Add hotkeys for label gun clear behaviour (shift)
+-- Add hotkeys for label gun pull behaviour (shift)
+-- Add hotkeys for label gun target manager behaviour (label the manager instead of pushing)
+-- Fix contiguous label assignment not working on world load/when adjacent cables not noticed into network
+-- Add notification in chat when blocks are skipped with ctrl+click because they aren't touching cables
+-- Ensure programs with labels longer than the max fail to compile (since the max is maybe only checked when packets involved?)
+-- Silence mixin warnings
+---- Thanks @Uncandango for the motivation!
+-- Clean up known_issues.sfml
 
 ---- 4.22.0 ----
 -- Thank you SpruceMist for the GitHub sponsorship <3
@@ -22,7 +37,7 @@ EVERY 20 TICKS DO
     INPUT RETAIN 300 FROM dank BOTTOM SIDE -- would refuse to pull, now fixed
     OUTPUT TO chest
 END
--- Fix label gun GUI text edit box limiting labels to 32 characters
+-- Fix label gun GUI text edit box limiting labels to 32 characters, fixes #147
 -- Increased max label length from 80 to 256
 -- VSCode extension improvements, thanks @Titop54 for the help <3
 -- Fix "/ by zero exception" in program edit screen

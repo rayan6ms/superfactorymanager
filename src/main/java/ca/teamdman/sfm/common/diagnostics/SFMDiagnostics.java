@@ -3,7 +3,7 @@ package ca.teamdman.sfm.common.diagnostics;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.diagnostics.SFMClientDiagnostics;
 import ca.teamdman.sfm.common.item.DiskItem;
-import ca.teamdman.sfm.common.program.LabelPositionHolder;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import net.minecraft.SharedConstants;
 import net.minecraft.world.item.ItemStack;
