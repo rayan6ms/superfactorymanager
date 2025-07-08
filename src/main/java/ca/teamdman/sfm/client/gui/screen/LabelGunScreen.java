@@ -1,12 +1,12 @@
 package ca.teamdman.sfm.client.gui.screen;
 
 import ca.teamdman.sfm.client.gui.widget.SFMButtonBuilder;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunClearPacket;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunCycleViewModePacket;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunPrunePacket;
-import ca.teamdman.sfm.common.net.ServerboundLabelGunUpdatePacket;
-import ca.teamdman.sfm.common.program.LabelPositionHolder;
+import ca.teamdman.sfm.common.net.ServerboundLabelGunSetActiveLabelPacket;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -50,7 +50,7 @@ public class LabelGunScreen extends Screen {
         ));
         this.labelField.setResponder(this::onTextUpdated);
         this.labelField.setSuggestion(LocalizationKeys.LABEL_GUN_GUI_LABEL_EDIT_PLACEHOLDER.getString());
-        this.labelField.setMaxLength(ServerboundLabelGunUpdatePacket.MAX_LABEL_LENGTH);
+        this.labelField.setMaxLength(ServerboundLabelGunSetActiveLabelPacket.MAX_LABEL_LENGTH);
         this.setInitialFocus(labelField);
         this.setFocused(labelField);
         this.labelField.setFocused(true);
@@ -110,7 +110,7 @@ public class LabelGunScreen extends Screen {
     }
 
     public void onDone() {
-        SFMPackets.sendToServer(new ServerboundLabelGunUpdatePacket(
+        SFMPackets.sendToServer(new ServerboundLabelGunSetActiveLabelPacket(
                 labelField.getValue(),
                 HAND
         ));

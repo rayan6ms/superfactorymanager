@@ -1,14 +1,14 @@
 package ca.teamdman.sfm.client;
 
+import ca.teamdman.sfm.client.gui.screen.SFMConfirmationScreen;
 import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
-import ca.teamdman.sfm.common.facade.FacadePlanWarning;
 import ca.teamdman.sfm.common.facade.FacadePlanner;
 import ca.teamdman.sfm.common.facade.IFacadePlan;
 import ca.teamdman.sfm.common.net.ServerboundFacadePacket;
 import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.util.ConfirmationParams;
 import ca.teamdman.sfm.common.util.SFMPlayerUtils;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.ConfirmScreen;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 
@@ -27,30 +27,23 @@ public class ClientFacadeWarningHelper {
                 msg
         );
         if (facadePlan == null) return;
-        FacadePlanWarning warning = facadePlan.computeWarning(level);
+        ConfirmationParams warning = facadePlan.computeWarning(level);
         if (warning == null) {
             // No confirmation necessary for single updates
             SFMPackets.sendToServer(msg);
             // Perform eager update
             facadePlan.apply(level);
         } else {
-            ConfirmScreen confirmScreen = new ConfirmScreen(
-                    (confirmed) -> {
-                        SFMScreenChangeHelpers.popScreen(); // Close confirm screen
-                        if (confirmed) {
-                            // Send packet
-                            SFMPackets.sendToServer(msg);
-                            // Perform eager update
-                            facadePlan.apply(level);
-                        }
-                    },
-                    warning.confirmTitle(),
-                    warning.confirmMessage(),
-                    warning.confirmYes(),
-                    warning.confirmNo()
-            );
-            SFMScreenChangeHelpers.setOrPushScreen(confirmScreen);
-            confirmScreen.setDelay(10);
+            SFMScreenChangeHelpers.setOrPushScreen(new SFMConfirmationScreen(
+                    warning,
+                    10,
+                    () -> {
+                        // Send packet
+                        SFMPackets.sendToServer(msg);
+                        // Perform eager update
+                        facadePlan.apply(level);
+                    }
+            ));
         }
     }
 }

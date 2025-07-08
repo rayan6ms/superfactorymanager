@@ -3,7 +3,7 @@ package ca.teamdman.sfml;
 import ca.teamdman.langs.SFMLLexer;
 import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfm.common.config.SFMClientProgramEditorConfig;
-import ca.teamdman.sfm.common.program.LabelPositionHolder;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.SFMDisplayUtils;
 import ca.teamdman.sfml.ast.ASTNode;
 import ca.teamdman.sfml.ast.Program;

@@ -145,7 +145,7 @@ public class CableNetworkManager {
 
         {
             BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
-            for (Direction direction : SFMDirections.DIRECTIONS) {
+            for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
                 target.set(pos).move(direction);
                 Optional<CableNetwork> found = getNetworkFromCablePosition(level, target);
                 if (found.isPresent()) {
@@ -196,7 +196,7 @@ public class CableNetworkManager {
                 (current, next, results) -> {
                     results.accept(current);
                     BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
-                    for (Direction d : SFMDirections.DIRECTIONS) {
+                    for (Direction d : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
                         target.set(current).move(d);
                         if (CableNetwork.isCable(rtn.getLevel(), target) && !rtn.containsCablePosition(target)) {
                             next.accept(target.immutable());
