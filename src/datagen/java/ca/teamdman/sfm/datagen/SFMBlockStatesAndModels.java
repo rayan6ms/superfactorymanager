@@ -19,6 +19,7 @@ public class SFMBlockStatesAndModels extends MCVersionAgnosticBlockStatesAndMode
         super(event, SFM.MOD_ID);
     }
 
+    @SuppressWarnings("DataFlowIssue")
     @Override
     protected void registerStatesAndModels() {
         simpleBlock(SFMBlocks.MANAGER_BLOCK.get(), models().cubeBottomTop(
@@ -167,7 +168,7 @@ public class SFMBlockStatesAndModels extends MCVersionAgnosticBlockStatesAndMode
                 .end();
 
         // Parts (connections)
-        for (Direction direction : SFMDirections.DIRECTIONS) {
+        for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
             var rotX = 0;
             var rotY = 0;
 

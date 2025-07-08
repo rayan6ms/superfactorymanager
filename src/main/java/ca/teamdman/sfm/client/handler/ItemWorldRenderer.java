@@ -4,7 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.gui.screen.SFMFontUtils;
 import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.item.NetworkToolItem;
-import ca.teamdman.sfm.common.program.LabelPositionHolder;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.HelpsWithMinecraftVersionIndependence;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMARGBColorUtils;
@@ -485,7 +485,7 @@ public class ItemWorldRenderer {
                 poseStack.pushPose();
                 poseStack.translate(blockPos.getX(), blockPos.getY(), blockPos.getZ());
                 Matrix4f matrix4f = poseStack.last().pose();
-                for (Direction face : SFMDirections.DIRECTIONS) {
+                for (Direction face : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
                     if (!positions.contains(blockPos.relative(face))) {
                         writeFaceVertices(bufferBuilder, matrix4f, face, r, g, b, a);
                     }

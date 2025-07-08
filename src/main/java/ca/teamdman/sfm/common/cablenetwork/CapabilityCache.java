@@ -71,7 +71,7 @@ public class CapabilityCache {
                 BlockCapability<?, @Nullable Direction> capKind = e.getKey();
 
                 var dirMap = e.getValue();
-                for (Direction direction : SFMDirections.DIRECTIONS) {
+                for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
                     BlockCapabilityCache<?, @Nullable Direction> cap = dirMap.get(direction);
                     if (cap != null) {
                         putCapability(BlockPos.of(pos), (BlockCapability) capKind, direction, cap);

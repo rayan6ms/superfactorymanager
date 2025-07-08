@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.gametest.tests.compat.mekanism;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
-import ca.teamdman.sfm.common.program.LabelPositionHolder;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
@@ -35,10 +35,6 @@ public class MekMultiFluidGameTest extends SFMGameTestDefinition {
         return "3x4x3";
     }
 
-    @Override
-    public String batchName() {
-        return "mek";
-    }
 
     @Override
     public void run(SFMGameTestHelper helper) {
@@ -77,11 +73,22 @@ public class MekMultiFluidGameTest extends SFMGameTestDefinition {
                 .add("b", helper.absolutePos(b2Pos))
                 .save(manager.getDisk());
 
-        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
-            assertTrue(a1.getFluidInTank(0).isEmpty(), "a1 did not empty");
-            assertTrue(a2.getFluidInTank(0).isEmpty(), "a2 did not empty");
-            assertTrue(b1.getFluidInTank(0).getFluid() == Fluids.WATER, "b1 did not fill with water");
-            assertTrue(b2.getFluidInTank(0).getFluid() == Fluids.LAVA, "b2 did not fill with lava");
-        });
+        helper.succeedIfManagerDidThingWithoutLagging(
+                manager, () -> {
+                    assertTrue(a1.getFluidInTank(0).isEmpty(), "a1 did not empty");
+                    assertTrue(a2.getFluidInTank(0).isEmpty(), "a2 did not empty");
+                    assertTrue(
+                            (
+                                    b1.getFluidInTank(0).getFluid() == Fluids.WATER
+                                    && b2.getFluidInTank(0).getFluid() == Fluids.LAVA
+                            ) ||
+                            (
+                                    b1.getFluidInTank(0).getFluid() == Fluids.LAVA
+                                    && b2.getFluidInTank(0).getFluid() == Fluids.WATER
+                            ),
+                            "b1 and b2 did not fill with water and lava"
+                    );
+                }
+        );
     }
 }

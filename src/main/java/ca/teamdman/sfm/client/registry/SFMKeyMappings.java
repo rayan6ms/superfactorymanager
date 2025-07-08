@@ -68,6 +68,23 @@ public class SFMKeyMappings {
             LocalizationKeys.SFM_KEY_CATEGORY.key().get()
     ));
 
+    public static final Lazy<KeyMapping> LABEL_GUN_CONTIGUOUS_MODIFIER_KEY = Lazy.of(() -> new KeyMapping(
+            LocalizationKeys.LABEL_GUN_CONTIGUOUS_MODIFIER_KEY.key().get(),
+            KeyConflictContext.IN_GAME,
+            KeyModifier.NONE,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_LEFT_CONTROL,
+            LocalizationKeys.SFM_KEY_CATEGORY.key().get()
+    ));
+
+    public static final Lazy<KeyMapping> LABEL_GUN_CLEAR_MODIFIER_KEY = Lazy.of(() -> new KeyMapping(
+            LocalizationKeys.LABEL_GUN_CLEAR_MODIFIER_KEY.key().get(),
+            KeyConflictContext.IN_GAME,
+            KeyModifier.NONE,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_LEFT_SHIFT,
+            LocalizationKeys.SFM_KEY_CATEGORY.key().get()
+    ));
 
     public static final Lazy<KeyMapping> LABEL_GUN_NEXT_LABEL_KEY = Lazy.of(() -> new KeyMapping(
             LocalizationKeys.LABEL_GUN_NEXT_LABEL_KEY.key().get(),
@@ -87,6 +104,26 @@ public class SFMKeyMappings {
             LocalizationKeys.SFM_KEY_CATEGORY.key().get()
     ));
 
+    // New: Label Gun Pull Modifier Key
+    public static final Lazy<KeyMapping> LABEL_GUN_PULL_MODIFIER_KEY = Lazy.of(() -> new KeyMapping(
+            LocalizationKeys.LABEL_GUN_PULL_MODIFIER_KEY.key().get(),
+            KeyConflictContext.IN_GAME,
+            KeyModifier.NONE,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_LEFT_SHIFT,
+            LocalizationKeys.SFM_KEY_CATEGORY.key().get()
+    ));
+
+    public static final Lazy<KeyMapping> LABEL_GUN_TARGET_MANAGER_MODIFIER_KEY = Lazy.of(() -> new KeyMapping(
+            LocalizationKeys.LABEL_GUN_TARGET_MANAGER_MODIFIER_KEY.key().get(),
+            KeyConflictContext.IN_GAME,
+            KeyModifier.NONE,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_RIGHT_ALT,
+            LocalizationKeys.SFM_KEY_CATEGORY.key().get()
+    ));
+
+
     @SubscribeEvent
     public static void registerBindings(RegisterKeyMappingsEvent event) {
         event.register(MORE_INFO_TOOLTIP_KEY.get());
@@ -94,7 +131,11 @@ public class SFMKeyMappings {
         event.register(ITEM_INSPECTOR_KEY.get());
         event.register(CYCLE_LABEL_VIEW_KEY.get());
         event.register(LABEL_GUN_PICK_BLOCK_MODIFIER_KEY.get());
+        event.register(LABEL_GUN_CONTIGUOUS_MODIFIER_KEY.get());
+        event.register(LABEL_GUN_CLEAR_MODIFIER_KEY.get());
+        event.register(LABEL_GUN_PULL_MODIFIER_KEY.get()); // Register new key
         event.register(LABEL_GUN_NEXT_LABEL_KEY.get());
         event.register(LABEL_GUN_PREVIOUS_LABEL_KEY.get());
+        event.register(LABEL_GUN_TARGET_MANAGER_MODIFIER_KEY.get());
     }
 }

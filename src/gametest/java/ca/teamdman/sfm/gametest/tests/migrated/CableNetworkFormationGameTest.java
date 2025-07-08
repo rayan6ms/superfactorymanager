@@ -124,14 +124,14 @@ public class CableNetworkFormationGameTest extends SFMGameTestDefinition {
 
         // create a new network in a plus shape
         helper.setBlock(new BlockPos(15, 2, 15), SFMBlocks.CABLE_BLOCK.get());
-        for (Direction value : SFMDirections.DIRECTIONS) {
+        for (Direction value : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
             helper.setBlock(new BlockPos(15, 2, 15).relative(value), SFMBlocks.CABLE_BLOCK.get());
         }
         // should all be on the same network
         net = CableNetworkManager
                 .getOrRegisterNetworkFromCablePosition(helper.getLevel(), helper.absolutePos(new BlockPos(15, 2, 15)))
                 .get();
-        for (Direction value : SFMDirections.DIRECTIONS) {
+        for (Direction value : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
             assertTrue(CableNetworkManager
                                .getOrRegisterNetworkFromCablePosition(
                                        helper.getLevel(),
@@ -151,7 +151,7 @@ public class CableNetworkFormationGameTest extends SFMGameTestDefinition {
                            )
                            .isEmpty(), "Network should not be present where the cable was removed from");
         var networks = new ArrayList<CableNetwork>();
-        for (Direction value : SFMDirections.DIRECTIONS) {
+        for (Direction value : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
             networks.add(CableNetworkManager
                                  .getOrRegisterNetworkFromCablePosition(
                                          helper.getLevel(),
@@ -173,7 +173,7 @@ public class CableNetworkFormationGameTest extends SFMGameTestDefinition {
         net = CableNetworkManager
                 .getOrRegisterNetworkFromCablePosition(helper.getLevel(), helper.absolutePos(new BlockPos(15, 2, 15)))
                 .get();
-        for (Direction value : SFMDirections.DIRECTIONS) {
+        for (Direction value : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
             assertTrue(CableNetworkManager
                                .getOrRegisterNetworkFromCablePosition(
                                        helper.getLevel(),

@@ -35,7 +35,7 @@ public abstract class SFMGameTestDefinition {
     public TestFunction intoTestFunction() {
         return new TestFunction(
                 this.batchName(),
-                "new_" + this.testName(), // TODO: remove prefix
+                this.testName(),
                 this.templateModId() + ":" + this.template(),
                 Rotation.NONE,
                 this.maxTicks(),
