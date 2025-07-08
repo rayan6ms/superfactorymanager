@@ -69,7 +69,7 @@ public class CapabilityCache {
                 Capability<?> capKind = e.getKey();
 
                 var dirMap = e.getValue();
-                for (Direction direction : SFMDirections.DIRECTIONS) {
+                for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
                     LazyOptional<?> cap = dirMap.get(direction);
                     if (cap != null) {
                         putCapability(BlockPos.of(pos), (Capability) capKind, direction, cap);

@@ -11,7 +11,7 @@ public class SFMDelegatedTestFunction extends TestFunction {
         // satisfy default constructor, we override all getters anyway
         super(
                 definition.batchName(),
-                "new_" + definition.testName(), // TODO: remove prefix
+                definition.testName(),
                 definition.templateModId() + ":" + definition.template(),
                 Rotation.NONE,
                 definition.maxTicks(),
@@ -31,7 +31,7 @@ public class SFMDelegatedTestFunction extends TestFunction {
 
     @Override
     public String getTestName() {
-        return "new_" + definition.testName(); // TODO: remove prefix
+        return definition.testName();
     }
 
     @Override

@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.util;
 
 import ca.teamdman.sfm.common.config.SFMClientProgramEditorConfig;
 import ca.teamdman.sfm.common.config.SFMConfig;
-import ca.teamdman.sfm.common.program.LabelPositionHolder;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfml.ast.ASTNode;
 import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;

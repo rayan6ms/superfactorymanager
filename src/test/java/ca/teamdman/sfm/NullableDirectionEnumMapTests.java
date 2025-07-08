@@ -27,7 +27,7 @@ public class NullableDirectionEnumMapTests {
         map = new SFMDirections.NullableDirectionEnumMap<>();
         map.put(null, "hi");
         assertEquals("hi", map.get(null));
-        for (Direction direction : SFMDirections.DIRECTIONS) {
+        for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
             assertNull(map.get(direction));
         }
     }
