@@ -1,5 +1,8 @@
 For cleaning up when the `/test clear` didn't finish the job
-/fill ~-22 ~ ~-22 ~22 ~5 ~22 air
+/fill ~-33 ~ ~-33 ~33 ~5 ~33 air
+
+For fixing grass
+/fill ~-60 ~-1 ~-60 ~60 ~ ~60 grass_block replace dirt
 
 For deleting dropped entities
 /kill @e[type=!minecraft:player]

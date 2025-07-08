@@ -5,7 +5,7 @@ import ca.teamdman.sfm.client.ClientKeyHelpers;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunCycleViewModePacket;
-import ca.teamdman.sfm.common.net.ServerboundLabelGunUpdatePacket;
+import ca.teamdman.sfm.common.net.ServerboundLabelGunSetActiveLabelPacket;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMHandUtils;
@@ -48,7 +48,7 @@ public class LabelGunKeyMappingHandler {
             var labelGun = SFMHandUtils.getItemAndHand(player, SFMItems.LABEL_GUN_ITEM.get());
             if (labelGun == null) return;
             var nextLabel = LabelGunItem.getNextLabel(labelGun.stack(), prevLabelKeyDown ? -1 : 1);
-            SFMPackets.sendToServer(new ServerboundLabelGunUpdatePacket(nextLabel, labelGun.hand()));
+            SFMPackets.sendToServer(new ServerboundLabelGunSetActiveLabelPacket(nextLabel, labelGun.hand()));
         }
     }
 

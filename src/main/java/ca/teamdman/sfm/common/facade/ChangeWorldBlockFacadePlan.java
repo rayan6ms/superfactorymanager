@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.block.IFacadableBlock;
 import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.util.ConfirmationParams;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -69,12 +70,12 @@ public record ChangeWorldBlockFacadePlan(
     }
 
     @Override
-    public @Nullable FacadePlanWarning computeWarning(
+    public @Nullable ConfirmationParams computeWarning(
             Level level
     ) {
         FacadePlanAnalysisResult analysisResult = FacadePlanAnalysisResult.analyze(level, positions);
         if (analysisResult.shouldWarn()) {
-            return FacadePlanWarning.of(
+            return ConfirmationParams.of(
                     LocalizationKeys.FACADE_CONFIRM_CHANGE_WORLD_BLOCK_SCREEN_TITLE.getComponent(),
                     LocalizationKeys.FACADE_CONFIRM_CHANGE_WORLD_BLOCK_SCREEN_MESSAGE.getComponent(
                             analysisResult.countAffected()
