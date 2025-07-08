@@ -1,7 +1,7 @@
 package ca.teamdman.sfm;
 
 import ca.teamdman.sfm.client.gui.screen.ProgramEditorScreen;
-import ca.teamdman.sfm.common.program.LabelPositionHolder;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfml.ast.*;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;

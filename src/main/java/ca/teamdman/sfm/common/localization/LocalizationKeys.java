@@ -40,6 +40,22 @@ public final class LocalizationKeys {
             "gui.sfm.save_changes_confirm.no_button",
             "Continue editing"
     );
+    public static final LocalizationEntry REMOVE_ACTIVE_LABEL_CONFIRM_SCREEN_TITLE = new LocalizationEntry(
+            "gui.sfm.remove_active_label_confirm.title",
+            "Remove label: %s"
+    );
+    public static final LocalizationEntry REMOVE_ACTIVE_LABEL_CONFIRM_SCREEN_MESSAGE = new LocalizationEntry(
+            "gui.sfm.remove_active_label_confirm.message",
+            "Are you sure you want to remove the label \"%s\" from %d blocks?"
+    );
+    public static final LocalizationEntry REMOVE_ALL_LABELS_CONFIRM_SCREEN_TITLE = new LocalizationEntry(
+            "gui.sfm.remove_all_labels_confirm.title",
+            "Remove ALL labels"
+    );
+    public static final LocalizationEntry REMOVE_ALL_LABELS_CONFIRM_SCREEN_MESSAGE = new LocalizationEntry(
+            "gui.sfm.remove_all_labels_confirm.message",
+            "Are you sure you want to remove %d labels from %d blocks?"
+    );
     public static final LocalizationEntry MANAGER_RESET_CONFIRM_SCREEN_TITLE = new LocalizationEntry(
             "gui.sfm.manager.reset_confirm_screen.title",
             "Reset disk?"
@@ -224,6 +240,10 @@ public final class LocalizationKeys {
     public static final LocalizationEntry LABEL_GUN_CHAT_PUSHED = new LocalizationEntry(
             () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".chat.pushed",
             () -> "Pushed labels to the manager."
+    );
+    public static final LocalizationEntry LABEL_GUN_CHAT_SKIPPED_BLOCKS = new LocalizationEntry(
+            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".chat.skipped_blocks",
+            () -> "Skipped %d blocks not touching cables"
     );
     public static final LocalizationEntry NETWORK_TOOL_ITEM_TOOLTIP_1 = new LocalizationEntry(
             () -> SFMItems.NETWORK_TOOL_ITEM.get().getDescriptionId() + ".tooltip.1",
@@ -845,6 +865,14 @@ public final class LocalizationKeys {
             "key.sfm.label_gun.pick_block_modifier",
             "Label Gun Pick Block Modifier"
     );
+    public static final LocalizationEntry LABEL_GUN_CONTIGUOUS_MODIFIER_KEY = new LocalizationEntry(
+            "key.sfm.label_gun.contiguous_modifier",
+            "Label Gun Contiguous Modifier"
+    );
+    public static final LocalizationEntry LABEL_GUN_CLEAR_MODIFIER_KEY = new LocalizationEntry(
+            "key.sfm.label_gun.clear_modifier",
+            "Label Gun Clear Modifier"
+    );
     public static final LocalizationEntry LABEL_GUN_NEXT_LABEL_KEY = new LocalizationEntry(
             "key.sfm.label_gun.next_label",
             "Label Gun Next Label"
@@ -852,6 +880,14 @@ public final class LocalizationKeys {
     public static final LocalizationEntry LABEL_GUN_PREVIOUS_LABEL_KEY = new LocalizationEntry(
             "key.sfm.label_gun.previous_label",
             "Label Gun Previous Label"
+    );
+    public static final LocalizationEntry LABEL_GUN_PULL_MODIFIER_KEY = new LocalizationEntry(
+            "key.sfm.label_gun.pull_modifier",
+            "Label Gun Pull Modifier"
+    );
+    public static final LocalizationEntry LABEL_GUN_TARGET_MANAGER_MODIFIER_KEY = new LocalizationEntry(
+            "key.sfm.label_gun.target_manager_modifier",
+            "Label Gun Target Manager Modifier"
     );
     public static final LocalizationEntry SFM_KEY_CATEGORY = new LocalizationEntry(
             "key.categories.sfm",
