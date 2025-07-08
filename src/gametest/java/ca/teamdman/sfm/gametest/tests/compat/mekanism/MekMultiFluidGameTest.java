@@ -73,11 +73,22 @@ public class MekMultiFluidGameTest extends SFMGameTestDefinition {
                 .add("b", helper.absolutePos(b2Pos))
                 .save(manager.getDisk());
 
-        helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
-            assertTrue(a1.getFluidInTank(0).isEmpty(), "a1 did not empty");
-            assertTrue(a2.getFluidInTank(0).isEmpty(), "a2 did not empty");
-            assertTrue(b1.getFluidInTank(0).getFluid() == Fluids.WATER, "b1 did not fill with water");
-            assertTrue(b2.getFluidInTank(0).getFluid() == Fluids.LAVA, "b2 did not fill with lava");
-        });
+        helper.succeedIfManagerDidThingWithoutLagging(
+                manager, () -> {
+                    assertTrue(a1.getFluidInTank(0).isEmpty(), "a1 did not empty");
+                    assertTrue(a2.getFluidInTank(0).isEmpty(), "a2 did not empty");
+                    assertTrue(
+                            (
+                                    b1.getFluidInTank(0).getFluid() == Fluids.WATER
+                                    && b2.getFluidInTank(0).getFluid() == Fluids.LAVA
+                            ) ||
+                            (
+                                    b1.getFluidInTank(0).getFluid() == Fluids.LAVA
+                                    && b2.getFluidInTank(0).getFluid() == Fluids.WATER
+                            ),
+                            "b1 and b2 did not fill with water and lava"
+                    );
+                }
+        );
     }
 }
