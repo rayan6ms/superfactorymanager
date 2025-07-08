@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.common.program;
+package ca.teamdman.sfm.common.label;
 
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.CompressedBlockPosSet;
@@ -33,9 +33,10 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
      * <p>
      * Saves it in the cache for faster future lookups.
      * <p>
-     * This mutably borrows the cache entry.
+     * This mutably borrows the cache entry. Call toOwned if you want a copy you can modify without affecting the cache.
      */
     public static LabelPositionHolder from(ItemStack stack) {
+        // TODO: make this return an immutable copy instead of mutably borrowing the cache entry
         return CACHE.computeIfAbsent(stack, s -> {
             var tag = stack.getOrCreateTag().getCompound("sfm:labels");
             return deserialize(tag);
@@ -118,18 +119,6 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
         }
     }
 
-    public LabelPositionHolder toggle(
-            String label,
-            BlockPos pos
-    ) {
-        if (contains(label, pos)) {
-            remove(label, pos);
-        } else {
-            add(label, pos);
-        }
-        return this;
-    }
-
     public Set<BlockPos> getPositions(String label) {
         return labels().getOrDefault(label, new HashSet<>());
     }
@@ -142,6 +131,7 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
             String label,
             Collection<BlockPos> positions
     ) {
+        if (label.isBlank()) return this;
         getPositionsMut(label).addAll(positions);
         return this;
     }
@@ -195,6 +185,7 @@ public record LabelPositionHolder(Map<String, HashSet<BlockPos>> labels) {
             String label,
             BlockPos position
     ) {
+        if (label.isBlank()) return this;
         getPositionsMut(label).add(position);
         return this;
     }
