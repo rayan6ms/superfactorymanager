@@ -15,7 +15,6 @@ use tracing::info;
 
 #[derive(Debug, Serialize, Deserialize, Clone, PartialEq, Default)]
 pub struct TranslationHelperConfig {
-    pub translation_file_paths: Vec<PathBuf>,
     pub root_dir: Option<PathBuf>,
 }
 
@@ -58,11 +57,6 @@ enum Commands {
 enum FileCommands {
     /// List translation files
     List,
-    /// Add a new translation file
-    Add {
-        /// Path to the translation file to add
-        path: PathBuf,
-    },
 }
 
 #[derive(Subcommand)]
@@ -266,9 +260,6 @@ async fn main() -> eyre::Result<()> {
             FileCommands::List => {
                 list_translation_files().await?;
             }
-            FileCommands::Add { path } => {
-                add_translation_file(path).await?;
-            }
         },
         Commands::Config { config_command } => match config_command {
             ConfigCommands::Show => {
@@ -325,20 +316,6 @@ async fn list_translation_files() -> eyre::Result<()> {
     Ok(())
 }
 
-async fn add_translation_file(path: PathBuf) -> eyre::Result<()> {
-    let mut config = TranslationHelperConfig::load().await?;
-
-    if config.translation_file_paths.contains(&path) {
-        println!("Translation file already exists: {}", path.display());
-    } else {
-        config.translation_file_paths.push(path.clone());
-        config.save().await?;
-        println!("Added translation file: {}", path.display());
-        info!("Translation file added successfully");
-    }
-
-    Ok(())
-}
 
 async fn set_root_directory(path: PathBuf) -> eyre::Result<()> {
     let mut config = TranslationHelperConfig::load().await?;
