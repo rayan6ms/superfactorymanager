@@ -1,0 +1,16 @@
+[package]
+name = "translation_helper"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+clap = { version = "4.5", features = ["derive"] }
+eye_config = "0.5.2"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+tokio = { version = "1.0", features = ["full"] }
+color-eyre = "0.6"
+eyre = "0.6"
+tracing = "0.1"
+git2 = "0.18"
+holda = "0.1.0"
