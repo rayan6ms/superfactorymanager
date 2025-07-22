@@ -1,7 +1,7 @@
 use holda::Holda;
 use std::path::PathBuf;
 
-use crate::language_file::LanguageFilePath;
+use crate::language_file_path::LanguageFilePath;
 
 #[derive(Holda)]
 #[holda(NoDisplay)]

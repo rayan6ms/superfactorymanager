@@ -37,6 +37,8 @@ pub enum Command {
 pub enum FileCommands {
     /// List translation files
     List,
+    /// Validates assumptions about translation files
+    Check,
 }
 
 #[derive(Subcommand)]

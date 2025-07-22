@@ -1,45 +1,29 @@
-use crate::source_set_path::SourceSetPath;
-use holda::Holda;
-use std::path::PathBuf;
-use tracing::debug;
+use crate::game_version::GameVersion;
+use crate::language_file_path::LanguageFilePath;
+use eyre::Context;
+use std::collections::HashMap;
+use std::fs;
+use std::path::Path;
 
-#[derive(Holda)]
-#[holda(NoDisplay)]
-pub struct LanguageFilePath {
-    inner: PathBuf,
+pub struct LanguageFile {
+    pub path: LanguageFilePath,
+    pub contents: HashMap<String, String>,
 }
-impl std::fmt::Display for LanguageFilePath {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{}", self.inner.display())
+impl LanguageFile {
+    pub fn load_from_path(path: LanguageFilePath) -> eyre::Result<Self> {
+        let contents = fs::read_to_string(path.as_path())
+            .wrap_err_with(|| format!("Failed to read language file: {}", path.display()))?;
+        let contents = serde_json::from_str(&contents)
+            .wrap_err_with(|| format!("Failed to parse language file: {}", path.display()))?;
+        Ok(Self { path, contents })
     }
-}
-
-impl LanguageFilePath {
-    pub fn discover_in_source_set(
-        source_set_path: &SourceSetPath,
-    ) -> eyre::Result<Vec<LanguageFilePath>> {
-        let mut paths = Vec::new();
-        let lang_dir = source_set_path.join(r"resources\assets\sfm\lang\");
-        let entries = match std::fs::read_dir(&lang_dir) {
-            Ok(entries) => entries,
-            Err(e) => {
-                debug!(
-                    "Failed to read language directory, probably doesn't exist for this source set\n{:?}\n{}",
-                    lang_dir.display(),
-                    e
-                );
-                return Ok(paths);
-            }
-        };
-        for entry in entries {
-            let entry = entry?;
-            if entry.file_type()?.is_file() {
-                let path = entry.path();
-                if path.extension().map(|e| e == "json").unwrap_or(false) {
-                    paths.push(LanguageFilePath { inner: path });
-                }
-            }
+    pub fn discover_in_root_dir(root_dir: &Path) -> eyre::Result<Vec<(LanguageFile, GameVersion)>> {
+        let language_files = LanguageFilePath::discover_in_root_dir(root_dir)?;
+        let mut files = Vec::new();
+        for (path, game_version) in language_files {
+            let file = LanguageFile::load_from_path(path)?;
+            files.push((file, game_version));
         }
-        Ok(paths)
+        Ok(files)
     }
 }

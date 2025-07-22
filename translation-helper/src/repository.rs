@@ -5,12 +5,10 @@ use eyre::Context;
 use eyre::bail;
 use git2::Repository;
 use std::fs;
-use std::path::PathBuf;
+use std::path::Path;
 use std::str::FromStr;
 
-pub async fn discover_repositories(
-    root_dir: PathBuf,
-) -> eyre::Result<Vec<(RepoPath, GameVersion)>> {
+pub fn discover_repositories(root_dir: &Path) -> eyre::Result<Vec<(RepoPath, GameVersion)>> {
     let mut repos: Vec<(RepoPath, CheckedOutBranch)> = Vec::new();
 
     if !root_dir.exists() {

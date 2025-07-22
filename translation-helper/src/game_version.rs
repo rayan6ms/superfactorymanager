@@ -3,6 +3,7 @@ use serde::Deserialize;
 use serde::Serialize;
 use std::str::FromStr;
 
+#[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub struct GameVersion {
     pub major: u16,
     pub minor: u16,
