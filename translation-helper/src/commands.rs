@@ -10,6 +10,7 @@ use crate::repository::discover_repositories;
 use crate::source_set::SourceSet;
 use eye_config::persistable_state::PersistableState;
 use itertools::Itertools;
+use serde_json::json;
 use std::collections::HashSet;
 use std::env;
 use tracing::info;
@@ -85,7 +86,15 @@ pub async fn handle_command(command: Command) -> eyre::Result<()> {
         Command::Repo { repo_command } => match repo_command {
             RepoCommands::List => {
                 let root_dir = get_root_dir().await?;
-                let repos = discover_repositories(&root_dir)?;
+                let repos = discover_repositories(&root_dir)?
+                    .into_iter()
+                    .map(|(repo, game_version)| {
+                        json!({
+                            "repo_path": repo,
+                            "game_version": game_version
+                        })
+                    })
+                    .collect::<Vec<_>>();
                 info!("Discovered {} repos", repos.len());
                 let json_output = serde_json::to_string_pretty(&repos)?;
                 println!("{json_output}");
