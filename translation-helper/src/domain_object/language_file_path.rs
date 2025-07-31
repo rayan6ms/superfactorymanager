@@ -1,7 +1,7 @@
-use crate::game_version::GameVersion;
-use crate::repository::discover_repositories;
-use crate::source_set::SourceSet;
-use crate::source_set_path::SourceSetPath;
+use crate::domain_object::game_version::GameVersion;
+use crate::domain_object::repository::discover_repositories;
+use crate::domain_object::source_set::SourceSet;
+use crate::domain_object::source_set_path::SourceSetPath;
 use holda::Holda;
 use std::path::{Path, PathBuf};
 use tracing::debug;

@@ -1,6 +1,6 @@
-use crate::checked_out_branch::CheckedOutBranch;
-use crate::game_version::GameVersion;
-use crate::repo_path::RepoPath;
+use crate::domain_object::checked_out_branch::CheckedOutBranch;
+use crate::domain_object::game_version::GameVersion;
+use crate::domain_object::repo_path::RepoPath;
 use eyre::Context;
 use eyre::bail;
 use git2::Repository;

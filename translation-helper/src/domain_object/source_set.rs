@@ -1,5 +1,5 @@
-use crate::repo_path::RepoPath;
-use crate::source_set_path::SourceSetPath;
+use crate::domain_object::repo_path::RepoPath;
+use crate::domain_object::source_set_path::SourceSetPath;
 use eyre::Context;
 use serde::Deserialize;
 use serde::Serialize;

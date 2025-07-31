@@ -11,15 +11,16 @@ pub struct Cli {
     pub global: GlobalArgs,
 
     #[command(subcommand)]
-    pub command: Command,
+    pub command: CliCommand,
 }
 
 #[derive(Subcommand)]
-pub enum Command {
+pub enum CliCommand {
     /// Commands for working with translation files
-    File {
+    #[command(alias = "lang")]
+    LanguageFile {
         #[command(subcommand)]
-        file_command: FileCommands,
+        file_command: LanguageFileCommands,
     },
     /// Configuration commands
     Config {
@@ -34,11 +35,13 @@ pub enum Command {
 }
 
 #[derive(Subcommand)]
-pub enum FileCommands {
+pub enum LanguageFileCommands {
     /// List translation files
     List,
     /// Validates assumptions about translation files
     Check,
+    /// Opens the files in vscode
+    Open,
 }
 
 #[derive(Subcommand)]
