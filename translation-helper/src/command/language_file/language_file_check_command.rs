@@ -16,6 +16,10 @@ pub enum Problem {
         language_file_path: LanguageFilePath,
         missing_key: TranslationKey,
     },
+    KeyPresentInOtherLanguageButNotEnglish {
+        language_file_path: LanguageFilePath,
+        missing_key: TranslationKey,
+    },
 }
 
 #[derive(Debug, Serialize)]
@@ -54,14 +58,28 @@ impl StandaloneCommand for LanguageFileCheckCommand {
                     if lang == Language::new("en_us") {
                         continue;
                     }
-                    let lang_keys = lang_file.contents.keys().cloned().collect::<HashSet<_>>();
-                    let missing_keys = english_keys
-                        .difference(&lang_keys)
+                    let other_keys = lang_file.contents.keys().cloned().collect::<HashSet<_>>();
+
+                    let keys_in_english_but_not_other = english_keys
+                        .difference(&other_keys)
                         .cloned()
                         .collect::<Vec<_>>();
-                    for missing_key in missing_keys {
+                    for missing_key in keys_in_english_but_not_other {
                         rtn.problems
                             .push(Problem::KeyPresentInEnglishButNotOtherLanguage {
+                                language_file_path: lang_file.path.clone(),
+                                missing_key,
+                            });
+                    }
+
+                    let keys_in_other_but_not_english = other_keys
+                        .difference(&english_keys)
+                        .cloned()
+                        .collect::<Vec<_>>();
+
+                    for missing_key in keys_in_other_but_not_english {
+                        rtn.problems
+                            .push(Problem::KeyPresentInOtherLanguageButNotEnglish {
                                 language_file_path: lang_file.path.clone(),
                                 missing_key,
                             });
@@ -70,6 +88,10 @@ impl StandaloneCommand for LanguageFileCheckCommand {
             }
             rtn.problems.sort_by_key(|problem| match problem {
                 Problem::KeyPresentInEnglishButNotOtherLanguage {
+                    language_file_path,
+                    missing_key,
+                } => (language_file_path.to_string(), missing_key.to_string()),
+                Problem::KeyPresentInOtherLanguageButNotEnglish {
                     language_file_path,
                     missing_key,
                 } => (language_file_path.to_string(), missing_key.to_string()),
