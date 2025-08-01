@@ -26,6 +26,7 @@ public class SFM {
         SFMProgramLinters.register(bus);
         SFMBlockEntities.register(bus);
         SFMCapabilityProviderMappers.register(bus);
+        SFMTextEditors.register(bus);
         SFMMenus.register(bus);
         SFMRecipeTypes.register(bus);
         SFMRecipeSerializers.register(bus);

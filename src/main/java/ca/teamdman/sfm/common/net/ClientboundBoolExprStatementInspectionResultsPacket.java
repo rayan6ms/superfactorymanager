@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.common.net;
 
-import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
+import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import net.minecraft.network.FriendlyByteBuf;
 
 public record ClientboundBoolExprStatementInspectionResultsPacket(

@@ -7,13 +7,13 @@ import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.diagnostics.SFMDiagnostics;
 import ca.teamdman.sfm.common.handler.OpenContainerTracker;
 import ca.teamdman.sfm.common.item.DiskItem;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.net.ClientboundManagerGuiUpdatePacket;
 import ca.teamdman.sfm.common.net.ClientboundManagerLogLevelUpdatedPacket;
 import ca.teamdman.sfm.common.net.ClientboundManagerLogsPacket;
-import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMContainerUtil;
@@ -101,7 +101,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         try {
             long start = System.nanoTime();
             manager.tick++;
-            if (manager.configRevision != SFMConfig.SERVER.getRevision()) {
+            if (manager.configRevision != SFMConfig.SERVER_CONFIG.getRevision()) {
                 manager.shouldRebuildProgram = true;
             }
             if (manager.shouldRebuildProgram && !manager.shouldRebuildProgramLock) {
@@ -139,13 +139,13 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         } catch (Throwable t) {
             // tell the user that they can disable the manager in the config
             String configPath;
-            var found = SFMConfigTracker.getPathForConfig(SFMConfig.SERVER_SPEC);
+            var found = SFMConfigTracker.getPathForConfig(SFMConfig.SERVER_CONFIG_SPEC);
             if (found != null) {
                 configPath = found.toString();
             } else {
                 configPath = "sfm-server.toml";
             }
-            String configValuePath = Joiner.on(".").join(SFMConfig.SERVER.disableProgramExecution.getPath());
+            String configValuePath = Joiner.on(".").join(SFMConfig.SERVER_CONFIG.disableProgramExecution.getPath());
             SFM.LOGGER.fatal(
                     "SFM detected a problem while ticking a manager. You can set `{} = true` in {} to help recover your world.",
                     configValuePath,
@@ -160,13 +160,13 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         super.fillCrashReportCategory(pReportCategory);
         {
             String configPath;
-            var found = SFMConfigTracker.getPathForConfig(SFMConfig.SERVER_SPEC);
+            var found = SFMConfigTracker.getPathForConfig(SFMConfig.SERVER_CONFIG_SPEC);
             if (found != null) {
                 configPath = found.toString();
             } else {
                 configPath = "sfm-server.toml";
             }
-            String configValuePath = Joiner.on(".").join(SFMConfig.SERVER.disableProgramExecution.getPath());
+            String configValuePath = Joiner.on(".").join(SFMConfig.SERVER_CONFIG.disableProgramExecution.getPath());
             pReportCategory.setDetail("SFM Reminder", "You can set `" + configValuePath + " = true` in " + configPath + " to help recover your world.");
         }
         {
@@ -252,7 +252,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         } else {
             this.program = DiskItem.compileAndUpdateErrorsAndWarnings(disk, this);
         }
-        this.configRevision = SFMConfig.SERVER.getRevision();
+        this.configRevision = SFMConfig.SERVER_CONFIG.getRevision();
         sendUpdatePacket();
     }
 

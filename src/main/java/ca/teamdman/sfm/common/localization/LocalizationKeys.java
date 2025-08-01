@@ -1016,6 +1016,18 @@ public final class LocalizationKeys {
             "gui.sfm.program_editor_config.intellisense.advanced",
             "Advanced"
     );
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR = new LocalizationEntry(
+            "gui.sfm.program_editor_config.preferred_editor",
+            "Preferred Editor"
+    );
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_DEFAULT = new LocalizationEntry(
+            "gui.sfm.program_editor_config.preferred_editor.default",
+            "Default"
+    );
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_ASK = new LocalizationEntry(
+            "gui.sfm.program_editor_config.preferred_editor.ask",
+            "Ask"
+    );
 
 
     public static List<LocalizationEntry> getEntries() {
