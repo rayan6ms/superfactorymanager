@@ -34,7 +34,7 @@ public class SFMLIntellisenseTests {
               INPUT FROM a
               OUTPUT TO b
             END
-             """.stripTrailing().stripIndent();
+            """.stripTrailing().stripIndent();
     /**
      * A small snippet of code where we have "INPUT 64 IRON_INGOT FROM Minecart"
      * The 'IRON_INGOT' portion is recognized by the grammar as resourceId,

@@ -216,7 +216,7 @@ public class SFMLTests {
     @Test
     public void forgeTimerIntervalPass() {
         var min = SFMConfig.SERVER_CONFIG.timerTriggerMinimumIntervalInTicksWhenOnlyForgeEnergyIO.getDefault();
-        assertEquals(min, 1);
+        assertEquals(1, min);
         var input = """
                     name "hello world"
                 
@@ -230,7 +230,7 @@ public class SFMLTests {
     @Test
     public void forgeTimerIntervalFail1() {
         var min = SFMConfig.SERVER_CONFIG.timerTriggerMinimumIntervalInTicksWhenOnlyForgeEnergyIO.getDefault();
-        assertEquals(min, 1);
+        assertEquals(1, min);
         var input = """
                     name "hello world"
                 
@@ -244,7 +244,7 @@ public class SFMLTests {
     @Test
     public void forgeTimerIntervalFail2() {
         var min = SFMConfig.SERVER_CONFIG.timerTriggerMinimumIntervalInTicksWhenOnlyForgeEnergyIO.getDefault();
-        assertEquals(min, 1);
+        assertEquals(1, min);
         var input = """
                     name "hello world"
                 

@@ -41,7 +41,7 @@ public class SFMLTimerTriggerTests {
     @Test
     public void every_1_ticks_do_fe_end() {
         var min = SFMConfig.SERVER_CONFIG.timerTriggerMinimumIntervalInTicksWhenOnlyForgeEnergyIO.getDefault();
-        assertEquals(min, 1);
+        assertEquals(1, min);
         assertNoCompileErrors(
                 """
                             every 1 ticks do
