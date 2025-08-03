@@ -5,6 +5,8 @@ import ca.teamdman.sfm.client.registry.SFMTextEditorActions;
 import ca.teamdman.sfm.client.screen.SFMFontUtils;
 import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.screen.SFMScreenRenderUtils;
+import ca.teamdman.sfm.client.text_editor.Caret;
+import ca.teamdman.sfm.client.text_editor.Cursor;
 import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
 import ca.teamdman.sfm.client.text_editor.TextEditContext;
 import ca.teamdman.sfm.client.text_editor.action.ITextEditAction;
@@ -15,9 +17,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.FastColor;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.jetbrains.annotations.Nullable;
@@ -127,6 +131,8 @@ public class SFMTextEditScreenV2 extends Screen {
             );
         }
         buffer.endBatch();
+
+        // Render selection highlights
         var selectedCharactersByLine = textEditContext.selectedCharactersByLine();
         for (int lineIndex = 0; lineIndex < numLines; lineIndex++) {
             @Nullable IntervalSet selectedCharacters = selectedCharactersByLine.get(lineIndex);
@@ -136,7 +142,7 @@ public class SFMTextEditScreenV2 extends Screen {
             }
             for (Interval interval : selectedCharacters.getIntervals()) {
                 int selectionStartX = this.font.width(line.substring(0, interval.a)) + marginForLineNumber;
-                int selectionEndX = this.font.width(line.substring(0, interval.b)) + marginForLineNumber;
+                int selectionEndX = this.font.width(line.substring(0, interval.b+1)) + marginForLineNumber;
                 int selectionY = lineIndex * this.font.lineHeight;
                 SFMScreenRenderUtils.renderHighlight(
                         pPoseStack,
@@ -147,6 +153,34 @@ public class SFMTextEditScreenV2 extends Screen {
                 );
             }
         }
+
+        // Render cursors
+        for (Cursor cursor : textEditContext.multiCursor().cursors()) {
+            Caret head = cursor.head();
+            Caret tail = cursor.tail();
+            int headX = this.font.width(lines.get(head.lineIndex()).substring(0, head.gapIndex())) + marginForLineNumber;
+            int tailX = this.font.width(lines.get(tail.lineIndex()).substring(0, tail.gapIndex())) + marginForLineNumber;
+            int headY = head.lineIndex() * this.font.lineHeight;
+            int tailY = tail.lineIndex() * this.font.lineHeight;
+            renderCursor(pPoseStack, headX, headY, FastColor.ARGB32.color(255/2, 255,0,0));
+            renderCursor(pPoseStack, tailX, tailY, FastColor.ARGB32.color(255/2, 0,0,255));
+        }
+    }
+
+    protected void renderCursor(
+            PoseStack pPoseStack,
+            int x,
+            int y,
+            int color
+    ) {
+        GuiComponent.fill(
+                pPoseStack,
+                x,
+                y,
+                x+2,
+                y+this.font.lineHeight,
+                color
+        );
     }
 
     @Override
