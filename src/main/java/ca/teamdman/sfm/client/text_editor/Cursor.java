@@ -6,8 +6,8 @@ import it.unimi.dsi.fastutil.ints.Int2IntFunction;
  * Represents a cursor in a text editor, with optional selection.
  */
 public record Cursor(
-        Caret head,
-        Caret tail
+        Caret tail,
+        Caret head
 ) {
 
     @Override
@@ -24,60 +24,24 @@ public record Cursor(
                 new Caret(position, 0)
         );
     }
-    public Cursor(Caret beginning, Caret end, boolean isBackwards) {
-        this(
-                isBackwards ? end : beginning,
-                isBackwards ? beginning : end
-        );
-    }
 
     public Cursor growSelectionLeft(Int2IntFunction lineLengths) {
-        boolean isBackwards = isBackwards();
-        Caret beginning = getBeginning();
-        Caret end = getEnd();
-        if (beginning.lineIndex() == 0 && beginning.gapIndex() == 0) {
-            // Already at the start of the document, unable to grow left
-            return this;
-        } else if (beginning.gapIndex() == 0) {
-            // Move to the end of the previous line
-            int newLineIndex = beginning.lineIndex() - 1;
-            int newGapIndex = lineLengths.get(newLineIndex);
-            beginning = new Caret(newLineIndex, newGapIndex);
-            return new Cursor(beginning, end, isBackwards);
+        if (isHeadOnLeft()) {
+            return new Cursor(tail(), head().moveLeftOneCharacter(lineLengths));
         } else {
-            // Move one character left
-            int newGapIndex = beginning.gapIndex() - 1;
-            beginning = new Caret(beginning.lineIndex(), newGapIndex);
-            return new Cursor(beginning, end, isBackwards);
+            return new Cursor(tail().moveLeftOneCharacter(lineLengths), head());
         }
     }
 
     public Cursor growSelectionRight(Int2IntFunction lineLengths, int numLines) {
-        boolean isBackwards = isBackwards();
-        Caret beginning = getBeginning();
-        Caret end = getEnd();
-        if (end.lineIndex() >= numLines - 1 && end.gapIndex() >= lineLengths.get(end.lineIndex())) {
-            // Already at the end of the document, unable to grow right
-            return this;
-        } else if (end.gapIndex() >= lineLengths.get(end.lineIndex())) {
-            // Move to the start of the next line
-            int newLineIndex = end.lineIndex() + 1;
-            int newGapIndex = 0;
-            end = new Caret(newLineIndex, newGapIndex);
-            return new Cursor(beginning, end, isBackwards);
+        if (isHeadOnLeft()) {
+            return new Cursor(tail(), head().moveRightOneCharacter(lineLengths, numLines));
         } else {
-            // Move one character right
-            int newGapIndex = end.gapIndex() + 1;
-            end = new Caret(end.lineIndex(), newGapIndex);
-            return new Cursor(beginning, end, isBackwards);
+            return new Cursor(tail().moveRightOneCharacter(lineLengths, numLines), head());
         }
     }
 
-    public Cursor flip() {
-        return new Cursor(tail(), head());
-    }
-
-    public boolean isBackwards() {
+    public boolean isHeadOnLeft() {
         return head().compareTo(tail()) > 0;
     }
 

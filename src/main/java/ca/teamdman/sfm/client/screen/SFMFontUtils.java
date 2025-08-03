@@ -51,9 +51,9 @@ public class SFMFontUtils {
             float x,
             float y,
             boolean dropShadow,
+            boolean transparent,
             Matrix4f matrix4f,
-            MultiBufferSource bufferSource,
-            boolean transparent
+            MultiBufferSource bufferSource
     ) {
         return font.drawInBatch(
                 text,

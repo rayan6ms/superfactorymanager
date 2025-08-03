@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.client.screen.text_editor;
 
+import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.registry.SFMTextEditorActions;
 import ca.teamdman.sfm.client.screen.SFMFontUtils;
 import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
@@ -13,8 +14,12 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.network.chat.Component;
+import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
@@ -63,6 +68,7 @@ public class SFMTextEditScreenV2 extends Screen {
                 .findFirst();
         if (matchedAction.isPresent()) {
             matchedAction.get().apply(textEditContext, impulse);
+            SFM.LOGGER.debug("New state: {}", textEditContext);
             return true;
         }
         return false;
@@ -94,20 +100,20 @@ public class SFMTextEditScreenV2 extends Screen {
         int numLines = lines.size();
         var buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
         boolean shouldShowLineNumbers = shouldShowLineNumbers();
-        int marginForLineNumber = shouldShowLineNumbers() ? this.font.width("000") : 0;
+        int marginForLineNumber = shouldShowLineNumbers() ? this.font.width("000") + 4 : 0;
         for (int lineIndex = 0; lineIndex < numLines; lineIndex++) {
             StringBuilder line = lines.get(lineIndex);
             int lineHeight = this.font.lineHeight;
             if (shouldShowLineNumbers) {
                 SFMFontUtils.drawInBatch(
-                        String.format("%03d", lineIndex + 1),
+                        Component.literal(String.format("%03d", lineIndex + 1)).withStyle(ChatFormatting.GRAY),
                         this.font,
                         0,
                         lineIndex * lineHeight,
                         true,
+                        false,
                         matrix4f,
-                        buffer,
-                        false
+                        buffer
                 );
             }
             SFMFontUtils.drawInBatch(
@@ -116,12 +122,31 @@ public class SFMTextEditScreenV2 extends Screen {
                     marginForLineNumber,
                     lineIndex * lineHeight,
                     true,
-                    matrix4f,
-                    buffer,
-                    false
+                    false, matrix4f,
+                    buffer
             );
         }
         buffer.endBatch();
+        var selectedCharactersByLine = textEditContext.selectedCharactersByLine();
+        for (int lineIndex = 0; lineIndex < numLines; lineIndex++) {
+            @Nullable IntervalSet selectedCharacters = selectedCharactersByLine.get(lineIndex);
+            StringBuilder line = lines.get(lineIndex);
+            if (selectedCharacters == null || selectedCharacters.isNil()) {
+                continue; // no selection on this line
+            }
+            for (Interval interval : selectedCharacters.getIntervals()) {
+                int selectionStartX = this.font.width(line.substring(0, interval.a)) + marginForLineNumber;
+                int selectionEndX = this.font.width(line.substring(0, interval.b)) + marginForLineNumber;
+                int selectionY = lineIndex * this.font.lineHeight;
+                SFMScreenRenderUtils.renderHighlight(
+                        pPoseStack,
+                        selectionStartX,
+                        selectionY,
+                        selectionEndX,
+                        selectionY + this.font.lineHeight
+                );
+            }
+        }
     }
 
     @Override

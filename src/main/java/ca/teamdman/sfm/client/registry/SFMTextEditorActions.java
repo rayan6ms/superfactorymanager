@@ -1,10 +1,7 @@
 package ca.teamdman.sfm.client.registry;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.text_editor.action.DeleteSelectionOrCharacterToTheLeftForEachCursorAction;
-import ca.teamdman.sfm.client.text_editor.action.DeleteSelectionOrCharacterToTheRightForEachCursorAction;
-import ca.teamdman.sfm.client.text_editor.action.ITextEditAction;
-import ca.teamdman.sfm.client.text_editor.action.SelectAllTextAction;
+import ca.teamdman.sfm.client.text_editor.action.*;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -16,6 +13,7 @@ import net.minecraftforge.registries.RegistryObject;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
+@SuppressWarnings("unused")
 public class SFMTextEditorActions {
     public static final ResourceLocation REGISTRY_ID = new ResourceLocation(SFM.MOD_ID, "text_editor_action");
     private static final DeferredRegister<ITextEditAction> REGISTERER = DeferredRegister.create(
@@ -38,6 +36,23 @@ public class SFMTextEditorActions {
     public static final RegistryObject<ITextEditAction> DELETE_SELECTION_OR_CHARACTER_TO_THE_RIGHT_FOR_EACH_CURSOR = REGISTERER.register(
             "delete_selection_or_character_to_the_right_for_each_cursor",
             DeleteSelectionOrCharacterToTheRightForEachCursorAction::new
+    );
+
+    public static final RegistryObject<ITextEditAction> MOVE_CURSOR_HEADS_RIGHT_ONE_CHARACTER = REGISTERER.register(
+            "move_cursor_heads_right_one_character",
+            MoveCursorHeadsRightOneCharacter::new
+    );
+    public static final RegistryObject<ITextEditAction> MOVE_CURSOR_HEADS_LEFT_ONE_CHARACTER = REGISTERER.register(
+            "move_cursor_heads_left_one_character",
+            MoveCursorHeadsLeftOneCharacter::new
+    );
+    public static final RegistryObject<ITextEditAction> MOVE_CURSORS_RIGHT_ONE_CHARACTER = REGISTERER.register(
+            "move_cursors_right_one_character",
+            MoveCursorsRightOneCharacter::new
+    );
+    public static final RegistryObject<ITextEditAction> MOVE_CURSORS_LEFT_ONE_CHARACTER = REGISTERER.register(
+            "move_cursors_left_one_character",
+            MoveCursorsLeftOneCharacter::new
     );
 
     public static Stream<ITextEditAction> getTextEditActions() {

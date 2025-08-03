@@ -317,9 +317,8 @@ public class ItemWorldRenderer {
                     -font.width(label) / 2f,
                     0,
                     false,
-                    poseStack.last().pose(),
-                    mbs,
-                    true
+                    true, poseStack.last().pose(),
+                    mbs
             );
             poseStack.translate(0, font.lineHeight + 0.1, 0);
 
