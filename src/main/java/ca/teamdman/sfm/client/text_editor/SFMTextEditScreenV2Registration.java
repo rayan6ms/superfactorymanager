@@ -12,7 +12,7 @@ public class SFMTextEditScreenV2Registration implements ISFMTextEditorRegistrati
                 SFMScreenChangeHelpers.getCurrentScreen(),
                 Minecraft.getInstance().options.hideGui
         );
-        Minecraft.getInstance().options.hideGui = true;
+//        Minecraft.getInstance().options.hideGui = true;
         SFMScreenChangeHelpers.setScreen(screen);
     }
 }
