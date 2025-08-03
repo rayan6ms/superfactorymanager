@@ -54,6 +54,18 @@ public class SFMTextEditorActions {
             "move_cursors_left_one_character",
             MoveCursorsLeftOneCharacter::new
     );
+    public static final RegistryObject<ITextEditAction> MOVE_CURSORS_UP_ONE_LINE = REGISTERER.register(
+            "move_cursors_up_one_line",
+            MoveCursorsUpOneLine::new
+    );
+    public static final RegistryObject<ITextEditAction> MOVE_CURSORS_DOWN_ONE_LINE = REGISTERER.register(
+            "move_cursors_down_one_line",
+            MoveCursorsDownOneLine::new
+    );
+    public static final RegistryObject<ITextEditAction> SWAP_CURSOR_HEADS_AND_TAILS = REGISTERER.register(
+            "swap_cursor_heads_and_tails",
+            SwapCursorHeadsAndTails::new
+    );
 
     public static Stream<ITextEditAction> getTextEditActions() {
         return registry().getValues().stream().sorted((a, b) -> Float.compare(a.priority(), b.priority()));

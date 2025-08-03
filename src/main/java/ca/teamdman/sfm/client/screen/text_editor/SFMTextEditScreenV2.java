@@ -28,13 +28,12 @@ import org.jetbrains.annotations.Nullable;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.LinkedList;
-import java.util.Optional;
 
 public class SFMTextEditScreenV2 extends Screen {
-    protected TextEditContext textEditContext;
-    protected ISFMTextEditScreenOpenContext openContext;
     private final boolean previousHideGui;
     private final @Nullable Screen previousScreen;
+    protected TextEditContext textEditContext;
+    protected ISFMTextEditScreenOpenContext openContext;
 
     public SFMTextEditScreenV2(
             ISFMTextEditScreenOpenContext openContext,
@@ -46,12 +45,6 @@ public class SFMTextEditScreenV2 extends Screen {
         this.previousScreen = previousScreen;
         this.textEditContext = new TextEditContext(openContext.initialValue());
         this.previousHideGui = previousHideGui;
-    }
-
-    private void finalizeClose() {
-        SFMScreenChangeHelpers.setScreen(previousScreen);
-        assert minecraft != null;
-        minecraft.options.hideGui = previousHideGui;
     }
 
     @Override
@@ -66,16 +59,14 @@ public class SFMTextEditScreenV2 extends Screen {
             return true;
         }
         KeyboardImpulse impulse = new KeyboardImpulse(pKeyCode, pScanCode, pModifiers);
-        Optional<ITextEditAction> matchedAction = SFMTextEditorActions
+        var matchedActions = SFMTextEditorActions
                 .getTextEditActions()
-                .filter(action -> action.matches(textEditContext, impulse))
-                .findFirst();
-        if (matchedAction.isPresent()) {
-            matchedAction.get().apply(textEditContext, impulse);
-            SFM.LOGGER.debug("New state: {}", textEditContext);
-            return true;
+                .filter(action -> action.matches(textEditContext, impulse)).toArray(ITextEditAction[]::new);
+        for (ITextEditAction matchedAction : matchedActions) {
+            SFM.LOGGER.debug("Matched action: {}", matchedAction.getClass().getSimpleName());
+            matchedAction.apply(textEditContext, impulse);
         }
-        return false;
+        return matchedActions.length > 0;
     }
 
     @Override
@@ -142,7 +133,7 @@ public class SFMTextEditScreenV2 extends Screen {
             }
             for (Interval interval : selectedCharacters.getIntervals()) {
                 int selectionStartX = this.font.width(line.substring(0, interval.a)) + marginForLineNumber;
-                int selectionEndX = this.font.width(line.substring(0, interval.b+1)) + marginForLineNumber;
+                int selectionEndX = this.font.width(line.substring(0, interval.b + 1)) + marginForLineNumber;
                 int selectionY = lineIndex * this.font.lineHeight;
                 SFMScreenRenderUtils.renderHighlight(
                         pPoseStack,
@@ -158,13 +149,21 @@ public class SFMTextEditScreenV2 extends Screen {
         for (Cursor cursor : textEditContext.multiCursor().cursors()) {
             Caret head = cursor.head();
             Caret tail = cursor.tail();
-            int headX = this.font.width(lines.get(head.lineIndex()).substring(0, head.gapIndex())) + marginForLineNumber;
-            int tailX = this.font.width(lines.get(tail.lineIndex()).substring(0, tail.gapIndex())) + marginForLineNumber;
+            int headX = this.font.width(lines.get(head.lineIndex()).substring(0, head.gapIndex()))
+                        + marginForLineNumber;
+            int tailX = this.font.width(lines.get(tail.lineIndex()).substring(0, tail.gapIndex()))
+                        + marginForLineNumber;
             int headY = head.lineIndex() * this.font.lineHeight;
             int tailY = tail.lineIndex() * this.font.lineHeight;
-            renderCursor(pPoseStack, headX, headY, FastColor.ARGB32.color(255/2, 255,0,0));
-            renderCursor(pPoseStack, tailX, tailY, FastColor.ARGB32.color(255/2, 0,0,255));
+            renderCursor(pPoseStack, headX, headY, FastColor.ARGB32.color(255 / 2, 255, 0, 0));
+            renderCursor(pPoseStack, tailX, tailY, FastColor.ARGB32.color(255 / 2, 0, 0, 255));
         }
+    }
+
+    private void finalizeClose() {
+        SFMScreenChangeHelpers.setScreen(previousScreen);
+        assert minecraft != null;
+        minecraft.options.hideGui = previousHideGui;
     }
 
     protected void renderCursor(
@@ -177,8 +176,8 @@ public class SFMTextEditScreenV2 extends Screen {
                 pPoseStack,
                 x,
                 y,
-                x+2,
-                y+this.font.lineHeight,
+                x + 2,
+                y + this.font.lineHeight,
                 color
         );
     }

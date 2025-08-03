@@ -47,4 +47,28 @@ public record Caret(int lineIndex, int gapIndex) {
             return new Caret(this.lineIndex(), newGapIndex);
         }
     }
+
+    public Caret moveDownOneLine(Int2IntFunction lineLengths, int numLines) {
+        if (this.lineIndex() >= numLines - 1) {
+            // Already at the last line, unable to move down
+            return this;
+        } else {
+            // Move down one line, keeping the same gap index
+            int newLineIndex = this.lineIndex() + 1;
+            int newGapIndex = Math.min(this.gapIndex(), lineLengths.get(newLineIndex));
+            return new Caret(newLineIndex, newGapIndex);
+        }
+    }
+
+    public Caret moveUpOneLine(Int2IntFunction lineLengths) {
+        if (this.lineIndex() == 0) {
+            // Already at the first line, unable to move up
+            return this;
+        } else {
+            // Move up one line, keeping the same gap index
+            int newLineIndex = this.lineIndex() - 1;
+            int newGapIndex = Math.min(this.gapIndex(), lineLengths.get(newLineIndex));
+            return new Caret(newLineIndex, newGapIndex);
+        }
+    }
 }
