@@ -8,13 +8,13 @@ import org.lwjgl.glfw.GLFW;
 import java.util.ArrayDeque;
 import java.util.Iterator;
 
-public class DeleteSelectionOrCharacterToTheLeftForEachCursorAction implements ITextEditAction {
+public class DeleteSelectionOrCharacterToTheRightForEachCursorAction implements ITextEditAction {
     @Override
     public boolean matches(
             TextEditContext context,
             KeyboardImpulse impulse
     ) {
-        return impulse.keyCode() == GLFW.GLFW_KEY_BACKSPACE;
+        return impulse.keyCode() == GLFW.GLFW_KEY_DELETE;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class DeleteSelectionOrCharacterToTheLeftForEachCursorAction implements I
             Cursor cursor = cursorIterator.next();
             if (!cursor.hasSelection()) {
                 cursorIterator.remove();
-                newCursors.push(cursor.growSelectionLeft(lineLengths));
+                newCursors.push(cursor.growSelectionRight(lineLengths, context.lines().size()));
             }
         }
         context.multiCursor().cursors().addAll(newCursors);

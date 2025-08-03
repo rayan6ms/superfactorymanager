@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.client.screen;
 
+import ca.teamdman.sfm.client.registry.SFMTextEditors;
 import ca.teamdman.sfm.client.screen.text_editor.SFMTextEditScreenV1;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditorIntellisenseLevel;
 import ca.teamdman.sfm.client.widget.SFMButtonBuilder;
@@ -21,8 +22,8 @@ public class SFMTextEditorConfigScreen extends Screen {
     private Button intellisenseOffButton;
     private Button intellisenseBasicButton;
     private Button intellisenseAdvancedButton;
-    private Button preferredEditorDefaultButton;
-    private Button preferredEditorAskButton;
+    private Button preferredEditorV1Button;
+    private Button preferredEditorV2Button;
 
     public SFMTextEditorConfigScreen(
             SFMTextEditScreenV1 parent,
@@ -166,29 +167,31 @@ public class SFMTextEditorConfigScreen extends Screen {
         this.addRenderableWidget(intellisenseAdvancedButton);
 
         // Preferred Editor Buttons
-        preferredEditorDefaultButton =
+        preferredEditorV1Button =
                 new SFMButtonBuilder()
                         .setPosition(x, y + 2 * spacing)
                         .setSize(buttonWidth, buttonHeight)
-                        .setText(LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_DEFAULT)
+                        .setText(LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V1)
                         .setOnPress(button -> {
-                            config.preferredEditor.set(SFMClientTextEditorConfig.PREFERRED_EDITOR_DEFAULT.get().toString());
+                            assert SFMTextEditors.V1.getKey() != null;
+                            config.preferredEditor.set(SFMTextEditors.V1.getKey().location().toString());
                             updateButtonStates();
                         })
                         .build();
-        preferredEditorAskButton =
+        preferredEditorV2Button =
                 new SFMButtonBuilder()
                         .setPosition(x + buttonWidth + buttonSpacing, y + 2 * spacing)
                         .setSize(buttonWidth, buttonHeight)
-                        .setText(LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_ASK)
+                        .setText(LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V2)
                         .setOnPress(button -> {
-                            config.preferredEditor.set(SFMClientTextEditorConfig.PREFERRED_EDITOR_ASK.get().toString());
+                            assert SFMTextEditors.V2.getKey() != null;
+                            config.preferredEditor.set(SFMTextEditors.V2.getKey().location().toString());
                             updateButtonStates();
                         })
                         .build();
 
-        this.addRenderableWidget(preferredEditorDefaultButton);
-        this.addRenderableWidget(preferredEditorAskButton);
+        this.addRenderableWidget(preferredEditorV1Button);
+        this.addRenderableWidget(preferredEditorV2Button);
 
         // Done Button
         this.addRenderableWidget(
@@ -214,8 +217,9 @@ public class SFMTextEditorConfigScreen extends Screen {
                 config.intellisenseLevel.get() != SFMTextEditorIntellisenseLevel.ADVANCED;
 
         String currentEditor = config.preferredEditor.get();
-        boolean isDefault = currentEditor.equals(SFMClientTextEditorConfig.PREFERRED_EDITOR_DEFAULT.get().toString());
-        preferredEditorDefaultButton.active = !isDefault;
-        preferredEditorAskButton.active = isDefault;
+        assert SFMTextEditors.V1.getKey() != null;
+        assert SFMTextEditors.V2.getKey() != null;
+        preferredEditorV1Button.active = !currentEditor.equals(SFMTextEditors.V1.getKey().location().toString());
+        preferredEditorV2Button.active = !currentEditor.equals(SFMTextEditors.V2.getKey().location().toString());
     }
 }

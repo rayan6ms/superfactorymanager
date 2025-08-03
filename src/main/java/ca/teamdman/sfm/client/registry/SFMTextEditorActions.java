@@ -1,6 +1,8 @@
 package ca.teamdman.sfm.client.registry;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.text_editor.action.DeleteSelectionOrCharacterToTheLeftForEachCursorAction;
+import ca.teamdman.sfm.client.text_editor.action.DeleteSelectionOrCharacterToTheRightForEachCursorAction;
 import ca.teamdman.sfm.client.text_editor.action.ITextEditAction;
 import ca.teamdman.sfm.client.text_editor.action.SelectAllTextAction;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
@@ -27,6 +29,15 @@ public class SFMTextEditorActions {
     public static final RegistryObject<ITextEditAction> SELECT_ALL_TEXT = REGISTERER.register(
             "select_all_text",
             SelectAllTextAction::new
+    );
+
+    public static final RegistryObject<ITextEditAction> DELETE_SELECTION_OR_CHARACTER_TO_THE_LEFT_FOR_EACH_CURSOR = REGISTERER.register(
+            "delete_selection_or_character_to_the_left_for_each_cursor",
+            DeleteSelectionOrCharacterToTheLeftForEachCursorAction::new
+    );
+    public static final RegistryObject<ITextEditAction> DELETE_SELECTION_OR_CHARACTER_TO_THE_RIGHT_FOR_EACH_CURSOR = REGISTERER.register(
+            "delete_selection_or_character_to_the_right_for_each_cursor",
+            DeleteSelectionOrCharacterToTheRightForEachCursorAction::new
     );
 
     public static Stream<ITextEditAction> getTextEditActions() {

@@ -22,6 +22,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
 import java.util.Objects;
@@ -62,8 +63,7 @@ public class SFMScreenChangeHelpers {
                         .getValue(new ResourceLocation(preferredEditorId)),
                 SFMTextEditors.V1.get()
         );
-        Screen screen = textEditorRegistration.createScreen(context);
-        setOrPushScreen(screen);
+        textEditorRegistration.openScreen(context);
     }
 
     public static void showTomlEditScreen(
@@ -162,5 +162,13 @@ public class SFMScreenChangeHelpers {
         ));
         setOrPushScreen(screen);
         screen.scrollToTop();
+    }
+
+    public static @Nullable Screen getCurrentScreen() {
+        return Minecraft.getInstance().screen;
+    }
+
+    public static void setScreen(@Nullable Screen screen) {
+        Minecraft.getInstance().setScreen(screen);
     }
 }

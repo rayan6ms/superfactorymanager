@@ -109,7 +109,7 @@ public class SFMTextEditScreenV1 extends Screen {
      */
     @Override
     public void onClose() {
-        openContext.onTryClose(textarea.getValue());
+        openContext.onTryClose(textarea.getValue(), SFMScreenChangeHelpers::popScreen);
     }
 
     public void onIntellisensePreferenceChanged() {

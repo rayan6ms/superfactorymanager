@@ -1,7 +1,10 @@
 package ca.teamdman.sfm.text_editor;
 
 import ca.teamdman.sfm.client.text_editor.TextEditContext;
+import ca.teamdman.sfm.client.text_editor.action.DeleteSelectionOrCharacterToTheLeftForEachCursorAction;
+import ca.teamdman.sfm.client.text_editor.action.KeyboardImpulse;
 import org.junit.jupiter.api.Test;
+import org.lwjgl.glfw.GLFW;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
@@ -53,5 +56,18 @@ public class TextEditorTests {
         context.deleteSelectedText();
         assertEquals(1, context.lines().size(), "Should have one line after deletion");
         assertEquals(", !", context.lines().get(0).toString(), "Text after deletion should match");
+    }
+
+    @Test
+    public void backspace() {
+        TextEditContext context = new TextEditContext();
+        String text = "Hello, world!";
+        context.insertTextAtCursors(text);
+        context.multiCursor().cursors().clear();
+        context.multiCursor().addCursor(0, text.length(), 0, text.length());
+        new DeleteSelectionOrCharacterToTheLeftForEachCursorAction()
+                .apply(context, new KeyboardImpulse(GLFW.GLFW_KEY_BACKSLASH, 0, 0));
+        assertEquals(1, context.lines().size(), "Should have one line after backspace");
+        assertEquals("Hello, world", context.lines().get(0).toString(), "Text after backspace should match");
     }
 }

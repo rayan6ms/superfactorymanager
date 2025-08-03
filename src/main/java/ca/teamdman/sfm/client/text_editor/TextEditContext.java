@@ -16,6 +16,26 @@ public record TextEditContext(
         this(new MultiCursor(), new LinkedList<>());
         lines.add(new StringBuilder());
     }
+    public TextEditContext(String initialContent) {
+        this(new MultiCursor(), new LinkedList<>());
+        if (initialContent.isEmpty()) {
+            lines.add(new StringBuilder());
+        } else {
+            String[] splitLines = initialContent.split("\n");
+            for (String line : splitLines) {
+                lines.add(new StringBuilder(line));
+            }
+        }
+    }
+
+    public Int2IntFunction lineLengths() {
+        return Int2IntFunctions.primitive(x -> {
+            if (x < 0 || x >= lines.size()) {
+                return -1;
+            }
+            return lines.get(x).length();
+        });
+    }
 
     public TextEditContext copy() {
         return new TextEditContext(
@@ -94,7 +114,7 @@ public record TextEditContext(
      * @return The indices of the cursors that were modified by this operation.
      */
     @SuppressWarnings("ExtractMethodRecommender")
-    public IntervalSet deleteSelectedText() {
+    public void deleteSelectedText() {
         // Remove all selected text from the lines.
         Int2ObjectOpenHashMap<IntervalSet> selectedCharactersByLine = selectedCharactersByLine();
         ListIterator<StringBuilder> lineIterator = lines().listIterator(lines().size());
@@ -166,7 +186,9 @@ public record TextEditContext(
             }
         }
         assertInvariants();
-        return modifiedCursorIndices;
+//        return modifiedCursorIndices;
+
+        // TODO: this method probably doesn't correctly reposition all cursors. Add test for this.
     }
 
 
@@ -199,5 +221,16 @@ public record TextEditContext(
             }
         });
         assertInvariants();
+    }
+
+    public String getContent() {
+        StringBuilder rtn = new StringBuilder();
+        for (StringBuilder line : lines()) {
+            rtn.append(line);
+            if (line != lines().getLast()) {
+                rtn.append('\n'); // add newline except for the last line
+            }
+        }
+        return rtn.toString();
     }
 }

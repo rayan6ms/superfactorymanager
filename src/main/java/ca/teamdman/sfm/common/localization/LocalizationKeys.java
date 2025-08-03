@@ -1020,13 +1020,13 @@ public final class LocalizationKeys {
             "gui.sfm.program_editor_config.preferred_editor",
             "Preferred Editor"
     );
-    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_DEFAULT = new LocalizationEntry(
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V1 = new LocalizationEntry(
             "gui.sfm.program_editor_config.preferred_editor.default",
-            "Default"
+            "V1 (Default)"
     );
-    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_ASK = new LocalizationEntry(
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V2 = new LocalizationEntry(
             "gui.sfm.program_editor_config.preferred_editor.ask",
-            "Ask"
+            "V2"
     );
 
 

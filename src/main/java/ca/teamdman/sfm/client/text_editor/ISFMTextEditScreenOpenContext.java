@@ -9,11 +9,11 @@ import java.util.function.Consumer;
 
 public interface ISFMTextEditScreenOpenContext {
     String initialValue();
-    default void onTryClose(String latestContent) {
+    default void onTryClose(String latestContent, Runnable finalizeClose) {
         // If the content is different, ask to save
         if (initialValue().equals(latestContent)) {
             // Content is unmodified, close without confirmation
-            SFMScreenChangeHelpers.popScreen();
+            finalizeClose.run();
         } else {
             // Confirm that the user wants to discard their changes
             ConfirmScreen exitWithoutSavingConfirmScreen = new ConfirmScreen(
@@ -23,7 +23,7 @@ public interface ISFMTextEditScreenOpenContext {
                         // Only close editor if user confirms
                         if (doSave) {
                             // close without saving
-                            SFMScreenChangeHelpers.popScreen();
+                            finalizeClose.run();
                         }
                     },
                     LocalizationKeys.EXIT_WITHOUT_SAVING_CONFIRM_SCREEN_TITLE.getComponent(),
