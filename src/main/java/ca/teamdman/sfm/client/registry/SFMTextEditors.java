@@ -1,8 +1,8 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.client.registry;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.common.text_editor.ISFMTextEditorRegistration;
-import ca.teamdman.sfm.common.text_editor.SFMTextEditScreenRegistration;
+import ca.teamdman.sfm.client.text_editor.ISFMTextEditorRegistration;
+import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenV1Registration;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -23,9 +23,9 @@ public class SFMTextEditors {
             () -> new RegistryBuilder<ISFMTextEditorRegistration>().setName(
                     REGISTRY_ID));
 
-    public static final RegistryObject<SFMTextEditScreenRegistration> V1 = REGISTERER.register(
+    public static final RegistryObject<SFMTextEditScreenV1Registration> V1 = REGISTERER.register(
             "v1",
-            SFMTextEditScreenRegistration::new
+            SFMTextEditScreenV1Registration::new
     );
 
     public static void register(IEventBus bus) {
@@ -36,15 +36,4 @@ public class SFMTextEditors {
     public static IForgeRegistry<ISFMTextEditorRegistration> registry() {
         return REGISTRY.get();
     }
-
-    /* TODO: add support for new resource types
-     * - mekanism heat
-     * - botania mana
-     * - ars nouveau source
-     * - flux plugs
-     * - PNC pressure
-     * - PNC heat
-     * - nature's aura aura
-     * - create rotation
-     */
 }

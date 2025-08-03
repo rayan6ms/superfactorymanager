@@ -1,15 +1,18 @@
 package ca.teamdman.sfm.client.screen;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.registry.SFMTextEditors;
 import ca.teamdman.sfm.client.screen.text_editor.SFMTextEditScreenV1;
+import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
+import ca.teamdman.sfm.client.text_editor.ISFMTextEditorRegistration;
+import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenDiskOpenContext;
+import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenExampleProgramOpenContext;
+import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundManagerLogDesireUpdatePacket;
 import ca.teamdman.sfm.common.registry.SFMPackets;
-import ca.teamdman.sfm.common.text_editor.ISFMTextEditScreenOpenContext;
-import ca.teamdman.sfm.common.text_editor.SFMTextEditScreenDiskOpenContext;
-import ca.teamdman.sfm.common.text_editor.SFMTextEditScreenExampleProgramOpenContext;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -21,6 +24,7 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -51,9 +55,15 @@ public class SFMScreenChangeHelpers {
     public static void showProgramEditScreen(
             ISFMTextEditScreenOpenContext context
     ) {
-        SFMTextEditScreenV1 screen = new SFMTextEditScreenV1(context);
+        String preferredEditorId = SFMConfig.CLIENT_TEXT_EDITOR_CONFIG.preferredEditor.get();
+        ISFMTextEditorRegistration textEditorRegistration = Objects.requireNonNullElse(
+                SFMTextEditors
+                        .registry()
+                        .getValue(new ResourceLocation(preferredEditorId)),
+                SFMTextEditors.V1.get()
+        );
+        Screen screen = textEditorRegistration.createScreen(context);
         setOrPushScreen(screen);
-        screen.scrollToTop();
     }
 
     public static void showTomlEditScreen(

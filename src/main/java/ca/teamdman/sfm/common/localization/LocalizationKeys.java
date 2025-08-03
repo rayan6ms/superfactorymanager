@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class LocalizationKeys {
-    public static final LocalizationEntry PROGRAM_EDIT_SCREEN_TITLE = new LocalizationEntry(
+    public static final LocalizationEntry TEXT_EDIT_SCREEN_TITLE = new LocalizationEntry(
             "gui.sfm.text_editor.title",
             "Text Editor"
     );

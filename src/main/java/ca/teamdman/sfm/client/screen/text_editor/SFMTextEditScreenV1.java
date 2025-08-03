@@ -7,13 +7,13 @@ import ca.teamdman.sfm.client.screen.SFMFontUtils;
 import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.screen.SFMScreenRenderUtils;
 import ca.teamdman.sfm.client.screen.SFMTextEditorConfigScreen;
+import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
 import ca.teamdman.sfm.client.widget.PickList;
 import ca.teamdman.sfm.client.widget.PickListItem;
 import ca.teamdman.sfm.client.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.client.widget.SFMExtendedButtonWithTooltip;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.text_editor.ISFMTextEditScreenOpenContext;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMDisplayUtils;
 import ca.teamdman.sfml.ast.Program;
@@ -62,7 +62,7 @@ public class SFMTextEditScreenV1 extends Screen {
     public SFMTextEditScreenV1(
             ISFMTextEditScreenOpenContext openContext
     ) {
-        super(LocalizationKeys.PROGRAM_EDIT_SCREEN_TITLE.getComponent());
+        super(LocalizationKeys.TEXT_EDIT_SCREEN_TITLE.getComponent());
         this.openContext = openContext;
     }
 
@@ -312,7 +312,6 @@ public class SFMTextEditScreenV1 extends Screen {
     @Override
     protected void init() {
         super.init();
-        assert this.minecraft != null;
         SFMScreenRenderUtils.enableKeyRepeating();
 
         this.textarea = this.addRenderableWidget(new MyMultiLineEditBox());

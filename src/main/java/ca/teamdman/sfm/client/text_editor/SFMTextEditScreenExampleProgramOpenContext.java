@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.common.text_editor;
+package ca.teamdman.sfm.client.text_editor;
 
 import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;

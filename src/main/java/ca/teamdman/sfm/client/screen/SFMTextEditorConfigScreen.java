@@ -1,10 +1,10 @@
 package ca.teamdman.sfm.client.screen;
 
 import ca.teamdman.sfm.client.screen.text_editor.SFMTextEditScreenV1;
+import ca.teamdman.sfm.client.text_editor.SFMTextEditorIntellisenseLevel;
 import ca.teamdman.sfm.client.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.config.SFMClientTextEditorConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.text_editor.SFMTextEditorIntellisenseLevel;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.screens.Screen;

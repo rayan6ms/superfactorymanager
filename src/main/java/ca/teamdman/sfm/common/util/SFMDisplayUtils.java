@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.common.util;
 
+import ca.teamdman.sfm.client.text_editor.SFMTextEditorIntellisenseLevel;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.text_editor.SFMTextEditorIntellisenseLevel;
 import ca.teamdman.sfml.ast.ASTNode;
 import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
