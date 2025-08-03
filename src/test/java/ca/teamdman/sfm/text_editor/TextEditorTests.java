@@ -3,6 +3,8 @@ package ca.teamdman.sfm.text_editor;
 import ca.teamdman.sfm.client.text_editor.TextEditContext;
 import ca.teamdman.sfm.client.text_editor.action.DeleteSelectionOrCharacterToTheLeftForEachCursorAction;
 import ca.teamdman.sfm.client.text_editor.action.KeyboardImpulse;
+import it.unimi.dsi.fastutil.ints.Int2ObjectOpenHashMap;
+import org.antlr.v4.runtime.misc.IntervalSet;
 import org.junit.jupiter.api.Test;
 import org.lwjgl.glfw.GLFW;
 
@@ -69,5 +71,19 @@ public class TextEditorTests {
                 .apply(context, new KeyboardImpulse(GLFW.GLFW_KEY_BACKSLASH, 0, 0));
         assertEquals(1, context.lines().size(), "Should have one line after backspace");
         assertEquals("Hello, world", context.lines().get(0).toString(), "Text after backspace should match");
+    }
+
+    @Test
+    public void selectedCharactersByLineTest() {
+        String text = "abc\ndef\nghi\njkl";
+        TextEditContext context = new TextEditContext(text);
+        context.multiCursor().cursors().clear();
+        context.multiCursor().addCursor(0,0,3,3);
+        Int2ObjectOpenHashMap<IntervalSet> selectedCharactersByLine = context.selectedCharactersByLine();
+        assertEquals(4, selectedCharactersByLine.size(), "Should have 4 lines in selected characters map");
+        assertEquals(IntervalSet.of(0, 2), selectedCharactersByLine.get(0), "Line 0 should have all characters selected");
+        assertEquals(IntervalSet.of(0, 2), selectedCharactersByLine.get(1), "Line 1 should have all characters selected");
+        assertEquals(IntervalSet.of(0, 2), selectedCharactersByLine.get(2), "Line 2 should have all characters selected");
+        assertEquals(IntervalSet.of(0, 2), selectedCharactersByLine.get(3), "Line 3 should have all characters selected");
     }
 }

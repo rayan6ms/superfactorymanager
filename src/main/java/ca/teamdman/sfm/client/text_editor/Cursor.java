@@ -13,8 +13,8 @@ public record Cursor(
     @Override
     public String toString() {
         return "Cursor{" +
-               "head=" + head +
-               ", tail=" + tail +
+               "tail=" + tail +
+               ", head=" + head +
                '}';
     }
 
