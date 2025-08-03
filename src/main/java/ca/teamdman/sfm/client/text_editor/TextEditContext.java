@@ -16,6 +16,7 @@ public record TextEditContext(
         this(new MultiCursor(), new LinkedList<>());
         lines.add(new StringBuilder());
     }
+
     public TextEditContext(String initialContent) {
         this(new MultiCursor(), new LinkedList<>());
         if (initialContent.isEmpty()) {
@@ -94,13 +95,16 @@ public record TextEditContext(
                 Caret end = cursor.getEnd();
                 if (beginning.lineIndex() == lineIndex && end.lineIndex() == lineIndex) {
                     // the selection is entirely on this line
-                    selectedCharacterIndicesInLine.add(beginning.gapIndex(), end.gapIndex());
+                    selectedCharacterIndicesInLine.add(beginning.gapIndex(), end.gapIndex() - 1);
+                } else if (beginning.lineIndex() < lineIndex && end.lineIndex() > lineIndex) {
+                    // the selection begins on a previous line and ends on a later line
+                    selectedCharacterIndicesInLine.add(0, lineLength - 1);
                 } else if (beginning.lineIndex() < lineIndex && end.lineIndex() == lineIndex) {
                     // the selection begins on a previous line and ends on this line
-                    selectedCharacterIndicesInLine.add(0, end.gapIndex());
+                    selectedCharacterIndicesInLine.add(0, end.gapIndex() - 1);
                 } else if (beginning.lineIndex() == lineIndex && end.lineIndex() > lineIndex) {
                     // the selection begins on this line and ends on a later line
-                    selectedCharacterIndicesInLine.add(beginning.gapIndex(), lineLength);
+                    selectedCharacterIndicesInLine.add(beginning.gapIndex(), lineLength - 1);
                 }
             }
             if (!selectedCharacterIndicesInLine.isNil()) {
