@@ -26,16 +26,16 @@ public class FormItem extends Item {
     }
 
     @MCVersionDependentBehaviour
-    public static ItemStack getReferenceFromFormBorrowed(ItemStack stack) {
+    public static ItemStack getBorrowedReferenceFromForm(ItemStack stack) {
         // Before data components, this always creates a copied value.
         return ItemStack.of(stack.getOrCreateTag().getCompound("reference"));
     }
 
 
     @MCVersionDependentBehaviour
-    public static ItemStack getReferenceFromFormCopied(ItemStack stack) {
+    public static ItemStack getCopiedReferenceFromForm(ItemStack stack) {
         // Before data components, we always receive a copied value from this function.
-        return getReferenceFromFormBorrowed(stack);
+        return getBorrowedReferenceFromForm(stack);
     }
 
     @MCVersionDependentBehaviour // 1.21 this gets replaced with RegisterClientExtensionsEvent
@@ -52,7 +52,7 @@ public class FormItem extends Item {
             TooltipFlag pIsAdvanced
     ) {
         if (pStack.hasTag()) {
-            var reference = getReferenceFromFormBorrowed(pStack);
+            var reference = getBorrowedReferenceFromForm(pStack);
             if (!reference.isEmpty()) {
                 pTooltipComponents.add(reference.getHoverName());
                 reference.getItem().appendHoverText(reference, pLevel, pTooltipComponents, pIsAdvanced);

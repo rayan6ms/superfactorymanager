@@ -147,7 +147,7 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
             }
 
             // Fail if the result is the same instance of ItemStack stored in the form
-            ItemStack referenceStack = FormItem.getReferenceFromFormBorrowed(printingPress.getForm());
+            ItemStack referenceStack = FormItem.getBorrowedReferenceFromForm(printingPress.getForm());
             if (Objects.equals(
                     System.identityHashCode(referenceStack),
                     System.identityHashCode(held)
