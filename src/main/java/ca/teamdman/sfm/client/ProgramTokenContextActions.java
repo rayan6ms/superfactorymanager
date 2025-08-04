@@ -3,7 +3,7 @@ package ca.teamdman.sfm.client;
 import ca.teamdman.langs.SFMLLexer;
 import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
+import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.common.net.*;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfml.ast.*;

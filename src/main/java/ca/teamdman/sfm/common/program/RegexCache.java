@@ -3,6 +3,7 @@ package ca.teamdman.sfm.common.program;
 import ca.teamdman.sfm.SFMPerformanceTweaks;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
@@ -51,22 +52,27 @@ public class RegexCache {
         if (x.startsWith(".*") && x.endsWith(".*")) {
             String substring = x.substring(2, x.length() - 2);
             if (!isRegexPattern(substring)) {
-                return s -> s.contains(substring);
+                String finalSubstring = substring.toLowerCase(Locale.ROOT);
+                return s -> s.contains(finalSubstring);
             }
         } else if (x.startsWith(".*")) {
             String suffix = x.substring(2);
             if (!isRegexPattern(suffix)) {
-                return s -> s.endsWith(suffix);
+                String finalSuffix = suffix.toLowerCase(Locale.ROOT);
+                return s -> s.endsWith(finalSuffix);
             }
         } else if (x.endsWith(".*")) {
             String prefix = x.substring(0, x.length() - 2);
             if (!isRegexPattern(prefix)) {
-                return s -> s.startsWith(prefix);
+                String finalPrefix = prefix.toLowerCase(Locale.ROOT);
+                return s -> s.startsWith(finalPrefix);
             }
         } else if (x.contains(".*")) {
             String[] parts = x.split("\\.\\*");
             if (parts.length == 2 && !isRegexPattern(parts[0]) && !isRegexPattern(parts[1])) {
-                return s -> s.startsWith(parts[0]) && s.endsWith(parts[1]);
+                String begin = parts[0].toLowerCase(Locale.ROOT);
+                String end = parts[1].toLowerCase(Locale.ROOT);
+                return s -> s.startsWith(begin) && s.endsWith(end);
             }
         }
         // Default case for other regex patterns
