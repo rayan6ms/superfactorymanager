@@ -3,12 +3,12 @@ package ca.teamdman.sfm.common.item;
 import ca.teamdman.sfm.common.component.ItemStackBox;
 import ca.teamdman.sfm.common.registry.SFMDataComponents;
 import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 
-import javax.annotation.Nonnull;
 import java.util.List;
 
 public class FormItem extends Item {
@@ -16,14 +16,20 @@ public class FormItem extends Item {
         super(new Item.Properties());
     }
 
-    public static ItemStack getForm(@Nonnull ItemStack stack) {
+    public static ItemStack createFormFromReference(ItemStack stack) {
         var formStack = new ItemStack(SFMItems.FORM_ITEM.get());
         formStack.set(SFMDataComponents.FORM_REFERENCE, new ItemStackBox(stack));
         return formStack;
     }
 
-    public static ItemStack getReference(ItemStack stack) {
+    @MCVersionDependentBehaviour
+    public static ItemStack getReferenceFromFormBorrowed(ItemStack stack) {
         return stack.getOrDefault(SFMDataComponents.FORM_REFERENCE, ItemStackBox.EMPTY).stack();
+    }
+
+    @MCVersionDependentBehaviour
+    public static ItemStack getReferenceFromFormCopied(ItemStack stack) {
+        return getReferenceFromFormBorrowed(stack).copy();
     }
 
     @Override
@@ -33,7 +39,7 @@ public class FormItem extends Item {
             List<Component> pTooltipComponents,
             TooltipFlag pTooltipFlag
     ) {
-        var reference = getReference(pStack);
+        var reference = getReferenceFromFormBorrowed(pStack);
         if (!reference.isEmpty()) {
             pTooltipComponents.add(reference.getHoverName());
             reference.getItem().appendHoverText(reference, pContext, pTooltipComponents, pTooltipFlag);

@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class LocalizationKeys {
-    public static final LocalizationEntry PROGRAM_EDIT_SCREEN_TITLE = new LocalizationEntry(
+    public static final LocalizationEntry TEXT_EDIT_SCREEN_TITLE = new LocalizationEntry(
             "gui.sfm.text_editor.title",
             "Text Editor"
     );
@@ -1020,6 +1020,18 @@ public final class LocalizationKeys {
             PROGRAM_EDITOR_CONFIG_INTELLISENSE_ADVANCED = new LocalizationEntry(
             "gui.sfm.program_editor_config.intellisense.advanced",
             "Advanced"
+    );
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR = new LocalizationEntry(
+            "gui.sfm.program_editor_config.preferred_editor",
+            "Preferred Editor"
+    );
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V1 = new LocalizationEntry(
+            "gui.sfm.program_editor_config.preferred_editor.default",
+            "V1 (Default)"
+    );
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V2 = new LocalizationEntry(
+            "gui.sfm.program_editor_config.preferred_editor.ask",
+            "V2"
     );
 
 

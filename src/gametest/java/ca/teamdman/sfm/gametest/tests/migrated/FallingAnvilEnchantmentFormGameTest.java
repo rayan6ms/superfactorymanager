@@ -68,7 +68,7 @@ public class FallingAnvilEnchantmentFormGameTest extends SFMGameTestDefinition {
                     );
             if (found
                     .stream()
-                    .anyMatch(e -> SFMItemUtils.isSameItemSameTags(e.getItem(), FormItem.getForm(reference)))) {
+                    .anyMatch(e -> SFMItemUtils.isSameItemSameTags(e.getItem(), FormItem.createFormFromReference(reference)))) {
                 helper.succeed();
             } else {
                 helper.fail("no form found");

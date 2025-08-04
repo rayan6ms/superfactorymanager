@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.common.util;
 
-import ca.teamdman.sfm.common.config.SFMClientProgramEditorConfig;
+import ca.teamdman.sfm.client.text_editor.SFMTextEditorIntellisenseLevel;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfml.ast.ASTNode;
@@ -95,8 +95,8 @@ public class SFMDisplayUtils {
                 0,
                 LabelPositionHolder.empty(),
                 SFMConfig.getOrFallback(
-                        SFMConfig.CLIENT_PROGRAM_EDITOR.intellisenseLevel,
-                        SFMClientProgramEditorConfig.IntellisenseLevel.BASIC
+                        SFMConfig.CLIENT_TEXT_EDITOR_CONFIG.intellisenseLevel,
+                        SFMTextEditorIntellisenseLevel.BASIC
                 )
         ));
         rtn.append('[');

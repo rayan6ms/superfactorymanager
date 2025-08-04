@@ -18,6 +18,8 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DirectionalBlock;
 
+import java.util.Objects;
+
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 
@@ -75,7 +77,7 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
                         OUTPUT TO a SLOTS 2
                     END
                 """.stripTrailing().stripIndent());
-        ItemStack form = FormItem.getForm(disk);
+        ItemStack form = FormItem.createFormFromReference(disk);
         player.setItemInHand(InteractionHand.MAIN_HAND, form);
         helper.useBlock(printingPos, player);
 
@@ -88,9 +90,18 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
             helper.useBlock(printingPos, player);
             ItemStack held = player.getMainHandItem();
 
-            // Fail if result is not a perfect clone of the disk
+            // Fail if the result is not a perfect clone of the disk
             if (!held.is(SFMItems.DISK_ITEM.get()) || !DiskItem.getProgram(held).equals(DiskItem.getProgram(disk))) {
                 helper.fail("Disk was not cloned");
+            }
+
+            // Fail if the result is the same instance of ItemStack stored in the form
+            ItemStack referenceStack = FormItem.getReferenceFromFormBorrowed(printingPress.getForm());
+            if (Objects.equals(
+                    System.identityHashCode(referenceStack),
+                    System.identityHashCode(held)
+            )) {
+                helper.fail("cloned item shares the same ItemStack instance as form reference");
             }
 
             // Place result in chest

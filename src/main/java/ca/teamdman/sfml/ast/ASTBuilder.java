@@ -138,7 +138,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
 
     @Override
     public Program visitProgram(SFMLParser.ProgramContext ctx) {
-        if (SFMConfig.getOrDefault(SFMConfig.SERVER.disableProgramExecution)) {
+        if (SFMConfig.getOrDefault(SFMConfig.SERVER_CONFIG.disableProgramExecution)) {
             throw new AssertionError("Program execution is disabled via config");
         }
         var name = visitName(ctx.name());
@@ -166,8 +166,8 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
 
         // get default min interval
         int minInterval = timerTrigger.usesOnlyForgeEnergyResourceIO()
-                          ? SFMConfig.getOrDefault(SFMConfig.SERVER.timerTriggerMinimumIntervalInTicksWhenOnlyForgeEnergyIO)
-                          : SFMConfig.getOrDefault(SFMConfig.SERVER.timerTriggerMinimumIntervalInTicks);
+                          ? SFMConfig.getOrDefault(SFMConfig.SERVER_CONFIG.timerTriggerMinimumIntervalInTicksWhenOnlyForgeEnergyIO)
+                          : SFMConfig.getOrDefault(SFMConfig.SERVER_CONFIG.timerTriggerMinimumIntervalInTicks);
 
         // validate interval
         if (time.ticks() < minInterval) {

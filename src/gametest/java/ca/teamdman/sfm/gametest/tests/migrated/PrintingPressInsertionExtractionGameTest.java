@@ -56,7 +56,7 @@ public class PrintingPressInsertionExtractionGameTest extends SFMGameTestDefinit
         assertTrue(!printingPress.getPaper().isEmpty(), "Paper was not inserted");
         assertTrue(player.getMainHandItem().isEmpty(), "Paper was not taken from hand");
         // put form in player hand
-        var form = FormItem.getForm(new ItemStack(Items.WRITTEN_BOOK));
+        var form = FormItem.createFormFromReference(new ItemStack(Items.WRITTEN_BOOK));
         player.setItemInHand(InteractionHand.MAIN_HAND, form.copy());
         // right click on printing press
         helper.useBlock(pos, player);
