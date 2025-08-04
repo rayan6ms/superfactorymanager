@@ -44,13 +44,13 @@ public class PrintingPressRecipe implements Recipe<PrintingPressBlockEntity> {
 
     @Override
     public boolean matches(PrintingPressBlockEntity pContainer, Level pLevel) {
-        return PAPER.test(pContainer.getPaper()) && INK.test(pContainer.getInk()) && FORM.test(FormItem.getReferenceFromFormBorrowed(
+        return PAPER.test(pContainer.getPaper()) && INK.test(pContainer.getInk()) && FORM.test(FormItem.getBorrowedReferenceFromForm(
                 pContainer.getForm()));
     }
 
     @Override
     public ItemStack assemble(PrintingPressBlockEntity pContainer, RegistryAccess p_267165_) {
-        ItemStack rtn = FormItem.getReferenceFromFormCopied(pContainer.getForm());
+        ItemStack rtn = FormItem.getCopiedReferenceFromForm(pContainer.getForm());
         rtn.setCount(pContainer.getPaper().getCount());
         return rtn;
     }
