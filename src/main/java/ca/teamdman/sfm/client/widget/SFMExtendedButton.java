@@ -21,11 +21,11 @@ public class SFMExtendedButton extends ExtendedButton {
 
     /**
      * This fn is copied from {@link ExtendedButton#renderButton(PoseStack, int, int, float)}
-     * I copied it to fix tab navigation button highlight
+     * I copied it to fix tab navigation button highlight.
      * <a href="https://github.com/TeamDman/SuperFactoryManager/issues/253">issue</a>
      */
     @Override
-    @MCVersionDependentBehaviour
+    @MCVersionDependentBehaviour // Removed as unnecessary for MC versions 1.19.4 and later
     public void renderButton(PoseStack poseStack, int mouseX, int mouseY, float partialTick)
     {
         Minecraft mc = Minecraft.getInstance();
