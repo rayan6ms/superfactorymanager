@@ -44,8 +44,9 @@ public class PrintingPressRecipe implements Recipe<PrintingPressBlockEntity> {
 
     @Override
     public boolean matches(PrintingPressBlockEntity pContainer, Level pLevel) {
-        return PAPER.test(pContainer.getPaper()) && INK.test(pContainer.getInk()) && FORM.test(FormItem.getBorrowedReferenceFromForm(
-                pContainer.getForm()));
+        return PAPER.test(pContainer.getPaper())
+               && INK.test(pContainer.getInk())
+               && FORM.test(FormItem.getBorrowedReferenceFromForm(pContainer.getForm()));
     }
 
     @Override
