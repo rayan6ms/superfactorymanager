@@ -275,7 +275,7 @@ public class OutputStatement implements IOStatement {
             addSlotDetailsToReport(report, destination, level);
 
             context.getLogger().error(x -> x.accept(LOG_PROGRAM_VOIDED_RESOURCES.get(report.toString())));
-            if (SFMConfig.SERVER.logResourceLossToConsole.get()) {
+            if (SFMConfig.SERVER_CONFIG.logResourceLossToConsole.get()) {
                 report.append("\nThis can be silenced in the SFM config.\n");
                 report.append(
                         "Operators can use `/sfm config edit` to open a GUI to change the SFM config while the game is running.\n");
@@ -418,11 +418,11 @@ public class OutputStatement implements IOStatement {
 
     /**
      * The output statement contains labels.
-     * Each block in the world can have more than one programString.
+     * Each block in the world can have more than one label.
      * Each block can have a block entity.
      * Each block entity can have 0 or more slots.
      * <p>
-     * We want collect the slots from all the labelled blocks.
+     * We want to collect the slots from all the labelled blocks.
      */
     @SuppressWarnings({"unchecked"}) // basically impossible to make this method generic safe
     public void gatherSlots(
