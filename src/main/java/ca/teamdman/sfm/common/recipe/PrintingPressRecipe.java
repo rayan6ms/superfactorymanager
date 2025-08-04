@@ -41,7 +41,7 @@ public record PrintingPressRecipe(
             PrintingPressBlockEntity pContainer,
             HolderLookup.Provider provider
     ) {
-        ItemStack rtn = FormItem.getReference(pContainer.getForm());
+        ItemStack rtn = FormItem.getReference(pContainer.getForm()).copy();
         rtn.setCount(pContainer.getPaper().getCount());
         return rtn;
     }
