@@ -145,7 +145,7 @@
   "item.sfm.network_tool.tooltip.7": "Ctrl+Alt点击伪装整个网络。",
   "item.sfm.xp_goop": "经验黏液",
   "item.sfm.xp_shard": "经验碎片",
-  "itemGroup.sfm": "超级工厂管理器",
+  "item_group.sfm": "超级工厂管理器",
   "key.categories.sfm": "超级工厂管理器",
   "key.sfm.container_inspector.activation_key": "切换容器检查器",
   "key.sfm.item_inspector.activation_key": "(开发中) 复制悬停物品到剪贴板",
