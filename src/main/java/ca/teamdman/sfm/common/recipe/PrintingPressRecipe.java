@@ -49,7 +49,7 @@ public class PrintingPressRecipe implements Recipe<PrintingPressBlockEntity> {
 
     @Override
     public ItemStack assemble(PrintingPressBlockEntity pContainer) {
-        ItemStack rtn = FormItem.getReference(pContainer.getForm());
+        ItemStack rtn = FormItem.getReference(pContainer.getForm()).copy();
         rtn.setCount(pContainer.getPaper().getCount());
         return rtn;
     }
