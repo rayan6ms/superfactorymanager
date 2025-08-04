@@ -4,7 +4,6 @@ import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -22,6 +21,8 @@ import net.minecraft.world.level.block.DirectionalBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+
+import java.util.Objects;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
@@ -138,16 +139,29 @@ public class PrintingPressCloneEnchantmentGameTest extends SFMGameTestDefinition
                     )
             );
             ItemStack held = player.getMainHandItem();
-            if (SFMItemUtils.isSameItemSameTags(held, reference)) {
-                var chest = helper.getItemHandler(chestPos);
-                chest.insertItem(0, held, false);
-                assertTrue(printingPress.getInk().getCount() == 9, "Ink was not consumed properly");
-                assertTrue(printingPress.getPaper().isEmpty(), "Paper was not consumed");
-                assertTrue(!printingPress.getForm().isEmpty(), "Form should not be consumed");
-                helper.succeed();
-            } else {
-                helper.fail("cloned item wasnt same");
+
+            // Fail if result is not a clone of the enchantment
+            if (!ItemStack.isSameItemSameTags(held, reference)) {
+                helper.fail("cloned item wasn't same");
             }
+
+            // Fail if result is the same instance of ItemStack stored in the form
+            if (Objects.equals(FormItem.getReference(printingPress.getForm()), held)) {
+                helper.fail("cloned item shares the same ItemStack instance as form reference");
+            }
+
+
+            // Place result in chest
+            var chest = helper.getItemHandler(chestPos);
+            chest.insertItem(0, held, false);
+
+            // Assert ingredient transformations
+            assertTrue(printingPress.getInk().getCount() == 9, "Ink was not consumed properly");
+            assertTrue(printingPress.getPaper().isEmpty(), "Paper was not consumed");
+            assertTrue(!printingPress.getForm().isEmpty(), "Form should not be consumed");
+
+            // Succeed test
+            helper.succeed();
         });
     }
 }

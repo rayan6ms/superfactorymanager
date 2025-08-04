@@ -20,6 +20,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.Objects;
+
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 
@@ -138,16 +140,28 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
                     )
             );
             ItemStack held = player.getMainHandItem();
-            if (held.is(SFMItems.DISK_ITEM.get()) && DiskItem.getProgram(held).equals(DiskItem.getProgram(disk))) {
-                var chest = helper.getItemHandler(chestPos);
-                chest.insertItem(0, held, false);
-                assertTrue(printingPress.getInk().isEmpty(), "Ink was not consumed");
-                assertTrue(printingPress.getPaper().isEmpty(), "Paper was not consumed");
-                assertTrue(!printingPress.getForm().isEmpty(), "Form should not be consumed");
-                helper.succeed();
-            } else {
+
+            // Fail if result is not a perfect clone of the disk
+            if (!held.is(SFMItems.DISK_ITEM.get()) || !DiskItem.getProgram(held).equals(DiskItem.getProgram(disk))) {
                 helper.fail("Disk was not cloned");
             }
+
+            // Fail if result is the same instance of ItemStack stored in the form
+            if (Objects.equals(FormItem.getReference(printingPress.getForm()), held)) {
+                helper.fail("cloned item shares the same ItemStack instance as form reference");
+            }
+
+            // Place result in chest
+            var chest = helper.getItemHandler(chestPos);
+            chest.insertItem(0, held, false);
+
+            // Assert ingredient transformations
+            assertTrue(printingPress.getInk().isEmpty(), "Ink was not consumed");
+            assertTrue(printingPress.getPaper().isEmpty(), "Paper was not consumed");
+            assertTrue(!printingPress.getForm().isEmpty(), "Form should not be consumed");
+
+            // Succeed test
+            helper.succeed();
         });
     }
 }
