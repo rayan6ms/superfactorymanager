@@ -23,13 +23,13 @@ public class FormItem extends Item {
     }
 
     @MCVersionDependentBehaviour
-    public static ItemStack getReferenceFromFormBorrowed(ItemStack stack) {
+    public static ItemStack getBorrowedReferenceFromForm(ItemStack stack) {
         return stack.getOrDefault(SFMDataComponents.FORM_REFERENCE, ItemStackBox.EMPTY).stack();
     }
 
     @MCVersionDependentBehaviour
-    public static ItemStack getReferenceFromFormCopied(ItemStack stack) {
-        return getReferenceFromFormBorrowed(stack).copy();
+    public static ItemStack getCopiedReferenceFromForm(ItemStack stack) {
+        return getBorrowedReferenceFromForm(stack).copy();
     }
 
     @Override
@@ -39,7 +39,7 @@ public class FormItem extends Item {
             List<Component> pTooltipComponents,
             TooltipFlag pTooltipFlag
     ) {
-        var reference = getReferenceFromFormBorrowed(pStack);
+        var reference = getBorrowedReferenceFromForm(pStack);
         if (!reference.isEmpty()) {
             pTooltipComponents.add(reference.getHoverName());
             reference.getItem().appendHoverText(reference, pContext, pTooltipComponents, pTooltipFlag);

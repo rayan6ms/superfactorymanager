@@ -618,7 +618,8 @@ public class SFMTextEditScreenV1 extends Screen {
                             lineX - 2 - this.font.width(lineNumber),
                             lineY,
                             true,
-                            false, matrix4f,
+                            false,
+                            matrix4f,
                             buffer
                     );
                 }
