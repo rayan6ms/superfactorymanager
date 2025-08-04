@@ -18,6 +18,8 @@ import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DirectionalBlock;
 
+import java.util.Objects;
+
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 
@@ -91,6 +93,11 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
             // Fail if result is not a perfect clone of the disk
             if (!held.is(SFMItems.DISK_ITEM.get()) || !DiskItem.getProgram(held).equals(DiskItem.getProgram(disk))) {
                 helper.fail("Disk was not cloned");
+            }
+
+            // Fail if result is the same instance of ItemStack stored in the form
+            if (Objects.equals(FormItem.getReference(printingPress.getForm()), held)) {
+                helper.fail("cloned item shares the same ItemStack instance as form reference");
             }
 
             // Place result in chest
