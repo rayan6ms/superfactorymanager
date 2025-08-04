@@ -83,7 +83,7 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
             builder.addSlot(RecipeIngredientRole.INPUT, 0, 36).addItemStack(ironBlock);
             builder
                     .addSlot(RecipeIngredientRole.OUTPUT, 50, 18)
-                    .addItemStacks(Arrays.stream(formRecipe.PARENT.FORM.getItems()).map(FormItem::getForm).toList());
+                    .addItemStacks(Arrays.stream(formRecipe.PARENT.FORM.getItems()).map(FormItem::createFormFromReference).toList());
         } else if (recipe instanceof FallingAnvilDisenchantRecipe) {
             Collection<Enchantment> enchants = ForgeRegistries.ENCHANTMENTS.getValues();
 

@@ -35,33 +35,33 @@ then it should be server config
 
  */
 public class SFMConfig {
-    public static final ForgeConfigSpec SERVER_SPEC;
-    public static final SFMServerConfig SERVER;
+    public static final ForgeConfigSpec SERVER_CONFIG_SPEC;
+    public static final SFMServerConfig SERVER_CONFIG;
 
-    public static final ForgeConfigSpec CLIENT_SPEC;
-    public static final SFMClientConfig CLIENT;
+    public static final ForgeConfigSpec CLIENT_CONFIG_SPEC;
+    public static final SFMClientConfig CLIENT_CONFIG;
 
-    public static final ForgeConfigSpec CLIENT_PROGRAM_EDITOR_SPEC;
-    public static final SFMClientProgramEditorConfig CLIENT_PROGRAM_EDITOR;
+    public static final ForgeConfigSpec CLIENT_TEXT_EDITOR_CONFIG_SPEC;
+    public static final SFMClientTextEditorConfig CLIENT_TEXT_EDITOR_CONFIG;
 
     static {
         {
             var pair =
                     new ForgeConfigSpec.Builder().configure(SFMServerConfig::new);
-            SERVER_SPEC = pair.getRight();
-            SERVER = pair.getLeft();
+            SERVER_CONFIG_SPEC = pair.getRight();
+            SERVER_CONFIG = pair.getLeft();
         }
         {
             var pair =
                     new ForgeConfigSpec.Builder().configure(SFMClientConfig::new);
-            CLIENT_SPEC = pair.getRight();
-            CLIENT = pair.getLeft();
+            CLIENT_CONFIG_SPEC = pair.getRight();
+            CLIENT_CONFIG = pair.getLeft();
         }
         {
             var pair =
-                    new ForgeConfigSpec.Builder().configure(SFMClientProgramEditorConfig::new);
-            CLIENT_PROGRAM_EDITOR_SPEC = pair.getRight();
-            CLIENT_PROGRAM_EDITOR = pair.getLeft();
+                    new ForgeConfigSpec.Builder().configure(SFMClientTextEditorConfig::new);
+            CLIENT_TEXT_EDITOR_CONFIG_SPEC = pair.getRight();
+            CLIENT_TEXT_EDITOR_CONFIG = pair.getLeft();
         }
     }
 
@@ -87,8 +87,8 @@ public class SFMConfig {
     }
 
     public static void register(ModLoadingContext context) {
-        context.registerConfig(ModConfig.Type.SERVER, SFMConfig.SERVER_SPEC);
-        context.registerConfig(ModConfig.Type.CLIENT, SFMConfig.CLIENT_SPEC);
-        context.registerConfig(ModConfig.Type.CLIENT, SFMConfig.CLIENT_PROGRAM_EDITOR_SPEC, "sfm-client-program-editor.toml");
+        context.registerConfig(ModConfig.Type.SERVER, SFMConfig.SERVER_CONFIG_SPEC);
+        context.registerConfig(ModConfig.Type.CLIENT, SFMConfig.CLIENT_CONFIG_SPEC);
+        context.registerConfig(ModConfig.Type.CLIENT, SFMConfig.CLIENT_TEXT_EDITOR_CONFIG_SPEC, "sfm-client-program-editor.toml");
     }
 }

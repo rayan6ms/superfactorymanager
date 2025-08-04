@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.client.registry;
 
-import ca.teamdman.sfm.client.gui.screen.ManagerScreen;
-import ca.teamdman.sfm.client.gui.screen.TestBarrelTankScreen;
+import ca.teamdman.sfm.client.screen.ManagerScreen;
+import ca.teamdman.sfm.client.screen.TestBarrelTankScreen;
 import ca.teamdman.sfm.common.registry.SFMMenus;
 import net.minecraft.client.gui.screens.MenuScreens;
 

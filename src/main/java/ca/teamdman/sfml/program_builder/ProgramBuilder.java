@@ -100,7 +100,7 @@ public class ProgramBuilder {
         if (!SFMEnvironmentUtils.isGameLoaded()) {
             return;
         }
-        List<? extends String> disallowedResourceTypes = SFMConfig.getOrDefault(SFMConfig.SERVER.disallowedResourceTypesForTransfer);
+        List<? extends String> disallowedResourceTypes = SFMConfig.getOrDefault(SFMConfig.SERVER_CONFIG.disallowedResourceTypesForTransfer);
         for (ResourceIdentifier<?, ?, ?> referencedResource : program.referencedResources()) {
             try {
                 ResourceType<?, ?, ?> resourceType = referencedResource.getResourceType();
