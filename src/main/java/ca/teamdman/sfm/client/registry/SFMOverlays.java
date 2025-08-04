@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.client.registry;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.gui.overlay.LabelGunReminderOverlay;
-import ca.teamdman.sfm.client.gui.overlay.NetworkToolReminderOverlay;
+import ca.teamdman.sfm.client.overlay.LabelGunReminderOverlay;
+import ca.teamdman.sfm.client.overlay.NetworkToolReminderOverlay;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;

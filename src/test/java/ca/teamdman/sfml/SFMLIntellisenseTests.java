@@ -2,7 +2,7 @@ package ca.teamdman.sfml;
 
 import ca.teamdman.langs.SFMLLexer;
 import ca.teamdman.langs.SFMLParser;
-import ca.teamdman.sfm.common.config.SFMClientProgramEditorConfig;
+import ca.teamdman.sfm.client.text_editor.SFMTextEditorIntellisenseLevel;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.SFMDisplayUtils;
 import ca.teamdman.sfml.ast.ASTNode;
@@ -34,7 +34,7 @@ public class SFMLIntellisenseTests {
               INPUT FROM a
               OUTPUT TO b
             END
-             """.stripTrailing().stripIndent();
+            """.stripTrailing().stripIndent();
     /**
      * A small snippet of code where we have "INPUT 64 IRON_INGOT FROM Minecart"
      * The 'IRON_INGOT' portion is recognized by the grammar as resourceId,
@@ -83,7 +83,7 @@ public class SFMLIntellisenseTests {
                     cursorPosition,
                     0,
                     LabelPositionHolder.empty(),
-                    SFMClientProgramEditorConfig.IntellisenseLevel.BASIC
+                    SFMTextEditorIntellisenseLevel.BASIC
             ));
             for (IntellisenseAction suggestion : suggestions) {
                 display.append("Suggestion: ");

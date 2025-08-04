@@ -109,13 +109,13 @@ public class SFMGameTestMethodHelpers {
     ) {
         if (!iter.hasNext()) {
             // restore config to value before the test
-            SFMConfig.SERVER.levelsToShards.set(configToRestore);
+            SFMConfig.SERVER_CONFIG.levelsToShards.set(configToRestore);
             helper.succeed();
             return;
         }
         var c = iter.next();
 
-        SFMConfig.SERVER.levelsToShards.set(c.first());
+        SFMConfig.SERVER_CONFIG.levelsToShards.set(c.first());
         // kill old item entities
         helper
                 .getLevel()
