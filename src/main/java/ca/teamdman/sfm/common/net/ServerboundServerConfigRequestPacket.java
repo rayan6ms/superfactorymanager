@@ -49,7 +49,7 @@ public record ServerboundServerConfigRequestPacket(
                 );
                 return;
             }
-            String configToml = SFMConfigReadWriter.getConfigToml(SFMConfig.SERVER_SPEC);
+            String configToml = SFMConfigReadWriter.getConfigToml(SFMConfig.SERVER_CONFIG_SPEC);
             if (configToml == null) {
                 SFM.LOGGER.warn("Unable to get server config for player {}", player.getName().getString());
                 player.sendSystemMessage(SFMConfigReadWriter.ConfigSyncResult.INTERNAL_FAILURE.component());

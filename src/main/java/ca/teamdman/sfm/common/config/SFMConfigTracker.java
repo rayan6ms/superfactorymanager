@@ -43,7 +43,7 @@ public class SFMConfigTracker {
         Set<ModConfig> modConfigs = getModConfigs(ModConfig.Type.SERVER);
         for (ModConfig modConfig : modConfigs) {
             // .equals() doesn't work here
-            if (modConfig.getSpec() == SFMConfig.SERVER_SPEC) {
+            if (modConfig.getSpec() == SFMConfig.SERVER_CONFIG_SPEC) {
                 return modConfig;
             }
         }
@@ -54,7 +54,7 @@ public class SFMConfigTracker {
         Set<ModConfig> modConfigs = getModConfigs(ModConfig.Type.CLIENT);
         for (ModConfig modConfig : modConfigs) {
             // .equals() doesn't work here
-            if (modConfig.getSpec() == SFMConfig.CLIENT_SPEC) {
+            if (modConfig.getSpec() == SFMConfig.CLIENT_CONFIG_SPEC) {
                 return modConfig;
             }
         }
@@ -123,7 +123,7 @@ public class SFMConfigTracker {
          */
         @SubscribeEvent
         public static void onServerStopped(ServerStoppedEvent event) {
-            configPaths.entrySet().removeIf(entry -> entry.getKey() == SFMConfig.SERVER_SPEC);
+            configPaths.entrySet().removeIf(entry -> entry.getKey() == SFMConfig.SERVER_CONFIG_SPEC);
         }
     }
 }

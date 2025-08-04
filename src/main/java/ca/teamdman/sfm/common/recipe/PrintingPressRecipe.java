@@ -32,8 +32,9 @@ public record PrintingPressRecipe(
             PrintingPressBlockEntity pContainer,
             Level pLevel
     ) {
-        return paper.test(pContainer.getPaper()) && ink.test(pContainer.getInk()) && form.test(FormItem.getReference(
-                pContainer.getForm()));
+        return paper.test(pContainer.getPaper())
+               && ink.test(pContainer.getInk())
+               && form.test(FormItem.getBorrowedReferenceFromForm(pContainer.getForm()));
     }
 
     @Override
@@ -41,7 +42,7 @@ public record PrintingPressRecipe(
             PrintingPressBlockEntity pContainer,
             HolderLookup.Provider provider
     ) {
-        ItemStack rtn = FormItem.getReference(pContainer.getForm());
+        ItemStack rtn = FormItem.getCopiedReferenceFromForm(pContainer.getForm());
         rtn.setCount(pContainer.getPaper().getCount());
         return rtn;
     }

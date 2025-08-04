@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.client;
 
-import ca.teamdman.sfm.client.gui.screen.SFMConfirmationScreen;
-import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
+import ca.teamdman.sfm.client.screen.SFMConfirmationScreen;
+import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.common.facade.FacadePlanner;
 import ca.teamdman.sfm.common.facade.IFacadePlan;
 import ca.teamdman.sfm.common.net.ServerboundFacadePacket;

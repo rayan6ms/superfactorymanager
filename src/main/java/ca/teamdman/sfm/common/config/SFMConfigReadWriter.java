@@ -41,7 +41,7 @@ public class SFMConfigReadWriter {
     public static ConfigSyncResult updateAndSyncServerConfig(String newConfigToml) {
         try {
             SFM.LOGGER.debug("Received server config for update and sync:\n{}", newConfigToml);
-            CommentedConfig config = parseConfigToml(newConfigToml, SFMConfig.SERVER_SPEC);
+            CommentedConfig config = parseConfigToml(newConfigToml, SFMConfig.SERVER_CONFIG_SPEC);
             if (config == null) {
                 SFM.LOGGER.error("Received invalid server config from player");
                 return ConfigSyncResult.INVALID_CONFIG;
@@ -62,7 +62,7 @@ public class SFMConfigReadWriter {
     public static ConfigSyncResult updateClientConfig(String newConfigToml) {
         try {
             SFM.LOGGER.debug("Received client config for update and sync:\n{}", newConfigToml);
-            CommentedConfig config = parseConfigToml(newConfigToml, SFMConfig.CLIENT_SPEC);
+            CommentedConfig config = parseConfigToml(newConfigToml, SFMConfig.CLIENT_CONFIG_SPEC);
             if (config == null) {
                 SFM.LOGGER.error("Received invalid config");
                 return ConfigSyncResult.INVALID_CONFIG;
@@ -181,7 +181,7 @@ public class SFMConfigReadWriter {
         }
 
         // Get the config path
-        Path configPath = SFMConfigTracker.getPathForConfig(SFMConfig.SERVER_SPEC);
+        Path configPath = SFMConfigTracker.getPathForConfig(SFMConfig.SERVER_CONFIG_SPEC);
         if (configPath == null) {
             SFM.LOGGER.warn("Failed to get server config path");
             return false;
@@ -217,7 +217,7 @@ public class SFMConfigReadWriter {
         }
 
         // Get the config path
-        Path configPath = SFMConfigTracker.getPathForConfig(SFMConfig.CLIENT_SPEC);
+        Path configPath = SFMConfigTracker.getPathForConfig(SFMConfig.CLIENT_CONFIG_SPEC);
         if (configPath == null) {
             SFM.LOGGER.warn("Failed to get client config path");
             return false;
