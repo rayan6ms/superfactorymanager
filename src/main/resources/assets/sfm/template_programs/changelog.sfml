@@ -21,6 +21,7 @@ NAME "Changelog"
 -- Clean up known_issues.sfml
 -- Add zh_cn Localization (#305), thanks @QiChenSn
 -- Add pt_br Localization (#275, #340), thanks @Jmpp2909, @IzaDellaCruz
+-- Fix printing press item ghosting misbehaviour (#259, #350), thanks @lennyservant!!!
 
 ---- 4.22.0 ----
 -- Thank you SpruceMist for the GitHub sponsorship <3
