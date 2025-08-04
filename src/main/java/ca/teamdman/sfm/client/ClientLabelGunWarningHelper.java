@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.client;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.gui.screen.SFMConfirmationScreen;
-import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
+import ca.teamdman.sfm.client.screen.SFMConfirmationScreen;
+import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.common.label.LabelGunPlan;
 import ca.teamdman.sfm.common.label.LabelGunPlanner;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunUsePacket;

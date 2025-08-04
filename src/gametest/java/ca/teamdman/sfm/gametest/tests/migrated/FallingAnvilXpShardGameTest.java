@@ -53,7 +53,7 @@ public class FallingAnvilXpShardGameTest extends SFMGameTestDefinition {
                 Pair.of(LevelsToShards.SumLevelsScaledExponentially, 10)
         );
 
-        var currentConfig = SFMConfig.SERVER.levelsToShards.get();
+        var currentConfig = SFMConfig.SERVER_CONFIG.levelsToShards.get();
         falling_anvil_xp_shard_inner(helper, 1, currentConfig, pos, enchBook, cases.iterator());
     }
 }

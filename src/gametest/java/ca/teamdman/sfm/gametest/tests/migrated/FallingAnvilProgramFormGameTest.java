@@ -62,7 +62,7 @@ public class FallingAnvilProgramFormGameTest extends SFMGameTestDefinition {
                             ItemEntity.class,
                             new AABB(helper.absolutePos(new BlockPos(1, 4, 1))).inflate(3)
                     );
-            if (found.stream().anyMatch(e -> SFMItemUtils.isSameItemSameTags(e.getItem(), FormItem.getForm(disk)))) {
+            if (found.stream().anyMatch(e -> SFMItemUtils.isSameItemSameTags(e.getItem(), FormItem.createFormFromReference(disk)))) {
                 helper.succeed();
             } else {
                 helper.fail("no form found");
