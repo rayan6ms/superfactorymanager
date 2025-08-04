@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.net;
 
-import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
-import ca.teamdman.sfm.client.gui.screen.TomlEditScreenOpenContext;
+import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
+import ca.teamdman.sfm.client.screen.TomlEditScreenOpenContext;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import net.minecraft.network.RegistryFriendlyByteBuf;

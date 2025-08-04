@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
-import ca.teamdman.sfm.client.gui.screen.TomlEditScreenOpenContext;
+import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
+import ca.teamdman.sfm.client.screen.TomlEditScreenOpenContext;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.config.SFMConfigReadWriter;
@@ -39,7 +39,7 @@ public record ClientboundClientConfigCommandPacket(
                 ClientboundClientConfigCommandPacket msg,
                 SFMPacketHandlingContext context
         ) {
-            String configTomlString = SFMConfigReadWriter.getConfigToml(SFMConfig.CLIENT_SPEC);
+            String configTomlString = SFMConfigReadWriter.getConfigToml(SFMConfig.CLIENT_CONFIG_SPEC);
             if (configTomlString == null) {
                 SFM.LOGGER.error("Unable to get client config");
                 return;

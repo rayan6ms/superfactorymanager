@@ -59,7 +59,7 @@ public class FallingAnvilHandler {
                             // check if the item can be turned into a form
                             if (recipe.value().form().test(item.getItem())) {
                                 didForm = true;
-                                item.setItem(FormItem.getForm(item.getItem()));
+                                item.setItem(FormItem.createFormFromReference(item.getItem()));
                                 break;
                             }
                         }
@@ -84,7 +84,7 @@ public class FallingAnvilHandler {
                             var item = e.getItem();
                             var enchantments = EnchantmentHelper.getEnchantmentsForCrafting(item);
 
-                            long shardsForEnchantments = switch (SFMConfig.SERVER.levelsToShards.get()) {
+                            long shardsForEnchantments = switch (SFMConfig.SERVER_CONFIG.levelsToShards.get()) {
                                 case JustOne -> 1;
                                 case EachOne -> enchantments.size();
                                 case SumLevels -> {

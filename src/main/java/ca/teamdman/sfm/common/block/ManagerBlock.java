@@ -82,9 +82,8 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
             @Stored BlockPos pos,
             BlockState state
     ) {
-        return SFMBlockEntities.MANAGER_BLOCK_ENTITY
-                .get()
-                .create(pos, state);
+        //noinspection DataFlowIssue
+        return SFMBlockEntities.MANAGER_BLOCK_ENTITY.get().create(pos, state);
     }
 
     @Override
@@ -95,7 +94,8 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
             Player player,
             BlockHitResult pHitResult
     ) {
-        if (level.getBlockEntity(pos) instanceof ManagerBlockEntity manager && player instanceof ServerPlayer sp) {
+        if (level.getBlockEntity(pos) instanceof ManagerBlockEntity manager
+            && player instanceof ServerPlayer serverPlayer) {
             // update warnings on disk as we open the gui
             var disk = manager.getDisk();
             if (disk != null) {
@@ -107,7 +107,7 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
                     );
                 }
             }
-            sp.openMenu(manager, buf -> ManagerContainerMenu.encode(manager, buf));
+            serverPlayer.openMenu(manager, buf -> ManagerContainerMenu.encode(manager, buf));
             return InteractionResult.CONSUME;
         }
         return InteractionResult.SUCCESS;

@@ -28,7 +28,10 @@ d----          2024-04-14  1:39 PM                SuperFactoryManager 1.20.3
     foreach ($repo in $repo_clones) {
         try {
             Push-Location $repo
-            idea . &
+            # Ultimate edition
+#            idea . &
+            # Community edition
+            idea2 . &
             # 2023.3.8 community edition
 #            start "$Env:LOCALAPPDATA\Programs\IntelliJ IDEA Community Edition 2\bin\idea64.exe" . &
             Start-Sleep -Seconds 3
