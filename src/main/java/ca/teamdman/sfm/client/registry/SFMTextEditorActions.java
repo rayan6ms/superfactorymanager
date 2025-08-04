@@ -64,7 +64,7 @@ public class SFMTextEditorActions {
     );
     public static final RegistryObject<ITextEditAction> SWAP_CURSOR_HEADS_AND_TAILS = REGISTERER.register(
             "swap_cursor_heads_and_tails",
-            SwapCursorHeadsAndTails::new
+            SwapCursorHeadsAndTailsAction::new
     );
 
     public static Stream<ITextEditAction> getTextEditActions() {

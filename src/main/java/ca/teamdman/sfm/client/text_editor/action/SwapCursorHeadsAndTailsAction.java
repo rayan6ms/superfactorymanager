@@ -8,7 +8,7 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayDeque;
 
-public class SwapCursorHeadsAndTails implements ITextEditAction {
+public class SwapCursorHeadsAndTailsAction implements ITextEditAction {
     @Override
     public boolean matches(
             TextEditContext context,
