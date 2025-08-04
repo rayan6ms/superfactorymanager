@@ -168,6 +168,12 @@ minecraft {
         client_teamy {
             //noinspection GroovyAssignabilityCheck
             parent runs.client
+
+            // THIS CAN CAUSE PROBLEMS! DISABLE AND REGEN RUNS IF ENCOUNTERING WEIRD ISSUES!
+            // Plays nice with: https://github.com/JetBrains/JetBrainsRuntime/releases/tag/jbr-release-17.0.14b1367.22
+            // Causes problems with: jbrsdk_jcef-17.0.6-x64-b469
+            jvmArgs '-XX:+AllowEnhancedClassRedefinition', '-XX:+IgnoreUnrecognizedVMOptions', '-XX:+AllowRedefinitionToAddDeleteMethods'
+
             args '--username', 'TeamDman', '--uuid', '83f1df8b-0ba3-4de0-8a26-e51a1fd74318', '--width', '1708', '--height', '960'
         }
 

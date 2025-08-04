@@ -59,6 +59,11 @@ public class RoundRobin implements ASTNode {
                 }
             }
             case BY_BLOCK -> {
+                // This can be optimized
+                // - ensure capacity where possible
+                // - determine index beforehand and stop collecting positions once we have enough
+                // to determine the next index do we not need to know the number of candidates?
+                // might be able to cache inside the object, as long as the object is nuked when labels are modified
                 List<Pair<Label, BlockPos>> candidates = new ArrayList<>();
                 LongOpenHashSet seen = new LongOpenHashSet();
                 for (Label label : labels) {

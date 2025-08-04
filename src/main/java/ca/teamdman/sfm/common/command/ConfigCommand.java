@@ -63,7 +63,7 @@ public record ConfigCommand(
 
     private int handleServerConfigCommand(ServerPlayer player) {
         String configToml = SFMConfigReadWriter.getConfigToml(
-                SFMConfig.SERVER_SPEC);
+                SFMConfig.SERVER_CONFIG_SPEC);
         if (configToml == null) {
             SFM.LOGGER.warn(
                     "Unable to get server config for player {} to {}",

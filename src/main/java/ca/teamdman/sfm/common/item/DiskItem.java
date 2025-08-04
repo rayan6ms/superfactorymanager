@@ -2,9 +2,9 @@ package ca.teamdman.sfm.common.item;
 
 import ca.teamdman.sfm.client.ClientKeyHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
-import ca.teamdman.sfm.client.gui.screen.ProgramEditScreenOpenContext;
-import ca.teamdman.sfm.client.gui.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
+import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
+import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenDiskOpenContext;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
@@ -195,7 +195,7 @@ public class DiskItem extends Item {
     ) {
         var stack = pPlayer.getItemInHand(pUsedHand);
         if (pLevel.isClientSide) {
-            SFMScreenChangeHelpers.showProgramEditScreen(new ProgramEditScreenOpenContext(
+            SFMScreenChangeHelpers.showProgramEditScreen(new SFMTextEditScreenDiskOpenContext(
                     getProgram(stack),
                     LabelPositionHolder.from(stack),
                     newProgramString -> SFMPackets.sendToServer(new ServerboundDiskItemSetProgramPacket(
