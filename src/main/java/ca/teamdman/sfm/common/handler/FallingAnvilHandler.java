@@ -58,7 +58,7 @@ public class FallingAnvilHandler {
                             // check if the item can be turned into a form
                             if (recipe.FORM.test(item.getItem())) {
                                 didForm = true;
-                                item.setItem(FormItem.getForm(item.getItem()));
+                                item.setItem(FormItem.createFormFromReference(item.getItem()));
                                 break;
                             }
                         }

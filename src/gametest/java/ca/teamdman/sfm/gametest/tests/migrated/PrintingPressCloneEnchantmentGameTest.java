@@ -94,7 +94,7 @@ public class PrintingPressCloneEnchantmentGameTest extends SFMGameTestDefinition
                 Enchantments.SHARPNESS,
                 3
         ));
-        player.setItemInHand(InteractionHand.MAIN_HAND, FormItem.getForm(reference));
+        player.setItemInHand(InteractionHand.MAIN_HAND, FormItem.createFormFromReference(reference));
         pressState.getBlock().use(
                 pressState,
                 helper.getLevel(),
@@ -146,7 +146,11 @@ public class PrintingPressCloneEnchantmentGameTest extends SFMGameTestDefinition
             }
 
             // Fail if result is the same instance of ItemStack stored in the form
-            if (Objects.equals(FormItem.getReference(printingPress.getForm()), held)) {
+            ItemStack referenceStack = FormItem.getReferenceFromFormBorrowed(printingPress.getForm());
+            if (Objects.equals(
+                    System.identityHashCode(referenceStack),
+                    System.identityHashCode(held)
+            )) {
                 helper.fail("cloned item shares the same ItemStack instance as form reference");
             }
 

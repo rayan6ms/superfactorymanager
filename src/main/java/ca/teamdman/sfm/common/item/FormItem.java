@@ -19,14 +19,23 @@ public class FormItem extends Item {
         super(new Item.Properties().tab(SFMItems.TAB));
     }
 
-    public static ItemStack getForm(ItemStack stack) {
+    public static ItemStack createFormFromReference(ItemStack stack) {
         var formStack = new ItemStack(SFMItems.FORM_ITEM.get());
         formStack.getOrCreateTag().put("reference", stack.serializeNBT());
         return formStack;
     }
 
-    public static ItemStack getReference(ItemStack stack) {
+    @MCVersionDependentBehaviour
+    public static ItemStack getReferenceFromFormBorrowed(ItemStack stack) {
+        // Before data components, this always creates a copied value.
         return ItemStack.of(stack.getOrCreateTag().getCompound("reference"));
+    }
+
+
+    @MCVersionDependentBehaviour
+    public static ItemStack getReferenceFromFormCopied(ItemStack stack) {
+        // Before data components, we always receive a copied value from this function.
+        return getReferenceFromFormBorrowed(stack);
     }
 
     @MCVersionDependentBehaviour // 1.21 this gets replaced with RegisterClientExtensionsEvent
@@ -43,7 +52,7 @@ public class FormItem extends Item {
             TooltipFlag pIsAdvanced
     ) {
         if (pStack.hasTag()) {
-            var reference = getReference(pStack);
+            var reference = getReferenceFromFormBorrowed(pStack);
             if (!reference.isEmpty()) {
                 pTooltipComponents.add(reference.getHoverName());
                 reference.getItem().appendHoverText(reference, pLevel, pTooltipComponents, pIsAdvanced);

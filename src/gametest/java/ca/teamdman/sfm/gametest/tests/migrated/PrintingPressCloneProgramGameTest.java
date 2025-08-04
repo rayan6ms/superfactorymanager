@@ -95,7 +95,7 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
                         OUTPUT TO a SLOTS 2
                     END
                 """.stripTrailing().stripIndent());
-        player.setItemInHand(InteractionHand.MAIN_HAND, FormItem.getForm(disk));
+        player.setItemInHand(InteractionHand.MAIN_HAND, FormItem.createFormFromReference(disk));
         pressState.getBlock().use(
                 pressState,
                 helper.getLevel(),
@@ -141,13 +141,17 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
             );
             ItemStack held = player.getMainHandItem();
 
-            // Fail if result is not a perfect clone of the disk
+            // Fail if the result is not a perfect clone of the disk
             if (!held.is(SFMItems.DISK_ITEM.get()) || !DiskItem.getProgram(held).equals(DiskItem.getProgram(disk))) {
                 helper.fail("Disk was not cloned");
             }
 
-            // Fail if result is the same instance of ItemStack stored in the form
-            if (Objects.equals(FormItem.getReference(printingPress.getForm()), held)) {
+            // Fail if the result is the same instance of ItemStack stored in the form
+            ItemStack referenceStack = FormItem.getReferenceFromFormBorrowed(printingPress.getForm());
+            if (Objects.equals(
+                    System.identityHashCode(referenceStack),
+                    System.identityHashCode(held)
+            )) {
                 helper.fail("cloned item shares the same ItemStack instance as form reference");
             }
 

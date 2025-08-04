@@ -66,7 +66,7 @@ public class FormItemRenderer extends BlockEntityWithoutLevelRenderer {
             renderer.renderModelLists(baseModel, stack, packedLight, packedOverlay, poseStack, buffer);
             poseStack.popPose();
 
-            var reference = FormItem.getReference(stack);
+            var reference = FormItem.getReferenceFromFormBorrowed(stack);
             if (!reference.isEmpty()) {
                 var model = renderer.getItemModelShaper().getItemModel(reference.getItem());
                 if (model != null) {
