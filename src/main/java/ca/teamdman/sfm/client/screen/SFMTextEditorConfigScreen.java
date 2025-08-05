@@ -192,10 +192,10 @@ public class SFMTextEditorConfigScreen extends Screen {
                                 updateButtonStates();
                             })
                             .build();
+            this.addRenderableWidget(preferredEditorV1Button);
+            this.addRenderableWidget(preferredEditorV2Button);
         }
 
-        this.addRenderableWidget(preferredEditorV1Button);
-        this.addRenderableWidget(preferredEditorV2Button);
 
         // Done Button
         this.addRenderableWidget(
