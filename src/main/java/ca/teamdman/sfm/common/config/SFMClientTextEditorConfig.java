@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.common.config;
 
-import ca.teamdman.sfm.client.registry.SFMTextEditors;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditorIntellisenseLevel;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
@@ -12,6 +11,6 @@ public class SFMClientTextEditorConfig {
     SFMClientTextEditorConfig(ModConfigSpec.Builder builder) {
         showLineNumbers = builder.define("showLineNumbers", true);
         intellisenseLevel = builder.defineEnum("intellisenseLevel", SFMTextEditorIntellisenseLevel.OFF);
-        preferredEditor = builder.define("preferredEditor", SFMTextEditors.V1.getKey().toString());
+        preferredEditor = builder.define("preferredEditor", "sfm:v1");
     }
 }
