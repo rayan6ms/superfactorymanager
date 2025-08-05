@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.common.config;
 
-import ca.teamdman.sfm.client.registry.SFMTextEditors;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditorIntellisenseLevel;
 import net.minecraftforge.common.ForgeConfigSpec;
 
@@ -12,8 +11,7 @@ public class SFMClientTextEditorConfig {
     SFMClientTextEditorConfig(ForgeConfigSpec.Builder builder) {
         showLineNumbers = builder.define("showLineNumbers", true);
         intellisenseLevel = builder.defineEnum("intellisenseLevel", SFMTextEditorIntellisenseLevel.OFF);
-        assert SFMTextEditors.V1.getKey() != null;
-        preferredEditor = builder.define("preferredEditor", SFMTextEditors.V1.getKey().location().toString());
+        preferredEditor = builder.define("preferredEditor", "sfm:v1");
     }
 
 }
