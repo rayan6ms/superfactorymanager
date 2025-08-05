@@ -3,6 +3,7 @@ package ca.teamdman.sfml;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
 import ca.teamdman.sfm.common.config.SFMConfig;
+import ca.teamdman.sfm.common.net.ServerboundLabelGunSetActiveLabelPacket;
 import ca.teamdman.sfml.ast.ResourceIdentifier;
 import com.google.common.collect.Sets;
 import net.minecraft.network.chat.Component;
@@ -196,12 +197,12 @@ public class SFMLTests {
     public void badTimerIntervalCheckingConfig() {
         var min = SFMConfig.SERVER_CONFIG.timerTriggerMinimumIntervalInTicks.getDefault();
         var template = """
-                        name "hello world"
-                    
-                        every X ticks do
-                            input from a
-                        end
-                    """;
+                    name "hello world"
+                
+                    every X ticks do
+                        input from a
+                    end
+                """;
         for (int i = min - 1; i > 0; i--) {
             String program = template.replace("X", String.valueOf(min - 1));
             assertCompileErrorsPresent(
@@ -211,6 +212,40 @@ public class SFMLTests {
                     )
             );
         }
+    }
+
+    @Test
+    public void badLabelLength() {
+        var template = """
+                    name "hello world"
+                
+                    every 20 ticks do
+                        input from X
+                    end
+                """;
+        String program = template.replace("X", "a".repeat(257));
+        assertCompileErrorsPresent(
+                program,
+                new CompileErrors(
+                        new IllegalArgumentException(
+                                "Maximum label length is "
+                                + ServerboundLabelGunSetActiveLabelPacket.MAX_LABEL_LENGTH
+                                + " characters. "
+                        )
+                )
+        );
+    }
+
+    @Test
+    public void emptyLabel() {
+        // not particularly useful, but there's not much reason to disallow it
+        assertNoCompileErrors("""
+            name "hello world"
+        
+            every 20 ticks do
+                input from ""
+            end
+        """);
     }
 
     @Test
@@ -662,9 +697,11 @@ public class SFMLTests {
     @Test
     public void demos() throws IOException {
         var rootDir = System.getProperty("user.dir");
-        rootDir = rootDir.replaceAll("runs"
-                                     + FileSystems.getDefault().getSeparator().replaceAll("\\\\", "\\\\\\\\")
-                                     + "junit$", "");
+        rootDir = rootDir.replaceAll(
+                "runs"
+                + FileSystems.getDefault().getSeparator().replaceAll("\\\\", "\\\\\\\\")
+                + "junit$", ""
+        );
         var examplesDir = Paths.get(rootDir, "examples").toFile();
         var found = 0;
         //noinspection DataFlowIssue
@@ -681,9 +718,11 @@ public class SFMLTests {
     @Test
     public void templates() throws IOException {
         var rootDir = System.getProperty("user.dir");
-        rootDir = rootDir.replaceAll("runs"
-                                     + FileSystems.getDefault().getSeparator().replaceAll("\\\\", "\\\\\\\\")
-                                     + "junit$", "");
+        rootDir = rootDir.replaceAll(
+                "runs"
+                + FileSystems.getDefault().getSeparator().replaceAll("\\\\", "\\\\\\\\")
+                + "junit$", ""
+        );
         var examplesDir = Paths.get(rootDir, "src/main/resources/assets/sfm/template_programs").toFile();
         var found = 0;
         //noinspection DataFlowIssue
