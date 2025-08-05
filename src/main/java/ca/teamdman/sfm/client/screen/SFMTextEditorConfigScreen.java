@@ -25,6 +25,7 @@ public class SFMTextEditorConfigScreen extends Screen {
     private Button intellisenseAdvancedButton;
     private Button preferredEditorV1Button;
     private Button preferredEditorV2Button;
+    private final boolean editorSelectorFeatureFlag = SFMEnvironmentUtils.isInIDE();
 
     public SFMTextEditorConfigScreen(
             SFMTextEditScreenV1 parent,
@@ -71,14 +72,16 @@ public class SFMTextEditorConfigScreen extends Screen {
                 y + 50,
                 0xFFFFFF
         );
-        drawString(
-                pPoseStack,
-                font,
-                LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR.getComponent(),
-                x,
-                y + 100,
-                0xFFFFFF
-        );
+        if (editorSelectorFeatureFlag) {
+            drawString(
+                    pPoseStack,
+                    font,
+                    LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR.getComponent(),
+                    x,
+                    y + 100,
+                    0xFFFFFF
+            );
+        }
         drawCenteredString(
                 pPoseStack,
                 font,
@@ -190,7 +193,7 @@ public class SFMTextEditorConfigScreen extends Screen {
                             updateButtonStates();
                         })
                         .build();
-        if (SFMEnvironmentUtils.isInIDE()) {
+        if (editorSelectorFeatureFlag) {
             // This behaviour is not ready for release.
             this.addRenderableWidget(preferredEditorV1Button);
             this.addRenderableWidget(preferredEditorV2Button);
