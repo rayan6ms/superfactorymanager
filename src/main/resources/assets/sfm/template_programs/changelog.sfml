@@ -7,7 +7,7 @@ NAME "Changelog"
 -- https://github.com/TeamDman/SuperFactoryManager/issues/new
 
 
----- vNext ----
+---- 4.23.0 ----
 -- Added more auto-lowercase rules in regex-like resource identifiers to avoid program-not-working confusion
 -- Add hotkeys for label gun contiguous behaviour (ctrl)
 -- Add hotkeys for label gun clear behaviour (shift)
