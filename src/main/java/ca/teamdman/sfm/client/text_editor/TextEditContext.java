@@ -197,6 +197,7 @@ public record TextEditContext(
 
 
     public void insertTextAtCursors(String text) {
+        // TODO: add support for when text contains a newline character.
         deleteSelectedText();
         var caretsByLine = new Int2ObjectOpenHashMap<IntList>();
         for (Cursor cursor : multiCursor().cursors()) {
