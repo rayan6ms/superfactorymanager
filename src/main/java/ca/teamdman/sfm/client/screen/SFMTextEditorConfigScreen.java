@@ -168,30 +168,30 @@ public class SFMTextEditorConfigScreen extends Screen {
         this.addRenderableWidget(intellisenseAdvancedButton);
 
         // Preferred Editor Buttons
+        preferredEditorV1Button =
+                new SFMButtonBuilder()
+                        .setPosition(x, y + 2 * spacing)
+                        .setSize(buttonWidth, buttonHeight)
+                        .setText(LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V1)
+                        .setOnPress(button -> {
+                            assert SFMTextEditors.V1.getKey() != null;
+                            config.preferredEditor.set(SFMTextEditors.V1.getKey().location().toString());
+                            updateButtonStates();
+                        })
+                        .build();
+        preferredEditorV2Button =
+                new SFMButtonBuilder()
+                        .setPosition(x + buttonWidth + buttonSpacing, y + 2 * spacing)
+                        .setSize(buttonWidth, buttonHeight)
+                        .setText(LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V2)
+                        .setOnPress(button -> {
+                            assert SFMTextEditors.V2.getKey() != null;
+                            config.preferredEditor.set(SFMTextEditors.V2.getKey().location().toString());
+                            updateButtonStates();
+                        })
+                        .build();
         if (SFMEnvironmentUtils.isInIDE()) {
             // This behaviour is not ready for release.
-            preferredEditorV1Button =
-                    new SFMButtonBuilder()
-                            .setPosition(x, y + 2 * spacing)
-                            .setSize(buttonWidth, buttonHeight)
-                            .setText(LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V1)
-                            .setOnPress(button -> {
-                                assert SFMTextEditors.V1.getKey() != null;
-                                config.preferredEditor.set(SFMTextEditors.V1.getKey().location().toString());
-                                updateButtonStates();
-                            })
-                            .build();
-            preferredEditorV2Button =
-                    new SFMButtonBuilder()
-                            .setPosition(x + buttonWidth + buttonSpacing, y + 2 * spacing)
-                            .setSize(buttonWidth, buttonHeight)
-                            .setText(LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V2)
-                            .setOnPress(button -> {
-                                assert SFMTextEditors.V2.getKey() != null;
-                                config.preferredEditor.set(SFMTextEditors.V2.getKey().location().toString());
-                                updateButtonStates();
-                            })
-                            .build();
             this.addRenderableWidget(preferredEditorV1Button);
             this.addRenderableWidget(preferredEditorV2Button);
         }
