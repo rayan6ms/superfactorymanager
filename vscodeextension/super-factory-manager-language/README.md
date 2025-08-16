@@ -24,6 +24,8 @@ For now, the following snippets are available: basic, energy, input, output, if,
 
 - **Settings:** Customizations! You can add more content or change some behaviors from the default ones
 
+- **Markdown:** On a markdown file, you can get almost all effect from the extension, except snippets
+
 ## Installation
 
 1. Install the extension through the VSCode Marketplace.
