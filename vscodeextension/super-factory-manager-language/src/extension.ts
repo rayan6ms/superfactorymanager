@@ -1,8 +1,8 @@
 import * as vscode from 'vscode';
 import { registerSnippets } from './snippets/snippetController';
 import { activityBar, deleteTempFiles } from './activitybar/ActivityBar';
-import { handleDocument} from './antlrg4/Parser';
-import { checkInputOutput } from './antlrg4/Warning';
+import { checkForErrors } from './antlrg4/Error';
+import { checkForWarnings } from './antlrg4/Warning';
 import { activateTooltip } from './tooltip/tooltip';
 import { activaColors } from './syntaxes/syntax';
 
@@ -16,8 +16,8 @@ export function activate(context: vscode.ExtensionContext) {
     activityBar(context);
     
     const checking = vscode.workspace.onDidSaveTextDocument((document) => {
-        handleDocument(document);
-        checkInputOutput(document);
+        checkForErrors(document);
+        checkForWarnings(document);
     });
     context.subscriptions.push(checking);
 
