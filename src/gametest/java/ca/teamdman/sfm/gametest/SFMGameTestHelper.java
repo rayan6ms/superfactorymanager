@@ -122,7 +122,6 @@ public class SFMGameTestHelper extends GameTestHelper {
         triggers.add(0, startTimerTrigger);
         triggers.add(endTimerTrigger);
 
-
         LongStream
                 .range(getTick() + 1, timeoutTicks - getTick())
                 .forEach(i -> runAfterDelay(i, () -> {
