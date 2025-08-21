@@ -7,6 +7,9 @@ import ca.teamdman.sfm.common.util.Stored;
 import ca.teamdman.sfml.ast.Label;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraftforge.event.server.ServerStoppedEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,6 +19,7 @@ import java.util.IdentityHashMap;
  * A pool of {@link LimitedOutputSlot} objects to avoid the garbage collector
  */
 @SuppressWarnings("DuplicatedCode")
+@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = SFM.MOD_ID)
 public class LimitedOutputSlotObjectPool {
     public static final IdentityHashMap<LimitedOutputSlot<?, ?, ?>, Boolean> LEASED = new IdentityHashMap<>();
     @SuppressWarnings("rawtypes")
@@ -113,5 +117,10 @@ public class LimitedOutputSlotObjectPool {
             SFM.LOGGER.warn("Leased objects not released: {}", LEASED);
             LEASED.clear();
         }
+    }
+
+    @SubscribeEvent
+    public static void onServerStopped(ServerStoppedEvent event) {
+        pool = new LimitedOutputSlot[27];
     }
 }
