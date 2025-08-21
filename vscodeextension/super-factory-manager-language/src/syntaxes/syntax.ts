@@ -1,6 +1,7 @@
 import * as vscode from 'vscode';
-import {CharStreams, Token} from 'antlr4ts';
-import {SFMLLexer} from '../generated/SFMLLexer';
+import { CharStreams, Token } from 'antlr4ts';
+import { SFMLLexer } from '../generated/SFMLLexer';
+import { extractSFMLCodeBlocks } from '../antlrg4/Error';
 
 export class SemanticTokensProvider implements vscode.DocumentSemanticTokensProvider
 {
@@ -110,27 +111,67 @@ export class SemanticTokensProvider implements vscode.DocumentSemanticTokensProv
     provideDocumentSemanticTokens(document: vscode.TextDocument, token: vscode.CancellationToken): vscode.ProviderResult<vscode.SemanticTokens>
     {
         const builder = new vscode.SemanticTokensBuilder(this.legend);
-        const text = document.getText();
-        const inputStream = CharStreams.fromString(text);
-        const lexer = new SFMLLexer(inputStream);
 
-        let antlrToken: Token;
-        while((antlrToken = lexer.nextToken()) && antlrToken.type !== Token.EOF)
+        if(document.languageId === 'sfml')
         {
-            const tokenType = this.tokenTypes.get(antlrToken.type);
-            if(!tokenType) continue;
+            const text = document.getText();
+            const inputStream = CharStreams.fromString(text);
+            const lexer = new SFMLLexer(inputStream);
 
-            const startPos = document.positionAt(antlrToken.startIndex);
-            const endPos = document.positionAt(antlrToken.stopIndex + 1);
-            
-            builder.push(
-                new vscode.Range(startPos, endPos),
-                tokenType
-                //If we add modifiers, add here :>
-            );
+            let antlrToken: Token;
+            while((antlrToken = lexer.nextToken()) && antlrToken.type !== Token.EOF)
+            {
+                if(token.isCancellationRequested) break;
+                
+                const tokenType = this.tokenTypes.get(antlrToken.type);
+                if(!tokenType) continue;
+
+                const startPos = document.positionAt(antlrToken.startIndex);
+                const endPos = document.positionAt(antlrToken.stopIndex + 1);
+                
+                builder.push(
+                    new vscode.Range(startPos, endPos),
+                    tokenType
+                );
+            }
         }
-        let tokens = builder.build();
-        return tokens;
+        else if(document.languageId === 'markdown')
+        {
+            const text = document.getText();
+            const blocks = extractSFMLCodeBlocks(text);
+
+            for(const block of blocks)
+            {
+                if(token.isCancellationRequested) break;
+                
+                const inputStream = CharStreams.fromString(block.content);
+                const lexer = new SFMLLexer(inputStream);
+
+                let antlrToken: Token;
+                while((antlrToken = lexer.nextToken()) && antlrToken.type !== Token.EOF)
+                {
+                    if (token.isCancellationRequested) break;
+                    
+                    const tokenType = this.tokenTypes.get(antlrToken.type);
+                    if(!tokenType) continue;
+
+                    //We need to make a few extract stuff to hit the correct line
+                    const tokenLine = block.startLine + antlrToken.line - 1;
+                    const tokenStartCol = antlrToken.charPositionInLine;
+                    const tokenEndCol = tokenStartCol + (antlrToken.text?.length || 0);
+
+                    const startPos = new vscode.Position(tokenLine, tokenStartCol);
+                    const endPos = new vscode.Position(tokenLine, tokenEndCol);
+                    
+                    builder.push(
+                        new vscode.Range(startPos, endPos),
+                        tokenType
+                    );
+                }
+            }
+        }
+
+        return builder.build();
     }
 
     //turns out that we can gain a few ms if we do this, idk why
@@ -143,12 +184,19 @@ export class SemanticTokensProvider implements vscode.DocumentSemanticTokensProv
 
 export function activaColors(context: vscode.ExtensionContext)
 {
-    const selector = { language: 'sfml', schema: 'file'}; //this is a somewhat lie but helps a bit
+    const sfmlSelector = { language: 'sfml', scheme: 'file' };
+    const markdownSelector = { language: 'markdown', scheme: 'file' };
+    
     const provider = new SemanticTokensProvider();
 
     context.subscriptions.push(
         vscode.languages.registerDocumentSemanticTokensProvider(
-            selector,
+            sfmlSelector,
+            provider,
+            provider.legend
+        ),
+        vscode.languages.registerDocumentSemanticTokensProvider(
+            markdownSelector,
             provider,
             provider.legend
         )
