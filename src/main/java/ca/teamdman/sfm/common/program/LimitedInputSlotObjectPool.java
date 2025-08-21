@@ -7,7 +7,9 @@ import ca.teamdman.sfm.common.util.Stored;
 import ca.teamdman.sfml.ast.Label;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.neoforged.fml.common.Mod;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.EventBusSubscriber;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -17,7 +19,7 @@ import java.util.IdentityHashMap;
  * A pool of {@link LimitedInputSlot} objects to avoid the garbage collector
  */
 @SuppressWarnings("DuplicatedCode")
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = SFM.MOD_ID)
+@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, modid = SFM.MOD_ID)
 public class LimitedInputSlotObjectPool {
     public static final IdentityHashMap<LimitedInputSlot<?, ?, ?>, Boolean> LEASED = new IdentityHashMap<>();
     @SuppressWarnings("rawtypes")
