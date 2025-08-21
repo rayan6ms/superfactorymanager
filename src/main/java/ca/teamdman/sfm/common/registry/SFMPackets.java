@@ -13,6 +13,7 @@ import net.neoforged.neoforge.network.event.RegisterPayloadHandlerEvent;
 import net.neoforged.neoforge.network.registration.IPayloadRegistrar;
 
 import java.util.IdentityHashMap;
+import java.util.Locale;
 import java.util.function.Supplier;
 
 @Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -112,7 +113,7 @@ public class SFMPackets {
     }
 
     private static ResourceLocation getPacketId(Class<? extends SFMPacket> clazz) {
-        return new ResourceLocation(SFM.MOD_ID, clazz.getSimpleName().toLowerCase());
+        return new ResourceLocation(SFM.MOD_ID, clazz.getSimpleName().toLowerCase(Locale.ROOT));
     }
 
     private record SFMWrappedPacket<T extends SFMPacket>(T inner) implements CustomPacketPayload {
