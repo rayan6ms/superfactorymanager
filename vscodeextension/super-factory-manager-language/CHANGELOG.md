@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.0.14]
+
+### Changes on code
+
+- **Markdown**
+  - Support for markdown codeblock, you can use \```sfm\``` or \```sfml``` for your codes, no snippets
+
 ## [0.0.13]
 
 ### Changes on code
