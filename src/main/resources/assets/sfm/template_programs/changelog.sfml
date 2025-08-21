@@ -12,6 +12,7 @@ NAME "Changelog"
 -- Fix Turkish locale causing crashes on launch, fixes #362
 -- Fix timer trigger offset in seconds not being multiplied by 20, fixes #354
 EVERY 20+10 SECONDS DO END
+-- Fix printing press form item tooltip not showing details on MC1.21+, fixes #361
 
 ---- 4.23.0 ----
 -- Added more auto-lowercase rules in regex-like resource identifiers to avoid program-not-working confusion

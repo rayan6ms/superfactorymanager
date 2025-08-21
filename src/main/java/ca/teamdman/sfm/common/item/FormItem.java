@@ -54,8 +54,7 @@ public class FormItem extends Item {
         if (pStack.hasTag()) {
             var reference = getBorrowedReferenceFromForm(pStack);
             if (!reference.isEmpty()) {
-                pTooltipComponents.add(reference.getHoverName());
-                reference.getItem().appendHoverText(reference, pLevel, pTooltipComponents, pIsAdvanced);
+                pTooltipComponents.addAll(reference.getTooltipLines(null, pIsAdvanced));
             }
         }
     }
