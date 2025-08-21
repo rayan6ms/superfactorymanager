@@ -79,7 +79,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
                 .replaceAll("::", ":*:")
                 .replaceAll(":$", ":*")
                 .replaceAll("\\*", ".*")
-                .toLowerCase();
+                .toLowerCase(Locale.ROOT);
 
         var rtn = ResourceIdentifier.fromString(str);
         USED_RESOURCES.add(rtn);
