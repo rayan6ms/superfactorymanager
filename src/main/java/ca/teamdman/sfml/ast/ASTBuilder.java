@@ -231,6 +231,9 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         TerminalNode secondNumber = ctx.NUMBER(1);
         if (secondNumber != null) {
             offset = Integer.parseInt(secondNumber.getText());
+            if (ctx.SECONDS() != null || ctx.SECOND() != null) {
+                offset *= 20;
+            }
         }
 
         Interval interval = new Interval(ticks, alignment, offset);
@@ -253,6 +256,9 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         TerminalNode secondNumber = ctx.NUMBER();
         if (secondNumber != null) {
             offset = Integer.parseInt(secondNumber.getText());
+            if (ctx.SECONDS() != null || ctx.SECOND() != null) {
+                offset *= 20;
+            }
         }
 
         Interval interval = new Interval(ticks, alignment, offset);
