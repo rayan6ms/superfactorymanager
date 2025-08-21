@@ -10,6 +10,8 @@ NAME "Changelog"
 -- Thanks Druadi for the support!
 -- Add SFML support to markdown code blocks in VSCode extension, thanks @Titop54!
 -- Fix Turkish locale causing crashes on launch, fixes #362
+-- Fix timer trigger offset in seconds not being multiplied by 20, fixes #354
+EVERY 20+10 SECONDS DO END
 
 ---- 4.23.0 ----
 -- Added more auto-lowercase rules in regex-like resource identifiers to avoid program-not-working confusion
