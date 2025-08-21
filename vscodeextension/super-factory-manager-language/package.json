@@ -15,7 +15,7 @@
       "name": "Titop54"
     }
   ],
-  "version": "0.0.13",
+  "version": "0.0.14",
   "icon": "media/controller.png",
   "main": "./out/extension.js",
   "engines": {
@@ -26,7 +26,8 @@
     "Programming Languages"
   ],
   "activationEvents": [
-    "onLanguage:sfm"
+    "onLanguage:sfm",
+    "onLanguage:markdown"
   ],
   "contributes": {
     "languages": [
@@ -160,7 +161,7 @@
   "devDependencies": {
     "@types/node": "^22.15.17",
     "@types/vscode": "^1.0.0",
-    "typescript": "^5.8.3"
+    "typescript": "^5.9.2"
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",
@@ -173,6 +174,6 @@
   "dependencies": {
     "antlr4ts": "^0.5.0-alpha.4",
     "antlr4ts-cli": "^0.5.0-alpha.4",
-    "axios": "^1.7.7"
+    "axios": "^1.11.0"
   }
 }

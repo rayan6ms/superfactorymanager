@@ -2,6 +2,8 @@ package ca.teamdman.sfm.gametest;
 
 import net.minecraft.gametest.framework.TestFunction;
 
+import java.util.Locale;
+
 public abstract class SFMGameTestDefinition {
     public abstract String template();
     public String templateModId() {
@@ -39,6 +41,6 @@ public abstract class SFMGameTestDefinition {
                 input.replaceAll("([a-zA-Z])(\\d+)", "$1_$2")
                         .replaceAll("(\\d+)([a-zA-Z])", "$1_$2")
                         .replaceAll("([a-z])([A-Z])", "$1_$2")
-                        .toLowerCase();
+                        .toLowerCase(Locale.ROOT);
     }
 }
