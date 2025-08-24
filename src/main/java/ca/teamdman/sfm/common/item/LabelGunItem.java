@@ -230,9 +230,8 @@ public class LabelGunItem extends Item {
             );
         } else {
             SFMItemUtils.appendMoreInfoKeyReminderTextIfOnClient(lines);
+            lines.addAll(LabelPositionHolder.from(stack).asHoverText());
         }
-
-        lines.addAll(LabelPositionHolder.from(stack).asHoverText());
     }
 
     @Override
