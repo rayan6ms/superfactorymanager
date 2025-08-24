@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.common.util;
 
-import ca.teamdman.sfm.client.ClientKeyHelpers;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import net.minecraft.ChatFormatting;
@@ -26,7 +25,7 @@ public class SFMItemUtils {
     }
 
     public static boolean isClientAndMoreInfoKeyPressed() {
-        return SFMEnvironmentUtils.isClient() && ClientKeyHelpers.isKeyDownInScreenOrWorld(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY);
+        return SFMEnvironmentUtils.isClient() && SFMKeyMappings.isKeyDownInScreenOrWorld(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY);
     }
 
     public static MutableComponent getRainbow(int length) {
