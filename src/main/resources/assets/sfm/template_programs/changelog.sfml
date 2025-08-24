@@ -7,7 +7,7 @@ NAME "Changelog"
 -- https://github.com/TeamDman/SuperFactoryManager/issues/new
 
 ---- 4.24.0 ----
--- Thanks Druadi for the support!
+-- Thanks @Druadi for the support!
 -- Add SFML support to markdown code blocks in VSCode extension, thanks @Titop54!
 -- Fix Turkish locale causing crashes on launch, fixes #362
 -- Fix timer trigger offset in seconds not being multiplied by 20, fixes #354
@@ -16,6 +16,7 @@ EVERY 20+10 SECONDS DO END
 -- Fix label gun tooltip hotkey reminders having bad translation formatting, fixes #311
 -- Add label gun scroll modifier keymapping, letting you change shift+scroll to something else
 -- Add more hotkey reminders to label gun tooltip
+-- Merge #353 with additional PT_BR localization entries, thanks @PrincessStelllar
 
 ---- 4.23.0 ----
 -- Added more auto-lowercase rules in regex-like resource identifiers to avoid program-not-working confusion
