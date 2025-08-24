@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunSetActiveLabelPacket;
 import ca.teamdman.sfm.common.registry.SFMPackets;
@@ -17,7 +18,7 @@ public class LabelGunScrollSwitcher {
     public static void onScroll(InputEvent.MouseScrollingEvent event) {
         var player = Minecraft.getInstance().player;
         if (player == null) return;
-        if (!player.isShiftKeyDown()) return;
+        if (!SFMKeyMappings.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_SCROLL_MODIFIER_KEY)) return;
         var gun = player.getMainHandItem();
         var hand = InteractionHand.MAIN_HAND;
         if (!(gun.getItem() instanceof LabelGunItem)) {
