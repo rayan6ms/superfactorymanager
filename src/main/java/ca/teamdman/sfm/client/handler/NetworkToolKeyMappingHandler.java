@@ -1,7 +1,6 @@
 package ca.teamdman.sfm.client.handler;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.ClientKeyHelpers;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.net.ServerboundNetworkToolToggleOverlayPacket;
 import ca.teamdman.sfm.common.registry.SFMItems;
@@ -40,7 +39,7 @@ public class NetworkToolKeyMappingHandler {
         if (minecraft.screen != null) return;
 
         // only do something if the key was pressed
-        boolean alt_down = ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.TOGGLE_NETWORK_TOOL_OVERLAY_KEY);
+        boolean alt_down = SFMKeyMappings.isKeyDownInWorld(SFMKeyMappings.TOGGLE_NETWORK_TOOL_OVERLAY_KEY);
         switch (toggleKeyState) {
             case Idle -> {
                 if (alt_down) {
