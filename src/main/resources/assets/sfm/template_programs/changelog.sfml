@@ -13,6 +13,9 @@ NAME "Changelog"
 -- Fix timer trigger offset in seconds not being multiplied by 20, fixes #354
 EVERY 20+10 SECONDS DO END
 -- Fix printing press form item tooltip not showing details on MC1.21+, fixes #361
+-- Fix label gun tooltip hotkey reminders having bad translation formatting, fixes #311
+-- Add label gun scroll modifier keymapping, letting you change shift+scroll to something else
+-- Add more hotkey reminders to label gun tooltip
 
 ---- 4.23.0 ----
 -- Added more auto-lowercase rules in regex-like resource identifiers to avoid program-not-working confusion

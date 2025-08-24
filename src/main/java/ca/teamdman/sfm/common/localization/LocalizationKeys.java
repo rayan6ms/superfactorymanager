@@ -273,25 +273,53 @@ public final class LocalizationKeys {
             () -> SFMItems.NETWORK_TOOL_ITEM.get().getDescriptionId() + ".tooltip.7",
             () -> "Ctrl-alt-click to facade entire network."
     );
-    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_1 = new LocalizationEntry(
-            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.1",
-            () -> "%s a Factory Manager to push labels."
+    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_TOGGLE_LABEL_REMINDER = new LocalizationEntry(
+            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.toggle_label_reminder",
+            () -> "%s a block to toggle the active label on it."
     );
-    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_2 = new LocalizationEntry(
-            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.2",
-            () -> "%s a Factory Manager while sneaking to pull labels."
+    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_PUSH_REMINDER = new LocalizationEntry(
+            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.push_reminder",
+            () -> "%s a Factory Manager to push labels to it."
     );
-    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_3 = new LocalizationEntry(
-            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.3",
-            () -> "Hold %s to apply labels to blocks of the same type adjacent to cables."
+    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_PULL_REMINDER = new LocalizationEntry(
+            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.pull_reminder",
+            () -> "%s + %s a Factory Manager to pull labels from it."
     );
-    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_4 = new LocalizationEntry(
-            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.4",
-            () -> "%s + %s to pick label from block."
+    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_CLEAR_REMINDER = new LocalizationEntry(
+            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.clear_reminder",
+            () -> "%s + %s a block to remove labels from it."
     );
-    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_5 = new LocalizationEntry(
-            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.5",
-            () -> "Press  %s to toggle label view."
+    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_PICK_REMINDER = new LocalizationEntry(
+            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.pick_reminder",
+            () -> "%s + %s a block to pick the active label from it."
+    );
+    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_CONTIGUOUS_REMINDER = new LocalizationEntry(
+            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.contiguous_reminder",
+            () -> "Hold %s to perform changes against contiguous blocks touching cables."
+    );
+    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_CYCLE_VIEW_REMINDER = new LocalizationEntry(
+            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.cycle_view_reminder",
+            () -> "Press %s to cycle label view."
+    );
+    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_NEXT_REMINDER = new LocalizationEntry(
+            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.next_reminder",
+            () -> "Press %s to select next label."
+    );
+    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_PREVIOUS_REMINDER = new LocalizationEntry(
+            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.previous_reminder",
+            () -> "Press %s to select previous label."
+    );
+    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_SCROLL_REMINDER = new LocalizationEntry(
+            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.scroll_reminder",
+            () -> "%s + mouse wheel to select next/previous label."
+    );
+    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_GUI_REMINDER = new LocalizationEntry(
+            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.gui_reminder",
+            () -> "%s the air to open GUI."
+    );
+    public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_TARGET_MANAGER_REMINDER = new LocalizationEntry(
+            () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.target_manager_reminder",
+            () -> "%s + %s to label a Factory Manager itself."
     );
     public static final LocalizationEntry LABEL_GUN_VIEW_MODE_SHOW_ONLY_ACTIVE_AND_TARGETED = new LocalizationEntry(
             () -> "sfm.label_gun.view_mode.show_only_active_and_targeted",
@@ -880,6 +908,10 @@ public final class LocalizationKeys {
     public static final LocalizationEntry LABEL_GUN_PREVIOUS_LABEL_KEY = new LocalizationEntry(
             "key.sfm.label_gun.previous_label",
             "Label Gun Previous Label"
+    );
+    public static final LocalizationEntry LABEL_GUN_SCROLL_MODIFIER_KEY = new LocalizationEntry(
+            "key.sfm.label_gun.scroll_modifier",
+            "Label Gun Scroll Modifier"
     );
     public static final LocalizationEntry LABEL_GUN_PULL_MODIFIER_KEY = new LocalizationEntry(
             "key.sfm.label_gun.pull_modifier",
