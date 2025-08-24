@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
@@ -86,6 +87,15 @@ public class SFMKeyMappings {
             LocalizationKeys.SFM_KEY_CATEGORY.key().get()
     ));
 
+    public static final Lazy<KeyMapping> LABEL_GUN_SCROLL_MODIFIER_KEY = Lazy.of(() -> new KeyMapping(
+            LocalizationKeys.LABEL_GUN_SCROLL_MODIFIER_KEY.key().get(),
+            KeyConflictContext.IN_GAME,
+            KeyModifier.NONE,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_LEFT_SHIFT,
+            LocalizationKeys.SFM_KEY_CATEGORY.key().get()
+    ));
+
     public static final Lazy<KeyMapping> LABEL_GUN_NEXT_LABEL_KEY = Lazy.of(() -> new KeyMapping(
             LocalizationKeys.LABEL_GUN_NEXT_LABEL_KEY.key().get(),
             KeyConflictContext.IN_GAME,
@@ -104,7 +114,6 @@ public class SFMKeyMappings {
             LocalizationKeys.SFM_KEY_CATEGORY.key().get()
     ));
 
-    // New: Label Gun Pull Modifier Key
     public static final Lazy<KeyMapping> LABEL_GUN_PULL_MODIFIER_KEY = Lazy.of(() -> new KeyMapping(
             LocalizationKeys.LABEL_GUN_PULL_MODIFIER_KEY.key().get(),
             KeyConflictContext.IN_GAME,
@@ -137,5 +146,24 @@ public class SFMKeyMappings {
         event.register(LABEL_GUN_NEXT_LABEL_KEY.get());
         event.register(LABEL_GUN_PREVIOUS_LABEL_KEY.get());
         event.register(LABEL_GUN_TARGET_MANAGER_MODIFIER_KEY.get());
+    }
+
+    public static boolean isKeyDownInScreenOrWorld(Lazy<KeyMapping> key) {
+        if (key.get().getKey().equals(InputConstants.UNKNOWN)) {
+            return false;
+        }
+        // special effort is needed to ensure this works properly when the manager screen is open
+        // https://github.com/mekanism/Mekanism/blob/f92b48a49e0766cd3aa78e95c9c4a47ba90402f5/src/main/java/mekanism/client/key/MekKeyHandler.java
+        long handle = Minecraft.getInstance().getWindow().getWindow();
+        return InputConstants.isKeyDown(
+                handle,
+                key.get().getKey().getValue()
+        );
+    }
+    public static boolean isKeyDownInWorld(Lazy<KeyMapping> key) {
+        if (key.get().getKey().equals(InputConstants.UNKNOWN)) {
+            return false;
+        }
+        return key.get().isDown();
     }
 }
