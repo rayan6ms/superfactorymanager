@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.common.item;
 
-import ca.teamdman.sfm.client.ClientKeyHelpers;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
@@ -210,7 +209,7 @@ public class DiskItem extends Item {
     @Override
     public Component getName(ItemStack stack) {
         if (SFMEnvironmentUtils.isClient()) {
-            if (ClientKeyHelpers.isKeyDownInScreenOrWorld(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY))
+            if (SFMKeyMappings.isKeyDownInScreenOrWorld(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY))
                 return super.getName(stack);
         }
         var name = getProgramName(stack);

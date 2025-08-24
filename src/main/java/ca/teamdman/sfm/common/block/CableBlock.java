@@ -1,7 +1,6 @@
 package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.client.ClientFacadeWarningHelper;
-import ca.teamdman.sfm.client.ClientKeyHelpers;
 import ca.teamdman.sfm.client.handler.NetworkToolKeyMappingHandler;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
@@ -80,7 +79,7 @@ public class CableBlock extends Block implements ICableBlock, IFacadableBlock {
                         pPlayer.getMainHandItem(),
                         InteractionHand.MAIN_HAND
                 );
-                if (ClientKeyHelpers.isKeyDownInWorld(SFMKeyMappings.TOGGLE_NETWORK_TOOL_OVERLAY_KEY)) {
+                if (SFMKeyMappings.isKeyDownInWorld(SFMKeyMappings.TOGGLE_NETWORK_TOOL_OVERLAY_KEY)) {
                     // we don't want to toggle the overlay if we're using alt-click behaviour
                     NetworkToolKeyMappingHandler.setExternalDebounce();
                 }
