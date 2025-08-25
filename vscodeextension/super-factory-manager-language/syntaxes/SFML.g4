@@ -38,8 +38,8 @@ forgetStatement : FORGET label? (COMMA label)* COMMA?;
 inputStatement  : INPUT inputResourceLimits? resourceExclusion? FROM EACH? labelAccess
                 | FROM EACH? labelAccess INPUT inputResourceLimits? resourceExclusion?
                 ;
-outputStatement : OUTPUT outputResourceLimits? resourceExclusion? TO EACH? labelAccess
-                | TO EACH? labelAccess OUTPUT outputResourceLimits? resourceExclusion?
+outputStatement : OUTPUT outputResourceLimits? resourceExclusion? TO emptyslots? EACH? labelAccess
+                | TO emptyslots? EACH? labelAccess OUTPUT outputResourceLimits? resourceExclusion?
                 ;
 
 inputResourceLimits   : resourceLimitList; // separate for different defaults
@@ -133,7 +133,6 @@ setOp           : OVERALL
 
 
 
-
 //
 // IO HELPERS
 //
@@ -142,6 +141,8 @@ roundrobin      : ROUND ROBIN BY (LABEL | BLOCK);
 label           : (identifier)   #RawLabel
                 | string                  #StringLabel
                 ;
+
+emptyslots      : EMPTY SLOTS IN ;
 
 identifier : (IDENTIFIER | REDSTONE | GLOBAL | SECOND | SECONDS) ;
 
@@ -196,12 +197,14 @@ RETAIN  : R E T A I N ;
 EACH    : E A C H ;
 EXCEPT  : E X C E P T ;
 FORGET  : F O R G E T ;
+EMPTY   : E M P T Y ;
+IN      : I N ;
 
 // WITH LOGIC
 WITHOUT : W I T H O U T;
 WITH    : W I T H ;
 TAG     : T A G ;
-HASHTAG : '#' ;
+HASHTAG : '#';
 
 // ROUND ROBIN
 ROUND : R O U N D ;

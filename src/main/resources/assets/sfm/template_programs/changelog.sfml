@@ -6,6 +6,19 @@ NAME "Changelog"
 -- SFM submit new issue:
 -- https://github.com/TeamDman/SuperFactoryManager/issues/new
 
+---- 4.25.0 ----
+-- Implement `EMPTY SLOTS IN` modifier for OUTPUT to place only into empty destination slots (#365)
+EVERY 20 TICKS DO
+    INPUT FROM mob_loot
+    OUTPUT TO EMPTY SLOTS IN storage
+END
+-- Optional: run an infrequent condensing pass to stack items
+EVERY 300 SECONDS DO
+    INPUT FROM storage
+    OUTPUT TO storage
+END
+
+
 ---- 4.24.0 ----
 -- Thanks @Druadi for the support!
 -- Add SFML support to markdown code blocks in VSCode extension, thanks @Titop54!
