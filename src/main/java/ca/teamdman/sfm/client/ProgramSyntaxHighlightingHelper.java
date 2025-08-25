@@ -120,6 +120,8 @@ public class ProgramSyntaxHighlightingHelper {
             case SFMLLexer.AND:
             case SFMLLexer.NOT:
             case SFMLLexer.OR:
+            case SFMLLexer.IN:
+            case SFMLLexer.EMPTY:
                 return ChatFormatting.GOLD;
             case SFMLLexer.NUMBER:
             case SFMLLexer.PLUS:
