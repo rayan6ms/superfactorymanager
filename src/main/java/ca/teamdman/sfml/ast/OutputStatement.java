@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.*;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -652,6 +653,7 @@ public class OutputStatement implements IOStatement {
         }
     }
 
+    @MCVersionDependentBehaviour
     private <STACK, ITEM, CAP> boolean shouldCreateSlot(
             ResourceType<STACK, ITEM, CAP> type,
             CAP cap,
