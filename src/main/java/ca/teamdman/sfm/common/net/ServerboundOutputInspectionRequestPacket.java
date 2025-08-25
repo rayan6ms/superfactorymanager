@@ -10,8 +10,8 @@ import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.SFMASTUtils;
-import ca.teamdman.sfml.ast.Number;
 import ca.teamdman.sfml.ast.*;
+import ca.teamdman.sfml.ast.Number;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -43,7 +43,8 @@ public record ServerboundOutputInspectionRequestPacket(
         successProgram.replaceOutputStatement(outputStatement, new OutputStatement(
                 outputStatement.labelAccess(),
                 outputStatement.resourceLimits(),
-                outputStatement.each()
+                outputStatement.each(),
+                outputStatement.emptySlotsOnly()
         ) {
             @Override
             public void tick(ProgramContext context) {
@@ -209,7 +210,8 @@ public record ServerboundOutputInspectionRequestPacket(
                                 .append(new OutputStatement(
                                         outputStatement.labelAccess(),
                                         condensedResourceLimits,
-                                        outputStatement.each()
+                                        outputStatement.each(),
+                                        outputStatement.emptySlotsOnly()
                                 ).toStringPretty());
                     }
 
