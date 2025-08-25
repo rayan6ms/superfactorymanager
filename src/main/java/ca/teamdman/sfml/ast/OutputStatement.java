@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.*;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -27,6 +28,7 @@ public class OutputStatement implements IOStatement {
     private final LabelAccess labelAccess;
     private final ResourceLimits resourceLimits;
     private final boolean each;
+    private final boolean emptySlotsOnly;
 
     private int lastInputCapacity = 32;
     private int lastOutputCapacity = 32;
@@ -34,11 +36,13 @@ public class OutputStatement implements IOStatement {
     public OutputStatement(
             LabelAccess labelAccess,
             ResourceLimits resourceLimits,
-            boolean each
+            boolean each,
+            boolean emptySlotsOnly
     ) {
         this.labelAccess = labelAccess;
         this.resourceLimits = resourceLimits;
         this.each = each;
+        this.emptySlotsOnly = emptySlotsOnly;
     }
 
     /**
@@ -496,6 +500,10 @@ public class OutputStatement implements IOStatement {
         return each;
     }
 
+    public boolean emptySlotsOnly() {
+        return emptySlotsOnly;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (obj == this) return true;
@@ -504,19 +512,20 @@ public class OutputStatement implements IOStatement {
         return Objects.equals(this.labelAccess, that.labelAccess) && Objects.equals(
                 this.resourceLimits,
                 that.resourceLimits
-        ) && this.each == that.each;
+        ) && this.each == that.each && this.emptySlotsOnly == that.emptySlotsOnly;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(labelAccess, resourceLimits, each);
+        return Objects.hash(labelAccess, resourceLimits, each, emptySlotsOnly);
     }
 
     @Override
     public String toString() {
-        return "OUTPUT " + resourceLimits.toStringCondensed(Limit.MAX_QUANTITY_MAX_RETENTION) + " TO " + (
-                each ? "EACH " : ""
-        ) + labelAccess;
+        return "OUTPUT " + resourceLimits.toStringCondensed(Limit.MAX_QUANTITY_MAX_RETENTION) + " TO " +
+                (emptySlotsOnly ? "EMPTY SLOTS IN " : "") +
+                (each ? "EACH " : "") +
+                labelAccess;
     }
 
     @Override
@@ -536,6 +545,7 @@ public class OutputStatement implements IOStatement {
             sb.append(" ");
         }
         sb.append("TO ");
+        if (emptySlotsOnly) sb.append("EMPTY SLOTS IN ");
         sb.append(each ? "EACH " : "");
         sb.append(labelAccess);
         return sb.toString();
@@ -642,6 +652,7 @@ public class OutputStatement implements IOStatement {
         }
     }
 
+    @MCVersionDependentBehaviour
     @SuppressWarnings("RedundantIfStatement")
     private <STACK, ITEM, CAP> boolean shouldCreateSlot(
             ResourceType<STACK, ITEM, CAP> type,
@@ -649,6 +660,9 @@ public class OutputStatement implements IOStatement {
             STACK stack,
             int slot
     ) {
+        if (emptySlotsOnly) {
+            return type.isEmpty(stack);
+        }
         // Chest holding dirt: maxStackSizeForStack=64 maxStackSizeForSlot=99
         // Bin holding sticks: maxStackSizeForStack=64 maxStackSizeForSlot=102400
         long amount = type.getAmount(stack);
