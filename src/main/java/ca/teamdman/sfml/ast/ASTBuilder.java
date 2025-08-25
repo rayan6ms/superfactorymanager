@@ -283,7 +283,8 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         var matchers = visitOutputResourceLimits(ctx.outputResourceLimits());
         var exclusions = visitResourceExclusion(ctx.resourceExclusion());
         var each = ctx.EACH() != null;
-        OutputStatement outputStatement = new OutputStatement(labelAccess, matchers.withExclusions(exclusions), each);
+        boolean emptySlotsOnly = ctx.emptyslots() != null;
+        OutputStatement outputStatement = new OutputStatement(labelAccess, matchers.withExclusions(exclusions), each, emptySlotsOnly);
         AST_NODE_CONTEXTS.add(new Pair<>(outputStatement, ctx));
         return outputStatement;
     }
