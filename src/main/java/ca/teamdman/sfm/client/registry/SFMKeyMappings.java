@@ -3,8 +3,10 @@ package ca.teamdman.sfm.client.registry;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import com.mojang.blaze3d.platform.InputConstants;
+import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
+import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
@@ -13,6 +15,8 @@ import net.minecraftforge.common.util.Lazy;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import org.lwjgl.glfw.GLFW;
+
+import java.util.function.Supplier;
 
 
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = SFM.MOD_ID, value = Dist.CLIENT)
@@ -168,6 +172,13 @@ public class SFMKeyMappings {
                 TITLE_SCREEN_OPEN_TEXT_EDITOR_KEY.get(),
                 TOGGLE_NETWORK_TOOL_OVERLAY_KEY.get()
         };
+    }
+
+    public static Component getKeyDisplay(KeyMapping key) {
+        return key.getTranslatedKeyMessage().plainCopy().withStyle(ChatFormatting.AQUA);
+    }
+    public static Component getKeyDisplay(Supplier<KeyMapping> key) {
+        return getKeyDisplay(key.get());
     }
 
     @SubscribeEvent

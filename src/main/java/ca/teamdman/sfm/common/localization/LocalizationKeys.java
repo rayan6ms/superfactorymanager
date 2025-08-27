@@ -399,7 +399,7 @@ public final class LocalizationKeys {
     );
     public static final LocalizationEntry MANAGER_GUI_EDIT_BUTTON_TOOLTIP = new LocalizationEntry(
             "gui.sfm.manager.edit_button.tooltip",
-            "Press Ctrl+E to edit."
+            "Press %s to edit."
     );
     public static final LocalizationEntry MANAGER_GUI_EDIT_BUTTON = new LocalizationEntry(
             "gui.sfm.manager.edit_button",
