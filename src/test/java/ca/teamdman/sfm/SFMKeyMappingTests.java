@@ -37,12 +37,12 @@ public class SFMKeyMappingTests {
                 .filter(k -> !fromMethod.contains(k))
                 .map(KeyMapping::getName)
                 .sorted()
-                .collect(Collectors.toList());
+                .toList();
         var extraInMethod = fromMethod.stream()
                 .filter(k -> !fromReflection.contains(k))
                 .map(KeyMapping::getName)
                 .sorted()
-                .collect(Collectors.toList());
+                .toList();
 
         if (!missingInMethod.isEmpty()) {
             System.err.println("[SFMKeyMappingTests] Missing in getSFMKeyMappings():");

@@ -53,17 +53,22 @@ public class SFMScreenChangeHelpers {
         setOrPushScreen(new LabelGunScreen(stack, hand));
     }
 
-    public static void showProgramEditScreen(
-            ISFMTextEditScreenOpenContext context
+    public static Screen createProgramEditScreen(
+            ISFMTextEditScreenOpenContext openContext
     ) {
-        String preferredEditorId = SFMConfig.CLIENT_TEXT_EDITOR_CONFIG.preferredEditor.get();
         ISFMTextEditorRegistration textEditorRegistration = Objects.requireNonNullElse(
                 SFMTextEditors
                         .registry()
-                        .getValue(new ResourceLocation(preferredEditorId)),
+                        .getValue(new ResourceLocation(SFMConfig.CLIENT_TEXT_EDITOR_CONFIG.preferredEditor.get())),
                 SFMTextEditors.V1.get()
         );
-        textEditorRegistration.openScreen(context);
+        return textEditorRegistration.createScreen(openContext);
+    }
+
+    public static void showProgramEditScreen(
+            ISFMTextEditScreenOpenContext context
+    ) {
+        setOrPushScreen(createProgramEditScreen(context));
     }
 
     public static void showTomlEditScreen(

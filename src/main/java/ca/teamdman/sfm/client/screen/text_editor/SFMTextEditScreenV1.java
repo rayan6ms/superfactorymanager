@@ -52,12 +52,13 @@ import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP;
 
 @SuppressWarnings("NotNullFieldNotInitialized")
-public class SFMTextEditScreenV1 extends Screen {
+public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditorScreen {
     private final ISFMTextEditScreenOpenContext openContext;
     protected MyMultiLineEditBox textarea;
     protected String lastProgram = "";
     protected List<MutableComponent> lastProgramWithSyntaxHighlighting = new ArrayList<>();
     protected PickList<IntellisenseAction> suggestedActions;
+    private boolean scrolledOnFirstInit = false;
 
     public SFMTextEditScreenV1(
             ISFMTextEditScreenOpenContext openContext
@@ -112,7 +113,8 @@ public class SFMTextEditScreenV1 extends Screen {
         openContext.onTryClose(textarea.getValue(), SFMScreenChangeHelpers::popScreen);
     }
 
-    public void onIntellisensePreferenceChanged() {
+    @Override
+    public void onPreferenceChanged() {
         textarea.rebuildIntellisense();
     }
 
@@ -368,6 +370,13 @@ public class SFMTextEditScreenV1 extends Screen {
         );
 
         textarea.setValue(openContext.initialValue());
+
+        // Scroll to top on first init to match previous behavior without needing external calls
+        if (!scrolledOnFirstInit) {
+            scrollToTop();
+            scrolledOnFirstInit = true;
+        }
+
         this.setInitialFocus(textarea);
     }
 
