@@ -10,11 +10,9 @@ import ca.teamdman.sfm.common.net.ServerboundLabelGunUsePacket;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import net.minecraft.ChatFormatting;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.Options;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -28,7 +26,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.function.Supplier;
 
 public class LabelGunItem extends Item {
     public LabelGunItem() {
@@ -147,14 +144,6 @@ public class LabelGunItem extends Item {
         return InteractionResult.CONSUME;
     }
 
-    public MutableComponent formatKey(KeyMapping key) {
-        return key.getTranslatedKeyMessage().plainCopy().withStyle(ChatFormatting.AQUA);
-    }
-
-    public MutableComponent formatKey(Supplier<KeyMapping> key) {
-        return formatKey(key.get());
-    }
-
     @Override
     public void appendHoverText(
             ItemStack stack,
@@ -166,66 +155,66 @@ public class LabelGunItem extends Item {
             Options options = Minecraft.getInstance().options;
             lines.add(
                     LocalizationKeys.LABEL_GUN_ITEM_TOOLTIP_TOGGLE_LABEL_REMINDER.getComponent(
-                            formatKey(options.keyUse)
+                            SFMKeyMappings.getKeyDisplay(options.keyUse)
                     ).withStyle(ChatFormatting.GRAY)
             );
             lines.add(
                     LocalizationKeys.LABEL_GUN_ITEM_TOOLTIP_CLEAR_REMINDER.getComponent(
-                            formatKey(SFMKeyMappings.LABEL_GUN_PULL_MODIFIER_KEY),
-                            formatKey(options.keyUse)
+                            SFMKeyMappings.getKeyDisplay(SFMKeyMappings.LABEL_GUN_PULL_MODIFIER_KEY),
+                            SFMKeyMappings.getKeyDisplay(options.keyUse)
                     ).withStyle(ChatFormatting.GRAY)
             );
             lines.add(
                     LocalizationKeys.LABEL_GUN_ITEM_TOOLTIP_PULL_REMINDER.getComponent(
-                            formatKey(SFMKeyMappings.LABEL_GUN_PULL_MODIFIER_KEY),
-                            formatKey(options.keyUse)
+                            SFMKeyMappings.getKeyDisplay(SFMKeyMappings.LABEL_GUN_PULL_MODIFIER_KEY),
+                            SFMKeyMappings.getKeyDisplay(options.keyUse)
                     ).withStyle(ChatFormatting.GRAY)
             );
             lines.add(
                     LocalizationKeys.LABEL_GUN_ITEM_TOOLTIP_PUSH_REMINDER.getComponent(
-                            formatKey(options.keyUse)
+                            SFMKeyMappings.getKeyDisplay(options.keyUse)
                     ).withStyle(ChatFormatting.GRAY)
             );
             lines.add(
                     LocalizationKeys.LABEL_GUN_ITEM_TOOLTIP_TARGET_MANAGER_REMINDER.getComponent(
-                            formatKey(SFMKeyMappings.LABEL_GUN_TARGET_MANAGER_MODIFIER_KEY),
-                            formatKey(options.keyUse)
+                            SFMKeyMappings.getKeyDisplay(SFMKeyMappings.LABEL_GUN_TARGET_MANAGER_MODIFIER_KEY),
+                            SFMKeyMappings.getKeyDisplay(options.keyUse)
                     ).withStyle(ChatFormatting.GRAY)
             );
             lines.add(
                     LocalizationKeys.LABEL_GUN_ITEM_TOOLTIP_CONTIGUOUS_REMINDER.getComponent(
-                            formatKey(SFMKeyMappings.LABEL_GUN_CONTIGUOUS_MODIFIER_KEY)
+                            SFMKeyMappings.getKeyDisplay(SFMKeyMappings.LABEL_GUN_CONTIGUOUS_MODIFIER_KEY)
                     ).withStyle(ChatFormatting.GRAY)
             );
             lines.add(
                     LocalizationKeys.LABEL_GUN_ITEM_TOOLTIP_PICK_REMINDER.getComponent(
-                            formatKey(SFMKeyMappings.LABEL_GUN_PICK_BLOCK_MODIFIER_KEY),
-                            formatKey(options.keyUse)
+                            SFMKeyMappings.getKeyDisplay(SFMKeyMappings.LABEL_GUN_PICK_BLOCK_MODIFIER_KEY),
+                            SFMKeyMappings.getKeyDisplay(options.keyUse)
                     ).withStyle(ChatFormatting.GRAY)
             );
             lines.add(
                     LocalizationKeys.LABEL_GUN_ITEM_TOOLTIP_NEXT_REMINDER.getComponent(
-                            formatKey(SFMKeyMappings.LABEL_GUN_NEXT_LABEL_KEY)
+                            SFMKeyMappings.getKeyDisplay(SFMKeyMappings.LABEL_GUN_NEXT_LABEL_KEY)
                     ).withStyle(ChatFormatting.GRAY)
             );
             lines.add(
                     LocalizationKeys.LABEL_GUN_ITEM_TOOLTIP_PREVIOUS_REMINDER.getComponent(
-                            formatKey(SFMKeyMappings.LABEL_GUN_PREVIOUS_LABEL_KEY)
+                            SFMKeyMappings.getKeyDisplay(SFMKeyMappings.LABEL_GUN_PREVIOUS_LABEL_KEY)
                     ).withStyle(ChatFormatting.GRAY)
             );
             lines.add(
                     LocalizationKeys.LABEL_GUN_ITEM_TOOLTIP_SCROLL_REMINDER.getComponent(
-                            formatKey(SFMKeyMappings.LABEL_GUN_SCROLL_MODIFIER_KEY)
+                            SFMKeyMappings.getKeyDisplay(SFMKeyMappings.LABEL_GUN_SCROLL_MODIFIER_KEY)
                     ).withStyle(ChatFormatting.GRAY)
             );
             lines.add(
                     LocalizationKeys.LABEL_GUN_ITEM_TOOLTIP_CYCLE_VIEW_REMINDER.getComponent(
-                            formatKey(SFMKeyMappings.CYCLE_LABEL_VIEW_KEY)
+                            SFMKeyMappings.getKeyDisplay(SFMKeyMappings.CYCLE_LABEL_VIEW_KEY)
                     ).withStyle(ChatFormatting.GRAY)
             );
             lines.add(
                     LocalizationKeys.LABEL_GUN_ITEM_TOOLTIP_GUI_REMINDER.getComponent(
-                            formatKey(options.keyUse)
+                            SFMKeyMappings.getKeyDisplay(options.keyUse)
                     ).withStyle(ChatFormatting.GRAY)
             );
         } else {
