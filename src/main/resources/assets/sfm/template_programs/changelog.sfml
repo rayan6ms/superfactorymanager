@@ -18,7 +18,8 @@ EVERY 300 SECONDS DO
     OUTPUT TO storage
 END
 -- Fix crash when reentering a level, fixes #372
-
+-- Add Ctrl+E hotkey for opening the text editor in the title screen
+-- Add Ctrl+E hotkey for opening the text editor in the select world screen
 
 ---- 4.24.0 ----
 -- Thanks @Druadi for the support!
