@@ -17,6 +17,7 @@ EVERY 300 SECONDS DO
     INPUT FROM storage
     OUTPUT TO storage
 END
+-- Fix crash when reentering a level, fixes #372
 
 
 ---- 4.24.0 ----
