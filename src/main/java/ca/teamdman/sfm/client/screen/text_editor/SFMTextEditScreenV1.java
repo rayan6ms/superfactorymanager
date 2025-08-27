@@ -384,6 +384,7 @@ public class SFMTextEditScreenV1 extends Screen {
             );
             this.textField.setValueListener(this::onValueOrCursorChanged);
             this.textField.setCursorListener(() -> this.onValueOrCursorChanged(this.textField.value()));
+            this.rebuild(false);
         }
 
         public void scrollToTop() {
