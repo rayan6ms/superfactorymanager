@@ -2,6 +2,7 @@ package ca.teamdman.sfm.client.screen;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.registry.SFMTextEditors;
+import ca.teamdman.sfm.client.screen.text_editor.ISFMTextEditScreen;
 import ca.teamdman.sfm.client.screen.text_editor.SFMTextEditScreenV1;
 import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
 import ca.teamdman.sfm.client.text_editor.ISFMTextEditorRegistration;
@@ -53,7 +54,7 @@ public class SFMScreenChangeHelpers {
         setOrPushScreen(new LabelGunScreen(stack, hand));
     }
 
-    public static Screen createProgramEditScreen(
+    public static ISFMTextEditScreen createProgramEditScreen(
             ISFMTextEditScreenOpenContext openContext
     ) {
         ISFMTextEditorRegistration textEditorRegistration = Objects.requireNonNullElse(
@@ -68,7 +69,16 @@ public class SFMScreenChangeHelpers {
     public static void showProgramEditScreen(
             ISFMTextEditScreenOpenContext context
     ) {
-        setOrPushScreen(createProgramEditScreen(context));
+        showTextEditScreen(createProgramEditScreen(context));
+    }
+
+    public static void showTextEditScreen(
+            ISFMTextEditScreen screen
+    ) {
+        switch (screen.openBehaviour()) {
+            case Push -> setOrPushScreen(screen.asScreen());
+            case Replace -> setScreen(screen.asScreen());
+        }
     }
 
     public static void showTomlEditScreen(

@@ -52,7 +52,7 @@ import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_SCREEN_DONE_BUTTON_TOOLTIP;
 
 @SuppressWarnings("NotNullFieldNotInitialized")
-public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditorScreen {
+public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
     private final ISFMTextEditScreenOpenContext openContext;
     protected MyMultiLineEditBox textarea;
     protected String lastProgram = "";
@@ -111,6 +111,11 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditorScreen 
     @Override
     public void onClose() {
         openContext.onTryClose(textarea.getValue(), SFMScreenChangeHelpers::popScreen);
+    }
+
+    @Override
+    public ISFMTextEditScreenOpenContext openContext() {
+        return openContext;
     }
 
     @Override

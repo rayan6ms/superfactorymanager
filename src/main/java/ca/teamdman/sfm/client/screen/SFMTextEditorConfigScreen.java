@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.client.screen;
 
 import ca.teamdman.sfm.client.registry.SFMTextEditors;
-import ca.teamdman.sfm.client.screen.text_editor.ISFMTextEditorScreen;
+import ca.teamdman.sfm.client.screen.text_editor.ISFMTextEditScreen;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditorIntellisenseLevel;
 import ca.teamdman.sfm.client.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.config.SFMClientTextEditorConfig;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings("NotNullFieldNotInitialized")
 public class SFMTextEditorConfigScreen extends Screen {
     private final SFMClientTextEditorConfig config;
-    private final ISFMTextEditorScreen parent;
+    private final ISFMTextEditScreen parent;
     private final Runnable closeCallback;
     private Button lineNumbersOnButton;
     private Button lineNumbersOffButton;
@@ -28,7 +28,7 @@ public class SFMTextEditorConfigScreen extends Screen {
     private final boolean editorSelectorFeatureFlag = SFMEnvironmentUtils.isInIDE();
 
     public SFMTextEditorConfigScreen(
-            ISFMTextEditorScreen parent,
+            ISFMTextEditScreen parent,
             SFMClientTextEditorConfig config,
             Runnable closeCallback
     ) {

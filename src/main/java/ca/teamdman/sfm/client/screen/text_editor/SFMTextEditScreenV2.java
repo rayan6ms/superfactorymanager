@@ -32,13 +32,18 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.LinkedList;
 
-public class SFMTextEditScreenV2 extends Screen implements ISFMTextEditorScreen {
+public class SFMTextEditScreenV2 extends Screen implements ISFMTextEditScreen {
+    private final @Nullable Screen previousScreen;
     protected TextEditContext textEditContext;
     protected ISFMTextEditScreenOpenContext openContext;
 
-    public SFMTextEditScreenV2(ISFMTextEditScreenOpenContext openContext) {
+    public SFMTextEditScreenV2(
+            ISFMTextEditScreenOpenContext openContext,
+            @Nullable Screen previousScreen
+    ) {
         super(LocalizationKeys.TEXT_EDIT_SCREEN_TITLE.getComponent());
         this.openContext = openContext;
+        this.previousScreen = previousScreen;
         this.textEditContext = new TextEditContext(openContext.initialValue());
     }
 
@@ -177,7 +182,20 @@ public class SFMTextEditScreenV2 extends Screen implements ISFMTextEditorScreen 
      */
     @Override
     public void onClose() {
-        openContext.onTryClose(textEditContext.getContent(), SFMScreenChangeHelpers::popScreen);
+        openContext.onTryClose(
+                textEditContext.getContent(),
+                () -> SFMScreenChangeHelpers.setScreen(previousScreen)
+        );
+    }
+
+    @Override
+    public ISFMTextEditScreenOpenContext openContext() {
+        return openContext;
+    }
+
+    @Override
+    public OpenBehaviour openBehaviour() {
+        return OpenBehaviour.Replace;
     }
 
     protected void renderCursor(
