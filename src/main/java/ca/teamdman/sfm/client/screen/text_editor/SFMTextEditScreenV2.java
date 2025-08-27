@@ -5,14 +5,12 @@ import ca.teamdman.sfm.client.registry.SFMTextEditorActions;
 import ca.teamdman.sfm.client.screen.SFMFontUtils;
 import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.screen.SFMScreenRenderUtils;
-import ca.teamdman.sfm.client.text_editor.Caret;
-import ca.teamdman.sfm.client.text_editor.Cursor;
-import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
-import ca.teamdman.sfm.client.text_editor.TextEditContext;
+import ca.teamdman.sfm.client.text_editor.*;
 import ca.teamdman.sfm.client.text_editor.action.ITextEditAction;
 import ca.teamdman.sfm.client.text_editor.action.KeyboardImpulse;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
@@ -20,8 +18,10 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
+import net.minecraft.util.Mth;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.jetbrains.annotations.Nullable;
@@ -83,6 +83,14 @@ public class SFMTextEditScreenV2 extends Screen {
         return SFMConfig.getOrDefault(SFMConfig.CLIENT_TEXT_EDITOR_CONFIG.showLineNumbers);
     }
 
+    @MCVersionDependentBehaviour
+    public @Nullable PanoramaRenderer getPanorama() {
+        if (this.openContext instanceof SFMTextEditScreenTitleScreenOpenContext titleScreenOpenContext) {
+            return titleScreenOpenContext.titleScreen().panorama;
+        }
+        return null;
+    }
+
     @Override
     public void render(
             PoseStack pPoseStack,
@@ -90,6 +98,11 @@ public class SFMTextEditScreenV2 extends Screen {
             int pMouseY,
             float pPartialTick
     ) {
+        PanoramaRenderer panorama = getPanorama();
+        if (panorama != null) {
+            panorama.render(pPartialTick, Mth.clamp(1.0F, 0.0F, 1.0F));
+        }
+
         Matrix4f matrix4f = pPoseStack.last().pose();
         LinkedList<StringBuilder> lines = textEditContext.lines();
         int numLines = lines.size();

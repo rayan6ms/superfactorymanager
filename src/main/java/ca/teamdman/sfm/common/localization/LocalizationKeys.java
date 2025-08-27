@@ -921,6 +921,14 @@ public final class LocalizationKeys {
             "key.sfm.label_gun.target_manager_modifier",
             "Label Gun Target Manager Modifier"
     );
+    public static final LocalizationEntry MANAGER_SCREEN_OPEN_TEXT_EDITOR_KEY = new LocalizationEntry(
+            "key.sfm.manager.text_editor",
+            "Manager Screen - Open Text Editor"
+    );
+    public static final LocalizationEntry TITLE_SCREEN_OPEN_TEXT_EDITOR_KEY = new LocalizationEntry(
+            "key.sfm.title_screen.text_editor",
+            "Title Screen - Open Text Editor"
+    );
     public static final LocalizationEntry SFM_KEY_CATEGORY = new LocalizationEntry(
             "key.categories.sfm",
             "Super Factory Manager"

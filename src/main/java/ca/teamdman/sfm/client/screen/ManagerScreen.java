@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.client.screen;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenDiskOpenContext;
 import ca.teamdman.sfm.client.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.client.widget.SFMExtendedButtonWithTooltip;
@@ -112,7 +113,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                    && examplesButton.visible) {
             onExamplesButtonClicked();
             return true;
-        } else if (pKeyCode == GLFW.GLFW_KEY_E && Screen.hasControlDown() && editButton.visible) {
+        } else if (SFMKeyMappings.isKeyDownInScreenOrWorld(SFMKeyMappings.MANAGER_SCREEN_OPEN_TEXT_EDITOR_KEY) && editButton.visible) {
             onEditButtonClicked();
             return true;
         }

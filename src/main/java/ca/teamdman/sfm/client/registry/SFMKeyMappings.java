@@ -132,20 +132,49 @@ public class SFMKeyMappings {
             LocalizationKeys.SFM_KEY_CATEGORY.key().get()
     ));
 
+    public static final Lazy<KeyMapping> MANAGER_SCREEN_OPEN_TEXT_EDITOR_KEY = Lazy.of(() -> new KeyMapping(
+            LocalizationKeys.MANAGER_SCREEN_OPEN_TEXT_EDITOR_KEY.key().get(),
+            KeyConflictContext.GUI,
+            KeyModifier.CONTROL,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_E,
+            LocalizationKeys.SFM_KEY_CATEGORY.key().get()
+    ));
+
+    public static final Lazy<KeyMapping> TITLE_SCREEN_OPEN_TEXT_EDITOR_KEY = Lazy.of(() -> new KeyMapping(
+            LocalizationKeys.TITLE_SCREEN_OPEN_TEXT_EDITOR_KEY.key().get(),
+            KeyConflictContext.GUI,
+            KeyModifier.CONTROL,
+            InputConstants.Type.KEYSYM,
+            GLFW.GLFW_KEY_E,
+            LocalizationKeys.SFM_KEY_CATEGORY.key().get()
+    ));
+
+    public static KeyMapping[] getSFMKeyMappings() {
+        return new KeyMapping[]{
+                MORE_INFO_TOOLTIP_KEY.get(),
+                CONTAINER_INSPECTOR_KEY.get(),
+                ITEM_INSPECTOR_KEY.get(),
+                CYCLE_LABEL_VIEW_KEY.get(),
+                LABEL_GUN_PICK_BLOCK_MODIFIER_KEY.get(),
+                LABEL_GUN_CONTIGUOUS_MODIFIER_KEY.get(),
+                LABEL_GUN_CLEAR_MODIFIER_KEY.get(),
+                LABEL_GUN_SCROLL_MODIFIER_KEY.get(),
+                LABEL_GUN_NEXT_LABEL_KEY.get(),
+                LABEL_GUN_PREVIOUS_LABEL_KEY.get(),
+                LABEL_GUN_PULL_MODIFIER_KEY.get(),
+                LABEL_GUN_TARGET_MANAGER_MODIFIER_KEY.get(),
+                MANAGER_SCREEN_OPEN_TEXT_EDITOR_KEY.get(),
+                TITLE_SCREEN_OPEN_TEXT_EDITOR_KEY.get(),
+                TOGGLE_NETWORK_TOOL_OVERLAY_KEY.get()
+        };
+    }
 
     @SubscribeEvent
     public static void registerBindings(RegisterKeyMappingsEvent event) {
-        event.register(MORE_INFO_TOOLTIP_KEY.get());
-        event.register(CONTAINER_INSPECTOR_KEY.get());
-        event.register(ITEM_INSPECTOR_KEY.get());
-        event.register(CYCLE_LABEL_VIEW_KEY.get());
-        event.register(LABEL_GUN_PICK_BLOCK_MODIFIER_KEY.get());
-        event.register(LABEL_GUN_CONTIGUOUS_MODIFIER_KEY.get());
-        event.register(LABEL_GUN_CLEAR_MODIFIER_KEY.get());
-        event.register(LABEL_GUN_PULL_MODIFIER_KEY.get()); // Register new key
-        event.register(LABEL_GUN_NEXT_LABEL_KEY.get());
-        event.register(LABEL_GUN_PREVIOUS_LABEL_KEY.get());
-        event.register(LABEL_GUN_TARGET_MANAGER_MODIFIER_KEY.get());
+        for (KeyMapping key : getSFMKeyMappings()) {
+            event.register(key);
+        }
     }
 
     public static boolean isKeyDownInScreenOrWorld(Lazy<KeyMapping> key) {
