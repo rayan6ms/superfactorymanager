@@ -14,7 +14,8 @@ import net.minecraftforge.fml.common.Mod;
 
 @Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TitleScreenOpenTextEditorOnLaunchHandler {
-    public static boolean firstTime = true;
+    public static boolean firstTime = false; // disabled for now lol
+//    public static boolean firstTime = true;
     @SubscribeEvent
     public static void onTitleScreenOpen(ScreenEvent.Opening event) {
         if (!firstTime) return;
