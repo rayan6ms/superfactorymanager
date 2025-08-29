@@ -2,7 +2,7 @@ package ca.teamdman.sfm;
 
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import net.minecraft.client.KeyMapping;
-import net.minecraftforge.common.util.Lazy;
+import net.neoforged.neoforge.common.util.Lazy;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
