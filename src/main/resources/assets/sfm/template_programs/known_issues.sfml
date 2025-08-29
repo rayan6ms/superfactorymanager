@@ -21,4 +21,8 @@ NAME "Known issues"
 ---- will skip the check for if the item is compostable
 ---- turning the composter into a trash can
 
+-- AE2 energy acceptors cannot receive forge energy from SFM
+---- This is because it reports its maximum capacity as zero :(
+
 -- Sorry for any inconveniences :(
+
