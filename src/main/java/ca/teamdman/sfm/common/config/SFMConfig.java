@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.config;
 
+import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.config.ModConfig;
 import net.neoforged.neoforge.common.ModConfigSpec;
@@ -99,6 +100,8 @@ public class SFMConfig {
         context.registerConfig(ModConfig.Type.SERVER, SFMConfig.SERVER_CONFIG_SPEC);
         context.registerConfig(ModConfig.Type.CLIENT, SFMConfig.CLIENT_CONFIG_SPEC);
         context.registerConfig(ModConfig.Type.CLIENT, SFMConfig.CLIENT_TEXT_EDITOR_CONFIG_SPEC, "sfm-client-program-editor.toml");
-        context.registerConfig(ModConfig.Type.COMMON, SFMConfig.AI_CONFIG_SPEC, "sfm-ai.toml");
+        if (SFMEnvironmentUtils.isInIDE()) {
+            context.registerConfig(ModConfig.Type.COMMON, SFMConfig.AI_CONFIG_SPEC, "sfm-ai.toml");
+        }
     }
 }
