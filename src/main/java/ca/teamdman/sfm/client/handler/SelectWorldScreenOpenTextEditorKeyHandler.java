@@ -9,6 +9,7 @@ import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
+import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.InputEvent;
@@ -16,7 +17,7 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import java.util.Date;
 import java.util.stream.Collectors;
 
-@Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class SelectWorldScreenOpenTextEditorKeyHandler {
     @SubscribeEvent
     public static void onKey(InputEvent.Key event) {
