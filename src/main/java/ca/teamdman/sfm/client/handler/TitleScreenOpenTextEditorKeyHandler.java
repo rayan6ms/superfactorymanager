@@ -8,11 +8,12 @@ import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenTitleScreenOpenContex
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class TitleScreenOpenTextEditorKeyHandler {
     @SubscribeEvent
     public static void onKey(InputEvent.Key event) {

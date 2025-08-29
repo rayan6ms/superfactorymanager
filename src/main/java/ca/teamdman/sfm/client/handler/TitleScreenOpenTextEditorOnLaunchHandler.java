@@ -7,11 +7,12 @@ import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenTitleScreenOpenContext;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import net.minecraft.client.gui.screens.TitleScreen;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ScreenEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
-@Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
+@Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE, value = Dist.CLIENT)
 public class TitleScreenOpenTextEditorOnLaunchHandler {
     public static boolean firstTime = false; // disabled for now lol
 //    public static boolean firstTime = true;
