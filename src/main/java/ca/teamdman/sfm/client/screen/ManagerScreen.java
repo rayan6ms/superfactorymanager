@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.client.screen;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenDiskOpenContext;
 import ca.teamdman.sfm.client.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
@@ -111,7 +112,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                    && examplesButton.visible) {
             onExamplesButtonClicked();
             return true;
-        } else if (pKeyCode == GLFW.GLFW_KEY_E && Screen.hasControlDown() && editButton.visible) {
+        } else if (SFMKeyMappings.isKeyDownInScreenOrWorld(SFMKeyMappings.MANAGER_SCREEN_OPEN_TEXT_EDITOR_KEY)
+                   && editButton.visible) {
             onEditButtonClicked();
             return true;
         }
@@ -175,7 +177,11 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                         .setSize(buttonWidth, buttonHeight)
                         .setText(MANAGER_GUI_EDIT_BUTTON)
                         .setOnPress(button -> onEditButtonClicked())
-                        .setTooltip(this, font, MANAGER_GUI_EDIT_BUTTON_TOOLTIP)
+                        .setTooltip(
+                                this,
+                                font,
+                                MANAGER_GUI_EDIT_BUTTON_TOOLTIP.getComponent(SFMKeyMappings.getKeyDisplay(SFMKeyMappings.MANAGER_SCREEN_OPEN_TEXT_EDITOR_KEY))
+                        )
                         .build()
         );
         examplesButton = this.addRenderableWidget(

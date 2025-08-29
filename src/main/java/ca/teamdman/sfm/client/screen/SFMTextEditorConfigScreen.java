@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.client.screen;
 
 import ca.teamdman.sfm.client.registry.SFMTextEditors;
-import ca.teamdman.sfm.client.screen.text_editor.SFMTextEditScreenV1;
+import ca.teamdman.sfm.client.screen.text_editor.ISFMTextEditScreen;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditorIntellisenseLevel;
 import ca.teamdman.sfm.client.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.config.SFMClientTextEditorConfig;
@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 @SuppressWarnings("NotNullFieldNotInitialized")
 public class SFMTextEditorConfigScreen extends Screen {
     private final SFMClientTextEditorConfig config;
-    private final SFMTextEditScreenV1 parent;
+    private final ISFMTextEditScreen parent;
     private final Runnable closeCallback;
     private Button lineNumbersOnButton;
     private Button lineNumbersOffButton;
@@ -28,7 +28,7 @@ public class SFMTextEditorConfigScreen extends Screen {
     private final boolean editorSelectorFeatureFlag = SFMEnvironmentUtils.isInIDE();
 
     public SFMTextEditorConfigScreen(
-            SFMTextEditScreenV1 parent,
+            ISFMTextEditScreen parent,
             SFMClientTextEditorConfig config,
             Runnable closeCallback
     ) {
@@ -138,7 +138,7 @@ public class SFMTextEditorConfigScreen extends Screen {
                         .setOnPress(button -> {
                             config.intellisenseLevel.set(SFMTextEditorIntellisenseLevel.OFF);
                             updateButtonStates();
-                            parent.onIntellisensePreferenceChanged();
+                            parent.onPreferenceChanged();
                         })
                         .build();
         intellisenseBasicButton =
@@ -149,7 +149,7 @@ public class SFMTextEditorConfigScreen extends Screen {
                         .setOnPress(button -> {
                             config.intellisenseLevel.set(SFMTextEditorIntellisenseLevel.BASIC);
                             updateButtonStates();
-                            parent.onIntellisensePreferenceChanged();
+                            parent.onPreferenceChanged();
                         })
                         .build();
         intellisenseAdvancedButton =
@@ -162,7 +162,7 @@ public class SFMTextEditorConfigScreen extends Screen {
                         .setOnPress(button -> {
                             config.intellisenseLevel.set(SFMTextEditorIntellisenseLevel.ADVANCED);
                             updateButtonStates();
-                            parent.onIntellisensePreferenceChanged();
+                            parent.onPreferenceChanged();
                         })
                         .build();
 
