@@ -122,5 +122,6 @@ public class LimitedOutputSlotObjectPool {
     @SubscribeEvent
     public static void onServerStopped(ServerStoppedEvent event) {
         pool = new LimitedOutputSlot[27];
+        index = -1;
     }
 }
