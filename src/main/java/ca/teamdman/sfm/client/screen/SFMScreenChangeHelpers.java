@@ -2,6 +2,7 @@ package ca.teamdman.sfm.client.screen;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.registry.SFMTextEditors;
+import ca.teamdman.sfm.client.screen.text_editor.ISFMTextEditScreen;
 import ca.teamdman.sfm.client.screen.text_editor.SFMTextEditScreenV1;
 import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
 import ca.teamdman.sfm.client.text_editor.ISFMTextEditorRegistration;
@@ -54,17 +55,31 @@ public class SFMScreenChangeHelpers {
         setOrPushScreen(new LabelGunScreen(stack, hand));
     }
 
-    public static void showProgramEditScreen(
-            ISFMTextEditScreenOpenContext context
+    public static ISFMTextEditScreen createProgramEditScreen(
+            ISFMTextEditScreenOpenContext openContext
     ) {
-        String preferredEditorId = SFMConfig.CLIENT_TEXT_EDITOR_CONFIG.preferredEditor.get();
         ISFMTextEditorRegistration textEditorRegistration = Objects.requireNonNullElse(
                 SFMTextEditors
                         .registry()
-                        .get(ResourceLocation.parse(preferredEditorId)),
+                        .get(ResourceLocation.parse(SFMConfig.CLIENT_TEXT_EDITOR_CONFIG.preferredEditor.get())),
                 SFMTextEditors.V1.get()
         );
-        textEditorRegistration.openScreen(context);
+        return textEditorRegistration.createScreen(openContext);
+    }
+
+    public static void showProgramEditScreen(
+            ISFMTextEditScreenOpenContext context
+    ) {
+        showTextEditScreen(createProgramEditScreen(context));
+    }
+
+    public static void showTextEditScreen(
+            ISFMTextEditScreen screen
+    ) {
+        switch (screen.openBehaviour()) {
+            case Push -> setOrPushScreen(screen.asScreen());
+            case Replace -> setScreen(screen.asScreen());
+        }
     }
 
     public static void showTomlEditScreen(
