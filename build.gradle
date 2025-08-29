@@ -264,6 +264,13 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
 
+    // https://github.com/ollama4j/ollama4j
+//    jarJar(implementation("io.github.ollama4j:ollama4j")) {
+//        version {
+//            strictly "[1.0.100]"
+//        }
+//    }
+
     // add benchmarking dependencies
     testImplementation 'org.openjdk.jmh:jmh-core:1.37'
     testImplementation 'org.openjdk.jmh:jmh-generator-annprocess:1.37'

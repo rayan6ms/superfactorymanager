@@ -5,21 +5,24 @@ import ca.teamdman.sfm.client.registry.SFMTextEditorActions;
 import ca.teamdman.sfm.client.screen.SFMFontUtils;
 import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.screen.SFMScreenRenderUtils;
-import ca.teamdman.sfm.client.text_editor.Caret;
-import ca.teamdman.sfm.client.text_editor.Cursor;
-import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
-import ca.teamdman.sfm.client.text_editor.TextEditContext;
+import ca.teamdman.sfm.client.screen.SFMTextEditorConfigScreen;
+import ca.teamdman.sfm.client.text_editor.*;
 import ca.teamdman.sfm.client.text_editor.action.ITextEditAction;
 import ca.teamdman.sfm.client.text_editor.action.KeyboardImpulse;
+import ca.teamdman.sfm.client.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.PanoramaRenderer;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.FastColor;
+import net.minecraft.util.Mth;
 import org.antlr.v4.runtime.misc.Interval;
 import org.antlr.v4.runtime.misc.IntervalSet;
 import org.jetbrains.annotations.Nullable;
@@ -28,22 +31,19 @@ import org.lwjgl.glfw.GLFW;
 
 import java.util.LinkedList;
 
-public class SFMTextEditScreenV2 extends Screen {
-    private final boolean previousHideGui;
+public class SFMTextEditScreenV2 extends Screen implements ISFMTextEditScreen {
     private final @Nullable Screen previousScreen;
     protected TextEditContext textEditContext;
     protected ISFMTextEditScreenOpenContext openContext;
 
     public SFMTextEditScreenV2(
             ISFMTextEditScreenOpenContext openContext,
-            @Nullable Screen previousScreen,
-            boolean previousHideGui
+            @Nullable Screen previousScreen
     ) {
         super(LocalizationKeys.TEXT_EDIT_SCREEN_TITLE.getComponent());
         this.openContext = openContext;
         this.previousScreen = previousScreen;
         this.textEditContext = new TextEditContext(openContext.initialValue());
-        this.previousHideGui = previousHideGui;
     }
 
     @Override
@@ -54,7 +54,7 @@ public class SFMTextEditScreenV2 extends Screen {
     ) {
         // we are not calling super here because we are not using traditional widgets with tab navigation
         if (pKeyCode == GLFW.GLFW_KEY_ESCAPE && this.shouldCloseOnEsc()) {
-            openContext.onTryClose(textEditContext.getContent(), this::finalizeClose);
+            this.onClose();
             return true;
         }
         KeyboardImpulse impulse = new KeyboardImpulse(pKeyCode, pScanCode, pModifiers);
@@ -82,6 +82,14 @@ public class SFMTextEditScreenV2 extends Screen {
         return SFMConfig.getOrDefault(SFMConfig.CLIENT_TEXT_EDITOR_CONFIG.showLineNumbers);
     }
 
+    @MCVersionDependentBehaviour
+    public @Nullable PanoramaRenderer getPanorama() {
+        if (this.openContext instanceof SFMTextEditScreenTitleScreenOpenContext titleScreenOpenContext) {
+            return titleScreenOpenContext.titleScreen().panorama;
+        }
+        return null;
+    }
+
     @Override
     public void render(
             GuiGraphics pGuiGraphics,
@@ -89,6 +97,11 @@ public class SFMTextEditScreenV2 extends Screen {
             int pMouseY,
             float pPartialTick
     ) {
+        PanoramaRenderer panorama = getPanorama();
+        if (panorama != null) {
+            panorama.render(pPartialTick, Mth.clamp(1.0F, 0.0F, 1.0F));
+        }
+
         Matrix4f matrix4f = pGuiGraphics.pose().last().pose();
         LinkedList<StringBuilder> lines = textEditContext.lines();
         int numLines = lines.size();
@@ -157,12 +170,30 @@ public class SFMTextEditScreenV2 extends Screen {
             renderCursor(pGuiGraphics, headX, headY, FastColor.ARGB32.color(255 / 2, 255, 0, 0));
             renderCursor(pGuiGraphics, tailX, tailY, FastColor.ARGB32.color(255 / 2, 0, 0, 255));
         }
+
+        // Render widgets (buttons) on top of editor content
+        super.render(pGuiGraphics, pMouseX, pMouseY, pPartialTick);
     }
 
-    private void finalizeClose() {
-        SFMScreenChangeHelpers.setScreen(previousScreen);
-        assert minecraft != null;
-        minecraft.options.hideGui = previousHideGui;
+    /**
+     * The user has tried to close the GUI without saving by hitting the Esc key
+     */
+    @Override
+    public void onClose() {
+        openContext.onTryClose(
+                textEditContext.getContent(),
+                () -> SFMScreenChangeHelpers.setScreen(previousScreen)
+        );
+    }
+
+    @Override
+    public ISFMTextEditScreenOpenContext openContext() {
+        return openContext;
+    }
+
+    @Override
+    public OpenBehaviour openBehaviour() {
+        return OpenBehaviour.Replace;
     }
 
     protected void renderCursor(
@@ -184,5 +215,53 @@ public class SFMTextEditScreenV2 extends Screen {
     protected void init() {
         super.init();
         SFMScreenRenderUtils.enableKeyRepeating();
+
+        // Add config button like V1 ("#"), bottom-left corner
+        this.addRenderableWidget(
+                new SFMButtonBuilder()
+                        .setPosition(4, this.height - 24)
+                        .setSize(16, 20)
+                        .setText(Component.literal("#"))
+                        .setOnPress((button) -> SFMScreenChangeHelpers.setOrPushScreen(
+                                new SFMTextEditorConfigScreen(
+                                        this,
+                                        SFMConfig.CLIENT_TEXT_EDITOR_CONFIG,
+                                        () -> { /* no-op */ }
+                                )
+                        ))
+                        .setTooltip(this, font, LocalizationKeys.PROGRAM_EDIT_SCREEN_CONFIG_BUTTON_TOOLTIP)
+                        .build()
+        );
+    }
+
+    protected void renderTooltip(
+            PoseStack pose,
+            int mx,
+            int my
+    ) {
+        if (this.minecraft != null && this.minecraft.screen != this) {
+            // keep focus behavior consistent with V1 (avoid stray tooltips)
+            this.renderables
+                    .stream()
+                    .filter(net.minecraft.client.gui.components.AbstractWidget.class::isInstance)
+                    .map(net.minecraft.client.gui.components.AbstractWidget.class::cast)
+                    .forEach(w -> w.setFocused(false));
+            return;
+        }
+        drawChildTooltips(pose, mx, my);
+    }
+
+    @MCVersionDependentBehaviour
+    private void drawChildTooltips(
+            PoseStack pose,
+            int mx,
+            int my
+    ) {
+        // 1.19.2: manually render button tooltips
+//        this.renderables
+//                .stream()
+//                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
+//                .map(SFMExtendedButtonWithTooltip.class::cast)
+//                .forEach(x -> x.renderToolTip(pose, mx, my));
     }
 }
