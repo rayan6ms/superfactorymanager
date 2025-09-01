@@ -20,6 +20,7 @@ END
 -- Fix crash when re-entering a level, fixes #372
 -- Add Ctrl+E hotkey for opening the text editor in the title screen
 -- Add Ctrl+E hotkey for opening the text editor in the select world screen
+-- Fix SFM keymapping logic failing to respect modifier keys, fixes #374
 
 ---- 4.24.0 ----
 -- Thanks @Druadi for the support!
