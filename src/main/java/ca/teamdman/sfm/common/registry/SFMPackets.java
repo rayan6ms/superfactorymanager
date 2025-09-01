@@ -59,6 +59,7 @@ public class SFMPackets {
         registerPacket(registrar, new ClientboundContainerExportsInspectionResultsPacket.Daddy());
         registerPacket(registrar, new ClientboundIfStatementInspectionResultsPacket.Daddy());
         registerPacket(registrar, new ClientboundInputInspectionResultsPacket.Daddy());
+        registerPacket(registrar, new ClientboundLabelGunUseResponsePacket.Daddy());
         registerPacket(registrar, new ClientboundLabelInspectionResultsPacket.Daddy());
         registerPacket(registrar, new ClientboundManagerGuiUpdatePacket.Daddy());
         registerPacket(registrar, new ClientboundManagerLogLevelUpdatedPacket.Daddy());
@@ -67,15 +68,14 @@ public class SFMPackets {
         registerPacket(registrar, new ClientboundServerConfigCommandPacket.Daddy());
         registerPacket(registrar, new ClientboundShowChangelogPacket.Daddy());
         registerPacket(registrar, new ServerboundBoolExprStatementInspectionRequestPacket.Daddy());
-        registerPacket(registrar, new ServerboundServerConfigRequestPacket.Daddy());
         registerPacket(registrar, new ServerboundContainerExportsInspectionRequestPacket.Daddy());
         registerPacket(registrar, new ServerboundDiskItemSetProgramPacket.Daddy());
         registerPacket(registrar, new ServerboundFacadePacket.Daddy());
         registerPacket(registrar, new ServerboundIfStatementInspectionRequestPacket.Daddy());
         registerPacket(registrar, new ServerboundInputInspectionRequestPacket.Daddy());
         registerPacket(registrar, new ServerboundLabelGunClearPacket.Daddy());
-        registerPacket(registrar, new ServerboundLabelGunPrunePacket.Daddy());
         registerPacket(registrar, new ServerboundLabelGunCycleViewModePacket.Daddy());
+        registerPacket(registrar, new ServerboundLabelGunPrunePacket.Daddy());
         registerPacket(registrar, new ServerboundLabelGunSetActiveLabelPacket.Daddy());
         registerPacket(registrar, new ServerboundLabelGunUsePacket.Daddy());
         registerPacket(registrar, new ServerboundLabelInspectionRequestPacket.Daddy());
@@ -89,6 +89,7 @@ public class SFMPackets {
         registerPacket(registrar, new ServerboundNetworkToolToggleOverlayPacket.Daddy());
         registerPacket(registrar, new ServerboundNetworkToolUsePacket.Daddy());
         registerPacket(registrar, new ServerboundOutputInspectionRequestPacket.Daddy());
+        registerPacket(registrar, new ServerboundServerConfigRequestPacket.Daddy());
         registerPacket(registrar, new ServerboundServerConfigUpdatePacket.Daddy());
     }
 

@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.label;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
-import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.net.ClientboundLabelGunUseResponsePacket;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunUsePacket;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -29,7 +29,8 @@ public record LabelGunManagerPushOrPullAction(
             // save to gun
             newLabels.save(gunStack);
             // give feedback to player
-            player.sendSystemMessage(LocalizationKeys.LABEL_GUN_CHAT_PULLED.getComponent());
+            new ClientboundLabelGunUseResponsePacket(ClientboundLabelGunUseResponsePacket.Behaviour.Pulled)
+                    .sendToPlayer(player);
         } else {
             // save gun labels to disk
             gunLabels.save(disk);
@@ -38,7 +39,8 @@ public record LabelGunManagerPushOrPullAction(
             // mark manager dirty
             manager.setChanged();
             // give feedback to player
-            player.sendSystemMessage(LocalizationKeys.LABEL_GUN_CHAT_PUSHED.getComponent());
+            new ClientboundLabelGunUseResponsePacket(ClientboundLabelGunUseResponsePacket.Behaviour.Pushed)
+                    .sendToPlayer(player);
         }
     }
 }
