@@ -18,7 +18,7 @@ public class LabelGunScrollSwitcher {
     public static void onScroll(InputEvent.MouseScrollingEvent event) {
         var player = Minecraft.getInstance().player;
         if (player == null) return;
-        if (!SFMKeyMappings.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_SCROLL_MODIFIER_KEY)) return;
+        if (!SFMKeyMappings.isKeyDown(SFMKeyMappings.LABEL_GUN_SCROLL_MODIFIER_KEY)) return;
         var gun = player.getMainHandItem();
         var hand = InteractionHand.MAIN_HAND;
         if (!(gun.getItem() instanceof LabelGunItem)) {
