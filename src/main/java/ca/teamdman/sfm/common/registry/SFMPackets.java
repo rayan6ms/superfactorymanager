@@ -41,6 +41,7 @@ public class SFMPackets {
         registerPacket(new ClientboundContainerExportsInspectionResultsPacket.Daddy());
         registerPacket(new ClientboundIfStatementInspectionResultsPacket.Daddy());
         registerPacket(new ClientboundInputInspectionResultsPacket.Daddy());
+        registerPacket(new ClientboundLabelGunUseResponsePacket.Daddy());
         registerPacket(new ClientboundLabelInspectionResultsPacket.Daddy());
         registerPacket(new ClientboundManagerGuiUpdatePacket.Daddy());
         registerPacket(new ClientboundManagerLogLevelUpdatedPacket.Daddy());
@@ -49,15 +50,14 @@ public class SFMPackets {
         registerPacket(new ClientboundServerConfigCommandPacket.Daddy());
         registerPacket(new ClientboundShowChangelogPacket.Daddy());
         registerPacket(new ServerboundBoolExprStatementInspectionRequestPacket.Daddy());
-        registerPacket(new ServerboundServerConfigRequestPacket.Daddy());
         registerPacket(new ServerboundContainerExportsInspectionRequestPacket.Daddy());
         registerPacket(new ServerboundDiskItemSetProgramPacket.Daddy());
         registerPacket(new ServerboundFacadePacket.Daddy());
         registerPacket(new ServerboundIfStatementInspectionRequestPacket.Daddy());
         registerPacket(new ServerboundInputInspectionRequestPacket.Daddy());
         registerPacket(new ServerboundLabelGunClearPacket.Daddy());
-        registerPacket(new ServerboundLabelGunPrunePacket.Daddy());
         registerPacket(new ServerboundLabelGunCycleViewModePacket.Daddy());
+        registerPacket(new ServerboundLabelGunPrunePacket.Daddy());
         registerPacket(new ServerboundLabelGunSetActiveLabelPacket.Daddy());
         registerPacket(new ServerboundLabelGunUsePacket.Daddy());
         registerPacket(new ServerboundLabelInspectionRequestPacket.Daddy());
@@ -71,6 +71,7 @@ public class SFMPackets {
         registerPacket(new ServerboundNetworkToolToggleOverlayPacket.Daddy());
         registerPacket(new ServerboundNetworkToolUsePacket.Daddy());
         registerPacket(new ServerboundOutputInspectionRequestPacket.Daddy());
+        registerPacket(new ServerboundServerConfigRequestPacket.Daddy());
         registerPacket(new ServerboundServerConfigUpdatePacket.Daddy());
     }
 
