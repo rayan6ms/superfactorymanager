@@ -80,7 +80,7 @@ public class CableBlock extends Block implements ICableBlock, IFacadableBlock {
                         pPlayer.getMainHandItem(),
                         InteractionHand.MAIN_HAND
                 );
-                if (SFMKeyMappings.isKeyDownInWorld(SFMKeyMappings.TOGGLE_NETWORK_TOOL_OVERLAY_KEY)) {
+                if (SFMKeyMappings.isKeyDown(SFMKeyMappings.TOGGLE_NETWORK_TOOL_OVERLAY_KEY)) {
                     // we don't want to toggle the overlay if we're using alt-click behaviour
                     NetworkToolKeyMappingHandler.setExternalDebounce();
                 }

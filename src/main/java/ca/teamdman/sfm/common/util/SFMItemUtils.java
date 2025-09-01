@@ -25,7 +25,7 @@ public class SFMItemUtils {
     }
 
     public static boolean isClientAndMoreInfoKeyPressed() {
-        return SFMEnvironmentUtils.isClient() && SFMKeyMappings.isKeyDownInScreenOrWorld(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY);
+        return SFMEnvironmentUtils.isClient() && SFMKeyMappings.isKeyDown(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY);
     }
 
     public static MutableComponent getRainbow(int length) {

@@ -121,11 +121,11 @@ public class LabelGunItem extends Item {
         var level = ctx.getLevel();
         Player player = ctx.getPlayer();
         if (level.isClientSide && player != null) {
-            boolean pickBlock = SFMKeyMappings.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_PICK_BLOCK_MODIFIER_KEY);
-            boolean contiguous = SFMKeyMappings.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_CONTIGUOUS_MODIFIER_KEY);
-            boolean clear = SFMKeyMappings.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_CLEAR_MODIFIER_KEY);
-            boolean pull = SFMKeyMappings.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_PULL_MODIFIER_KEY);
-            boolean targetManager = SFMKeyMappings.isKeyDownInWorld(SFMKeyMappings.LABEL_GUN_TARGET_MANAGER_MODIFIER_KEY);
+            boolean pickBlock = SFMKeyMappings.isKeyDown(SFMKeyMappings.LABEL_GUN_PICK_BLOCK_MODIFIER_KEY);
+            boolean contiguous = SFMKeyMappings.isKeyDown(SFMKeyMappings.LABEL_GUN_CONTIGUOUS_MODIFIER_KEY);
+            boolean clear = SFMKeyMappings.isKeyDown(SFMKeyMappings.LABEL_GUN_CLEAR_MODIFIER_KEY);
+            boolean pull = SFMKeyMappings.isKeyDown(SFMKeyMappings.LABEL_GUN_PULL_MODIFIER_KEY);
+            boolean targetManager = SFMKeyMappings.isKeyDown(SFMKeyMappings.LABEL_GUN_TARGET_MANAGER_MODIFIER_KEY);
             ServerboundLabelGunUsePacket msg = new ServerboundLabelGunUsePacket(
                     ctx.getHand(),
                     ctx.getClickedPos(),
