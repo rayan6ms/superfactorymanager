@@ -210,7 +210,7 @@ public class DiskItem extends Item {
     @Override
     public Component getName(ItemStack stack) {
         if (SFMEnvironmentUtils.isClient()) {
-            if (SFMKeyMappings.isKeyDownInScreenOrWorld(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY))
+            if (SFMKeyMappings.isKeyDown(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY))
                 return super.getName(stack);
         }
         var name = getProgramName(stack);

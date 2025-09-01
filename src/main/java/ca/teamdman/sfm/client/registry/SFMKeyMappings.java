@@ -177,6 +177,7 @@ public class SFMKeyMappings {
     public static Component getKeyDisplay(KeyMapping key) {
         return key.getTranslatedKeyMessage().plainCopy().withStyle(ChatFormatting.AQUA);
     }
+
     public static Component getKeyDisplay(Supplier<KeyMapping> key) {
         return getKeyDisplay(key.get());
     }
@@ -188,23 +189,24 @@ public class SFMKeyMappings {
         }
     }
 
-    public static boolean isKeyDownInScreenOrWorld(Lazy<KeyMapping> key) {
-        if (key.get().getKey().equals(InputConstants.UNKNOWN)) {
+    public static boolean isKeyDown(Supplier<KeyMapping> key) {
+        KeyMapping keyMapping = key.get();
+        if (keyMapping.getKey().equals(InputConstants.UNKNOWN)) {
             return false;
         }
-        // special effort is needed to ensure this works properly when the manager screen is open
+        // We cannot use keyMapping.isDown because it fails when a screen is open
         // https://github.com/mekanism/Mekanism/blob/f92b48a49e0766cd3aa78e95c9c4a47ba90402f5/src/main/java/mekanism/client/key/MekKeyHandler.java
-        long handle = Minecraft.getInstance().getWindow().getWindow();
-        return InputConstants.isKeyDown(
-                handle,
-                key.get().getKey().getValue()
+        long windowHandle = Minecraft.getInstance().getWindow().getWindow();
+        boolean keyDown = InputConstants.isKeyDown(
+                windowHandle,
+                keyMapping.getKey().getValue()
         );
-    }
-
-    public static boolean isKeyDownInWorld(Lazy<KeyMapping> key) {
-        if (key.get().getKey().equals(InputConstants.UNKNOWN)) {
+        if (!keyDown) {
             return false;
+        } else if (KeyModifier.isKeyCodeModifier(keyMapping.getKey())) {
+            return true;
+        } else {
+            return keyMapping.getKeyModifier().isActive(KeyConflictContext.GUI);
         }
-        return key.get().isDown();
     }
 }
