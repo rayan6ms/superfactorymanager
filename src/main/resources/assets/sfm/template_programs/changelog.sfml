@@ -21,6 +21,7 @@ END
 -- Add Ctrl+E hotkey for opening the text editor in the title screen
 -- Add Ctrl+E hotkey for opening the text editor in the select world screen
 -- Fix SFM keymapping logic failing to respect modifier keys, fixes #374
+-- Update label gun push/pull chat reminders to show the pull modifier key instead of saying "shift"
 
 ---- 4.24.0 ----
 -- Thanks @Druadi for the support!
