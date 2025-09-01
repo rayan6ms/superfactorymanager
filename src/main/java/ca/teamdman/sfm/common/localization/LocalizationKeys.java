@@ -235,11 +235,11 @@ public final class LocalizationKeys {
     );
     public static final LocalizationEntry LABEL_GUN_CHAT_PULLED = new LocalizationEntry(
             () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".chat.pulled",
-            () -> "Pulled labels from the manager. Stop sneaking to push instead."
+            () -> "Pulled labels from the manager. Release the SFM label gun pull modifier key to push instead."
     );
     public static final LocalizationEntry LABEL_GUN_CHAT_PUSHED = new LocalizationEntry(
             () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".chat.pushed",
-            () -> "Pushed labels to the manager. Sneak to pull instead."
+            () -> "Pushed labels to the manager. Hold the SFM label gun pull modifier key to pull instead."
     );
     public static final LocalizationEntry LABEL_GUN_CHAT_SKIPPED_BLOCKS = new LocalizationEntry(
             () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".chat.skipped_blocks",
