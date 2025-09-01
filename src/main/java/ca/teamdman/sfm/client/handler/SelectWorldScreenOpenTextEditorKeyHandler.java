@@ -22,7 +22,7 @@ public class SelectWorldScreenOpenTextEditorKeyHandler {
     @SubscribeEvent
     public static void onKey(InputEvent.Key event) {
         if (
-                SFMKeyMappings.TITLE_SCREEN_OPEN_TEXT_EDITOR_KEY.get().matches(event.getKey(), event.getScanCode())
+                SFMKeyMappings.isKeyDown(SFMKeyMappings.TITLE_SCREEN_OPEN_TEXT_EDITOR_KEY)
                 && Minecraft.getInstance().screen instanceof SelectWorldScreen selectWorldScreen
         ) {
             WorldSelectionList list = selectWorldScreen.list;

@@ -41,7 +41,7 @@ public class NetworkToolKeyMappingHandler {
         if (minecraft.screen != null) return;
 
         // only do something if the key was pressed
-        boolean alt_down = SFMKeyMappings.isKeyDownInWorld(SFMKeyMappings.TOGGLE_NETWORK_TOOL_OVERLAY_KEY);
+        boolean alt_down = SFMKeyMappings.isKeyDown(SFMKeyMappings.TOGGLE_NETWORK_TOOL_OVERLAY_KEY);
         switch (toggleKeyState) {
             case Idle -> {
                 if (alt_down) {

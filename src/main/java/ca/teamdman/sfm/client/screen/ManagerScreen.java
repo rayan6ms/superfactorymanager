@@ -113,7 +113,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
                    && examplesButton.visible) {
             onExamplesButtonClicked();
             return true;
-        } else if (SFMKeyMappings.isKeyDownInScreenOrWorld(SFMKeyMappings.MANAGER_SCREEN_OPEN_TEXT_EDITOR_KEY)
+        } else if (SFMKeyMappings.isKeyDown(SFMKeyMappings.MANAGER_SCREEN_OPEN_TEXT_EDITOR_KEY)
                    && editButton.visible) {
             onEditButtonClicked();
             return true;
