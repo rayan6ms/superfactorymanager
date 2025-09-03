@@ -14,6 +14,7 @@ import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundManagerLogDesireUpdatePacket;
 import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.Screen;
@@ -61,7 +62,7 @@ public class SFMScreenChangeHelpers {
         ISFMTextEditorRegistration textEditorRegistration = Objects.requireNonNullElse(
                 SFMTextEditors
                         .registry()
-                        .get(ResourceLocation.parse(SFMConfig.CLIENT_TEXT_EDITOR_CONFIG.preferredEditor.get())),
+                        .get(SFMResourceLocation.parse(SFMConfig.CLIENT_TEXT_EDITOR_CONFIG.preferredEditor.get())),
                 SFMTextEditors.V1.get()
         );
         return textEditorRegistration.createScreen(openContext);

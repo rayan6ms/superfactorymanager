@@ -7,9 +7,12 @@ import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMRecipeSerializers;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticRecipeDataGen;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.data.recipes.*;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.RecipeProvider;
+import net.minecraft.data.recipes.SpecialRecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
@@ -47,7 +50,7 @@ public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
                 .requires(SFMBlocks.FANCY_CABLE_BLOCK.get(), 1)
                 .unlockedBy("has_iron_ingot", RecipeProvider.has(Items.IRON_INGOT))
                 .unlockedBy("has_chest", RecipeProvider.has(Tags.Items.CHESTS))
-                .save(writer, ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "fancy_to_cable"));
+                .save(writer, SFMResourceLocation.fromSFMPath("fancy_to_cable"));
 
         beginShaped(SFMBlocks.MANAGER_BLOCK.get(), 1)
                 .define('A', Tags.Items.CHESTS)
@@ -139,7 +142,7 @@ public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
 
         addPrintingPressRecipe(
                 writer,
-                ResourceLocation.fromNamespaceAndPath("sfm", "written_book_copy"),
+                SFMResourceLocation.fromSFMPath("written_book_copy"),
                 Ingredient.of(Items.WRITTEN_BOOK),
                 Ingredient.of(Tags.Items.DYES_BLACK),
                 Ingredient.of(Items.BOOK)
@@ -147,7 +150,7 @@ public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
 
         addPrintingPressRecipe(
                 writer,
-                ResourceLocation.fromNamespaceAndPath("sfm", "enchanted_book_copy"),
+                SFMResourceLocation.fromSFMPath("enchanted_book_copy"),
                 Ingredient.of(Items.ENCHANTED_BOOK),
                 Ingredient.of(SFMItems.EXPERIENCE_GOOP_ITEM.get()),
                 Ingredient.of(Items.BOOK)
@@ -155,7 +158,7 @@ public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
 
         addPrintingPressRecipe(
                 writer,
-                ResourceLocation.fromNamespaceAndPath("sfm", "map_copy"),
+                SFMResourceLocation.fromSFMPath("map_copy"),
                 Ingredient.of(Items.FILLED_MAP),
                 Ingredient.of(Tags.Items.DYES_BLACK),
                 Ingredient.of(Items.MAP)
@@ -163,7 +166,7 @@ public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
 
         addPrintingPressRecipe(
                 writer,
-                ResourceLocation.fromNamespaceAndPath("sfm", "program_copy"),
+                SFMResourceLocation.fromSFMPath("program_copy"),
                 Ingredient.of(SFMItems.DISK_ITEM.get()),
                 Ingredient.of(Tags.Items.DYES_BLACK),
                 Ingredient.of(SFMItems.DISK_ITEM.get())
