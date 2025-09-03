@@ -2,8 +2,8 @@ package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.item.*;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
@@ -70,7 +70,7 @@ public class SFMItems {
 
     @SubscribeEvent
     public static void onRegister(CreativeModeTabEvent.Register event) {
-        tab = event.registerCreativeModeTab(new ResourceLocation(SFM.MOD_ID, "main"), builder ->
+        tab = event.registerCreativeModeTab(SFMResourceLocation.fromSFMPath("main"), builder ->
                 // Set name of tab to display
                 builder.title(Component.translatable("item_group." + SFM.MOD_ID + ".main"))
                         // Set icon of creative tab
