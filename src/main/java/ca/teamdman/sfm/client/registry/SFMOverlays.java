@@ -3,6 +3,7 @@ package ca.teamdman.sfm.client.registry;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.overlay.LabelGunReminderOverlay;
 import ca.teamdman.sfm.client.overlay.NetworkToolReminderOverlay;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -20,12 +21,12 @@ public class SFMOverlays {
     public static void onRegisterOverlays(RegisterGuiOverlaysEvent event) {
         event.registerAbove(
                 VanillaGuiOverlay.HOTBAR.id(),
-                new ResourceLocation(SFM.MOD_ID, "label_gun_reminder"),
+                SFMResourceLocation.fromSFMPath("label_gun_reminder"),
                 LABEL_GUN_REMINDER_OVERLAY.get()
         );
         event.registerAbove(
                 VanillaGuiOverlay.HOTBAR.id(),
-                new ResourceLocation(SFM.MOD_ID, "network_tool_reminder"),
+                SFMResourceLocation.fromSFMPath( "network_tool_reminder"),
                 NETWORK_TOOL_REMINDER_OVERLAY.get()
         );
     }
