@@ -3,6 +3,7 @@ package ca.teamdman.sfm.client.registry;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.text_editor.action.*;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -13,7 +14,7 @@ import java.util.stream.Stream;
 
 @SuppressWarnings("unused")
 public class SFMTextEditorActions {
-    public static final ResourceLocation REGISTRY_ID = ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "text_editor_action");
+    public static final ResourceLocation REGISTRY_ID = SFMResourceLocation.fromSFMPath("text_editor_action");
     private static final DeferredRegister<ITextEditAction> REGISTERER = DeferredRegister.create(
             REGISTRY_ID,
             SFM.MOD_ID

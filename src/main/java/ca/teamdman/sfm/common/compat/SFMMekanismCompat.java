@@ -1,12 +1,12 @@
 package ca.teamdman.sfm.common.compat;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.linting.IProgramLinter;
 import ca.teamdman.sfm.common.program.linting.MekanismSideConfigProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ChemicalResourceType;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfml.ast.DirectionQualifier;
 import ca.teamdman.sfml.ast.IOStatement;
 import ca.teamdman.sfml.ast.ResourceIdentifier;
@@ -18,7 +18,6 @@ import mekanism.common.tile.component.config.DataType;
 import mekanism.common.tile.interfaces.ISideConfiguration;
 import mekanism.common.util.UnitDisplayUtils;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.Nullable;
@@ -36,24 +35,24 @@ public class SFMMekanismCompat {
             case ITEM -> SFMResourceTypes.ITEM.get();
             case FLUID -> SFMResourceTypes.FLUID.get();
 //            case GAS -> {
-//                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "gas");
+//                ResourceLocation id = SFMResourceLocation.fromSFMPath("gas");
 //                yield SFMResourceTypes.registry().get(id);
 //            }
 //            case INFUSION -> {
-//                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "infusion");
+//                ResourceLocation id = SFMResourceLocation.fromSFMPath("infusion");
 //                yield SFMResourceTypes.registry().get(id);
 //            }
 //            case PIGMENT -> {
-//                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "pigment");
+//                ResourceLocation id = SFMResourceLocation.fromSFMPath("pigment");
 //                yield SFMResourceTypes.registry().get(id);
 //            }
 //            case SLURRY -> {
-//                ResourceLocation id = ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "slurry");
+//                ResourceLocation id = SFMResourceLocation.fromSFMPath("slurry");
 //                yield SFMResourceTypes.registry().get(id);
 //            }
             case ENERGY -> SFMResourceTypes.FORGE_ENERGY.get();
             case CHEMICAL -> SFMResourceTypes.registry()
-                    .get(ResourceLocation.fromNamespaceAndPath(SFM.MOD_ID, "chemical"));
+                    .get(SFMResourceLocation.fromSFMPath("chemical"));
             default -> null;
         };
     }
