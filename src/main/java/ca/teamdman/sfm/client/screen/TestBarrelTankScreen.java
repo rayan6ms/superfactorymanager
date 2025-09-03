@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.client.screen;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import net.minecraft.client.gui.GuiGraphics;
@@ -20,8 +20,7 @@ import net.minecraftforge.fluids.FluidStack;
 import org.joml.Matrix4f;
 
 public class TestBarrelTankScreen extends AbstractContainerScreen<TestBarrelTankContainerMenu> {
-    private static final ResourceLocation BACKGROUND_TEXTURE_LOCATION = new ResourceLocation(
-            SFM.MOD_ID,
+    private static final ResourceLocation BACKGROUND_TEXTURE_LOCATION = SFMResourceLocation.fromSFMPath(
             "textures/gui/container/manager.png"
     );
 

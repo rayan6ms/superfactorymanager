@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.program.linting.FlowProgramLinter;
 import ca.teamdman.sfm.common.program.linting.IProgramLinter;
 import ca.teamdman.sfm.common.program.linting.ResourcesProgramLinter;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -16,7 +17,7 @@ import net.minecraftforge.registries.RegistryObject;
 import java.util.function.Supplier;
 
 public class SFMProgramLinters {
-    public static final ResourceLocation REGISTRY_ID = new ResourceLocation(SFM.MOD_ID, "program_linters");
+    public static final ResourceLocation REGISTRY_ID = SFMResourceLocation.fromSFMPath("program_linters");
     private static final DeferredRegister<IProgramLinter> REGISTERER = DeferredRegister.create(
             REGISTRY_ID,
             SFM.MOD_ID

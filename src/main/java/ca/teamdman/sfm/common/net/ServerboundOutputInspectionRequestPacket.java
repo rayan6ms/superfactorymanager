@@ -10,6 +10,7 @@ import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.SFMASTUtils;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfml.ast.*;
 import ca.teamdman.sfml.ast.Number;
 import net.minecraft.network.FriendlyByteBuf;
@@ -158,7 +159,7 @@ public record ServerboundOutputInspectionRequestPacket(
 
                                 // because these resource limits were generated from resource stacks
                                 // they should always be valid resource locations (not patterns)
-                                ResourceLocation resourceLimitLocation = new ResourceLocation(
+                                ResourceLocation resourceLimitLocation = SFMResourceLocation.fromNamespaceAndPath(
                                         resourceId.resourceNamespace,
                                         resourceId.resourceName
                                 );
