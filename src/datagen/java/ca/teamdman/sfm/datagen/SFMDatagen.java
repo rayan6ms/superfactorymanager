@@ -12,12 +12,12 @@ public class SFMDatagen {
     public static void onGather(GatherDataEvent event) {
         if (!DatagenModLoader.isRunningDataGen()) return;
         if (event.includeServer()) {
-            event.getGenerator().addProvider(event.includeClient(), new SFMBlockStatesAndModels(event));
-            event.getGenerator().addProvider(event.includeClient(), new SFMItemModels(event));
-            event.getGenerator().addProvider(event.includeClient(), new SFMBlockTags(event));
-            event.getGenerator().addProvider(event.includeClient(), new SFMLootTables(event));
-            event.getGenerator().addProvider(event.includeClient(), new SFMRecipes(event));
-            event.getGenerator().addProvider(event.includeClient(), new SFMLanguageProvider(event));
+            event.getGenerator().addProvider(event.includeClient(), new SFMBlockStatesAndModelsDatagen(event));
+            event.getGenerator().addProvider(event.includeClient(), new SFMItemModelsDatagen(event));
+            event.getGenerator().addProvider(event.includeClient(), new SFMBlockTagsDatagen(event));
+            event.getGenerator().addProvider(event.includeClient(), new SFMLootTablesDatagen(event));
+            event.getGenerator().addProvider(event.includeClient(), new SFMRecipesDatagen(event));
+            event.getGenerator().addProvider(event.includeClient(), new SFMLanguageProviderDatagen(event));
         }
     }
 }

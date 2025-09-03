@@ -20,8 +20,8 @@ import net.minecraftforge.data.event.GatherDataEvent;
 
 import java.util.function.Consumer;
 
-public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
-    public SFMRecipes(GatherDataEvent event) {
+public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
+    public SFMRecipesDatagen(GatherDataEvent event) {
         super(event, SFM.MOD_ID);
     }
 
