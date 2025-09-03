@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceLocation;
 
 public class SFMResourceLocation {
     public static ResourceLocation fromNamespaceAndPath(String namespace, String path) {
-        return new ResourceLocation(namespace, path);
+        return ResourceLocation.fromNamespaceAndPath(namespace, path);
     }
     public static ResourceLocation fromSFMPath(String path) {
         return fromNamespaceAndPath(SFM.MOD_ID, path);
@@ -14,6 +14,6 @@ public class SFMResourceLocation {
         return fromNamespaceAndPath("minecraft", path);
     }
     public static ResourceLocation parse(String expanded) {
-        return new ResourceLocation(expanded);
+        return ResourceLocation.parse(expanded);
     }
 }
