@@ -24,11 +24,26 @@ public class SFMCreativeTabs {
                     .builder()
                     .title(LocalizationKeys.ITEM_GROUP.getComponent())
                     .icon(() -> new ItemStack(SFMBlocks.MANAGER_BLOCK.get()))
-                    .displayItems(SFMItems::populateMainCreativeTab)
+                    .displayItems(SFMCreativeTabs::populateMainCreativeTab)
                     .build()
     );
 
     public static void register(IEventBus bus) {
         CREATIVE_TABS.register(bus);
+    }
+
+    public static void populateMainCreativeTab(
+            @SuppressWarnings("unused")
+            CreativeModeTab.ItemDisplayParameters params,
+            CreativeModeTab.Output output
+    ) {
+        output.acceptAll(
+                SFMItems.ITEMS
+                        .getEntries()
+                        .stream()
+                        .map(RegistryObject::get)
+                        .map(ItemStack::new)
+                        .toList()
+        );
     }
 }
