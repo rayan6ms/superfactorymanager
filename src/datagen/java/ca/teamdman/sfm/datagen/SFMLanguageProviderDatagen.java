@@ -11,8 +11,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-public class SFMLanguageProvider extends MCVersionAgnosticLanguageDataGen {
-    public SFMLanguageProvider(GatherDataEvent event) {
+public class SFMLanguageProviderDatagen extends MCVersionAgnosticLanguageDataGen {
+    public SFMLanguageProviderDatagen(GatherDataEvent event) {
         super(event, SFM.MOD_ID, "en_us");
     }
 

@@ -11,8 +11,8 @@ import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.data.event.GatherDataEvent;
 import net.minecraftforge.registries.RegistryObject;
 
-public class SFMItemModels extends MCVersionAgnosticItemModelsDataGen {
-    public SFMItemModels(
+public class SFMItemModelsDatagen extends MCVersionAgnosticItemModelsDataGen {
+    public SFMItemModelsDatagen(
             GatherDataEvent event
     ) {
         super(event, SFM.MOD_ID);
