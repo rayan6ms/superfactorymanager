@@ -2,6 +2,7 @@ package ca.teamdman.sfm;
 
 import ca.teamdman.sfm.client.screen.text_editor.SFMTextEditScreenV1;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfml.ast.*;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -75,7 +76,7 @@ public class SFMTests {
 
     @Test
     public void iForgetIfICanUseResourceLocationsHere() {
-        ResourceLocation bruh = new ResourceLocation("sfm","bruh");
+        ResourceLocation bruh = SFMResourceLocation.fromSFMPath("bruh");
         assertEquals("sfm", bruh.getNamespace());
         assertEquals("bruh", bruh.getPath());
     }

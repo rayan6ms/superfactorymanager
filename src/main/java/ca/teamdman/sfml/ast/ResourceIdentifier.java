@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.program.RegexCache;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.resources.ResourceKey;
@@ -149,7 +150,7 @@ public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode, ToStringCo
 
     public Optional<ResourceLocation> getLocation() {
         try {
-            return Optional.of(new ResourceLocation(resourceNamespace, resourceName));
+            return Optional.of(SFMResourceLocation.fromNamespaceAndPath(resourceNamespace, resourceName));
         } catch (ResourceLocationException e) {
             return Optional.empty();
         }
@@ -209,7 +210,7 @@ public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode, ToStringCo
     }
 
     public ResourceLocation getResourceTypeId() {
-        return new ResourceLocation(resourceTypeNamespace, resourceTypeName);
+        return SFMResourceLocation.fromNamespaceAndPath(resourceTypeNamespace, resourceTypeName);
     }
 
     public @Nullable ResourceType<STACK, ITEM, CAP> getResourceType() {
@@ -234,7 +235,7 @@ public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode, ToStringCo
         boolean isSFMMod = resourceTypeNamespace.equals(SFM.MOD_ID);
         boolean isItemType = resourceTypeName.equals("item");
         boolean isForgeEnergyType = resourceTypeName.equals("forge_energy") && getLocation()
-                .filter(rl -> rl.equals(new ResourceLocation("forge", "energy")))
+                .filter(rl -> rl.equals(SFMResourceLocation.fromNamespaceAndPath("forge", "energy")))
                 .isPresent();
         String resourceNamespaceAlias = isForgeEnergyType ? "fe" : resourceNamespace;
         boolean shouldQuoteResult = false;
