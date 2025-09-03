@@ -4,9 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.item.*;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredRegister;
@@ -15,7 +13,7 @@ import java.util.function.Supplier;
 
 public class SFMItems {
 
-    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, SFM.MOD_ID);
+    static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, SFM.MOD_ID);
     public static final Supplier<BlockItem> MANAGER_ITEM = register("manager", SFMBlocks.MANAGER_BLOCK);
 //    public static final Supplier<BlockItem> TUNNELLED_MANAGER_ITEM = register(
 //            "tunnelled_manager",
@@ -64,15 +62,4 @@ public class SFMItems {
         return ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
     }
 
-    public static void populateMainCreativeTab(
-            @SuppressWarnings("unused") CreativeModeTab.ItemDisplayParameters params,
-            CreativeModeTab.Output output
-    ) {
-        output.acceptAll(SFMItems.ITEMS
-                                 .getEntries()
-                                 .stream()
-                                 .map(Supplier::get)
-                                 .map(ItemStack::new)
-                                 .toList());
-    }
 }
