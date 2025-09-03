@@ -24,7 +24,9 @@ import java.util.List;
 import java.util.Objects;
 
 public class ProgramBuilder {
-    public static ProgramBuildResult build(String programString) {
+    public static ProgramBuildResult build(
+            @Nullable String programString
+    ) {
         if (programString == null) {
             programString = "";
         }
