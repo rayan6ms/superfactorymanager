@@ -636,7 +636,7 @@ public class OutputStatement implements IOStatement {
                                             finalSlot,
                                             type.getAmount(stack)
                                             + " of "
-                                            + type.getMaxStackSizeForSlot(capability, finalSlot)
+                                            + Math.min(type.getMaxStackSize(stack), type.getMaxStackSizeForSlot(capability, finalSlot))
                                             + " "
                                             + type.getItem(stack)
                                     )));
