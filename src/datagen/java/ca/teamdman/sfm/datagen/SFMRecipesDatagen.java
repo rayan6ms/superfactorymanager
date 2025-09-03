@@ -21,8 +21,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.common.Tags;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-public class SFMRecipes extends MCVersionAgnosticRecipeDataGen {
-    public SFMRecipes(GatherDataEvent event) {
+public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
+    public SFMRecipesDatagen(GatherDataEvent event) {
         super(event, SFM.MOD_ID);
     }
 

@@ -14,8 +14,8 @@ import net.neoforged.neoforge.client.model.generators.ModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
-public class SFMBlockStatesAndModels extends MCVersionAgnosticBlockStatesAndModelsDataGen {
-    public SFMBlockStatesAndModels(GatherDataEvent event) {
+public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStatesAndModelsDataGen {
+    public SFMBlockStatesAndModelsDatagen(GatherDataEvent event) {
         super(event, SFM.MOD_ID);
     }
 

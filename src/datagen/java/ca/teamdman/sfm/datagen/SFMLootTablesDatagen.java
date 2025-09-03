@@ -10,9 +10,9 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-public class SFMLootTables extends MCVersionAgnosticLootTablesDataGen {
+public class SFMLootTablesDatagen extends MCVersionAgnosticLootTablesDataGen {
 
-    public SFMLootTables(GatherDataEvent event) {
+    public SFMLootTablesDatagen(GatherDataEvent event) {
         super(event, SFM.MOD_ID);
     }
 
