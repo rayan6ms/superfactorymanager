@@ -9,6 +9,7 @@ import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.level.Level;
+import net.neoforged.neoforge.network.NetworkHooks;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
@@ -247,7 +248,7 @@ public record Program(
                             .forEach(body -> trace.accept(LocalizationKeys.LOG_LABEL_POSITION_HOLDER_DETAILS_BODY.get(
                                     body))));
             trace.accept(LocalizationKeys.LOG_LABEL_POSITION_HOLDER_DETAILS_FOOTER.get());
-            trace.accept(LocalizationKeys.LOG_PROGRAM_CONTEXT.get(context));
+            trace.accept(LocalizationKeys.LOG_PROGRAM_CONTEXT.get(context.toString()));
         };
     }
 
