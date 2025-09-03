@@ -6,8 +6,8 @@ import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticBlockTagsDataGe
 import net.minecraft.tags.BlockTags;
 import net.minecraftforge.data.event.GatherDataEvent;
 
-public class SFMBlockTags extends MCVersionAgnosticBlockTagsDataGen {
-    public SFMBlockTags(GatherDataEvent event) {
+public class SFMBlockTagsDatagen extends MCVersionAgnosticBlockTagsDataGen {
+    public SFMBlockTagsDatagen(GatherDataEvent event) {
         super(event, SFM.MOD_ID);
     }
 

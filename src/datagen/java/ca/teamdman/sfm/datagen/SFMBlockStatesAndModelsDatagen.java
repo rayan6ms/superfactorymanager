@@ -13,8 +13,8 @@ import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.data.event.GatherDataEvent;
 
-public class SFMBlockStatesAndModels extends MCVersionAgnosticBlockStatesAndModelsDataGen {
-    public SFMBlockStatesAndModels(GatherDataEvent event) {
+public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStatesAndModelsDataGen {
+    public SFMBlockStatesAndModelsDatagen(GatherDataEvent event) {
         super(event, SFM.MOD_ID);
     }
 
