@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.resourcetype.ForgeEnergyResourceType;
 import ca.teamdman.sfm.common.resourcetype.ItemResourceType;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -26,10 +27,7 @@ import java.util.function.Supplier;
 import java.util.stream.Stream;
 
 public class SFMResourceTypes {
-    public static final ResourceKey<Registry<ResourceType<?, ?, ?>>> REGISTRY_ID = ResourceKey.createRegistryKey(new ResourceLocation(
-            SFM.MOD_ID,
-            "resource_type"
-    ));
+    public static final ResourceKey<Registry<ResourceType<?, ?, ?>>> REGISTRY_ID = ResourceKey.createRegistryKey(SFMResourceLocation.fromSFMPath("resource_type"));
 
     private static final DeferredRegister<ResourceType<?, ?, ?>> REGISTERER = DeferredRegister.create(
             REGISTRY_ID,

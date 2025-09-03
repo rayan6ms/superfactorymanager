@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype.exclude;
 
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import mekanism.api.Action;
 import mekanism.api.energy.IStrictEnergyHandler;
 import mekanism.api.math.FloatingLong;
@@ -16,7 +17,7 @@ public class MekanismEnergyResourceType extends ScalarResourceType<FloatingLong,
     });
 
     public MekanismEnergyResourceType() {
-        super(CAP, new ResourceLocation("mekanism", "energy"), FloatingLong.class);
+        super(CAP, SFMResourceLocation.fromNamespaceAndPath("mekanism", "energy"), FloatingLong.class);
     }
 
     @Override

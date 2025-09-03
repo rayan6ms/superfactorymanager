@@ -1,12 +1,12 @@
 package ca.teamdman.sfm.common.resourcetype;
 
-import net.minecraft.resources.ResourceLocation;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.neoforged.neoforge.common.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 public class ForgeEnergyResourceType extends IntegerResourceType<IEnergyStorage> {
     public ForgeEnergyResourceType() {
-        super(Capabilities.ENERGY, new ResourceLocation("forge", "energy"));
+        super(Capabilities.ENERGY, SFMResourceLocation.fromNamespaceAndPath("forge", "energy"));
     }
 
     @Override

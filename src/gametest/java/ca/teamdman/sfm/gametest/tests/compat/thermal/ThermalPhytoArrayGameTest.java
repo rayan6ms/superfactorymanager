@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -14,7 +15,6 @@ import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.TileEntityFluidTank;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -74,7 +74,7 @@ public class ThermalPhytoArrayGameTest extends SFMGameTestDefinition {
         tank.setFluidInTank(0, new FluidStack(Fluids.WATER, Integer.MAX_VALUE));
 
         // set up phytos
-        var phytoBlock = ForgeRegistries.BLOCKS.getValue(new ResourceLocation("thermal", "machine_insolator"));
+        var phytoBlock = ForgeRegistries.BLOCKS.getValue(SFMResourceLocation.fromNamespaceAndPath("thermal", "machine_insolator"));
         SFM.LOGGER.debug("Setting up phytos with block {}", phytoBlock);
         for (int x = 0; x < 25; x++) {
             for (int z = 1; z < 25; z++) {
@@ -108,11 +108,11 @@ public class ThermalPhytoArrayGameTest extends SFMGameTestDefinition {
                     Items.MELON_SEEDS,
                     Items.PUMPKIN_SEEDS,
                     Items.WHEAT_SEEDS,
-                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(new ResourceLocation("thermal", "phytogro")),
-                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(new ResourceLocation("thermal", "phytogro")),
-                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(new ResourceLocation("thermal", "phytogro")),
-                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(new ResourceLocation("thermal", "phytogro")),
-                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(new ResourceLocation("thermal", "phytogro")),
+                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(SFMResourceLocation.fromNamespaceAndPath("thermal", "phytogro")),
+                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(SFMResourceLocation.fromNamespaceAndPath("thermal", "phytogro")),
+                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(SFMResourceLocation.fromNamespaceAndPath("thermal", "phytogro")),
+                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(SFMResourceLocation.fromNamespaceAndPath("thermal", "phytogro")),
+                    SFMResourceTypes.ITEM.get().getItemFromRegistryKey(SFMResourceLocation.fromNamespaceAndPath("thermal", "phytogro")),
                     };
             int slot = 0;
             for (Item item : items) {
