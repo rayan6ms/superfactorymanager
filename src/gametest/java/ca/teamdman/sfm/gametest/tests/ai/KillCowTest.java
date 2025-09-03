@@ -1,12 +1,12 @@
 package ca.teamdman.sfm.gametest.tests.ai;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.gametest.SFMGameTestBase;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -26,7 +26,7 @@ public class KillCowTest extends SFMGameTestBase {
             }
         }
         // spawn the animal
-        var cowType = BuiltInRegistries.ENTITY_TYPE.get(new ResourceLocation("minecraft", "cow"));
+        var cowType = BuiltInRegistries.ENTITY_TYPE.get(SFMResourceLocation.fromMinecraftPath("cow"));
 
         // begin agent code
         // item.setPos(Vec3.atCenterOf(helper.absolutePos(pressurePlatePos)));
