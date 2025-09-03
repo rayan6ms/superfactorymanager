@@ -248,7 +248,7 @@ public record Program(
                             .forEach(body -> trace.accept(LocalizationKeys.LOG_LABEL_POSITION_HOLDER_DETAILS_BODY.get(
                                     body))));
             trace.accept(LocalizationKeys.LOG_LABEL_POSITION_HOLDER_DETAILS_FOOTER.get());
-            trace.accept(LocalizationKeys.LOG_PROGRAM_CONTEXT.get(context));
+            trace.accept(LocalizationKeys.LOG_PROGRAM_CONTEXT.get(context.toString()));
         };
     }
 
