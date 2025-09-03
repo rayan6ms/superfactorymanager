@@ -3,9 +3,7 @@ package ca.teamdman.sfm.common.registry;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.item.*;
 import net.minecraft.world.item.BlockItem;
-import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
@@ -15,8 +13,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 @Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class SFMItems {
-
-    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, SFM.MOD_ID);
+    static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, SFM.MOD_ID);
     public static final RegistryObject<BlockItem> MANAGER_ITEM = register("manager", SFMBlocks.MANAGER_BLOCK);
 //    public static final RegistryObject<BlockItem> TUNNELLED_MANAGER_ITEM = register(
 //            "tunnelled_manager",
@@ -65,15 +62,4 @@ public class SFMItems {
         return ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
     }
 
-    public static void populateMainCreativeTab(
-            @SuppressWarnings("unused") CreativeModeTab.ItemDisplayParameters params,
-            CreativeModeTab.Output output
-    ) {
-        output.acceptAll(SFMItems.ITEMS
-                                 .getEntries()
-                                 .stream()
-                                 .map(RegistryObject::get)
-                                 .map(ItemStack::new)
-                                 .toList());
-    }
 }
