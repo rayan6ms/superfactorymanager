@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.item;
 
 import ca.teamdman.sfm.client.render.FormItemExtensions;
+import ca.teamdman.sfm.common.registry.SFMCreativeTabs;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.network.chat.Component;
@@ -16,7 +17,7 @@ import java.util.function.Consumer;
 
 public class FormItem extends Item {
     public FormItem() {
-        super(new Item.Properties().tab(SFMItems.TAB));
+        super(new Item.Properties().tab(SFMCreativeTabs.TAB));
     }
 
     public static ItemStack createFormFromReference(ItemStack stack) {

@@ -7,7 +7,7 @@ import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunUsePacket;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.SFMCreativeTabs;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -29,7 +29,7 @@ import java.util.List;
 
 public class LabelGunItem extends Item {
     public LabelGunItem() {
-        super(new Properties().stacksTo(1).tab(SFMItems.TAB));
+        super(new Properties().stacksTo(1).tab(SFMCreativeTabs.TAB));
     }
 
     public static void setActiveLabel(

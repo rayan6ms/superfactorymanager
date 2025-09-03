@@ -9,7 +9,7 @@ import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundDiskItemSetProgramPacket;
 import ca.teamdman.sfm.common.program.linting.ProgramLinter;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.SFMCreativeTabs;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 
 public class DiskItem extends Item {
     public DiskItem() {
-        super(new Item.Properties().tab(SFMItems.TAB));
+        super(new Item.Properties().tab(SFMCreativeTabs.TAB));
     }
 
     public static String getProgram(ItemStack stack) {
