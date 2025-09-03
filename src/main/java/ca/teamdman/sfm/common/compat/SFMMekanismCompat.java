@@ -1,15 +1,11 @@
 package ca.teamdman.sfm.common.compat;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.linting.IProgramLinter;
 import ca.teamdman.sfm.common.program.linting.MekanismSideConfigProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.*;
-import ca.teamdman.sfm.common.resourcetype.GasResourceType;
-import ca.teamdman.sfm.common.resourcetype.InfuseResourceType;
-import ca.teamdman.sfm.common.resourcetype.PigmentResourceType;
-import ca.teamdman.sfm.common.resourcetype.SlurryResourceType;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfml.ast.DirectionQualifier;
 import ca.teamdman.sfml.ast.IOStatement;
 import ca.teamdman.sfml.ast.ResourceIdentifier;
@@ -25,8 +21,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.neoforge.registries.DeferredRegister;
-
 import org.jetbrains.annotations.Nullable;
+
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Map;
@@ -40,19 +36,19 @@ public class SFMMekanismCompat {
             case ITEM -> SFMResourceTypes.ITEM.get();
             case FLUID -> SFMResourceTypes.FLUID.get();
             case GAS -> {
-                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "gas");
+                ResourceLocation id = SFMResourceLocation.fromSFMPath("gas");
                 yield SFMResourceTypes.registry().get(id);
             }
             case INFUSION -> {
-                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "infusion");
+                ResourceLocation id = SFMResourceLocation.fromSFMPath("infusion");
                 yield SFMResourceTypes.registry().get(id);
             }
             case PIGMENT -> {
-                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "pigment");
+                ResourceLocation id = SFMResourceLocation.fromSFMPath("pigment");
                 yield SFMResourceTypes.registry().get(id);
             }
             case SLURRY -> {
-                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "slurry");
+                ResourceLocation id = SFMResourceLocation.fromSFMPath("slurry");
                 yield SFMResourceTypes.registry().get(id);
             }
             default -> null;

@@ -5,6 +5,7 @@ import ca.teamdman.sfm.client.text_editor.ISFMTextEditorRegistration;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenV1Registration;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenV2Registration;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
@@ -12,7 +13,7 @@ import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredRegister;
 
 public class SFMTextEditors {
-    public static final ResourceLocation REGISTRY_ID = new ResourceLocation(SFM.MOD_ID, "text_editor");
+    public static final ResourceLocation REGISTRY_ID = SFMResourceLocation.fromSFMPath("text_editor");
     private static final DeferredRegister<ISFMTextEditorRegistration> REGISTERER = DeferredRegister.create(
             REGISTRY_ID,
             SFM.MOD_ID

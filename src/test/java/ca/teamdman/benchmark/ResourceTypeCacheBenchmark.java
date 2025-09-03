@@ -1,5 +1,6 @@
 package ca.teamdman.benchmark;
 
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectAVLTreeMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap;
@@ -34,15 +35,15 @@ public class ResourceTypeCacheBenchmark {
 
     @Setup()
     public void setup() {
-         values = new ResourceLocation[] {
-            new ResourceLocation("sfm","item"),
-            new ResourceLocation("sfm","fluid"),
-            new ResourceLocation("sfm","gas"),
-            new ResourceLocation("sfm","forge_energy"),
-            new ResourceLocation("sfm","infusion"),
-            new ResourceLocation("sfm","mana"),
-            new ResourceLocation("sfm","bruh"),
-        };
+        values = new ResourceLocation[]{
+                SFMResourceLocation.fromSFMPath("item"),
+                SFMResourceLocation.fromSFMPath("fluid"),
+                SFMResourceLocation.fromSFMPath("gas"),
+                SFMResourceLocation.fromSFMPath("forge_energy"),
+                SFMResourceLocation.fromSFMPath("infusion"),
+                SFMResourceLocation.fromSFMPath("mana"),
+                SFMResourceLocation.fromSFMPath("bruh"),
+                };
         for (ResourceLocation value : values) {
             intCache.put(value.hashCode(), value.toString());
             objArrayCache.put(value, value.toString());
