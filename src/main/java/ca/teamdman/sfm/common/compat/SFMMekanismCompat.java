@@ -1,11 +1,11 @@
 package ca.teamdman.sfm.common.compat;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.linting.IProgramLinter;
 import ca.teamdman.sfm.common.program.linting.MekanismSideConfigProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.*;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfml.ast.DirectionQualifier;
 import ca.teamdman.sfml.ast.IOStatement;
 import ca.teamdman.sfml.ast.ResourceIdentifier;
@@ -34,19 +34,19 @@ public class SFMMekanismCompat {
             case ITEM -> SFMResourceTypes.ITEM.get();
             case FLUID -> SFMResourceTypes.FLUID.get();
             case GAS -> {
-                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "gas");
+                ResourceLocation id = SFMResourceLocation.fromSFMPath("gas");
                 yield SFMResourceTypes.registry().getValue(id);
             }
             case INFUSION -> {
-                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "infusion");
+                ResourceLocation id = SFMResourceLocation.fromSFMPath("infusion");
                 yield SFMResourceTypes.registry().getValue(id);
             }
             case PIGMENT -> {
-                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "pigment");
+                ResourceLocation id = SFMResourceLocation.fromSFMPath("pigment");
                 yield SFMResourceTypes.registry().getValue(id);
             }
             case SLURRY -> {
-                ResourceLocation id = new ResourceLocation(SFM.MOD_ID, "slurry");
+                ResourceLocation id = SFMResourceLocation.fromSFMPath("slurry");
                 yield SFMResourceTypes.registry().getValue(id);
             }
             default -> null;

@@ -5,6 +5,7 @@ import ca.teamdman.sfm.common.capabilityprovidermapper.BlockEntityCapabilityProv
 import ca.teamdman.sfm.common.capabilityprovidermapper.CapabilityProviderMapper;
 import ca.teamdman.sfm.common.capabilityprovidermapper.CauldronCapabilityProviderMapper;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
@@ -22,8 +23,7 @@ import java.util.Collection;
 import java.util.function.Supplier;
 
 public class SFMCapabilityProviderMappers {
-    public static final  ResourceLocation                                   REGISTRY_ID      = new ResourceLocation(
-            SFM.MOD_ID,
+    public static final  ResourceLocation                                   REGISTRY_ID      = SFMResourceLocation.fromSFMPath(
             "capability_provider_mappers"
     );
     private static final DeferredRegister<CapabilityProviderMapper> REGISTERER = DeferredRegister.create(

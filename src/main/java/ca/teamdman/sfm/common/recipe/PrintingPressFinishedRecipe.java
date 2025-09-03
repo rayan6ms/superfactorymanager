@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.recipe;
 
 import ca.teamdman.sfm.common.registry.SFMRecipeSerializers;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import com.google.gson.JsonObject;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.resources.ResourceLocation;
@@ -49,6 +50,6 @@ public class PrintingPressFinishedRecipe implements FinishedRecipe {
 
     @Override
     public ResourceLocation getAdvancementId() {
-        return new ResourceLocation("");
+        return SFMResourceLocation.fromMinecraftPath("");
     }
 }

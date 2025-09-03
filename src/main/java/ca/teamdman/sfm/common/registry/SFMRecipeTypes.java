@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
-import net.minecraft.resources.ResourceLocation;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -17,7 +17,7 @@ public class SFMRecipeTypes {
 
     public static final RegistryObject<RecipeType<PrintingPressRecipe>> PRINTING_PRESS = RECIPE_TYPES.register(
             "printing_press",
-            () -> RecipeType.simple(new ResourceLocation(SFM.MOD_ID, "printing_press"))
+            () -> RecipeType.simple(SFMResourceLocation.fromSFMPath("printing_press"))
     );
 
     public static void register(IEventBus bus) {
