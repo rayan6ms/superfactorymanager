@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -10,6 +11,7 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
+@MCVersionDependentBehaviour
 public class SFMCreativeTabs {
     private static final DeferredRegister<CreativeModeTab> CREATIVE_TABS = DeferredRegister.create(
             Registries.CREATIVE_MODE_TAB,
