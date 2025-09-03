@@ -1,8 +1,7 @@
 package ca.teamdman.sfm.common.registry;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.net.*;
-import net.minecraft.resources.ResourceLocation;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
 import net.neoforged.neoforge.network.NetworkRegistry;
 import net.neoforged.neoforge.network.PacketDistributor;
@@ -13,7 +12,7 @@ import java.util.function.Supplier;
 public class SFMPackets {
     public static final String SFM_CHANNEL_VERSION="1.0.0";
     public static final SimpleChannel SFM_CHANNEL = NetworkRegistry.newSimpleChannel(
-            new ResourceLocation(SFM.MOD_ID, "manager"),
+            SFMResourceLocation.fromSFMPath("manager"),
             SFM_CHANNEL_VERSION::toString,
             SFM_CHANNEL_VERSION::equals,
             SFM_CHANNEL_VERSION::equals
