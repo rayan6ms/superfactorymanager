@@ -187,7 +187,7 @@ public final class LocalizationKeys {
     );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry ITEM_GROUP = new LocalizationEntry(
-            "item_group.sfm.main",
+            "item_group.sfm",
             "Super Factory Manager"
     );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
