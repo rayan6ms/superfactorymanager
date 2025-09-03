@@ -13,6 +13,7 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.*;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfml.ast.Program;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
@@ -41,8 +42,7 @@ import static ca.teamdman.sfm.common.localization.LocalizationKeys.*;
 
 @SuppressWarnings({"FieldCanBeLocal", "unused", "NotNullFieldNotInitialized"})
 public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu> {
-    private static final ResourceLocation BACKGROUND_TEXTURE_LOCATION = ResourceLocation.fromNamespaceAndPath(
-            SFM.MOD_ID,
+    private static final ResourceLocation BACKGROUND_TEXTURE_LOCATION = SFMResourceLocation.fromSFMPath(
             "textures/gui/container/manager.png"
     );
     private final float STATUS_DURATION = 40;
