@@ -13,8 +13,8 @@ import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 import java.util.function.Supplier;
 
-public class SFMItemModels extends MCVersionAgnosticItemModelsDataGen {
-    public SFMItemModels(
+public class SFMItemModelsDatagen extends MCVersionAgnosticItemModelsDataGen {
+    public SFMItemModelsDatagen(
             GatherDataEvent event
     ) {
         super(event, SFM.MOD_ID);
