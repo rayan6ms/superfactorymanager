@@ -1,9 +1,11 @@
 package ca.teamdman.sfm.datagen;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.registry.SFMBlockTags;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticBlockTagsDataGen;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.level.block.Blocks;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 
 public class SFMBlockTagsDatagen extends MCVersionAgnosticBlockTagsDataGen {
@@ -22,5 +24,11 @@ public class SFMBlockTagsDatagen extends MCVersionAgnosticBlockTagsDataGen {
                 .add(SFMBlocks.PRINTING_PRESS_BLOCK.get());
         tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(SFMBlocks.PRINTING_PRESS_BLOCK.get());
+        tag(SFMBlockTags.ANVIL_DISENCHANTING)
+                .add(Blocks.OBSIDIAN)
+                .add(Blocks.CRYING_OBSIDIAN);
+        tag(SFMBlockTags.ANVIL_PRINTING_PRESS_FORMING)
+                .add(Blocks.IRON_BLOCK)
+                .add(Blocks.COPPER_BLOCK);
     }
 }
