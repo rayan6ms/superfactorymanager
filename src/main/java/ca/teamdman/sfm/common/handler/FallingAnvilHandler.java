@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.handler;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.registry.SFMBlockTags;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
@@ -41,7 +42,7 @@ public class FallingAnvilHandler {
                     return;
                 }
                 Block block = level.getBlockState(landPosition.below()).getBlock();
-                if (block == Blocks.IRON_BLOCK) { // create a form
+                if (SFMBlockTags.blockHasTag(block, SFMBlockTags.ANVIL_PRINTING_PRESS_FORMING)) { // create a form
                     List<PrintingPressRecipe> recipes = level
                             .getRecipeManager()
                             .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get());
@@ -66,7 +67,7 @@ public class FallingAnvilHandler {
                     if (didForm) {
                         level.setBlockAndUpdate(landPosition.below(), Blocks.AIR.defaultBlockState());
                     }
-                } else if (block == Blocks.OBSIDIAN) { // crush and disenchant items
+                } else if (SFMBlockTags.blockHasTag(block, SFMBlockTags.ANVIL_DISENCHANTING)) { // crush and disenchant items
                     List<ItemEntity> items = new ArrayList<>();
                     for (ItemEntity itemEntity : level.getEntitiesOfClass(ItemEntity.class, new AABB(landPosition))) {
                         if (itemEntity.isAlive() && !itemEntity.getItem().isEmpty()) {
