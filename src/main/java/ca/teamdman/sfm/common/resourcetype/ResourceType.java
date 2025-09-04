@@ -1,8 +1,9 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.CapabilityConsumer;
-import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.Stored;
@@ -11,7 +12,6 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.capabilities.Capability;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -19,9 +19,9 @@ import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 public abstract class ResourceType<STACK, ITEM, CAP> {
-    public final Capability<CAP> CAPABILITY_KIND;
+    public final SFMBlockCapabilityKind<CAP> CAPABILITY_KIND;
 
-    public ResourceType(Capability<CAP> CAPABILITY_KIND) {
+    public ResourceType(SFMBlockCapabilityKind<CAP> CAPABILITY_KIND) {
         this.CAPABILITY_KIND = CAPABILITY_KIND;
     }
 

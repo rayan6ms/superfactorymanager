@@ -1,13 +1,13 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.common.capabilities.Capability;
 
 import java.util.stream.Stream;
 
 public abstract class IntegerResourceType<CAP> extends ScalarResourceType<Integer, CAP> {
     public IntegerResourceType(
-            Capability<CAP> capability,
+            SFMBlockCapabilityKind<CAP> capability,
             ResourceLocation registryKey
     ) {
         super(capability, registryKey, Integer.class);

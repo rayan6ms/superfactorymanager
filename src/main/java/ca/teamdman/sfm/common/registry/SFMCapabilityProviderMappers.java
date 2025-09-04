@@ -66,7 +66,7 @@ public class SFMCapabilityProviderMappers {
     }
 
     /**
-     * Find a {@link CapabilityProvider} as provided by the registered capability provider mappers.
+     * Find a {@link CapabilityProvider} as provided by the registered capabilityKind provider mappers.
      * If multiple {@link CapabilityProviderMapper}s match, the first one is returned.
      */
     public static @Nullable ICapabilityProvider discoverCapabilityProvider(

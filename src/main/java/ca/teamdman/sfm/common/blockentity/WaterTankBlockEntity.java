@@ -66,7 +66,7 @@ public class WaterTankBlockEntity extends BlockEntity {
             @NotNull Capability<T> cap,
             @Nullable Direction side
     ) {
-        if (cap == SFMWellKnownCapabilities.FLUID_HANDLER.capability()) {
+        if (cap == SFMWellKnownCapabilities.FLUID_HANDLER.capabilityKind()) {
             return TANK_CAPABILITY.cast();
         } else {
             return super.getCapability(cap, side);

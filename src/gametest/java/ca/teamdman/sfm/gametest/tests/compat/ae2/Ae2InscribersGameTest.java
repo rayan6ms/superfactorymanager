@@ -83,32 +83,32 @@ public class Ae2InscribersGameTest extends SFMGameTestDefinition {
         var last2 = ((InscriberBlockEntity) helper.getBlockEntity(lastPos2));
         var last3 = ((InscriberBlockEntity) helper.getBlockEntity(lastPos3));
         silicon1
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability())
+                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind())
                 .resolve()
                 .get()
                 .insertItem(0, new ItemStack(AEItems.SILICON_PRESS), false);
         silicon2
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability())
+                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind())
                 .resolve()
                 .get()
                 .insertItem(0, new ItemStack(AEItems.SILICON_PRESS), false);
         silicon3
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability())
+                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind())
                 .resolve()
                 .get()
                 .insertItem(0, new ItemStack(AEItems.SILICON_PRESS), false);
         engineering
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability())
+                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind())
                 .resolve()
                 .get()
                 .insertItem(0, new ItemStack(AEItems.ENGINEERING_PROCESSOR_PRESS), false);
         calculation
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability())
+                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind())
                 .resolve()
                 .get()
                 .insertItem(0, new ItemStack(AEItems.CALCULATION_PROCESSOR_PRESS), false);
         logic
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability())
+                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind())
                 .resolve()
                 .get()
                 .insertItem(0, new ItemStack(AEItems.LOGIC_PROCESSOR_PRESS), false);
@@ -134,11 +134,11 @@ public class Ae2InscribersGameTest extends SFMGameTestDefinition {
         //noinspection DataFlowIssue,OptionalGetWithoutIsPresent
         var materials = helper
                 .getBlockEntity(materialsPos)
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability())
+                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind())
                 .resolve()
                 .get();
         //noinspection DataFlowIssue,OptionalGetWithoutIsPresent
-        var results = helper.getBlockEntity(resultsPos).getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability()).resolve().get();
+        var results = helper.getBlockEntity(resultsPos).getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind()).resolve().get();
         materials.insertItem(0, new ItemStack(Items.REDSTONE, 64), false);
         materials.insertItem(1, new ItemStack(Items.REDSTONE, 64), false);
         materials.insertItem(2, new ItemStack(Items.REDSTONE, 64), false);
