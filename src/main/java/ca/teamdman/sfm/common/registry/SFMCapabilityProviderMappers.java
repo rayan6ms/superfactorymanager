@@ -1,10 +1,9 @@
 package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.common.capabilityprovidermapper.BlockEntityCapabilityProviderMapper;
-import ca.teamdman.sfm.common.capabilityprovidermapper.CapabilityProviderMapper;
-import ca.teamdman.sfm.common.capabilityprovidermapper.CauldronCapabilityProviderMapper;
-import ca.teamdman.sfm.common.compat.SFMModCompat;
+import ca.teamdman.sfm.common.capability.BlockEntityCapabilityProviderMapper;
+import ca.teamdman.sfm.common.capability.CapabilityProviderMapper;
+import ca.teamdman.sfm.common.capability.CauldronCapabilityProviderMapper;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.common.util.Stored;
