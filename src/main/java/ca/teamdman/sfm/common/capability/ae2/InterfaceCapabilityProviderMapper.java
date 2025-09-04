@@ -54,7 +54,7 @@ public class InterfaceCapabilityProviderMapper implements CapabilityProviderMapp
     private record InterfaceCapabilityProvider(LevelAccessor level, BlockPos pos) implements ICapabilityProvider {
         @Override
         public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-            if (cap == SFMWellKnownCapabilities.ITEM_HANDLER.capability() || cap == SFMWellKnownCapabilities.FLUID_HANDLER.capability()) {
+            if (cap == SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind() || cap == SFMWellKnownCapabilities.FLUID_HANDLER.capabilityKind()) {
                 return LazyOptional.of(() -> new InterfaceHandler(level, pos)).cast();
             }
 
@@ -123,7 +123,7 @@ public class InterfaceCapabilityProviderMapper implements CapabilityProviderMapp
                 return null;
             }
 
-            var maybeCap = in.getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability());
+            var maybeCap = in.getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind());
             if (maybeCap.isPresent()) {
                 //noinspection DataFlowIssue
                 return callback.apply(maybeCap.orElse(null));
@@ -137,7 +137,7 @@ public class InterfaceCapabilityProviderMapper implements CapabilityProviderMapp
                 return null;
             }
 
-            var maybeCap = in.getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capability());
+            var maybeCap = in.getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capabilityKind());
             if (maybeCap.isPresent()) {
                 //noinspection DataFlowIssue
                 return callback.apply(maybeCap.orElse(null));

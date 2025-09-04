@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.slurry.ISlurryHandler;
@@ -7,7 +8,6 @@ import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.CapabilityManager;
 import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -15,8 +15,10 @@ import net.minecraftforge.registries.IForgeRegistry;
 import java.util.stream.Stream;
 
 public class SlurryResourceType extends RegistryBackedResourceType<SlurryStack, Slurry, ISlurryHandler> {
-    public static final Capability<ISlurryHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
-    });
+    public static final SFMBlockCapabilityKind<ISlurryHandler> CAP = new SFMBlockCapabilityKind<>(
+            CapabilityManager.get(new CapabilityToken<>() {
+            })
+    );
 
     public SlurryResourceType() {
         super(CAP);

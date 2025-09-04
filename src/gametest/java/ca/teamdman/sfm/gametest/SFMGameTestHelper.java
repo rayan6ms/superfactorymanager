@@ -38,7 +38,7 @@ public class SFMGameTestHelper extends GameTestHelper {
         BlockEntity blockEntity = getBlockEntity(pos);
         SFMGameTestMethodHelpers.assertTrue(blockEntity != null, "No block entity found at " + pos);
         Optional<IFluidHandler> found = blockEntity
-                .getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capability(), direction)
+                .getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capabilityKind(), direction)
                 .resolve();
         SFMGameTestMethodHelpers.assertTrue(found.isPresent(), "No fluid handler found at " + pos);
         return found.get();
@@ -52,7 +52,7 @@ public class SFMGameTestHelper extends GameTestHelper {
         BlockEntity blockEntity = getBlockEntity(pos);
         SFMGameTestMethodHelpers.assertTrue(blockEntity != null, "No block entity found at " + pos);
         Optional<IItemHandler> found = blockEntity
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability(), direction)
+                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind(), direction)
                 .resolve();
         SFMGameTestMethodHelpers.assertTrue(found.isPresent(), "No item handler found at " + pos);
         return found.get();
