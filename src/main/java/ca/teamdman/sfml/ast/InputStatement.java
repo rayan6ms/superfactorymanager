@@ -94,7 +94,7 @@ public final class InputStatement implements IOStatement {
                                 resourceType.displayAsCapabilityClass()
                         )));
 
-                // gather slots for each capability found for positions tagged by a provided label
+                // gather slots for each capabilityKind found for positions tagged by a provided label
                 Consumer<LimitedInputSlot<?, ?, ?>> finalSlotConsumer = slotConsumer;
                 // TODO: fix #166 forEachCapability advances the round robin when it should be shared between resource types
                 resourceType.forEachCapability(context, labelAccess, (label, pos, direction, cap) -> gatherSlotsForCap(
@@ -118,7 +118,7 @@ public final class InputStatement implements IOStatement {
                                 resourceType.displayAsCapabilityClass()
                         )));
 
-                // gather slots for each capability found for positions tagged by a provided label
+                // gather slots for each capabilityKind found for positions tagged by a provided label
                 Consumer<LimitedInputSlot<?, ?, ?>> finalSlotConsumer = slotConsumer;
                 resourceType.forEachCapability(context, labelAccess, (label, pos, direction, cap) -> {
                     List<IInputResourceTracker> inputTrackers = resourceLimits.createInputTrackers();

@@ -66,12 +66,12 @@ public class MeatFluidDirectGameTest extends SFMGameTestDefinition {
 
         // add some power
         washingFactory
-                .getCapability(SFMWellKnownCapabilities.ENERGY.capability())
+                .getCapability(SFMWellKnownCapabilities.ENERGY.capabilityKind())
                 .resolve()
                 .get().receiveEnergy(Integer.MAX_VALUE, false);
 
         // add some meat
-        washingFactory.getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capability())
+        washingFactory.getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capabilityKind())
                 .resolve().get().fill(
                         new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), Integer.MAX_VALUE),
                         IFluidHandler.FluidAction.EXECUTE
@@ -79,7 +79,7 @@ public class MeatFluidDirectGameTest extends SFMGameTestDefinition {
 
         // add some iron
         washingFactory
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability(), Direction.UP)
+                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind(), Direction.UP)
                 .resolve()
                 .get()
                 .insertItem(0, new ItemStack(Items.RAW_IRON, 64), false);
