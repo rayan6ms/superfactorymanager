@@ -1,10 +1,12 @@
 package ca.teamdman.sfm.common.capability;
 
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import net.minecraftforge.common.capabilities.Capability;
+import net.minecraft.core.Direction;
+import net.neoforged.neoforge.capabilities.BlockCapability;
+import org.jetbrains.annotations.Nullable;
 
 @MCVersionDependentBehaviour
 public record SFMBlockCapabilityWrapper<CAP>(
-        Capability<CAP> capability
+        BlockCapability<CAP, @Nullable Direction> capability
 ) {
 }
