@@ -1,12 +1,10 @@
 package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.common.blockcapabilityprovider.CauldronBlockCapabilityProvider;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BarrelBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -83,13 +81,6 @@ public class SFMBlockCapabilities {
                 Capabilities.FluidHandler.BLOCK,
                 SFMBlockEntities.TEST_BARREL_TANK_BLOCK_ENTITY.get(),
                 (blockEntity, direction) -> blockEntity.getTank()
-        );
-        event.registerBlock(
-                Capabilities.FluidHandler.BLOCK,
-                new CauldronBlockCapabilityProvider(),
-                Blocks.CAULDRON,
-                Blocks.LAVA_CAULDRON,
-                Blocks.WATER_CAULDRON
         );
 //        SFMResourceTypes.getCapabilities().forEach(cap -> {
 //            event.registerBlock(
