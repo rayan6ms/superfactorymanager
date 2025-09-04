@@ -29,7 +29,7 @@ public class SFMCapabilityDiscovery {
         LevelCapabilityCache levelCapabilityCache = cableNetwork.getLevelCapabilityCache();
         // we assume that if there is a cache entry that it is adjacent to a cable
 
-        // It is a precondition to enter the cache that the capabilityKind is adjacent to a cable
+        // It is a precondition to enter the cache that the capability is adjacent to a cable
         SFMBlockCapabilityResult<CAP> cached = discoverCapabilityFromCache(
                 capKind,
                 pos,
@@ -37,7 +37,7 @@ public class SFMCapabilityDiscovery {
                 logger,
                 levelCapabilityCache
         );
-        if (cached != null) return cached;
+        if (cached.isPresent()) return cached;
 
         // NEED TO DISCOVER
 
@@ -76,18 +76,24 @@ public class SFMCapabilityDiscovery {
         return cap;
     }
 
-    public static <CAP> @NotNull SFMBlockCapabilityResult<CAP> getCapabilityFromProvider(
+    private static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromCapabilityProvider(
             SFMBlockCapabilityKind<CAP> capKind,
-            BlockEntity capabilityProvider,
+            @Nullable BlockEntity capabilityProvider,
             @Nullable Direction direction
     ) {
+        if (capabilityProvider == null) {
+            return SFMBlockCapabilityResult.empty();
+        }
         Level level = capabilityProvider.getLevel();
         assert level != null;
         CAP capability = level.getCapability(capKind.capabilityKind(), capabilityProvider.getBlockPos(), direction);
         return new SFMBlockCapabilityResult<>(capability);
     }
 
-    public static boolean hasAnyCapabilityAnyDirection(ILevelExtension level, BlockPos pos) {
+    public static boolean hasAnyCapabilityAnyDirection(
+            ILevelExtension level,
+            BlockPos pos
+    ) {
         return SFMResourceTypes.getCapabilities().anyMatch(cap -> {
             for (Direction direction : SFMDirections.DIRECTIONS_WITH_NULL) {
                 if (discoverCapabilityFromLevel(level, cap, pos, direction).isPresent()) {
@@ -98,7 +104,21 @@ public class SFMCapabilityDiscovery {
         });
     }
 
-    private static <CAP> @Nullable SFMBlockCapabilityResult<CAP> discoverCapabilityFromCache(
+    public static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromLevel(
+            ILevelExtension level,
+            SFMBlockCapabilityKind<CAP> capKind,
+            @NotStored BlockPos pos,
+            @Nullable Direction direction
+    ) {
+        var cap = level.getCapability(capKind.capabilityKind(), pos, direction);
+        if (cap != null) {
+            return new SFMBlockCapabilityResult<>(cap);
+        } else {
+            return SFMBlockCapabilityResult.empty();
+        }
+    }
+
+    private static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromCache(
             SFMBlockCapabilityKind<CAP> capKind,
             @NotStored BlockPos pos,
             @Nullable Direction direction,
@@ -131,20 +151,6 @@ public class SFMCapabilityDiscovery {
                     direction
             )));
         }
-        return null;
-    }
-
-    private static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromLevel(
-            ILevelExtension level,
-            SFMBlockCapabilityKind<CAP> capKind,
-            @NotStored BlockPos pos,
-            @Nullable Direction direction
-    ) {
-        var cap = level.getCapability(capKind.capabilityKind(), pos, direction);
-        if (cap != null) {
-            return new SFMBlockCapabilityResult<>(cap);
-        } else {
-            return SFMBlockCapabilityResult.empty();
-        }
+        return SFMBlockCapabilityResult.empty();
     }
 }

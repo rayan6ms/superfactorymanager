@@ -103,7 +103,7 @@ public class ProgramLinter {
                 .getOrRegisterNetworkFromManagerPosition(manager)
                 .ifPresent(network -> labels.removeIf((label, pos) -> !network.isAdjacentToCable(pos)));
 
-        // remove labels with no viable capabilityKind provider
+        // remove labels with no viable capability provider
         var level = manager.getLevel();
         if (level != null) {
             labels.removeIf((label, pos) -> !SFMCapabilityDiscovery.hasAnyCapabilityAnyDirection(level, pos));

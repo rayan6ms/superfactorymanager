@@ -1,9 +1,10 @@
 package ca.teamdman.sfm.common.capability;
 
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Optional;
+import java.util.Objects;
 
 @MCVersionDependentBehaviour
 public record SFMBlockCapabilityResult<CAP>(@Nullable CAP capability) {
@@ -11,8 +12,8 @@ public record SFMBlockCapabilityResult<CAP>(@Nullable CAP capability) {
         return new SFMBlockCapabilityResult<>(null);
     }
 
-    public Optional<CAP> resolve() {
-        return Optional.ofNullable(capability());
+    public @NotNull CAP unwrap() {
+        return Objects.requireNonNull(capability);
     }
 
     public boolean isPresent() {

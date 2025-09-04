@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.resourcetype;
 
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.CapabilityConsumer;
@@ -14,7 +15,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Set;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
@@ -137,9 +141,8 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             BiConsumer<Direction, CAP> consumer
     ) {
         for (Direction dir : directions) {
-            Optional<CAP> maybeCap = programContext.getNetwork()
-                    .getCapability(CAPABILITY_KIND, pos, dir, programContext.getLogger())
-                    .resolve();
+            SFMBlockCapabilityResult<CAP> maybeCap = programContext.getNetwork()
+                    .getCapability(CAPABILITY_KIND, pos, dir, programContext.getLogger());
             if (maybeCap.isPresent()) {
                 programContext
                         .getLogger()
@@ -148,7 +151,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
                                 pos,
                                 dir
                         )));
-                CAP cap = maybeCap.get();
+                CAP cap = maybeCap.unwrap();
                 consumer.accept(dir, cap);
             } else {
                 // Log error
