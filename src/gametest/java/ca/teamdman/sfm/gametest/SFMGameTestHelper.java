@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.gametest;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
@@ -10,7 +11,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.GameTestInfo;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
@@ -38,7 +38,7 @@ public class SFMGameTestHelper extends GameTestHelper {
             @Nullable Direction direction
     ) {
         var found = getLevel()
-                .getCapability(Capabilities.FluidHandler.BLOCK, absolutePos(pos), direction);
+                .getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capability(), absolutePos(pos), direction);
         SFMGameTestMethodHelpers.assertTrue(found != null, "No fluid handler found at " + pos);
         return found;
     }
@@ -49,7 +49,7 @@ public class SFMGameTestHelper extends GameTestHelper {
             @Nullable Direction direction
     ) {
         var found = getLevel()
-                .getCapability(Capabilities.ItemHandler.BLOCK, absolutePos(pos), direction);
+                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability(), absolutePos(pos), direction);
         SFMGameTestMethodHelpers.assertTrue(found != null, "No item handler found at " + pos);
         return found;
     }
