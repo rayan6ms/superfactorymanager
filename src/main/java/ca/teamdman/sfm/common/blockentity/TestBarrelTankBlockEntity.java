@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.blockentity;
 
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
@@ -17,7 +18,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
@@ -49,10 +49,10 @@ public class TestBarrelTankBlockEntity extends BaseContainerBlockEntity {
             Capability<T> cap,
             @Nullable Direction side
     ) {
-        if (cap == ForgeCapabilities.ITEM_HANDLER) {
+        if (cap == SFMWellKnownCapabilities.ITEM_HANDLER.capability()) {
             return item_capability.cast();
         }
-        if (cap == ForgeCapabilities.FLUID_HANDLER) {
+        if (cap == SFMWellKnownCapabilities.FLUID_HANDLER.capability()) {
             return fluid_capability.cast();
         }
         return super.getCapability(cap, side);

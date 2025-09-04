@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.gametest.tests.compat.industrialforegoing;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
@@ -13,7 +14,6 @@ import com.buuz135.industrial.utils.BlockUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
@@ -45,9 +45,9 @@ public class IndustrialforegoingBlackholeEmptyGameTest extends SFMGameTestDefini
 
         // set up the world
         helper.setBlock(leftPos, ModuleTransportStorage.BLACK_HOLE_UNIT_SUPREME.getLeft().get());
-        var left = helper.getBlockEntity(leftPos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+        var left = helper.getBlockEntity(leftPos).getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability()).orElse(null);
         helper.setBlock(rightPos, ModuleTransportStorage.BLACK_HOLE_UNIT_SUPREME.getLeft().get());
-        var right = helper.getBlockEntity(rightPos).getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+        var right = helper.getBlockEntity(rightPos).getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability()).orElse(null);
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
