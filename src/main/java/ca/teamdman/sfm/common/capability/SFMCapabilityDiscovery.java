@@ -142,8 +142,7 @@ public class SFMCapabilityDiscovery {
     ) {
         var cap = level.getCapability(capKind.capabilityKind(), pos, direction);
         if (cap != null) {
-            SFMBlockCapabilityResult<CAP> ourCap = new SFMBlockCapabilityResult<>(cap);
-            return ourCap;
+            return new SFMBlockCapabilityResult<>(cap);
         } else {
             return SFMBlockCapabilityResult.empty();
         }
