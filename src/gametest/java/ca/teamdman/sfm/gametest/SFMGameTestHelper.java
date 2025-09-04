@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.gametest;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
@@ -38,7 +39,7 @@ public class SFMGameTestHelper extends GameTestHelper {
         BlockEntity blockEntity = getBlockEntity(pos);
         SFMGameTestMethodHelpers.assertTrue(blockEntity != null, "No block entity found at " + pos);
         Optional<IFluidHandler> found = blockEntity
-                .getCapability(Capabilities.FLUID_HANDLER, direction)
+                .getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capability(), direction)
                 .resolve();
         SFMGameTestMethodHelpers.assertTrue(found.isPresent(), "No fluid handler found at " + pos);
         return found.get();
@@ -52,7 +53,7 @@ public class SFMGameTestHelper extends GameTestHelper {
         BlockEntity blockEntity = getBlockEntity(pos);
         SFMGameTestMethodHelpers.assertTrue(blockEntity != null, "No block entity found at " + pos);
         Optional<IItemHandler> found = blockEntity
-                .getCapability(Capabilities.ITEM_HANDLER, direction)
+                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability(), direction)
                 .resolve();
         SFMGameTestMethodHelpers.assertTrue(found.isPresent(), "No item handler found at " + pos);
         return found.get();

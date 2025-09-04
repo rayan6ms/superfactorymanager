@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.blockentity;
 
 import ca.teamdman.sfm.common.block.WaterTankBlock;
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.watertanknetwork.WaterNetworkManager;
 import net.minecraft.core.BlockPos;
@@ -66,7 +67,7 @@ public class WaterTankBlockEntity extends BlockEntity {
             @NotNull Capability<T> cap,
             @Nullable Direction side
     ) {
-        if (cap == Capabilities.FLUID_HANDLER) {
+        if (cap == SFMWellKnownCapabilities.FLUID_HANDLER.capability()) {
             return TANK_CAPABILITY.cast();
         } else {
             return super.getCapability(cap, side);

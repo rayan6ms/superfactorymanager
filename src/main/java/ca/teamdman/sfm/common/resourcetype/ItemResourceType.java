@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.core.Registry;
@@ -16,7 +17,7 @@ import java.util.stream.Stream;
 
 public class ItemResourceType extends RegistryBackedResourceType<ItemStack, Item, IItemHandler> {
     public ItemResourceType() {
-        super(Capabilities.ITEM_HANDLER);
+        super(SFMWellKnownCapabilities.ITEM_HANDLER.capability());
     }
 
     @Override

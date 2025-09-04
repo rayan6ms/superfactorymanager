@@ -11,6 +11,7 @@ import appeng.api.storage.StorageHelper;
 import appeng.blockentity.misc.InterfaceBlockEntity;
 import appeng.capabilities.Capabilities;
 import ca.teamdman.sfm.common.capability.CapabilityProviderMapper;
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.common.util.Stored;
@@ -54,7 +55,7 @@ public class InterfaceCapabilityProviderMapper implements CapabilityProviderMapp
     private record InterfaceCapabilityProvider(LevelAccessor level, BlockPos pos) implements ICapabilityProvider {
         @Override
         public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-            if (cap == ForgeCapabilities.ITEM_HANDLER || cap == ForgeCapabilities.FLUID_HANDLER) {
+            if (cap == SFMWellKnownCapabilities.ITEM_HANDLER.capability() || cap == SFMWellKnownCapabilities.FLUID_HANDLER.capability()) {
                 return LazyOptional.of(() -> new InterfaceHandler(level, pos)).cast();
             }
 
@@ -123,7 +124,7 @@ public class InterfaceCapabilityProviderMapper implements CapabilityProviderMapp
                 return null;
             }
 
-            var maybeCap = in.getCapability(ForgeCapabilities.ITEM_HANDLER);
+            var maybeCap = in.getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability());
             if (maybeCap.isPresent()) {
                 //noinspection DataFlowIssue
                 return callback.apply(maybeCap.orElse(null));
@@ -137,7 +138,7 @@ public class InterfaceCapabilityProviderMapper implements CapabilityProviderMapp
                 return null;
             }
 
-            var maybeCap = in.getCapability(ForgeCapabilities.FLUID_HANDLER);
+            var maybeCap = in.getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capability());
             if (maybeCap.isPresent()) {
                 //noinspection DataFlowIssue
                 return callback.apply(maybeCap.orElse(null));

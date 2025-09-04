@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.capability.ae2;
 
 import appeng.blockentity.networking.EnergyAcceptorBlockEntity;
 import ca.teamdman.sfm.common.capability.CapabilityProviderMapper;
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
@@ -34,7 +35,7 @@ public class EnergyAcceptorCapabilityProviderMapper implements CapabilityProvide
                 EnergyAcceptorBlockEntity inner
         ) {
             this.inner = inner;
-            this.energy = inner.getCapability(Capabilities.ENERGY)
+            this.energy = inner.getCapability(SFMWellKnownCapabilities.ENERGY.capability())
                     .lazyMap(EnergyAcceptorEnergyStorageWrapper::new);
         }
 
@@ -43,7 +44,7 @@ public class EnergyAcceptorCapabilityProviderMapper implements CapabilityProvide
                 @NotNull Capability<T> cap,
                 @Nullable Direction side
         ) {
-            if (cap == Capabilities.ENERGY) {
+            if (cap == SFMWellKnownCapabilities.ENERGY.capability()) {
                 return energy.cast();
             } else {
                 return inner.getCapability(cap, side);

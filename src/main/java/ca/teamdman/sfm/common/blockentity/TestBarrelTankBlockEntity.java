@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.blockentity;
 
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
@@ -49,10 +50,10 @@ public class TestBarrelTankBlockEntity extends BaseContainerBlockEntity {
             Capability<T> cap,
             @Nullable Direction side
     ) {
-        if (cap == Capabilities.ITEM_HANDLER) {
+        if (cap == SFMWellKnownCapabilities.ITEM_HANDLER.capability()) {
             return item_capability.cast();
         }
-        if (cap == Capabilities.FLUID_HANDLER) {
+        if (cap == SFMWellKnownCapabilities.FLUID_HANDLER.capability()) {
             return fluid_capability.cast();
         }
         return super.getCapability(cap, side);
