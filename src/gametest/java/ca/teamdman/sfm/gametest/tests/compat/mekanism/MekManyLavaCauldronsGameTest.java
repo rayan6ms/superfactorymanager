@@ -95,7 +95,7 @@ public class MekManyLavaCauldronsGameTest extends SFMGameTestDefinition {
             int found = destBlocks
                     .stream()
                     .map(helper::absolutePos)
-                    .map(pos -> helper.getLevel().getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capability(), pos, Direction.DOWN))
+                    .map(pos -> helper.getLevel().getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capabilityKind(), pos, Direction.DOWN))
                     .peek(Objects::requireNonNull)
                     .map(x -> x.getFluidInTank(0))
                     .mapToInt(FluidStack::getAmount)

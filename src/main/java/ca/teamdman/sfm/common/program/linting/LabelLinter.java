@@ -2,9 +2,9 @@ package ca.teamdman.sfm.common.program.linting;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
+import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlockCapabilities;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
@@ -103,7 +103,7 @@ public class LabelLinter implements IProgramLinter {
                                 String.format("[%d,%d,%d]", pos.getX(), pos.getY(), pos.getZ())
                         ));
                     }
-                    var viable = SFMBlockCapabilities.hasAnyCapabilityAnyDirection(level, pos);
+                    var viable = SFMCapabilityDiscovery.hasAnyCapabilityAnyDirection(level, pos);
                     if (!viable && adjacent) {
                         warnings.add(PROGRAM_WARNING_CONNECTED_BUT_NOT_VIABLE_LABEL.get(
                                 label,
@@ -129,9 +129,7 @@ public class LabelLinter implements IProgramLinter {
 
         // remove labels with no viable capability provider
         var level = manager.getLevel();
-        if (level != null) {
-            labels.removeIf((label, pos) -> !SFMBlockCapabilities.hasAnyCapabilityAnyDirection(level, pos));
-        }
+        labels.removeIf((label, pos) -> !SFMCapabilityDiscovery.hasAnyCapabilityAnyDirection(level, pos));
 
         // save new labels
         labels.save(disk);
