@@ -1,10 +1,10 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.material.Fluid;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -14,7 +14,7 @@ import java.util.stream.Stream;
 
 public class FluidResourceType extends RegistryBackedResourceType<FluidStack, Fluid, IFluidHandler> {
     public FluidResourceType() {
-        super(ForgeCapabilities.FLUID_HANDLER);
+        super(SFMWellKnownCapabilities.FLUID_HANDLER.capability());
     }
 
     @Override
