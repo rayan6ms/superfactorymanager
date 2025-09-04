@@ -18,6 +18,8 @@ import mekanism.common.tile.component.config.DataType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
+
 @SuppressWarnings("DataFlowIssue")
 @SFMGameTest
 public class Ae2EnergyAcceptorGameTest extends SFMGameTestDefinition {
@@ -74,12 +76,10 @@ public class Ae2EnergyAcceptorGameTest extends SFMGameTestDefinition {
 
         helper.succeedIfManagerDidThingWithoutLagging(
                 manager, () -> {
-                    // TODO: implement a custom capability provider wrapper for the energy acceptor
-                    // TODO: reinstate SFM custom capability provider wrappers for later versions
-//                    assertTrue(
-//                            cube.getEnergy(0).smallerThan(EnergyCubeTier.ULTIMATE.getMaxEnergy()),
-//                            "Mekanism cube did not output FE to AE2 acceptor"
-//                    );
+                    assertTrue(
+                            cube.getEnergy(0).smallerThan(EnergyCubeTier.ULTIMATE.getMaxEnergy()),
+                            "Mekanism cube did not output FE to AE2 acceptor"
+                    );
                 }
         );
     }

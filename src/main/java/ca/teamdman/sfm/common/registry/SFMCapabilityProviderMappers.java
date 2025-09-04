@@ -4,6 +4,8 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.capabilityprovidermapper.BlockEntityCapabilityProviderMapper;
 import ca.teamdman.sfm.common.capabilityprovidermapper.CapabilityProviderMapper;
 import ca.teamdman.sfm.common.capabilityprovidermapper.CauldronCapabilityProviderMapper;
+import ca.teamdman.sfm.common.capabilityprovidermapper.ae2.EnergyAcceptorCapabilityProviderMapper;
+import ca.teamdman.sfm.common.compat.SFMModCompat;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.common.util.Stored;
@@ -22,28 +24,37 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Collection;
 import java.util.function.Supplier;
 
+@SuppressWarnings({"unused", "UnstableApiUsage"})
 public class SFMCapabilityProviderMappers {
-    public static final  ResourceLocation                                   REGISTRY_ID      = SFMResourceLocation.fromSFMPath(
-            "capability_provider_mappers"
-    );
-    private static final DeferredRegister<CapabilityProviderMapper> REGISTERER = DeferredRegister.create(
-            REGISTRY_ID,
-            SFM.MOD_ID
-    );
-    private static final Supplier<IForgeRegistry<CapabilityProviderMapper>> REGISTRY = REGISTERER.makeRegistry(() -> new RegistryBuilder<CapabilityProviderMapper>().setName(
-            REGISTRY_ID));
+    public static final ResourceLocation
+            REGISTRY_ID = SFMResourceLocation.fromSFMPath("capability_provider_mappers");
 
-    @SuppressWarnings("unused")
-    public static final RegistryObject<BlockEntityCapabilityProviderMapper> BLOCK_ENTITY_MAPPER = REGISTERER.register(
-            "block_entity",
-            BlockEntityCapabilityProviderMapper::new
-    );
+    public static final @Nullable RegistryObject<EnergyAcceptorCapabilityProviderMapper>
+            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER;
 
-    @SuppressWarnings("unused")
-    public static final RegistryObject<CauldronCapabilityProviderMapper> CAULDRON_MAPPER = REGISTERER.register(
-            "cauldron",
-            CauldronCapabilityProviderMapper::new
-    );
+    private static final DeferredRegister<CapabilityProviderMapper>
+            REGISTERER = DeferredRegister.create(REGISTRY_ID, SFM.MOD_ID);
+
+    private static final Supplier<IForgeRegistry<CapabilityProviderMapper>>
+            REGISTRY = REGISTERER.makeRegistry(() -> new RegistryBuilder<CapabilityProviderMapper>().setName(REGISTRY_ID));
+
+    public static final RegistryObject<BlockEntityCapabilityProviderMapper>
+            BLOCK_ENTITY_MAPPER = REGISTERER.register("block_entity", BlockEntityCapabilityProviderMapper::new);
+
+    public static final RegistryObject<CauldronCapabilityProviderMapper>
+            CAULDRON_MAPPER = REGISTERER.register("cauldron", CauldronCapabilityProviderMapper::new);
+
+    static {
+        if (SFMModCompat.isAE2Loaded()) {
+            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER = REGISTERER.register(
+                    "ae2/energy_acceptor",
+                    EnergyAcceptorCapabilityProviderMapper::new
+            );
+//            MAPPERS.register("ae2/interface", InterfaceCapabilityProviderMapper::new);
+        } else {
+            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER = null;
+        }
+    }
 
     public static void register(IEventBus bus) {
         REGISTERER.register(bus);
@@ -54,18 +65,10 @@ public class SFMCapabilityProviderMappers {
         return REGISTRY.get();
     }
 
-
-//    static {
-//        if (SFMModCompat.isAE2Loaded()) {
-//            MAPPERS.register("ae2/interface", InterfaceCapabilityProviderMapper::new);
-//        }
-//    }
-
     /**
      * Find a {@link CapabilityProvider} as provided by the registered capability provider mappers.
      * If multiple {@link CapabilityProviderMapper}s match, the first one is returned.
      */
-    @SuppressWarnings("UnstableApiUsage") // for the javadoc lol
     public static @Nullable ICapabilityProvider discoverCapabilityProvider(
             Level level,
             @Stored BlockPos pos
