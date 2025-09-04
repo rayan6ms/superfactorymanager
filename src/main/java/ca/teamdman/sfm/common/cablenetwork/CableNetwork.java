@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.common.cablenetwork;
 
-import ca.teamdman.sfm.common.capabilityprovidermapper.SFMCapabilityDiscovery;
+import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
