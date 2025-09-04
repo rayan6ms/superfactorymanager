@@ -1,5 +1,7 @@
 package ca.teamdman.sfm.common.cablenetwork;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
@@ -10,8 +12,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.neoforged.neoforge.capabilities.BlockCapability;
-import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
@@ -19,7 +19,7 @@ import java.util.stream.Stream;
 public class LevelCapabilityCache {
     // Position => Capability => Direction => LazyOptional
     // We don't use an EnumMap here for Direction because we need to support the null key
-    private final Long2ObjectMap<Object2ObjectOpenHashMap<BlockCapability<?, @Nullable Direction>, SFMDirections.NullableDirectionEnumMap<BlockCapabilityCache<?, @Nullable Direction>>>> CACHE = new Long2ObjectOpenHashMap<>();
+    private final Long2ObjectMap<Object2ObjectOpenHashMap<SFMBlockCapabilityKind<?>, SFMDirections.NullableDirectionEnumMap<SFMBlockCapabilityResult<?>>>> CACHE = new Long2ObjectOpenHashMap<>();
     // Chunk position => Set of Block positions
     private final Long2ObjectMap<LongArraySet> CHUNK_TO_BLOCK_POSITIONS = new Long2ObjectOpenHashMap<>();
 
@@ -40,9 +40,9 @@ public class LevelCapabilityCache {
         addToChunkMap(pos);
     }
 
-    public <CAP> @Nullable BlockCapabilityCache<CAP, @Nullable Direction> getCapability(
+    public <CAP> @Nullable SFMBlockCapabilityResult<CAP> getCapability(
             @NotStored BlockPos pos,
-            BlockCapability<CAP, Direction> capKind,
+            SFMBlockCapabilityKind<CAP> capKind,
             @Nullable Direction direction
     ) {
         var capMap = CACHE.get(pos.asLong());
@@ -54,7 +54,7 @@ public class LevelCapabilityCache {
                     return null;
                 } else {
                     //noinspection unchecked
-                    return (BlockCapabilityCache<CAP, Direction>) found;
+                    return (SFMBlockCapabilityResult<CAP>) found;
                 }
             }
         }
@@ -68,13 +68,13 @@ public class LevelCapabilityCache {
 
             var capMap = entry.getValue();
             for (var e : capMap.entrySet()) {
-                BlockCapability<?, @Nullable Direction> capKind = e.getKey();
+                SFMBlockCapabilityKind<?> capKind = e.getKey();
 
                 var dirMap = e.getValue();
                 for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
-                    BlockCapabilityCache<?, @Nullable Direction> cap = dirMap.get(direction);
+                    SFMBlockCapabilityResult<?> cap = dirMap.get(direction);
                     if (cap != null) {
-                        putCapability(BlockPos.of(pos), (BlockCapability) capKind, direction, cap);
+                        putCapability(BlockPos.of(pos), (SFMBlockCapabilityKind) capKind, direction, cap);
                     }
                 }
             }
@@ -87,7 +87,7 @@ public class LevelCapabilityCache {
 
     public void remove(
             @NotStored BlockPos pos,
-            BlockCapability<?, @Nullable Direction> capKind,
+            SFMBlockCapabilityKind<?> capKind,
             @Nullable Direction direction
     ) {
         var capMap = CACHE.get(pos.asLong());
@@ -108,9 +108,9 @@ public class LevelCapabilityCache {
 
     public <CAP> void putCapability(
             @NotStored BlockPos pos,
-            BlockCapability<CAP, @Nullable Direction> capKind,
+            SFMBlockCapabilityKind<CAP> capKind,
             @Nullable Direction direction,
-            BlockCapabilityCache<CAP, @Nullable Direction> cap
+            SFMBlockCapabilityResult<CAP> cap
     ) {
         var capMap = CACHE.computeIfAbsent(pos.asLong(), k -> new Object2ObjectOpenHashMap<>());
         var dirMap = capMap.computeIfAbsent(capKind, k -> new SFMDirections.NullableDirectionEnumMap<>());
