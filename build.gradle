@@ -19,6 +19,8 @@ sourceSets {
         }
         java {
             exclude "ca/teamdman/sfm/common/capability/ae2/InterfaceCapabilityProviderMapper.java"
+            exclude "ca/teamdman/sfm/common/capability/ae2/EnergyAcceptorCapabilityProviderMapper.java"
+//            exclude "ca/teamdman/sfm/common/program/linting/MekanismSideConfigProgramLinter.java"
         }
         java {
             exclude "ca/teamdman/sfm/common/block/TunnelledManagerBlock.java"
