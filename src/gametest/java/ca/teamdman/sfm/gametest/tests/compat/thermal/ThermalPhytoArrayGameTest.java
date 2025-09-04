@@ -2,6 +2,7 @@ package ca.teamdman.sfm.gametest.tests.compat.thermal;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
@@ -19,7 +20,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
@@ -65,7 +65,7 @@ public class ThermalPhytoArrayGameTest extends SFMGameTestDefinition {
         helper.setBlock(powerPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
         helper
                 .getBlockEntity(powerPos)
-                .getCapability(ForgeCapabilities.ENERGY, Direction.UP)
+                .getCapability(SFMWellKnownCapabilities.ENERGY.capability(), Direction.UP)
                 .ifPresent(energy -> energy.receiveEnergy(Integer.MAX_VALUE, false));
 
         // set up water
