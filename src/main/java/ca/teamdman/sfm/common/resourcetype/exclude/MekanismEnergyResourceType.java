@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype.exclude;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import mekanism.api.Action;
 import mekanism.api.energy.IStrictEnergyHandler;
@@ -13,8 +14,10 @@ import net.neoforged.registries.IForgeRegistry;
 import java.util.stream.Stream;
 
 public class MekanismEnergyResourceType extends ScalarResourceType<FloatingLong, IStrictEnergyHandler> {
-    public static final Capability<IStrictEnergyHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
-    });
+    public static final SFMBlockCapabilityKind<IStrictEnergyHandler> CAP = new SFMBlockCapabilityKind<>(
+            CapabilityManager.get(new CapabilityToken<>() {
+            })
+    );
 
     public MekanismEnergyResourceType() {
         super(CAP, SFMResourceLocation.fromNamespaceAndPath("mekanism", "energy"), FloatingLong.class);
@@ -108,18 +111,18 @@ public class MekanismEnergyResourceType extends ScalarResourceType<FloatingLong,
     }
 
     @Override
-    protected FloatingLong setCount(
-            FloatingLong stack,
-            long amount
-    ) {
-        return FloatingLong.create(amount);
-    }
-
-    @Override
     public FloatingLong withCount(
             FloatingLong floatingLong,
             long count
     ) {
         return FloatingLong.create(count);
+    }
+
+    @Override
+    protected FloatingLong setCount(
+            FloatingLong stack,
+            long amount
+    ) {
+        return FloatingLong.create(amount);
     }
 }

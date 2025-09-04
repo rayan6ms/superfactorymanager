@@ -2,6 +2,8 @@ package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.SFMDirections;
@@ -89,11 +91,11 @@ public record ServerboundNetworkToolUsePacket(
                         payload.append("---- (dev only) block entity ----\n");
                         payload.append(entity).append("\n");
                     }
-                    payload.append("---- capability directions ----\n");
-                    for (var cap : (Iterable<Capability<?>>) SFMResourceTypes.getCapabilities()::iterator) {
+                    payload.append("---- capabilityKind directions ----\n");
+                    for (var cap : (Iterable<SFMBlockCapabilityKind<?>>) SFMResourceTypes.getCapabilities()::iterator) {
                         String directions = DirectionQualifier.EVERY_DIRECTION
                                 .stream()
-                                .filter(dir -> entity.getCapability(cap, dir).isPresent())
+                                .filter(dir -> SFMCapabilityDiscovery.getCapabilityFromProvider(cap, entity, dir).isPresent())
                                 .map(dir -> dir == null ? "NULL DIRECTION" : DirectionQualifier.directionToString(dir))
                                 .collect(Collectors.joining(", ", "[", "]"));
                         if (!directions.equals("[]")) {

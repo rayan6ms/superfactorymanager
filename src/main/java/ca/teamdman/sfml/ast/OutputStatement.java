@@ -52,7 +52,7 @@ public class OutputStatement implements IOStatement {
      *
      * @param <STACK>     the stack type
      * @param <ITEM>      the item type
-     * @param <CAP>       the capability type
+     * @param <CAP>       the capabilityKind type
      * @param context     program execution context
      * @param source      The slot to pull from
      * @param destination the slot to push to
@@ -663,7 +663,7 @@ public class OutputStatement implements IOStatement {
         if (emptySlotsOnly) {
             return type.isEmpty(stack);
         }
-        // we check the stack limit on the capability
+        // we check the stack limit on the capabilityKind
         // this is to accommodate drawers/bins/barrels/black hole units/whatever
         // those blocks hold many more items than normal in a single stack
         // we don't also test the tracker because we can deposit into empty slots

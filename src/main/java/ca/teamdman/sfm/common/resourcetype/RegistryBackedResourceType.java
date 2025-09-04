@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
@@ -13,7 +14,7 @@ import java.util.stream.Collectors;
 
 public abstract class RegistryBackedResourceType<STACK,ITEM,CAP> extends ResourceType<STACK,ITEM,CAP> {
     private final Map<ITEM, ResourceLocation> registryKeyCache = new Object2ObjectOpenHashMap<>();
-    public RegistryBackedResourceType(Capability<CAP> CAPABILITY_KIND) {
+    public RegistryBackedResourceType(SFMBlockCapabilityKind<CAP> CAPABILITY_KIND) {
         super(CAPABILITY_KIND);
     }
 

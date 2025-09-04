@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 
 public class FluidResourceType extends RegistryBackedResourceType<FluidStack, Fluid, IFluidHandler> {
     public FluidResourceType() {
-        super(SFMWellKnownCapabilities.FLUID_HANDLER.capability());
+        super(SFMWellKnownCapabilities.FLUID_HANDLER);
     }
 
     @Override

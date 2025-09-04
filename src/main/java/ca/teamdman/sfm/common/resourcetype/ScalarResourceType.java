@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +14,7 @@ public abstract class ScalarResourceType<STACK, CAP> extends ResourceType<STACK,
     public final Class<STACK> item;
 
     public ScalarResourceType(
-            Capability<CAP> capability,
+            SFMBlockCapabilityKind<CAP> capability,
             ResourceLocation registryKey,
             Class<STACK> item
     ) {

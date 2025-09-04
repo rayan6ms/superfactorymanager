@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.resourcetype.FluidResourceType;
 import ca.teamdman.sfm.common.resourcetype.ForgeEnergyResourceType;
 import ca.teamdman.sfm.common.resourcetype.ItemResourceType;
@@ -15,7 +16,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -68,7 +68,7 @@ public class SFMResourceTypes {
         );
     }
 
-    public static Stream<Capability<?>> getCapabilities() {
+    public static Stream<SFMBlockCapabilityKind<?>> getCapabilities() {
         return REGISTERER.getEntries().stream().map(Supplier::get).map(resourceType -> resourceType.CAPABILITY_KIND);
     }
 

@@ -7,10 +7,10 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
 
 public class SFMWellKnownCapabilities {
-    public static final SFMBlockCapabilityWrapper<IEnergyStorage> ENERGY
-            = new SFMBlockCapabilityWrapper<>(Capabilities.ENERGY);
-    public static final SFMBlockCapabilityWrapper<IFluidHandler> FLUID_HANDLER
-            = new SFMBlockCapabilityWrapper<>(Capabilities.FLUID_HANDLER);
-    public static final SFMBlockCapabilityWrapper<IItemHandler> ITEM_HANDLER
-            = new SFMBlockCapabilityWrapper<>(Capabilities.ITEM_HANDLER);
+    public static final SFMBlockCapabilityKind<IEnergyStorage> ENERGY
+            = new SFMBlockCapabilityKind<>(Capabilities.ENERGY);
+    public static final SFMBlockCapabilityKind<IFluidHandler> FLUID_HANDLER
+            = new SFMBlockCapabilityKind<>(Capabilities.FLUID_HANDLER);
+    public static final SFMBlockCapabilityKind<IItemHandler> ITEM_HANDLER
+            = new SFMBlockCapabilityKind<>(Capabilities.ITEM_HANDLER);
 }

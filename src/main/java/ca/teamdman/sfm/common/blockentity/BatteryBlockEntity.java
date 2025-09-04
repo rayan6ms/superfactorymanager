@@ -33,7 +33,7 @@ public class BatteryBlockEntity extends BlockEntity {
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap == SFMWellKnownCapabilities.ENERGY.capability()) {
+        if (cap == SFMWellKnownCapabilities.ENERGY.capabilityKind()) {
             return CAPABILITY.cast();
         } else {
             return super.getCapability(cap, side);

@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype.exclude;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.pigment.IPigmentHandler;
@@ -15,8 +16,10 @@ import org.apache.commons.lang3.NotImplementedException;
 import java.util.stream.Stream;
 
 public class PigmentResourceType extends RegistryBackedResourceType<PigmentStack, Pigment, IPigmentHandler> {
-    public static final Capability<IPigmentHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
-    });
+    public static final SFMBlockCapabilityKind<IPigmentHandler> CAP = new SFMBlockCapabilityKind<>(
+            CapabilityManager.get(new CapabilityToken<>() {
+            })
+    );
 
     public PigmentResourceType() {
         super(CAP);

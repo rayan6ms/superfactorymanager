@@ -35,7 +35,7 @@ public class EnergyAcceptorCapabilityProviderMapper implements CapabilityProvide
                 EnergyAcceptorBlockEntity inner
         ) {
             this.inner = inner;
-            this.energy = inner.getCapability(SFMWellKnownCapabilities.ENERGY.capability())
+            this.energy = inner.getCapability(SFMWellKnownCapabilities.ENERGY.capabilityKind())
                     .lazyMap(EnergyAcceptorEnergyStorageWrapper::new);
         }
 
@@ -44,7 +44,7 @@ public class EnergyAcceptorCapabilityProviderMapper implements CapabilityProvide
                 @NotNull Capability<T> cap,
                 @Nullable Direction side
         ) {
-            if (cap == SFMWellKnownCapabilities.ENERGY.capability()) {
+            if (cap == SFMWellKnownCapabilities.ENERGY.capabilityKind()) {
                 return energy.cast();
             } else {
                 return inner.getCapability(cap, side);

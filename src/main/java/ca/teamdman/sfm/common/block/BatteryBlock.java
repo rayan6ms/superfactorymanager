@@ -52,7 +52,7 @@ public class BatteryBlock extends Block implements EntityBlock {
     ) {
         BlockEntity be = pLevel.getBlockEntity(pPos);
         if (be instanceof BatteryBlockEntity bbe) {
-            var cap = bbe.getCapability(SFMWellKnownCapabilities.ENERGY.capability(), pHit.getDirection());
+            var cap = bbe.getCapability(SFMWellKnownCapabilities.ENERGY.capabilityKind(), pHit.getDirection());
             cap.ifPresent(c -> {
                 if (pPlayer.isShiftKeyDown()) {
                     c.extractEnergy(1000, false);

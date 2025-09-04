@@ -128,7 +128,7 @@ public class PrintingPressBlockEntity extends BlockEntity implements NotContaine
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap == SFMWellKnownCapabilities.ITEM_HANDLER.capability()) {
+        if (cap == SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind()) {
             return ITEMS_CAPABILITY.cast();
         }
         return super.getCapability(cap, side);

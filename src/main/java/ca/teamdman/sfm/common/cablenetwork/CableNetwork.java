@@ -1,5 +1,7 @@
 package ca.teamdman.sfm.common.cablenetwork;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
@@ -154,8 +156,8 @@ public class CableNetwork {
     }
 
     @MCVersionDependentBehaviour
-    public <CAP> @NotNull LazyOptional<CAP> getCapability(
-            Capability<CAP> capKind,
+    public <CAP> @NotNull SFMBlockCapabilityResult<CAP> getCapability(
+            SFMBlockCapabilityKind<CAP> capKind,
             @NotStored BlockPos pos,
             @Nullable Direction direction,
             TranslatableLogger logger

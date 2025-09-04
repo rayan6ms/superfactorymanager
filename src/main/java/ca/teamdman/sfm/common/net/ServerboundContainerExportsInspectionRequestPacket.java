@@ -75,7 +75,7 @@ public record ServerboundContainerExportsInspectionRequestPacket(
         ICapabilityProvider prov = SFMCapabilityProviderMappers.discoverCapabilityProvider(level, pos);
 
         if (prov != null) {
-            prov.getCapability(resourceType.CAPABILITY_KIND, direction).ifPresent(cap -> {
+            prov.getCapability(resourceType.CAPABILITY_KIND.capabilityKind(), direction).ifPresent(cap -> {
                 int slots = resourceType.getSlots(cap);
                 Int2ObjectMap<STACK> slotContents = new Int2ObjectArrayMap<>(slots);
                 for (int slot = 0; slot < slots; slot++) {

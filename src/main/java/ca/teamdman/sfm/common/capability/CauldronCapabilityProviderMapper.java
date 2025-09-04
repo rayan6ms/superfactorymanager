@@ -39,7 +39,7 @@ public class CauldronCapabilityProviderMapper implements CapabilityProviderMappe
 
         @Override
         public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-            if (cap == SFMWellKnownCapabilities.FLUID_HANDLER.capability()) {
+            if (cap == SFMWellKnownCapabilities.FLUID_HANDLER.capabilityKind()) {
                 return fluidHandlerLazyOptional.cast();
             }
             return LazyOptional.empty();

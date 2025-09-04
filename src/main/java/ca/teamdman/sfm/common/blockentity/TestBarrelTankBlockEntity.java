@@ -50,10 +50,10 @@ public class TestBarrelTankBlockEntity extends BaseContainerBlockEntity {
             Capability<T> cap,
             @Nullable Direction side
     ) {
-        if (cap == SFMWellKnownCapabilities.ITEM_HANDLER.capability()) {
+        if (cap == SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind()) {
             return item_capability.cast();
         }
-        if (cap == SFMWellKnownCapabilities.FLUID_HANDLER.capability()) {
+        if (cap == SFMWellKnownCapabilities.FLUID_HANDLER.capabilityKind()) {
             return fluid_capability.cast();
         }
         return super.getCapability(cap, side);
