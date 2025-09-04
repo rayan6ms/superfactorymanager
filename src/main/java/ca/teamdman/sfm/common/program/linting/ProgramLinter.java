@@ -3,12 +3,12 @@ package ca.teamdman.sfm.common.program.linting;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
+import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
 import ca.teamdman.sfm.common.compat.SFMModCompat;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.program.ProgramContext;
-import ca.teamdman.sfm.common.registry.SFMCapabilityProviderMappers;
 import ca.teamdman.sfml.ast.*;
 import com.mojang.datafixers.util.Pair;
 import mekanism.api.RelativeSide;
@@ -115,10 +115,10 @@ public class ProgramLinter {
                 .getOrRegisterNetworkFromManagerPosition(manager)
                 .ifPresent(network -> labels.removeIf((label, pos) -> !network.isAdjacentToCable(pos)));
 
-        // remove labels with no viable capabilityKind provider
+        // remove labels with no viable capability provider
         var level = manager.getLevel();
         assert level != null;
-        labels.removeIf((label, pos) -> SFMCapabilityProviderMappers.discoverCapabilityProvider(level, pos) == null);
+        labels.removeIf((label, pos) -> !SFMCapabilityDiscovery.hasAnyCapabilityAnyDirection(level, pos));
 
         // save new labels
         labels.save(disk);
@@ -354,7 +354,7 @@ public class ProgramLinter {
                                 )
                         ));
                     }
-                    var viable = SFMCapabilityProviderMappers.discoverCapabilityProvider(level, pos) != null;
+                    var viable = SFMCapabilityDiscovery.hasAnyCapabilityAnyDirection(level, pos);
                     if (!viable && adjacent) {
                         warnings.add(PROGRAM_WARNING_CONNECTED_BUT_NOT_VIABLE_LABEL.get(
                                 label,

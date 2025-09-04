@@ -1,9 +1,11 @@
 package ca.teamdman.sfm.gametest;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
+import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.program.ProgramContext;
-import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfml.ast.Block;
 import ca.teamdman.sfml.ast.Trigger;
@@ -11,13 +13,16 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.GameTestInfo;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Locale;
+import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.LongStream;
@@ -30,32 +35,52 @@ public class SFMGameTestHelper extends GameTestHelper {
         super(helper.testInfo);
     }
 
-    @MCVersionDependentBehaviour
+    public <CAP> CAP discoverCapability(
+            SFMBlockCapabilityKind<CAP> capKind,
+            @NotStored BlockPos localPos,
+            @Nullable Direction direction
+    ) {
+        SFMBlockCapabilityResult<CAP> found = SFMCapabilityDiscovery.discoverCapabilityFromLevel(
+                getLevel(),
+                capKind,
+                absolutePos(localPos),
+                direction
+        );
+        SFMGameTestMethodHelpers.assertTrue(found.isPresent(), "No " + capKind.getName() + " found at " + localPos);
+        return found.unwrap();
+    }
+
     public IFluidHandler getFluidHandler(
             @NotStored BlockPos pos,
             @Nullable Direction direction
     ) {
-        BlockEntity blockEntity = getBlockEntity(pos);
-        SFMGameTestMethodHelpers.assertTrue(blockEntity != null, "No block entity found at " + pos);
-        Optional<IFluidHandler> found = blockEntity
-                .getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capabilityKind(), direction)
-                .resolve();
-        SFMGameTestMethodHelpers.assertTrue(found.isPresent(), "No fluid handler found at " + pos);
-        return found.get();
+        return discoverCapability(
+                SFMWellKnownCapabilities.FLUID_HANDLER,
+                pos,
+                direction
+        );
     }
 
-    @MCVersionDependentBehaviour
     public IItemHandler getItemHandler(
             @NotStored BlockPos pos,
             @Nullable Direction direction
     ) {
-        BlockEntity blockEntity = getBlockEntity(pos);
-        SFMGameTestMethodHelpers.assertTrue(blockEntity != null, "No block entity found at " + pos);
-        Optional<IItemHandler> found = blockEntity
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind(), direction)
-                .resolve();
-        SFMGameTestMethodHelpers.assertTrue(found.isPresent(), "No item handler found at " + pos);
-        return found.get();
+        return discoverCapability(
+                SFMWellKnownCapabilities.ITEM_HANDLER,
+                pos,
+                direction
+        );
+    }
+
+    public IEnergyStorage getEnergyStorage(
+            @NotStored BlockPos pos,
+            @Nullable Direction direction
+    ) {
+        return discoverCapability(
+                SFMWellKnownCapabilities.ENERGY,
+                pos,
+                direction
+        );
     }
 
     public IItemHandler getItemHandler(
