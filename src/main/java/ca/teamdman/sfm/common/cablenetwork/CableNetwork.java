@@ -160,7 +160,7 @@ public class CableNetwork {
             @Nullable Direction direction,
             TranslatableLogger logger
     ) {
-       return SFMCapabilityDiscovery.getCapability(
+       return SFMCapabilityDiscovery.discoverCapabilityFromNetwork(
                this,
                capKind,
                pos,
