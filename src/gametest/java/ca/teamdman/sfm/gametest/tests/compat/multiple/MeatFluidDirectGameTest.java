@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.gametest.tests.compat.multiple;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
@@ -17,7 +18,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 
@@ -66,12 +66,12 @@ public class MeatFluidDirectGameTest extends SFMGameTestDefinition {
 
         // add some power
         washingFactory
-                .getCapability(ForgeCapabilities.ENERGY)
+                .getCapability(SFMWellKnownCapabilities.ENERGY.capability())
                 .resolve()
                 .get().receiveEnergy(Integer.MAX_VALUE, false);
 
         // add some meat
-        washingFactory.getCapability(ForgeCapabilities.FLUID_HANDLER)
+        washingFactory.getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capability())
                 .resolve().get().fill(
                         new FluidStack(ModuleCore.MEAT.getSourceFluid().get(), Integer.MAX_VALUE),
                         IFluidHandler.FluidAction.EXECUTE
@@ -79,7 +79,7 @@ public class MeatFluidDirectGameTest extends SFMGameTestDefinition {
 
         // add some iron
         washingFactory
-                .getCapability(ForgeCapabilities.ITEM_HANDLER, Direction.UP)
+                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability(), Direction.UP)
                 .resolve()
                 .get()
                 .insertItem(0, new ItemStack(Items.RAW_IRON, 64), false);
