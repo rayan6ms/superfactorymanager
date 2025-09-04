@@ -1,7 +1,6 @@
 package ca.teamdman.sfm.gametest.tests.compat.thermal;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
-import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
@@ -56,13 +55,14 @@ public class ThermalFurnaceArrayGameTest extends SFMGameTestDefinition {
 
         // set up power
         helper.setBlock(powerPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
-        helper
-                .getBlockEntity(powerPos)
-                .getCapability(SFMWellKnownCapabilities.ENERGY.capabilityKind(), Direction.UP)
-                .ifPresent(energy -> energy.receiveEnergy(Integer.MAX_VALUE, false));
+        helper.getEnergyStorage(powerPos, Direction.UP)
+                .receiveEnergy(Integer.MAX_VALUE, false);
 
         // set up furnaces
-        var furnaceBlock = ForgeRegistries.BLOCKS.getValue(SFMResourceLocation.fromNamespaceAndPath("thermal", "machine_furnace"));
+        var furnaceBlock = ForgeRegistries.BLOCKS.getValue(SFMResourceLocation.fromNamespaceAndPath(
+                "thermal",
+                "machine_furnace"
+        ));
         for (int x = 0; x < 25; x++) {
             for (int z = 1; z < 25; z++) {
                 helper.setBlock(new BlockPos(x, 2, z), SFMBlocks.CABLE_BLOCK.get());

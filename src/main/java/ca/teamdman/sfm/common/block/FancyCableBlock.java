@@ -4,7 +4,6 @@ import ca.teamdman.sfm.common.block.shape.ShapeCache;
 import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
 import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.Stored;
 import com.google.common.collect.ImmutableMap;
@@ -193,8 +192,6 @@ public class FancyCableBlock extends CableBlock implements IFacadableBlock {
             return false;
         }
 
-        return SFMResourceTypes
-                .getCapabilities()
-                .anyMatch(cap -> SFMCapabilityDiscovery.getCapabilityFromProvider(cap, blockEntity, direction).isPresent());
+        return SFMCapabilityDiscovery.hasAnyCapabilityAnyDirection(level, relative);
     }
 }

@@ -5,11 +5,14 @@ import ca.teamdman.sfm.common.cablenetwork.LevelCapabilityCache;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.registry.SFMCapabilityProviderMappers;
+import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
+import ca.teamdman.sfm.common.util.SFMDirections;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.LevelAccessor;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
 import net.neoforged.neoforge.common.util.LazyOptional;
@@ -27,7 +30,7 @@ public class SFMCapabilityDiscovery {
     ) {
         LevelCapabilityCache levelCapabilityCache = cableNetwork.getLevelCapabilityCache();
 
-        // It is a precondition to enter the cache that the capabilityKind is adjacent to a cable
+        // It is a precondition to enter the cache that the capability is adjacent to a cable
         SFMBlockCapabilityResult<CAP> cached = discoverCapabilityFromCache(
                 capKind,
                 pos,
@@ -35,7 +38,7 @@ public class SFMCapabilityDiscovery {
                 logger,
                 levelCapabilityCache
         );
-        if (cached != null) return cached;
+        if (cached.isPresent()) return cached;
 
         // NEED TO DISCOVER
 
@@ -46,25 +49,68 @@ public class SFMCapabilityDiscovery {
             return SFMBlockCapabilityResult.empty();
         }
 
-        return discoverCapabilityFromLevel(
-                cableNetwork.getLevel(),
+        if (!(cableNetwork.getLevel() instanceof ServerLevel serverLevel)) {
+            return SFMBlockCapabilityResult.empty();
+        }
+        SFMBlockCapabilityResult<CAP> cap = discoverCapabilityFromLevel(
+                serverLevel,
                 capKind,
                 pos,
-                direction,
-                logger,
-                levelCapabilityCache
+                direction
         );
+        if (cap.isPresent()) {
+            cap.addListener(x -> levelCapabilityCache.remove(pos, capKind, direction));
+            levelCapabilityCache.putCapability(pos, capKind, direction, cap);
+        } else {
+            logger.warn(x -> x.accept(LocalizationKeys.LOGS_MISSING_CAPABILITY_PROVIDER.get(
+                    pos,
+                    capKind.getName(),
+                    direction
+            )));
+        }
+        return cap;
     }
 
-    public static @NotNull <CAP> SFMBlockCapabilityResult<CAP> getCapabilityFromProvider(
+    private static @NotNull <CAP> SFMBlockCapabilityResult<CAP> discoverCapabilityFromCapabilityProvider(
             SFMBlockCapabilityKind<CAP> capKind,
-            ICapabilityProvider capabilityProvider,
+            @Nullable ICapabilityProvider capabilityProvider,
             @Nullable Direction direction
     ) {
+        if (capabilityProvider == null) {
+            return SFMBlockCapabilityResult.empty();
+        }
         return new SFMBlockCapabilityResult<>(capabilityProvider.getCapability(capKind.capabilityKind(), direction));
     }
 
-    private static <CAP> @Nullable SFMBlockCapabilityResult<CAP> discoverCapabilityFromCache(
+    public static boolean hasAnyCapabilityAnyDirection(
+            LevelAccessor level,
+            BlockPos pos
+    ) {
+        return SFMResourceTypes.getCapabilities().anyMatch(cap -> {
+            for (Direction direction : SFMDirections.DIRECTIONS_WITH_NULL) {
+                if (discoverCapabilityFromLevel(level, cap, pos, direction).isPresent()) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    public static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromLevel(
+            LevelAccessor level,
+            SFMBlockCapabilityKind<CAP> capKind,
+            @NotStored BlockPos pos,
+            @Nullable Direction direction
+    ) {
+        var capabilityProvider = SFMCapabilityProviderMappers.discoverCapabilityProvider(level, pos.immutable());
+        if (capabilityProvider != null) {
+            return discoverCapabilityFromCapabilityProvider(capKind, capabilityProvider, direction);
+        } else {
+            return SFMBlockCapabilityResult.empty();
+        }
+    }
+
+    private static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromCache(
             SFMBlockCapabilityKind<CAP> capKind,
             @NotStored BlockPos pos,
             @Nullable Direction direction,
@@ -97,38 +143,6 @@ public class SFMCapabilityDiscovery {
                     direction
             )));
         }
-        return null;
-    }
-
-    private static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromLevel(
-            Level level,
-            SFMBlockCapabilityKind<CAP> capKind,
-            @NotStored BlockPos pos,
-            @Nullable Direction direction,
-            TranslatableLogger logger,
-            LevelCapabilityCache levelCapabilityCache
-    ) {
-        var capabilityProvider = SFMCapabilityProviderMappers.discoverCapabilityProvider(level, pos.immutable());
-        if (capabilityProvider != null) {
-            var cap = getCapabilityFromProvider(capKind, capabilityProvider, direction);
-            if (cap.isPresent()) {
-                levelCapabilityCache.putCapability(pos, capKind, direction, cap);
-                cap.addListener(x -> levelCapabilityCache.remove(pos, capKind, direction));
-            } else {
-                logger.warn(x -> x.accept(LocalizationKeys.LOGS_EMPTY_CAPABILITY.get(
-                        pos,
-                        capKind.getName(),
-                        direction
-                )));
-            }
-            return cap;
-        } else {
-            logger.warn(x -> x.accept(LocalizationKeys.LOGS_MISSING_CAPABILITY_PROVIDER.get(
-                    pos,
-                    capKind.getName(),
-                    direction
-            )));
-            return SFMBlockCapabilityResult.empty();
-        }
+        return SFMBlockCapabilityResult.empty();
     }
 }

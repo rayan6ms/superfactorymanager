@@ -1,7 +1,8 @@
 package ca.teamdman.sfm.common.net;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
+import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.registry.SFMCapabilityProviderMappers;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
@@ -19,7 +20,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -72,32 +72,36 @@ public record ServerboundContainerExportsInspectionRequestPacket(
             @Nullable Direction direction
     ) {
         StringBuilder sb = new StringBuilder();
-        ICapabilityProvider prov = SFMCapabilityProviderMappers.discoverCapabilityProvider(level, pos);
-
-        if (prov != null) {
-            prov.getCapability(resourceType.CAPABILITY_KIND.capabilityKind(), direction).ifPresent(cap -> {
-                int slots = resourceType.getSlots(cap);
-                Int2ObjectMap<STACK> slotContents = new Int2ObjectArrayMap<>(slots);
-                for (int slot = 0; slot < slots; slot++) {
-                    STACK stack = resourceType.getStackInSlot(cap, slot);
-                    if (!resourceType.isEmpty(stack)) {
-                        slotContents.put(slot, stack);
-                    }
+        SFMBlockCapabilityResult<CAP> capResult = SFMCapabilityDiscovery.discoverCapabilityFromLevel(
+                level,
+                resourceType.CAPABILITY_KIND,
+                pos,
+                direction
+        );
+        if (capResult.isPresent()) {
+            CAP cap = capResult.unwrap();
+            int slots = resourceType.getSlots(cap);
+            Int2ObjectMap<STACK> slotContents = new Int2ObjectArrayMap<>(slots);
+            for (int slot = 0; slot < slots; slot++) {
+                STACK stack = resourceType.getStackInSlot(cap, slot);
+                if (!resourceType.isEmpty(stack)) {
+                    slotContents.put(slot, stack);
                 }
+            }
 
-                if (!slotContents.isEmpty()) {
-                    slotContents.forEach((slot, stack) -> {
-                        InputStatement inputStatement = SFMASTUtils.getInputStatementForStack(
-                                resourceTypeResourceKey,
-                                resourceType,
-                                stack,
-                                "target",
-                                slot,
-                                false,
-                                direction
-                        );
-                        sb.append(inputStatement.toStringPretty()).append("\n");
-                    });
+            if (!slotContents.isEmpty()) {
+                slotContents.forEach((slot, stack) -> {
+                    InputStatement inputStatement = SFMASTUtils.getInputStatementForStack(
+                            resourceTypeResourceKey,
+                            resourceType,
+                            stack,
+                            "target",
+                            slot,
+                            false,
+                            direction
+                    );
+                    sb.append(inputStatement.toStringPretty()).append("\n");
+                });
 
                     List<ResourceLimit> resourceLimitList = new ArrayList<>();
                     slotContents.forEach((slot, stack) -> {
@@ -129,7 +133,7 @@ public record ServerboundContainerExportsInspectionRequestPacket(
                     );
                     sb.append(inputStatement.toStringPretty());
                 }
-            });
+
         }
         String result = sb.toString();
         if (!result.isBlank()) {
@@ -186,13 +190,15 @@ public record ServerboundContainerExportsInspectionRequestPacket(
                         String payload = buildInspectionResults(blockEntity.getLevel(), blockEntity.getBlockPos());
                         var player = context.sender();
 
-                        SFMPackets.sendToPlayer(() -> player, new ClientboundContainerExportsInspectionResultsPacket(
-                                msg.windowId,
-                                SFMPacketDaddy.truncate(
-                                        payload,
-                                        ClientboundContainerExportsInspectionResultsPacket.MAX_RESULTS_LENGTH
+                        SFMPackets.sendToPlayer(
+                                () -> player, new ClientboundContainerExportsInspectionResultsPacket(
+                                        msg.windowId,
+                                        SFMPacketDaddy.truncate(
+                                                payload,
+                                                ClientboundContainerExportsInspectionResultsPacket.MAX_RESULTS_LENGTH
+                                        )
                                 )
-                        ));
+                        );
                     }
             );
         }

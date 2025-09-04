@@ -129,10 +129,7 @@ public class MeatFluidGameTest extends SFMGameTestDefinition {
                 );
 
         // add some iron
-        washingFactory
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind(), Direction.UP)
-                .resolve()
-                .get()
+        helper.getItemHandler(washingFactoryPos, Direction.UP)
                 .insertItem(0, new ItemStack(Items.RAW_IRON, 64), false);
 
         // place the manager
