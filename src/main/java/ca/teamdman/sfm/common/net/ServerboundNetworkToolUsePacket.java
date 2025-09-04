@@ -90,20 +90,20 @@ public record ServerboundNetworkToolUsePacket(
                         payload.append("---- (dev only) block entity ----\n");
                         payload.append(entity).append("\n");
                     }
-                    payload.append("---- capabilityKind directions ----\n");
-                    for (var cap : (Iterable<SFMBlockCapabilityKind<?>>) SFMResourceTypes.getCapabilities()::iterator) {
-                        String directions = DirectionQualifier.EVERY_DIRECTION
-                                .stream()
-                                .filter(dir -> SFMCapabilityDiscovery.getCapabilityFromProvider(cap, entity, dir).isPresent())
-                                .map(dir -> dir == null ? "NULL DIRECTION" : DirectionQualifier.directionToString(dir))
-                                .collect(Collectors.joining(", ", "[", "]"));
-                        if (!directions.equals("[]")) {
-                            payload
-                                    .append(cap.getName())
-                                    .append("\n")
-                                    .append(directions)
-                                    .append("\n");
-                        }
+                }
+                payload.append("---- capabilityKind directions ----\n");
+                for (var cap : (Iterable<SFMBlockCapabilityKind<?>>) SFMResourceTypes.getCapabilities()::iterator) {
+                    String directions = DirectionQualifier.EVERY_DIRECTION
+                            .stream()
+                            .filter(dir -> SFMCapabilityDiscovery.discoverCapabilityFromLevel(level, cap, pos, dir).isPresent())
+                            .map(dir -> dir == null ? "NULL DIRECTION" : DirectionQualifier.directionToString(dir))
+                            .collect(Collectors.joining(", ", "[", "]"));
+                    if (!directions.equals("[]")) {
+                        payload
+                                .append(cap.getName())
+                                .append("\n")
+                                .append(directions)
+                                .append("\n");
                     }
                 }
 
