@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.common.capabilityprovidermapper.ae2;
+package ca.teamdman.sfm.common.capability.ae2;
 
 import appeng.api.config.Actionable;
 import appeng.api.networking.energy.IEnergyService;
@@ -10,7 +10,7 @@ import appeng.api.storage.MEStorage;
 import appeng.api.storage.StorageHelper;
 import appeng.blockentity.misc.InterfaceBlockEntity;
 import appeng.capabilities.Capabilities;
-import ca.teamdman.sfm.common.capabilityprovidermapper.CapabilityProviderMapper;
+import ca.teamdman.sfm.common.capability.CapabilityProviderMapper;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.common.util.Stored;

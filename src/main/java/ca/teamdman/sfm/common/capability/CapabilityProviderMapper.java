@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.common.capabilityprovidermapper;
+package ca.teamdman.sfm.common.capability;
 
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
