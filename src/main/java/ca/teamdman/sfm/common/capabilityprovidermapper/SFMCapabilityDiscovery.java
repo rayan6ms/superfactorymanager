@@ -9,23 +9,52 @@ import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SFMCapabilityDiscovery {
-
     @MCVersionDependentBehaviour
-    public static <CAP> @NotNull LazyOptional<CAP> getCapability(
+    public static <CAP> @NotNull LazyOptional<CAP> discoverCapabilityFromNetwork(
             CableNetwork cableNetwork,
             Capability<CAP> capKind,
             @NotStored BlockPos pos,
             @Nullable Direction direction,
             TranslatableLogger logger
     ) {
-        // we assume that if there is a cache entry that it is adjacent to a cable
         LevelCapabilityCache levelCapabilityCache = cableNetwork.getLevelCapabilityCache();
+
+        // It is a precondition to enter the cache that the capability is adjacent to a cable
+        LazyOptional<CAP> cached = discoverCapabilityFromCache(
+                capKind,
+                pos,
+                direction,
+                logger,
+                levelCapabilityCache
+        );
+        if (cached != null) return cached;
+
+        // NEED TO DISCOVER
+
+        // any BlockPos can have labels assigned
+        // we must only proceed here if there is an adjacent cable from this network
+        if (!cableNetwork.isAdjacentToCable(pos)) {
+            logger.warn(x -> x.accept(LocalizationKeys.LOGS_MISSING_ADJACENT_CABLE.get(pos)));
+            return LazyOptional.empty();
+        }
+
+        return discoverCapabilityFromLevel(cableNetwork.getLevel(), capKind, pos, direction, logger, levelCapabilityCache);
+    }
+
+    private static <CAP> @Nullable LazyOptional<CAP> discoverCapabilityFromCache(
+            Capability<CAP> capKind,
+            @NotStored BlockPos pos,
+            @Nullable Direction direction,
+            TranslatableLogger logger,
+            LevelCapabilityCache levelCapabilityCache
+    ) {
         var found = levelCapabilityCache.getCapability(pos, capKind, direction);
         if (found != null) {
             // CACHE HIT
@@ -48,16 +77,18 @@ public class SFMCapabilityDiscovery {
             // CACHE MISS
             logger.trace(x -> x.accept(LocalizationKeys.LOG_CAPABILITY_CACHE_MISS.get(pos, capKind.getName(), direction)));
         }
+        return null;
+    }
 
-        // NEED TO DISCOVER
-
-        // any BlockPos can have labels assigned
-        // we must only proceed here if there is an adjacent cable from this network
-        if (!cableNetwork.isAdjacentToCable(pos)) {
-            logger.warn(x -> x.accept(LocalizationKeys.LOGS_MISSING_ADJACENT_CABLE.get(pos)));
-            return LazyOptional.empty();
-        }
-        var capabilityProvider = SFMCapabilityProviderMappers.discoverCapabilityProvider(cableNetwork.getLevel(), pos.immutable());
+    private static <CAP> @NotNull LazyOptional<CAP> discoverCapabilityFromLevel(
+            Level level,
+            Capability<CAP> capKind,
+            @NotStored BlockPos pos,
+            @Nullable Direction direction,
+            TranslatableLogger logger,
+            LevelCapabilityCache levelCapabilityCache
+    ) {
+        var capabilityProvider = SFMCapabilityProviderMappers.discoverCapabilityProvider(level, pos.immutable());
         if (capabilityProvider != null) {
             var cap = capabilityProvider.getCapability(capKind, direction);
             if (cap.isPresent()) {
@@ -76,5 +107,4 @@ public class SFMCapabilityDiscovery {
             return LazyOptional.empty();
         }
     }
-
 }
