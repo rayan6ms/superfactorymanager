@@ -1,7 +1,7 @@
-package ca.teamdman.sfm.common.capabilityprovidermapper.ae2;
+package ca.teamdman.sfm.common.capability.ae2;
 
 import appeng.blockentity.networking.EnergyAcceptorBlockEntity;
-import ca.teamdman.sfm.common.capabilityprovidermapper.CapabilityProviderMapper;
+import ca.teamdman.sfm.common.capability.CapabilityProviderMapper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
