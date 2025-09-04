@@ -3,8 +3,7 @@ package ca.teamdman.sfm.common.capability;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;
-
-import java.util.Optional;
+import org.jetbrains.annotations.NotNull;
 
 @MCVersionDependentBehaviour
 public record SFMBlockCapabilityResult<CAP>(LazyOptional<CAP> capability) {
@@ -12,8 +11,8 @@ public record SFMBlockCapabilityResult<CAP>(LazyOptional<CAP> capability) {
         return new SFMBlockCapabilityResult<>(LazyOptional.empty());
     }
 
-    public Optional<CAP> resolve() {
-        return capability.resolve();
+    public @NotNull CAP unwrap() {
+        return capability.orElseThrow(IllegalStateException::new);
     }
 
     public boolean isPresent() {

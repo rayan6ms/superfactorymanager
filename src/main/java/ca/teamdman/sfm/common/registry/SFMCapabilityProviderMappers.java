@@ -11,7 +11,7 @@ import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.common.capabilities.CapabilityProvider;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -70,11 +70,9 @@ public class SFMCapabilityProviderMappers {
      * If multiple {@link CapabilityProviderMapper}s match, the first one is returned.
      */
     public static @Nullable ICapabilityProvider discoverCapabilityProvider(
-            Level level,
+            LevelAccessor level,
             @Stored BlockPos pos
     ) {
-        if (!level.isLoaded(pos)) return null;
-
         Collection<CapabilityProviderMapper> mappers = REGISTRY.get().getValues();
         CapabilityProviderMapper beMapper = null;
         for (CapabilityProviderMapper mapper : mappers) {
