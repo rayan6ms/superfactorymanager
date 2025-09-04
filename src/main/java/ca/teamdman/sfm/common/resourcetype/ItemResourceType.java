@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
@@ -8,7 +9,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.items.IItemHandler;
 
@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 public class ItemResourceType extends RegistryBackedResourceType<ItemStack, Item, IItemHandler> {
     public ItemResourceType() {
-        super(Capabilities.ItemHandler.BLOCK);
+        super(SFMWellKnownCapabilities.ITEM_HANDLER.capability());
     }
 
     @Override
