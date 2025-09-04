@@ -2,6 +2,8 @@ package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.SFMDirections;
@@ -15,9 +17,7 @@ import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.BlockCapability;
 import org.apache.commons.lang3.mutable.MutableBoolean;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -90,20 +90,20 @@ public record ServerboundNetworkToolUsePacket(
                         payload.append("---- (dev only) block entity ----\n");
                         payload.append(entity).append("\n");
                     }
-                    payload.append("---- capability directions ----\n");
-                    for (var cap : (Iterable<BlockCapability<?, @Nullable Direction>>) SFMResourceTypes.getCapabilities()::iterator) {
-                        String directions = DirectionQualifier.EVERY_DIRECTION
-                                .stream()
-                                .filter(dir -> level.getCapability(cap, pos, dir) != null)
-                                .map(dir -> dir == null ? "NULL DIRECTION" : DirectionQualifier.directionToString(dir))
-                                .collect(Collectors.joining(", ", "[", "]"));
-                        if (!directions.equals("[]")) {
-                            payload
-                                    .append(cap.name())
-                                    .append("\n")
-                                    .append(directions)
-                                    .append("\n");
-                        }
+                }
+                payload.append("---- capabilityKind directions ----\n");
+                for (var cap : (Iterable<SFMBlockCapabilityKind<?>>) SFMResourceTypes.getCapabilities()::iterator) {
+                    String directions = DirectionQualifier.EVERY_DIRECTION
+                            .stream()
+                            .filter(dir -> SFMCapabilityDiscovery.discoverCapabilityFromLevel(level, cap, pos, dir).isPresent())
+                            .map(dir -> dir == null ? "NULL DIRECTION" : DirectionQualifier.directionToString(dir))
+                            .collect(Collectors.joining(", ", "[", "]"));
+                    if (!directions.equals("[]")) {
+                        payload
+                                .append(cap.getName())
+                                .append("\n")
+                                .append(directions)
+                                .append("\n");
                     }
                 }
 

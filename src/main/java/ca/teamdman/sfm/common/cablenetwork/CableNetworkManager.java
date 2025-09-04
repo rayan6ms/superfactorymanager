@@ -241,7 +241,7 @@ public class CableNetworkManager {
         // Unregister network from cable position lookup
         Long2ObjectMap<CableNetwork> posMap = NETWORKS_BY_CABLE_POSITION
                 .computeIfAbsent(network.getLevel(), k -> new Long2ObjectOpenHashMap<>());
-        network.CABLE_POSITIONS.forEach(posMap::remove);
+        network.cablePositions.forEach(posMap::remove);
         onNetworkLookupChanged();
     }
 
@@ -252,7 +252,7 @@ public class CableNetworkManager {
         // Register network to cable position lookup
         Long2ObjectMap<CableNetwork> posMap = NETWORKS_BY_CABLE_POSITION
                 .computeIfAbsent(network.getLevel(), k -> new Long2ObjectOpenHashMap<>());
-        network.CABLE_POSITIONS.forEach(cablePos -> posMap.put(cablePos, network));
+        network.cablePositions.forEach(cablePos -> posMap.put(cablePos, network));
         onNetworkLookupChanged();
     }
 

@@ -1,22 +1,22 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.infuse.IInfusionHandler;
 import mekanism.api.chemical.infuse.InfuseType;
 import mekanism.api.chemical.infuse.InfusionStack;
 import mekanism.common.capabilities.Capabilities;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.neoforged.neoforge.capabilities.BlockCapability;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
 public class InfuseResourceType extends RegistryBackedResourceType<InfusionStack, InfuseType, IInfusionHandler> {
-    public static final BlockCapability<IInfusionHandler, @Nullable Direction> CAP = Capabilities.INFUSION.block();
+    public static final SFMBlockCapabilityKind<IInfusionHandler> CAP = new SFMBlockCapabilityKind<>(
+            Capabilities.INFUSION.block()
+    );
 
     public InfuseResourceType() {
         super(CAP);

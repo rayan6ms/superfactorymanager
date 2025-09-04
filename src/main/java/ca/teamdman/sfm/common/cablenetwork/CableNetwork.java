@@ -1,5 +1,7 @@
 package ca.teamdman.sfm.common.cablenetwork;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
@@ -12,7 +14,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.ChunkAccess;
-import net.neoforged.neoforge.capabilities.BlockCapability;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -152,13 +154,13 @@ public class CableNetwork {
     }
 
     @MCVersionDependentBehaviour
-    public <CAP> @Nullable CAP getCapability(
-            BlockCapability<CAP, @Nullable Direction> capKind,
+    public <CAP> @NotNull SFMBlockCapabilityResult<CAP> getCapability(
+            SFMBlockCapabilityKind<CAP> capKind,
             @NotStored BlockPos pos,
             @Nullable Direction direction,
             TranslatableLogger logger
     ) {
-       return SFMCapabilityDiscovery.getCapability(
+       return SFMCapabilityDiscovery.discoverCapabilityFromNetwork(
                this,
                capKind,
                pos,

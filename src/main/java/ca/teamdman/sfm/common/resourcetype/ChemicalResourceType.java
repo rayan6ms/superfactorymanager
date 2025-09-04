@@ -1,22 +1,22 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
 import mekanism.common.capabilities.Capabilities;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.neoforged.neoforge.capabilities.BlockCapability;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
 public class ChemicalResourceType extends RegistryBackedResourceType<ChemicalStack, Chemical, IChemicalHandler> {
-    public static final BlockCapability<IChemicalHandler, @Nullable Direction> CAP = Capabilities.CHEMICAL.block();
+    public static final SFMBlockCapabilityKind<IChemicalHandler> CAP = new SFMBlockCapabilityKind<>(
+            Capabilities.CHEMICAL.block()
+    );
 
     public ChemicalResourceType() {
         super(CAP);

@@ -7,7 +7,7 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 public class ForgeEnergyResourceType extends IntegerResourceType<IEnergyStorage> {
     public ForgeEnergyResourceType() {
         super(
-                SFMWellKnownCapabilities.ENERGY.capability(),
+                SFMWellKnownCapabilities.ENERGY,
                 SFMResourceLocation.fromNamespaceAndPath("forge", "energy")
         );
     }

@@ -1,5 +1,7 @@
 package ca.teamdman.sfm.common.net;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
+import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
@@ -70,8 +72,14 @@ public record ServerboundContainerExportsInspectionRequestPacket(
             @Nullable Direction direction
     ) {
         StringBuilder sb = new StringBuilder();
-        var cap = level.getCapability(resourceType.CAPABILITY_KIND, pos, direction);
-        if (cap != null) {
+        SFMBlockCapabilityResult<CAP> capResult = SFMCapabilityDiscovery.discoverCapabilityFromLevel(
+                level,
+                resourceType.CAPABILITY_KIND,
+                pos,
+                direction
+        );
+        if (capResult.isPresent()) {
+            CAP cap = capResult.unwrap();
             int slots = resourceType.getSlots(cap);
             Int2ObjectMap<STACK> slotContents = new Int2ObjectArrayMap<>(slots);
             for (int slot = 0; slot < slots; slot++) {
@@ -181,13 +189,15 @@ public record ServerboundContainerExportsInspectionRequestPacket(
                         String payload = buildInspectionResults(blockEntity.getLevel(), blockEntity.getBlockPos());
                         var player = context.sender();
 
-                        SFMPackets.sendToPlayer(() -> player, new ClientboundContainerExportsInspectionResultsPacket(
-                                msg.windowId,
-                                SFMPacketDaddy.truncate(
-                                        payload,
-                                        ClientboundContainerExportsInspectionResultsPacket.MAX_RESULTS_LENGTH
+                        SFMPackets.sendToPlayer(
+                                () -> player, new ClientboundContainerExportsInspectionResultsPacket(
+                                        msg.windowId,
+                                        SFMPacketDaddy.truncate(
+                                                payload,
+                                                ClientboundContainerExportsInspectionResultsPacket.MAX_RESULTS_LENGTH
+                                        )
                                 )
-                        ));
+                        );
                     }
             );
         }
