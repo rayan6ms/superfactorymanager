@@ -1,7 +1,6 @@
 package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.common.util.SFMDirections;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -14,7 +13,6 @@ import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider;
 import net.neoforged.neoforge.capabilities.RegisterCapabilitiesEvent;
-import net.neoforged.neoforge.common.extensions.ILevelExtension;
 import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -109,18 +107,4 @@ public class SFMBlockCapabilities {
         };
     }
 
-    public static boolean hasAnyCapabilityAnyDirection(ILevelExtension level, BlockPos pos) {
-        return SFMResourceTypes.getCapabilities().anyMatch(cap -> {
-            for (Direction direction : SFMDirections.DIRECTIONS_WITH_NULL) {
-                if (level.getCapability(cap, pos, direction) != null) {
-                    return true;
-                }
-            }
-            return false;
-        });
-    }
-
-    public static boolean hasAnyCapability(ILevelExtension level, BlockPos pos, @Nullable Direction direction) {
-        return SFMResourceTypes.getCapabilities().anyMatch(cap -> level.getCapability(cap, pos, direction) != null);
-    }
 }

@@ -19,6 +19,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
+
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -69,7 +70,7 @@ public record ServerboundContainerExportsInspectionRequestPacket(
             @Nullable Direction direction
     ) {
         StringBuilder sb = new StringBuilder();
-        var cap = level.getCapability(resourceType.CAPABILITY_KIND, pos, direction);
+        var cap = level.getCapability(resourceType.CAPABILITY_KIND.capabilityKind(), pos, direction);
         if (cap != null) {
             int slots = resourceType.getSlots(cap);
             Int2ObjectMap<STACK> slotContents = new Int2ObjectArrayMap<>(slots);

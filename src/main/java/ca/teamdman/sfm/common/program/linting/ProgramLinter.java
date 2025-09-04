@@ -3,10 +3,10 @@ package ca.teamdman.sfm.common.program.linting;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
+import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.program.ProgramContext;
-import ca.teamdman.sfm.common.registry.SFMBlockCapabilities;
 import ca.teamdman.sfml.ast.IOStatement;
 import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.ast.ResourceQuantity;
@@ -103,10 +103,10 @@ public class ProgramLinter {
                 .getOrRegisterNetworkFromManagerPosition(manager)
                 .ifPresent(network -> labels.removeIf((label, pos) -> !network.isAdjacentToCable(pos)));
 
-        // remove labels with no viable capability provider
+        // remove labels with no viable capabilityKind provider
         var level = manager.getLevel();
         if (level != null) {
-            labels.removeIf((label, pos) -> !SFMBlockCapabilities.hasAnyCapabilityAnyDirection(level, pos));
+            labels.removeIf((label, pos) -> !SFMCapabilityDiscovery.hasAnyCapabilityAnyDirection(level, pos));
         }
         // save new labels
         labels.save(disk);
@@ -342,7 +342,7 @@ public class ProgramLinter {
                                 )
                         ));
                     }
-                    var viable = SFMBlockCapabilities.hasAnyCapabilityAnyDirection(level, pos);
+                    var viable = SFMCapabilityDiscovery.hasAnyCapabilityAnyDirection(level, pos);
                     if (!viable && adjacent) {
                         warnings.add(PROGRAM_WARNING_CONNECTED_BUT_NOT_VIABLE_LABEL.get(
                                 label,

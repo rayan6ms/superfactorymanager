@@ -38,7 +38,7 @@ public class SFMGameTestHelper extends GameTestHelper {
             @Nullable Direction direction
     ) {
         var found = getLevel()
-                .getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capability(), absolutePos(pos), direction);
+                .getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capabilityKind(), absolutePos(pos), direction);
         SFMGameTestMethodHelpers.assertTrue(found != null, "No fluid handler found at " + pos);
         return found;
     }
@@ -49,7 +49,7 @@ public class SFMGameTestHelper extends GameTestHelper {
             @Nullable Direction direction
     ) {
         var found = getLevel()
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capability(), absolutePos(pos), direction);
+                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind(), absolutePos(pos), direction);
         SFMGameTestMethodHelpers.assertTrue(found != null, "No item handler found at " + pos);
         return found;
     }

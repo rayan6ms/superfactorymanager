@@ -4,21 +4,24 @@ import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.LevelCapabilityCache;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.logging.TranslatableLogger;
+import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
+import ca.teamdman.sfm.common.util.SFMDirections;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.neoforged.neoforge.capabilities.BlockCapability;
-import net.neoforged.neoforge.capabilities.BlockCapabilityCache;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.neoforge.common.extensions.ILevelExtension;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class SFMCapabilityDiscovery {
     @MCVersionDependentBehaviour
-    public static <CAP> @Nullable CAP getCapability(
+    public static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromNetwork(
             CableNetwork cableNetwork,
-            BlockCapability<CAP, @Nullable Direction> capKind,
+            SFMBlockCapabilityKind<CAP> capKind,
             @NotStored BlockPos pos,
             @Nullable Direction direction,
             TranslatableLogger logger
@@ -26,8 +29,8 @@ public class SFMCapabilityDiscovery {
         LevelCapabilityCache levelCapabilityCache = cableNetwork.getLevelCapabilityCache();
         // we assume that if there is a cache entry that it is adjacent to a cable
 
-        // It is a precondition to enter the cache that the capability is adjacent to a cable
-        @Nullable CAP cached = discoverCapabilityFromCache(
+        // It is a precondition to enter the cache that the capabilityKind is adjacent to a cable
+        SFMBlockCapabilityResult<CAP> cached = discoverCapabilityFromCache(
                 capKind,
                 pos,
                 direction,
@@ -42,14 +45,61 @@ public class SFMCapabilityDiscovery {
         // we must only proceed here if there is an adjacent cable from this network
         if (!cableNetwork.isAdjacentToCable(pos)) {
             logger.warn(x -> x.accept(LocalizationKeys.LOGS_MISSING_ADJACENT_CABLE.get(pos)));
-            return null;
+            return SFMBlockCapabilityResult.empty();
         }
 
-        return discoverCapabilityFromLevel(cableNetwork.getLevel(), capKind, pos, direction, logger, levelCapabilityCache);
+        if (!(cableNetwork.getLevel() instanceof ServerLevel serverLevel)) {
+            return SFMBlockCapabilityResult.empty();
+        }
+        SFMBlockCapabilityResult<CAP> cap = discoverCapabilityFromLevel(
+                serverLevel,
+                capKind,
+                pos,
+                direction
+        );
+        if (cap.isPresent()) {
+            serverLevel.registerCapabilityListener(
+                    pos.immutable(),
+                    ()-> {
+                        levelCapabilityCache.remove(pos, capKind, direction);
+                        return false; // remove this invalidation listener; no longer valid
+                    }
+            );
+            levelCapabilityCache.putCapability(pos, capKind, direction, cap);
+        } else {
+            logger.warn(x -> x.accept(LocalizationKeys.LOGS_MISSING_CAPABILITY_PROVIDER.get(
+                    pos,
+                    capKind.getName(),
+                    direction
+            )));
+        }
+        return cap;
     }
 
-    private static <CAP> @Nullable CAP discoverCapabilityFromCache(
-            BlockCapability<CAP, @Nullable Direction> capKind,
+    public static <CAP> @NotNull SFMBlockCapabilityResult<CAP> getCapabilityFromProvider(
+            SFMBlockCapabilityKind<CAP> capKind,
+            BlockEntity capabilityProvider,
+            @Nullable Direction direction
+    ) {
+        Level level = capabilityProvider.getLevel();
+        assert level != null;
+        CAP capability = level.getCapability(capKind.capabilityKind(), capabilityProvider.getBlockPos(), direction);
+        return new SFMBlockCapabilityResult<>(capability);
+    }
+
+    public static boolean hasAnyCapabilityAnyDirection(ILevelExtension level, BlockPos pos) {
+        return SFMResourceTypes.getCapabilities().anyMatch(cap -> {
+            for (Direction direction : SFMDirections.DIRECTIONS_WITH_NULL) {
+                if (discoverCapabilityFromLevel(level, cap, pos, direction).isPresent()) {
+                    return true;
+                }
+            }
+            return false;
+        });
+    }
+
+    private static <CAP> @Nullable SFMBlockCapabilityResult<CAP> discoverCapabilityFromCache(
+            SFMBlockCapabilityKind<CAP> capKind,
             @NotStored BlockPos pos,
             @Nullable Direction direction,
             TranslatableLogger logger,
@@ -57,76 +107,45 @@ public class SFMCapabilityDiscovery {
     ) {
         var found = levelCapabilityCache.getCapability(pos, capKind, direction);
         if (found != null) {
-            CAP cap = found.getCapability();
-            if (cap != null) {
-                // CACHE HIT
+            // CACHE HIT
+            if (found.isPresent()) {
                 logger.trace(x -> x.accept(LocalizationKeys.LOG_CAPABILITY_CACHE_HIT.get(
                         pos,
-                        capKind.name(),
+                        capKind.getName(),
                         direction
                 )));
-                return cap;
+                return found;
             } else {
                 // CACHE HIT BUT STALE
-                logger.trace(x -> x.accept(LocalizationKeys.LOG_CAPABILITY_CACHE_HIT_INVALID.get(
+                logger.error(x -> x.accept(LocalizationKeys.LOG_CAPABILITY_CACHE_HIT_INVALID.get(
                         pos,
-                        capKind.name(),
+                        capKind.getName(),
                         direction
                 )));
             }
         } else {
             // CACHE MISS
-            logger.trace(x -> x.accept(LocalizationKeys.LOG_CAPABILITY_CACHE_MISS.get(pos, capKind.name(), direction)));
+            logger.trace(x -> x.accept(LocalizationKeys.LOG_CAPABILITY_CACHE_MISS.get(
+                    pos,
+                    capKind.getName(),
+                    direction
+            )));
         }
         return null;
     }
 
-    private static <CAP> @Nullable CAP discoverCapabilityFromLevel(
-            Level level,
-            BlockCapability<CAP, @Nullable Direction> capKind,
+    private static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromLevel(
+            ILevelExtension level,
+            SFMBlockCapabilityKind<CAP> capKind,
             @NotStored BlockPos pos,
-            @Nullable Direction direction,
-            TranslatableLogger logger,
-            LevelCapabilityCache levelCapabilityCache
+            @Nullable Direction direction
     ) {
-        var cap = level.getCapability(capKind, pos, direction);
+        var cap = level.getCapability(capKind.capabilityKind(), pos, direction);
         if (cap != null) {
-            if (!(level instanceof ServerLevel serverLevel)) {
-                return null;
-            }
-            var found = BlockCapabilityCache.<CAP, @Nullable Direction>create(
-                    capKind,
-                    serverLevel,
-                    pos,
-                    direction,
-                    () -> true,
-                    () ->  levelCapabilityCache.remove(pos, capKind, direction)
-            );
-            levelCapabilityCache.putCapability(pos, capKind, direction, found);
-            return cap;
+            SFMBlockCapabilityResult<CAP> ourCap = new SFMBlockCapabilityResult<>(cap);
+            return ourCap;
         } else {
-            logger.warn(x -> x.accept(LocalizationKeys.LOGS_EMPTY_CAPABILITY.get(pos, capKind.name(), direction)));
-            return null;
+            return SFMBlockCapabilityResult.empty();
         }
-
-//        // old
-//        var capabilityProvider = SFMCapabilityProviderMappers.discoverCapabilityProvider(level, pos.immutable());
-//        if (capabilityProvider != null) {
-//            var cap = capabilityProvider.getCapability(capKind, direction);
-//            if (cap.isPresent()) {
-//                levelCapabilityCache.putCapability(pos, capKind, direction, cap);
-//                cap.addListener(x -> levelCapabilityCache.remove(pos, capKind, direction));
-//            } else {
-//                logger.warn(x -> x.accept(LocalizationKeys.LOGS_EMPTY_CAPABILITY.get(pos, capKind.getName(), direction)));
-//            }
-//            return cap;
-//        } else {
-//            logger.warn(x -> x.accept(LocalizationKeys.LOGS_MISSING_CAPABILITY_PROVIDER.get(
-//                    pos,
-//                    capKind.getName(),
-//                    direction
-//            )));
-//            return LazyOptional.empty();
-//        }
     }
 }

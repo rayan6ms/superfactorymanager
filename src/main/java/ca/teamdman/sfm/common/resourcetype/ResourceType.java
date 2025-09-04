@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.CapabilityConsumer;
@@ -11,20 +12,16 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.capabilities.BlockCapability;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiConsumer;
 import java.util.stream.Stream;
 
 public abstract class ResourceType<STACK, ITEM, CAP> {
-    public final BlockCapability<CAP, @Nullable Direction> CAPABILITY_KIND;
+    public final SFMBlockCapabilityKind<CAP> CAPABILITY_KIND;
 
-    public ResourceType(BlockCapability<CAP, @Nullable Direction> CAPABILITY_KIND) {
+    public ResourceType(SFMBlockCapabilityKind<CAP> CAPABILITY_KIND) {
         this.CAPABILITY_KIND = CAPABILITY_KIND;
     }
 
@@ -140,9 +137,10 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             BiConsumer<Direction, CAP> consumer
     ) {
         for (Direction dir : directions) {
-            @Nullable CAP maybeCap = programContext.getNetwork()
-                    .getCapability(CAPABILITY_KIND, pos, dir, programContext.getLogger());
-            if (maybeCap != null) {
+            Optional<CAP> maybeCap = programContext.getNetwork()
+                    .getCapability(CAPABILITY_KIND, pos, dir, programContext.getLogger())
+                    .resolve();
+            if (maybeCap.isPresent()) {
                 programContext
                         .getLogger()
                         .debug(x -> x.accept(LocalizationKeys.LOG_RESOURCE_TYPE_GET_CAPABILITIES_CAP_PRESENT.get(
@@ -150,7 +148,8 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
                                 pos,
                                 dir
                         )));
-                consumer.accept(dir, maybeCap);
+                CAP cap = maybeCap.get();
+                consumer.accept(dir, cap);
             } else {
                 // Log error
                 programContext
@@ -212,7 +211,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     }
 
     public String displayAsCapabilityClass() {
-        return CAPABILITY_KIND.name().toString();
+        return CAPABILITY_KIND.getName();
     }
 
     protected abstract STACK setCount(

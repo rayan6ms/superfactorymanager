@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.resourcetype.FluidResourceType;
 import ca.teamdman.sfm.common.resourcetype.ForgeEnergyResourceType;
 import ca.teamdman.sfm.common.resourcetype.ItemResourceType;
@@ -8,7 +9,6 @@ import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.minecraft.core.Direction;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -16,7 +16,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.capabilities.BlockCapability;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -69,7 +68,7 @@ public class SFMResourceTypes {
         );
     }
 
-    public static Stream<BlockCapability<?, @Nullable Direction>> getCapabilities() {
+    public static Stream<SFMBlockCapabilityKind<?>> getCapabilities() {
         return REGISTERER.getEntries().stream().map(Supplier::get).map(resourceType -> resourceType.CAPABILITY_KIND);
     }
 

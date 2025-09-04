@@ -56,7 +56,7 @@ public class ThermalFurnaceArrayGameTest extends SFMGameTestDefinition {
         helper.setBlock(powerPos, MekanismBlocks.ULTIMATE_ENERGY_CUBE.getBlock());
         helper
                 .getBlockEntity(powerPos)
-                .getCapability(SFMWellKnownCapabilities.ENERGY.capability(), Direction.UP)
+                .getCapability(SFMWellKnownCapabilities.ENERGY.capabilityKind(), Direction.UP)
                 .ifPresent(energy -> energy.receiveEnergy(Integer.MAX_VALUE, false));
 
         // set up furnaces

@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype.exclude;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import mekanism.api.Action;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
@@ -7,7 +8,6 @@ import mekanism.api.chemical.gas.IGasHandler;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
-import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.common.capabilities.CapabilityManager;
 import net.neoforged.neoforge.common.capabilities.CapabilityToken;
 import org.apache.commons.lang3.NotImplementedException;
@@ -15,8 +15,11 @@ import org.apache.commons.lang3.NotImplementedException;
 import java.util.stream.Stream;
 
 public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, IGasHandler> {
-    public static final Capability<IGasHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
-    });
+    public static final SFMBlockCapabilityKind<IGasHandler> CAP = new SFMBlockCapabilityKind<>(
+            CapabilityManager.get(new CapabilityToken<>() {
+            })
+    );
+
 
     public GasResourceType() {
         super(CAP);
@@ -28,7 +31,10 @@ public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, I
     }
 
     @Override
-    public GasStack getStackInSlot(IGasHandler iGasHandler, int slot) {
+    public GasStack getStackInSlot(
+            IGasHandler iGasHandler,
+            int slot
+    ) {
         return iGasHandler.getChemicalInTank(slot);
     }
 
@@ -38,7 +44,12 @@ public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, I
     }
 
     @Override
-    public GasStack extract(IGasHandler handler, int slot, long amount, boolean simulate) {
+    public GasStack extract(
+            IGasHandler handler,
+            int slot,
+            long amount,
+            boolean simulate
+    ) {
         return handler.extractChemical(slot, amount, simulate ? Action.SIMULATE : Action.EXECUTE);
     }
 
@@ -53,12 +64,20 @@ public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, I
     }
 
     @Override
-    public long getMaxStackSizeForSlot(IGasHandler handler, int slot) {
+    public long getMaxStackSizeForSlot(
+            IGasHandler handler,
+            int slot
+    ) {
         return handler.getTankCapacity(slot);
     }
 
     @Override
-    public GasStack insert(IGasHandler handler, int slot, GasStack gasStack, boolean simulate) {
+    public GasStack insert(
+            IGasHandler handler,
+            int slot,
+            GasStack gasStack,
+            boolean simulate
+    ) {
         return handler.insertChemical(slot, gasStack, simulate ? Action.SIMULATE : Action.EXECUTE);
     }
 
@@ -100,7 +119,10 @@ public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, I
     }
 
     @Override
-    protected GasStack setCount(GasStack gasStack, long amount) {
+    protected GasStack setCount(
+            GasStack gasStack,
+            long amount
+    ) {
         gasStack.setAmount(amount);
         return gasStack;
     }

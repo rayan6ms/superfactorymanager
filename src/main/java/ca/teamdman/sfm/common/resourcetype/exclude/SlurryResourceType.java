@@ -1,13 +1,12 @@
 package ca.teamdman.sfm.common.resourcetype.exclude;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import mekanism.api.Action;
-import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.slurry.ISlurryHandler;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.common.capabilities.CapabilityManager;
 import net.neoforged.neoforge.common.capabilities.CapabilityToken;
 import org.apache.commons.lang3.NotImplementedException;
@@ -15,8 +14,10 @@ import org.apache.commons.lang3.NotImplementedException;
 import java.util.stream.Stream;
 
 public class SlurryResourceType extends RegistryBackedResourceType<SlurryStack, Slurry, ISlurryHandler> {
-    public static final Capability<ISlurryHandler> CAP = CapabilityManager.get(new CapabilityToken<>() {
-    });
+    public static final SFMBlockCapabilityKind<ISlurryHandler> CAP = new SFMBlockCapabilityKind<>(
+            CapabilityManager.get(new CapabilityToken<>() {
+            })
+    );
 
     public SlurryResourceType() {
         super(CAP);

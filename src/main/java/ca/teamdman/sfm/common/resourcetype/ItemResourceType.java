@@ -16,7 +16,7 @@ import java.util.stream.Stream;
 
 public class ItemResourceType extends RegistryBackedResourceType<ItemStack, Item, IItemHandler> {
     public ItemResourceType() {
-        super(SFMWellKnownCapabilities.ITEM_HANDLER.capability());
+        super(SFMWellKnownCapabilities.ITEM_HANDLER);
     }
 
     @Override

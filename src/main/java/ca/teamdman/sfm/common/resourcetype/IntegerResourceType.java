@@ -1,15 +1,13 @@
 package ca.teamdman.sfm.common.resourcetype;
 
-import net.minecraft.core.Direction;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import net.minecraft.resources.ResourceLocation;
-import net.neoforged.neoforge.capabilities.BlockCapability;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
 public abstract class IntegerResourceType<CAP> extends ScalarResourceType<Integer, CAP> {
     public IntegerResourceType(
-            BlockCapability<CAP, @Nullable Direction> capability,
+            SFMBlockCapabilityKind<CAP> capability,
             ResourceLocation registryKey
     ) {
         super(capability, registryKey, Integer.class);
