@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.Stored;
@@ -17,7 +18,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.neoforged.neoforge.capabilities.Capabilities;
 
 public class BatteryBlock extends Block implements EntityBlock {
     public static final IntegerProperty LEVEL = IntegerProperty.create("level", 0, 10);
@@ -49,7 +49,7 @@ public class BatteryBlock extends Block implements EntityBlock {
             InteractionHand pHand,
             BlockHitResult pHit
     ) {
-        var cap = pLevel.getCapability(Capabilities.EnergyStorage.BLOCK, pPos, pHit.getDirection());
+        var cap = pLevel.getCapability(SFMWellKnownCapabilities.ENERGY.capability(), pPos, pHit.getDirection());
         if (cap != null) {
             if (pPlayer.isShiftKeyDown()) {
                 cap.extractEnergy(1000, false);
