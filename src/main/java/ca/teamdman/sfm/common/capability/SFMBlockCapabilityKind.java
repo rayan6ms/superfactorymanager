@@ -6,7 +6,10 @@ import net.neoforged.neoforge.capabilities.BlockCapability;
 import org.jetbrains.annotations.Nullable;
 
 @MCVersionDependentBehaviour
-public record SFMBlockCapabilityWrapper<CAP>(
-        BlockCapability<CAP, @Nullable Direction> capability
+public record SFMBlockCapabilityKind<CAP>(
+        BlockCapability<CAP, @Nullable Direction> capabilityKind
 ) {
+    public String getName() {
+        return capabilityKind.name().toString();
+    }
 }

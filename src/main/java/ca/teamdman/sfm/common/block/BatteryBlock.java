@@ -49,7 +49,7 @@ public class BatteryBlock extends Block implements EntityBlock {
             InteractionHand pHand,
             BlockHitResult pHit
     ) {
-        var cap = pLevel.getCapability(SFMWellKnownCapabilities.ENERGY.capability(), pPos, pHit.getDirection());
+        var cap = pLevel.getCapability(SFMWellKnownCapabilities.ENERGY.capabilityKind(), pPos, pHit.getDirection());
         if (cap != null) {
             if (pPlayer.isShiftKeyDown()) {
                 cap.extractEnergy(1000, false);
