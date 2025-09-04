@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.gametest.tests.compat.mekanism;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
@@ -11,7 +12,6 @@ import mekanism.common.registries.MekanismBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 
 import java.util.ArrayList;
@@ -94,7 +94,7 @@ public class MekManyLavaCauldronsGameTest extends SFMGameTestDefinition {
             int found = destBlocks
                     .stream()
                     .map(helper::getBlockEntity)
-                    .map(be -> be.getCapability(ForgeCapabilities.FLUID_HANDLER))
+                    .map(be -> be.getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capability()))
                     .map(x -> x.orElse(null))
                     .peek(Objects::requireNonNull)
                     .map(x -> x.getFluidInTank(0))

@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.blockentity;
 
 import ca.teamdman.sfm.common.block.WaterTankBlock;
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.watertanknetwork.WaterNetworkManager;
 import net.minecraft.core.BlockPos;
@@ -9,7 +10,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -66,7 +66,7 @@ public class WaterTankBlockEntity extends BlockEntity {
             @NotNull Capability<T> cap,
             @Nullable Direction side
     ) {
-        if (cap == ForgeCapabilities.FLUID_HANDLER) {
+        if (cap == SFMWellKnownCapabilities.FLUID_HANDLER.capability()) {
             return TANK_CAPABILITY.cast();
         } else {
             return super.getCapability(cap, side);

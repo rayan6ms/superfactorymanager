@@ -9,7 +9,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
@@ -39,7 +38,7 @@ public class CauldronCapabilityProviderMapper implements CapabilityProviderMappe
 
         @Override
         public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-            if (cap == ForgeCapabilities.FLUID_HANDLER) {
+            if (cap == SFMWellKnownCapabilities.FLUID_HANDLER.capability()) {
                 return fluidHandlerLazyOptional.cast();
             }
             return LazyOptional.empty();
