@@ -17,10 +17,12 @@ public record SFMRegistryWrapper<V>(
         @MCVersionDependentBehaviour
         IForgeRegistry<V> registry
 ) implements Iterable<V> {
+    @MCVersionDependentBehaviour
     public @Nullable V getValue(ResourceLocation resourceTypeId) {
         return registry.getValue(resourceTypeId);
     }
 
+    @MCVersionDependentBehaviour
     public @NotNull Set<ResourceLocation> getKeys() {
         return registry.getKeys();
     }
@@ -37,6 +39,7 @@ public record SFMRegistryWrapper<V>(
         return registry.getResourceKey(value);
     }
 
+    @MCVersionDependentBehaviour
     public @NotNull Set<Map.Entry<ResourceKey<V>, V>> getEntries() {
         return registry.getEntries();
     }
