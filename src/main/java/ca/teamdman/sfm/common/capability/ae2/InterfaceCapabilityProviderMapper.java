@@ -10,7 +10,7 @@ import appeng.api.storage.MEStorage;
 import appeng.api.storage.StorageHelper;
 import appeng.blockentity.misc.InterfaceBlockEntity;
 import appeng.capabilities.Capabilities;
-import ca.teamdman.sfm.common.capability.CapabilityProviderMapper;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProviderOld;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
@@ -31,7 +31,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
-public class InterfaceCapabilityProviderMapper implements CapabilityProviderMapper {
+public class InterfaceCapabilityProviderMapper implements SFMBlockCapabilityProviderOld {
     @Override
     public @Nullable ICapabilityProvider getProviderFor(LevelAccessor level, @Stored BlockPos pos) {
         var be = level.getBlockEntity(pos);

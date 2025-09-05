@@ -6,6 +6,6 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import org.jetbrains.annotations.Nullable;
 
-public interface CapabilityProviderMapper {
+public interface SFMBlockCapabilityProviderOld {
     @Nullable ICapabilityProvider getProviderFor(LevelAccessor level, @Stored BlockPos pos);
 }
