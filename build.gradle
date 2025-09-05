@@ -3,7 +3,7 @@ plugins {
     id 'eclipse'
     id 'idea'
     id 'maven-publish'
-    id 'net.neoforged.gradle.userdev' version '7.0.145'
+    id 'net.neoforged.gradle.userdev' version '7.0.192'
     id 'antlr'
     id 'application'
 }
@@ -157,7 +157,7 @@ runs {
 
     client_teamy {
 //        https://discord.com/channels/313125603924639766/1232440595738529913/1246122881516048445
-        configure('client')
+        runType 'client'
 
         modSource project.sourceSets.gametest
         // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
@@ -168,13 +168,13 @@ runs {
         // Causes problems with: jbrsdk_jcef-17.0.6-x64-b469
         jvmArguments '-XX:+AllowEnhancedClassRedefinition', '-XX:+IgnoreUnrecognizedVMOptions', '-XX:+AllowRedefinitionToAddDeleteMethods'
 
-        programArguments '--username', 'TeamDman', '--uuid', '83f1df8b-0ba3-4de0-8a26-e51a1fd74318', '--width', '1708', '--height', '960'
+        arguments '--username', 'TeamDman', '--uuid', '83f1df8b-0ba3-4de0-8a26-e51a1fd74318', '--width', '1708', '--height', '960'
     }
 
     server {
         modSource project.sourceSets.gametest
         systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
-        programArgument '--nogui'
+        argument '--nogui'
     }
 
     // This run config launches GameTestServer and runs all registered gametests, then exits.
@@ -191,7 +191,7 @@ runs {
         // workingDirectory project.file('run-data')
 
         // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
-        programArguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
+        arguments.addAll '--mod', project.mod_id, '--all', '--output', file('src/generated/resources/').getAbsolutePath(), '--existing', file('src/main/resources/').getAbsolutePath()
     }
 }
 
@@ -211,6 +211,7 @@ repositories {
     // flatDir {
     //     dir 'libs'
     // }
+    mavenCentral()
 
     maven {
         name 'jei'
@@ -295,6 +296,11 @@ dependencies {
 //    implementation "mekanism:Mekanism:1.21.1-10.7.4.60:api"
 //
 //    implementation "curse.maven:spark-361579:5759671" // spark-1.10.109-neoforge.jar
+//
+//
+//
+//    implementation 'org.appliedenergistics:appliedenergistics2:19.2.15'
+//    compileOnly "org.appliedenergistics:appliedenergistics2:19.2.15:api"
 }
 
 // This block of code expands all declared replace properties in the specified resource targets.

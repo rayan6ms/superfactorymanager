@@ -15,7 +15,7 @@ import java.util.WeakHashMap;
 import java.util.stream.Stream;
 
 // TODO: consider replacing with ContainerOpenersCounter, see BarrelBlockEntity
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, modid = SFM.MOD_ID)
+@EventBusSubscriber(modid = SFM.MOD_ID)
 public class OpenContainerTracker {
     private static final Map<BlockPos, Map<ServerPlayer, ManagerContainerMenu>> OPEN_CONTAINERS = new WeakHashMap<>();
 

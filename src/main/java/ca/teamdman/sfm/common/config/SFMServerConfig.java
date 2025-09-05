@@ -8,7 +8,7 @@ import net.neoforged.neoforge.common.ModConfigSpec;
 
 import java.util.List;
 
-@EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = SFM.MOD_ID)
 public class SFMServerConfig {
     public final ModConfigSpec.BooleanValue disableProgramExecution;
     public final ModConfigSpec.BooleanValue logResourceLossToConsole;

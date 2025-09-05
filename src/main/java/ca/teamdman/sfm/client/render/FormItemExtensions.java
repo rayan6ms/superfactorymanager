@@ -10,7 +10,7 @@ import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.extensions.common.IClientItemExtensions;
 import net.neoforged.neoforge.client.extensions.common.RegisterClientExtensionsEvent;
 
-@EventBusSubscriber(modid= SFM.MOD_ID, bus= EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
+@EventBusSubscriber(modid= SFM.MOD_ID, value = Dist.CLIENT)
 public class FormItemExtensions implements IClientItemExtensions {
     private final BlockEntityWithoutLevelRenderer RENDERER = new FormItemRenderer();
 

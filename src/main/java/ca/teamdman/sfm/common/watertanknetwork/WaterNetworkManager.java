@@ -22,7 +22,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, modid = SFM.MOD_ID)
+@EventBusSubscriber(modid = SFM.MOD_ID)
 public class WaterNetworkManager {
     private static final Map<Level, Long2ObjectMap<WaterNetwork>> NETWORKS = new Object2ObjectOpenHashMap<>();
 

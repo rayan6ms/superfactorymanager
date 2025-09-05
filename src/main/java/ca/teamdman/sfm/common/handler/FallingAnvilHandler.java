@@ -29,7 +29,7 @@ import net.neoforged.neoforge.event.entity.EntityLeaveLevelEvent;
 import java.util.ArrayList;
 import java.util.List;
 
-@EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
+@EventBusSubscriber(modid = SFM.MOD_ID)
 public class FallingAnvilHandler {
     @SubscribeEvent
     public static void onLeave(EntityLeaveLevelEvent event) {

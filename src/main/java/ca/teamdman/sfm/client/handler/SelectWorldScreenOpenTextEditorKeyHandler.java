@@ -17,7 +17,7 @@ import net.neoforged.neoforge.client.event.InputEvent;
 import java.util.Date;
 import java.util.stream.Collectors;
 
-@EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@EventBusSubscriber(modid = SFM.MOD_ID, value = Dist.CLIENT)
 public class SelectWorldScreenOpenTextEditorKeyHandler {
     @SubscribeEvent
     public static void onKey(InputEvent.Key event) {

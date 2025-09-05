@@ -24,7 +24,7 @@ import net.neoforged.neoforge.server.command.EnumArgument;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, modid = SFM.MOD_ID)
+@EventBusSubscriber(modid = SFM.MOD_ID)
 public class SFMCommand {
     @SubscribeEvent
     public static void onRegisterCommand(final RegisterCommandsEvent event) {
