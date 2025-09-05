@@ -19,7 +19,7 @@ import java.util.IdentityHashMap;
  * A pool of {@link LimitedOutputSlot} objects to avoid the garbage collector
  */
 @SuppressWarnings("DuplicatedCode")
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.GAME, modid = SFM.MOD_ID)
+@EventBusSubscriber(modid = SFM.MOD_ID)
 public class LimitedOutputSlotObjectPool {
     public static final IdentityHashMap<LimitedOutputSlot<?, ?, ?>, Boolean> LEASED = new IdentityHashMap<>();
     @SuppressWarnings("rawtypes")

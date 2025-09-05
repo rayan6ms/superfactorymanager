@@ -12,7 +12,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ScreenEvent;
 
-@EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value= Dist.CLIENT)
+@EventBusSubscriber(modid = SFM.MOD_ID, value= Dist.CLIENT)
 public class TitleScreenOpenTextEditorOnLaunchHandler {
     public static boolean firstTime = false; // disabled for now lol
 //    public static boolean firstTime = true;

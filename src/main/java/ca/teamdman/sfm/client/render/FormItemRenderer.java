@@ -19,7 +19,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ModelEvent;
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = SFM.MOD_ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = SFM.MOD_ID, value = Dist.CLIENT)
 public class FormItemRenderer extends BlockEntityWithoutLevelRenderer {
 
     private static final ModelResourceLocation BASE_MODEL = ModelResourceLocation.standalone(SFMResourceLocation.fromSFMPath("item/form_base"));

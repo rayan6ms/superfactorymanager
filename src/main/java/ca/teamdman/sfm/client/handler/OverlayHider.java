@@ -8,7 +8,7 @@ import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RenderGuiEvent;
 
-@EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.GAME, value = Dist.CLIENT)
+@EventBusSubscriber(modid = SFM.MOD_ID, value = Dist.CLIENT)
 public class OverlayHider {
     @SubscribeEvent
     public static void onTryOverlay(RenderGuiEvent.Pre event) {

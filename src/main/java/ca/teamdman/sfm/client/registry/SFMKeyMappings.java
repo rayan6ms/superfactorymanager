@@ -19,7 +19,7 @@ import org.lwjgl.glfw.GLFW;
 import java.util.function.Supplier;
 
 
-@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD, modid = SFM.MOD_ID, value = Dist.CLIENT)
+@EventBusSubscriber(modid = SFM.MOD_ID, value = Dist.CLIENT)
 
 public class SFMKeyMappings {
     public static final Lazy<KeyMapping> MORE_INFO_TOOLTIP_KEY = Lazy.of(() -> new KeyMapping(

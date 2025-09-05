@@ -7,7 +7,7 @@ import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.data.loading.DatagenModLoader;
 
 @SuppressWarnings("unused")
-@EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = SFM.MOD_ID)
 public class SFMDatagen {
     @SubscribeEvent
     public static void onGather(GatherDataEvent event) {

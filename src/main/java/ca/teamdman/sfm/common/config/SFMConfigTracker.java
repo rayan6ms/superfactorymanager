@@ -61,7 +61,7 @@ public class SFMConfigTracker {
         return null;
     }
 
-    @EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+    @EventBusSubscriber(modid = SFM.MOD_ID)
     public static class ModConfigEventListeners {
         /**
          * Tracks when configs are loaded
@@ -113,7 +113,7 @@ public class SFMConfigTracker {
         }
     }
 
-    @EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.GAME)
+    @EventBusSubscriber(modid = SFM.MOD_ID)
     public static class GameConfigEventListeners {
         /**
          * Tracks when configs are unloaded

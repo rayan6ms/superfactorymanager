@@ -20,7 +20,7 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.Nullable;
 
-@EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+@EventBusSubscriber(modid = SFM.MOD_ID)
 @MCVersionDependentBehaviour // 1.20.3+
 public class SFMBlockCapabilities {
 
