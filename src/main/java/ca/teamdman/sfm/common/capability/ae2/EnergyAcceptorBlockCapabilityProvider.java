@@ -5,6 +5,7 @@ import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
@@ -18,12 +19,13 @@ import net.neoforged.neoforge.energy.IEnergyStorage;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class EnergyAcceptorCapabilityProviderMapper implements SFMBlockCapabilityProvider<IEnergyStorage> {
+public class EnergyAcceptorBlockCapabilityProvider implements SFMBlockCapabilityProvider<IEnergyStorage> {
     @Override
     public boolean matchesCapabilityKind(SFMBlockCapabilityKind<?> capabilityKind) {
         return SFMWellKnownCapabilities.ENERGY.equals(capabilityKind);
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public SFMBlockCapabilityResult<IEnergyStorage> getCapability(
             SFMBlockCapabilityKind<IEnergyStorage> capabilityKind,
