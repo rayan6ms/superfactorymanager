@@ -35,6 +35,7 @@ public class SFMResourceTypes {
     );
     public static final Registry<ResourceType<?, ?, ?>> REGISTRY = REGISTERER.makeRegistry(
             registryBuilder->{});
+
     public static final Supplier<ResourceType<ItemStack, Item, IItemHandler>> ITEM = REGISTERER.register(
             "item",
             ItemResourceType::new
@@ -64,7 +65,7 @@ public class SFMResourceTypes {
     ) {
         return DEFERRED_TYPES_BY_ID.computeIfAbsent(
                 resourceTypeId,
-                i -> registry().get(resourceTypeId)
+                i -> registry().getValue(resourceTypeId)
         );
     }
 
@@ -77,8 +78,8 @@ public class SFMResourceTypes {
     }
 
     @MCVersionDependentBehaviour
-    public static Registry<ResourceType<?, ?, ?>> registry() {
-        return REGISTRY;
+    public static SFMRegistryWrapper<ResourceType<?, ?, ?>> registry() {
+        return new SFMRegistryWrapper<>(REGISTRY);
     }
 
     /* TODO: add support for new resource types

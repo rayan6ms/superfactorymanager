@@ -1,9 +1,9 @@
 package ca.teamdman.sfm.gametest;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
-import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.util.NotStored;
@@ -40,7 +40,7 @@ public class SFMGameTestHelper extends GameTestHelper {
             @NotStored BlockPos localPos,
             @Nullable Direction direction
     ) {
-        SFMBlockCapabilityResult<CAP> found = SFMCapabilityDiscovery.discoverCapabilityFromLevel(
+        SFMBlockCapabilityResult<CAP> found = SFMBlockCapabilityDiscovery.discoverCapabilityFromLevel(
                 getLevel(),
                 capKind,
                 absolutePos(localPos),
