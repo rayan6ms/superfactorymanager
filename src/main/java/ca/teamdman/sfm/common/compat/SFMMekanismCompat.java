@@ -36,19 +36,19 @@ public class SFMMekanismCompat {
             case FLUID -> SFMResourceTypes.FLUID.get();
             case GAS -> {
                 ResourceLocation id = SFMResourceLocation.fromSFMPath("gas");
-                yield SFMResourceTypes.registry().get(id);
+                yield SFMResourceTypes.registry().getValue(id);
             }
             case INFUSION -> {
                 ResourceLocation id = SFMResourceLocation.fromSFMPath("infusion");
-                yield SFMResourceTypes.registry().get(id);
+                yield SFMResourceTypes.registry().getValue(id);
             }
             case PIGMENT -> {
                 ResourceLocation id = SFMResourceLocation.fromSFMPath("pigment");
-                yield SFMResourceTypes.registry().get(id);
+                yield SFMResourceTypes.registry().getValue(id);
             }
             case SLURRY -> {
                 ResourceLocation id = SFMResourceLocation.fromSFMPath("slurry");
-                yield SFMResourceTypes.registry().get(id);
+                yield SFMResourceTypes.registry().getValue(id);
             }
             default -> null;
         };
