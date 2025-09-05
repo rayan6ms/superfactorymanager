@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.block.shape.ShapeCache;
 import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
-import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.Stored;
@@ -191,6 +191,6 @@ public class FancyCableBlock extends CableBlock implements IFacadableBlock {
             return false;
         }
 
-        return SFMCapabilityDiscovery.hasAnyCapabilityAnyDirection(levelExtension, relative);
+        return SFMBlockCapabilityDiscovery.hasAnyCapabilityAnyDirection(levelExtension, relative);
     }
 }

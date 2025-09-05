@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.capability;
 
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -16,7 +17,8 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CauldronBlockCapabilityProvider implements IBlockCapabilityProvider<IFluidHandler, @Nullable Direction> {
+public class CauldronBlockCapabilityProvider implements @MCVersionDependentBehaviour IBlockCapabilityProvider<IFluidHandler, @Nullable Direction> {
+    @MCVersionDependentBehaviour
     @Override
     public @Nullable IFluidHandler getCapability(
             Level level,
@@ -29,8 +31,9 @@ public class CauldronBlockCapabilityProvider implements IBlockCapabilityProvider
             || state.getBlock() == Blocks.WATER_CAULDRON
             || state.getBlock() == Blocks.LAVA_CAULDRON) {
             return new CauldronFluidHandler(level, pos);
+        } else {
+            return null;
         }
-        return null;
     }
 
     private record CauldronFluidHandler(
@@ -64,12 +67,18 @@ public class CauldronBlockCapabilityProvider implements IBlockCapabilityProvider
         }
 
         @Override
-        public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
+        public boolean isFluidValid(
+                int tank,
+                @NotNull FluidStack stack
+        ) {
             return stack.getFluid() == Fluids.WATER || stack.getFluid() == Fluids.LAVA;
         }
 
         @Override
-        public int fill(FluidStack resource, FluidAction action) {
+        public int fill(
+                FluidStack resource,
+                FluidAction action
+        ) {
             var state = level.getBlockState(pos);
             if (state.getBlock() == Blocks.CAULDRON) { // if empty
                 if (resource.getFluid() == Fluids.WATER) {
@@ -114,7 +123,10 @@ public class CauldronBlockCapabilityProvider implements IBlockCapabilityProvider
         }
 
         @Override
-        public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
+        public @NotNull FluidStack drain(
+                FluidStack resource,
+                FluidAction action
+        ) {
             var state = level.getBlockState(pos);
             if (state.getBlock() instanceof LayeredCauldronBlock) {
                 int waterLevel = state.getValue(LayeredCauldronBlock.LEVEL);
@@ -153,7 +165,10 @@ public class CauldronBlockCapabilityProvider implements IBlockCapabilityProvider
         }
 
         @Override
-        public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
+        public @NotNull FluidStack drain(
+                int maxDrain,
+                FluidAction action
+        ) {
             var state = level.getBlockState(pos);
             if (state.getBlock() instanceof LayeredCauldronBlock) {
                 int waterLevel = state.getValue(LayeredCauldronBlock.LEVEL);
