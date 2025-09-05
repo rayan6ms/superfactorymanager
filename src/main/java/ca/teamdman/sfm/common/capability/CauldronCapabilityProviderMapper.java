@@ -1,47 +1,40 @@
 package ca.teamdman.sfm.common.capability;
 
-import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.LayeredCauldronBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraftforge.common.capabilities.Capability;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
-import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CauldronCapabilityProviderMapper implements CapabilityProviderMapper {
+public class CauldronCapabilityProviderMapper implements SFMBlockCapabilityProvider<IFluidHandler> {
     @Override
-    public @Nullable ICapabilityProvider getProviderFor(LevelAccessor level, @Stored BlockPos pos) {
-        var state = level.getBlockState(pos);
+    public boolean matchesCapabilityKind(SFMBlockCapabilityKind<?> capabilityKind) {
+        return SFMWellKnownCapabilities.FLUID_HANDLER.equals(capabilityKind);
+    }
+
+    @Override
+    public SFMBlockCapabilityResult<IFluidHandler> getCapability(
+            SFMBlockCapabilityKind<IFluidHandler> capabilityKind,
+            LevelAccessor level,
+            BlockPos pos,
+            BlockState state,
+            @Nullable BlockEntity blockEntity,
+            @Nullable Direction direction
+    ) {
         if (state.getBlock() == Blocks.CAULDRON
             || state.getBlock() == Blocks.WATER_CAULDRON
             || state.getBlock() == Blocks.LAVA_CAULDRON) {
-            return new CauldronCapabilityProvider(level, pos);
-        }
-        return null;
-    }
-
-    private static class CauldronCapabilityProvider implements ICapabilityProvider {
-        private final LazyOptional<IFluidHandler> fluidHandlerLazyOptional;
-
-
-        public CauldronCapabilityProvider(LevelAccessor level, BlockPos pos) {
-            this.fluidHandlerLazyOptional = LazyOptional.of(() -> new CauldronFluidHandler(level, pos));
-        }
-
-        @Override
-        public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-            if (cap == SFMWellKnownCapabilities.FLUID_HANDLER.capabilityKind()) {
-                return fluidHandlerLazyOptional.cast();
-            }
-            return LazyOptional.empty();
+            return SFMBlockCapabilityResult.of(new CauldronFluidHandler(level, pos));
+        } else {
+            return SFMBlockCapabilityResult.empty();
         }
     }
 
