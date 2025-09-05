@@ -21,7 +21,7 @@ public class SFMBlockCapabilityProviders {
     public static final ResourceLocation
             REGISTRY_ID = SFMResourceLocation.fromSFMPath("capability_provider_mappers");
 
-//    public static final @Nullable RegistryObject<EnergyAcceptorCapabilityProviderMapper>
+//    public static final @Nullable RegistryObject<EnergyAcceptorBlockCapabilityProvider>
 //            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER;
 
     private static final DeferredRegister<SFMBlockCapabilityProvider<?>>
@@ -37,7 +37,7 @@ public class SFMBlockCapabilityProviders {
 //        if (SFMModCompat.isAE2Loaded()) {
 //            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER = REGISTERER.register(
 //                    "ae2/energy_acceptor",
-//                    EnergyAcceptorCapabilityProviderMapper::new
+//                    EnergyAcceptorBlockCapabilityProvider::new
 //            );
 ////            MAPPERS.register("ae2/interface", InterfaceCapabilityProviderMapper::new);
 //        } else {
