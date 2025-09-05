@@ -30,6 +30,7 @@ public class SFM {
         SFMResourceTypes.register(bus);
         SFMProgramLinters.register(bus);
         SFMBlockEntities.register(bus);
+        SFMBlockCapabilityProviders.register(bus);
         if (SFMEnvironmentUtils.isClient()) {
             SFMTextEditors.register(bus);
             SFMTextEditorActions.register(bus);

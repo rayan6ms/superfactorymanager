@@ -1,59 +1,47 @@
 package ca.teamdman.sfm.common.capability.ae2;
 
 import appeng.blockentity.networking.EnergyAcceptorBlockEntity;
-import ca.teamdman.sfm.common.capability.CapabilityProviderMapper;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProvider;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.LevelAccessor;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.common.util.LazyOptional;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.energy.IEnergyStorage;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class EnergyAcceptorCapabilityProviderMapper implements CapabilityProviderMapper {
+public class EnergyAcceptorCapabilityProviderMapper implements SFMBlockCapabilityProvider<IEnergyStorage> {
     @Override
-    public @Nullable ICapabilityProvider getProviderFor(
-            LevelAccessor level,
-            BlockPos pos
-    ) {
-        if (level.getBlockEntity(pos) instanceof EnergyAcceptorBlockEntity blockEntity) {
-            return new EnergyAcceptorCapabilityProvider(blockEntity);
-        } else {
-            return null;
-        }
+    public boolean matchesCapabilityKind(SFMBlockCapabilityKind<?> capabilityKind) {
+        return SFMWellKnownCapabilities.ENERGY.equals(capabilityKind);
     }
 
-    public static final class EnergyAcceptorCapabilityProvider implements ICapabilityProvider {
-        private final LazyOptional<EnergyAcceptorEnergyStorageWrapper> energy;
-        private final EnergyAcceptorBlockEntity inner;
+    @Override
+    public SFMBlockCapabilityResult<IEnergyStorage> getCapability(
+            SFMBlockCapabilityKind<IEnergyStorage> capabilityKind,
+            Level level,
+            BlockPos pos,
+            BlockState state,
+            @Nullable BlockEntity blockEntity,
+            @Nullable Direction direction
+    ) {
+        if (blockEntity instanceof EnergyAcceptorBlockEntity energyAcceptor) {
+            return SFMBlockCapabilityResult.of(
+                    energyAcceptor.getCapability(SFMWellKnownCapabilities.ENERGY.capabilityKind())
+                            .lazyMap(EnergyAcceptorEnergyStorageWrapper::new)
 
-        public EnergyAcceptorCapabilityProvider(
-                EnergyAcceptorBlockEntity inner
-        ) {
-            this.inner = inner;
-            this.energy = inner.getCapability(SFMWellKnownCapabilities.ENERGY.capabilityKind())
-                    .lazyMap(EnergyAcceptorEnergyStorageWrapper::new);
-        }
-
-        @Override
-        public @NotNull <T> LazyOptional<T> getCapability(
-                @NotNull Capability<T> cap,
-                @Nullable Direction side
-        ) {
-            if (cap == SFMWellKnownCapabilities.ENERGY.capabilityKind()) {
-                return energy.cast();
-            } else {
-                return inner.getCapability(cap, side);
-            }
+            );
+        } else {
+            return SFMBlockCapabilityResult.empty();
         }
     }
 
     public record EnergyAcceptorEnergyStorageWrapper(
             IEnergyStorage inner
-    ) implements IEnergyStorage{
+    ) implements IEnergyStorage {
         @Override
         public int receiveEnergy(
                 int maxReceive,

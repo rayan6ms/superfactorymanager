@@ -6,6 +6,14 @@ NAME "Changelog"
 -- SFM submit new issue:
 -- https://github.com/TeamDman/SuperFactoryManager/issues/new
 
+---- 4.26.0 ----
+-- Reduce code entropy between Minecraft versions
+---- Fixed mixed localization keys: itemGroup.sfm -> item_group.sfm
+---- Standardized capability stuff, before and after 1.20.3 NeoForge rework now much cleaner
+---- Standardized resource location object construction
+-- WIP: AE2 energy acceptor mod compat to fix fe:: not working, fixes #322
+
+
 ---- 4.25.0 ----
 -- Implement `EMPTY SLOTS IN` modifier for OUTPUT to place only into empty destination slots (#365)
 EVERY 20 TICKS DO

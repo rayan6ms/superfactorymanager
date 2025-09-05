@@ -29,8 +29,9 @@ public class CauldronBlockCapabilityProvider implements IBlockCapabilityProvider
             || state.getBlock() == Blocks.WATER_CAULDRON
             || state.getBlock() == Blocks.LAVA_CAULDRON) {
             return new CauldronFluidHandler(level, pos);
+        } else {
+            return null;
         }
-        return null;
     }
 
     private record CauldronFluidHandler(
