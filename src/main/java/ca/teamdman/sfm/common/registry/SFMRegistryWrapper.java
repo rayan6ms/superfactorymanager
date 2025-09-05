@@ -8,7 +8,10 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public record SFMRegistryWrapper<V>(
         @MCVersionDependentBehaviour
@@ -22,10 +25,8 @@ public record SFMRegistryWrapper<V>(
         return registry.keySet();
     }
 
-    public @NotNull Collection<V> getValues() {
-        ArrayList<V> rtn = new ArrayList<>(registry.size());
-        registry.forEach(rtn::add);
-        return rtn;
+    public @NotNull Iterable<V> getValues() {
+        return registry;
     }
 
     public @Nullable ResourceLocation getKey(V value) {
