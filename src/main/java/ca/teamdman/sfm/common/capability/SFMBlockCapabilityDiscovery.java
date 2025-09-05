@@ -1,26 +1,44 @@
 package ca.teamdman.sfm.common.capability;
 
 import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
-import ca.teamdman.sfm.common.cablenetwork.LevelCapabilityCache;
+import ca.teamdman.sfm.common.cablenetwork.SFMBlockCapabilityCacheForLevel;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.logging.TranslatableLogger;
-import ca.teamdman.sfm.common.registry.SFMCapabilityProviderMappers;
+import ca.teamdman.sfm.common.program.LimitedInputSlot;
+import ca.teamdman.sfm.common.program.LimitedOutputSlot;
+import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMDirections;
+import ca.teamdman.sfml.ast.OutputStatement;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.LevelAccessor;
-import net.neoforged.neoforge.common.capabilities.Capability;
-import net.neoforged.neoforge.common.capabilities.ICapabilityProvider;
-import net.neoforged.neoforge.common.util.LazyOptional;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class SFMCapabilityDiscovery {
-    @MCVersionDependentBehaviour
+/// When SFM is moving items
+///
+/// ```
+/// INPUT item::, fluid:: FROM a
+/// OUTPUT item::, fluid:: TO b
+/// ```
+///
+/// the {@link SFMResourceTypes} being moved are each tied to a {@link SFMBlockCapabilityKind}.
+/// See {@link OutputStatement#moveTo(ProgramContext, LimitedInputSlot, LimitedOutputSlot)} for details.
+///
+/// This class helps keep related capability discovery logic in one place and out of the {@link CableNetwork}.
+///
+/// The methods by which capabilities are retrieved change in Minecraft 1.20.3.
+/// To discover the right capability for a given block position, we use {@link SFMBlockCapabilityProviderCache} to
+/// iterate over the appropriate {@link SFMBlockCapabilityProvider} to find a {@link SFMBlockCapabilityResult}.
+///
+/// The discovery results from {@link CableNetwork#getCapability(SFMBlockCapabilityKind, BlockPos, Direction, TranslatableLogger)}
+/// will be cached in the {@link CableNetwork#getLevelCapabilityCache()}
+/// so the {@link SFMBlockCapabilityProviderCache} can focus on its job.
+public class SFMBlockCapabilityDiscovery {
     public static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromNetwork(
             CableNetwork cableNetwork,
             SFMBlockCapabilityKind<CAP> capKind,
@@ -28,7 +46,7 @@ public class SFMCapabilityDiscovery {
             @Nullable Direction direction,
             TranslatableLogger logger
     ) {
-        LevelCapabilityCache levelCapabilityCache = cableNetwork.getLevelCapabilityCache();
+        SFMBlockCapabilityCacheForLevel levelCapabilityCache = cableNetwork.getLevelCapabilityCache();
 
         // It is a precondition to enter the cache that the capability is adjacent to a cable
         SFMBlockCapabilityResult<CAP> cached = discoverCapabilityFromCache(
@@ -59,8 +77,9 @@ public class SFMCapabilityDiscovery {
                 direction
         );
         if (cap.isPresent()) {
-            cap.addListener(x -> levelCapabilityCache.remove(pos, capKind, direction));
+            // Track in cache and add hook for invalidation
             levelCapabilityCache.putCapability(pos, capKind, direction, cap);
+            cap.addListener(x -> levelCapabilityCache.remove(pos, capKind, direction));
         } else {
             logger.warn(x -> x.accept(LocalizationKeys.LOGS_MISSING_CAPABILITY_PROVIDER.get(
                     pos,
@@ -69,17 +88,6 @@ public class SFMCapabilityDiscovery {
             )));
         }
         return cap;
-    }
-
-    private static @NotNull <CAP> SFMBlockCapabilityResult<CAP> discoverCapabilityFromCapabilityProvider(
-            SFMBlockCapabilityKind<CAP> capKind,
-            @Nullable ICapabilityProvider capabilityProvider,
-            @Nullable Direction direction
-    ) {
-        if (capabilityProvider == null) {
-            return SFMBlockCapabilityResult.empty();
-        }
-        return new SFMBlockCapabilityResult<>(capabilityProvider.getCapability(capKind.capabilityKind(), direction));
     }
 
     public static boolean hasAnyCapabilityAnyDirection(
@@ -96,18 +104,21 @@ public class SFMCapabilityDiscovery {
         });
     }
 
+    @MCVersionDependentBehaviour
     public static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromLevel(
             LevelAccessor level,
             SFMBlockCapabilityKind<CAP> capKind,
             @NotStored BlockPos pos,
             @Nullable Direction direction
     ) {
-        var capabilityProvider = SFMCapabilityProviderMappers.discoverCapabilityProvider(level, pos.immutable());
-        if (capabilityProvider != null) {
-            return discoverCapabilityFromCapabilityProvider(capKind, capabilityProvider, direction);
-        } else {
-            return SFMBlockCapabilityResult.empty();
-        }
+        return SFMBlockCapabilityProviderCache.getCapabilityFromLevel(
+                capKind,
+                level,
+                pos,
+                level.getBlockState(pos),
+                level.getBlockEntity(pos),
+                direction
+        );
     }
 
     private static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromCache(
@@ -115,7 +126,7 @@ public class SFMCapabilityDiscovery {
             @NotStored BlockPos pos,
             @Nullable Direction direction,
             TranslatableLogger logger,
-            LevelCapabilityCache levelCapabilityCache
+            SFMBlockCapabilityCacheForLevel levelCapabilityCache
     ) {
         var found = levelCapabilityCache.getCapability(pos, capKind, direction);
         if (found != null) {

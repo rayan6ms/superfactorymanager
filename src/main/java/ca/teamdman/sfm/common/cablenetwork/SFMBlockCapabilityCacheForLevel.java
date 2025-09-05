@@ -17,7 +17,7 @@ import net.neoforged.neoforge.common.util.LazyOptional;
 import org.jetbrains.annotations.Nullable;
 import java.util.stream.Stream;
 
-public class LevelCapabilityCache {
+public class SFMBlockCapabilityCacheForLevel {
     // Position => Capability => Direction => LazyOptional
     // We don't use an EnumMap here for Direction because we need to support the null key
     private final Long2ObjectMap<Object2ObjectOpenHashMap<SFMBlockCapabilityKind<?>, SFMDirections.NullableDirectionEnumMap<SFMBlockCapabilityResult<?>>>> CACHE = new Long2ObjectOpenHashMap<>();
@@ -33,7 +33,7 @@ public class LevelCapabilityCache {
         return CACHE.values().stream().flatMap(x -> x.values().stream()).mapToInt(SFMDirections.NullableDirectionEnumMap::size).sum();
     }
 
-    public void overwriteFromOther(@NotStored BlockPos pos, LevelCapabilityCache other) {
+    public void overwriteFromOther(@NotStored BlockPos pos, SFMBlockCapabilityCacheForLevel other) {
         var found = other.CACHE.get(pos.asLong());
         if (found != null) {
             CACHE.put(pos.asLong(), new Object2ObjectOpenHashMap<>(found));
@@ -62,7 +62,7 @@ public class LevelCapabilityCache {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public void putAll(LevelCapabilityCache other) {
+    public void putAll(SFMBlockCapabilityCacheForLevel other) {
         for (var entry : other.CACHE.long2ObjectEntrySet()) {
             long pos = entry.getLongKey();
 

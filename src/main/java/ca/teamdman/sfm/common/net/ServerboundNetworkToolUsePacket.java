@@ -2,8 +2,8 @@ package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
-import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.SFMDirections;
@@ -96,7 +96,8 @@ public record ServerboundNetworkToolUsePacket(
                 for (var cap : (Iterable<SFMBlockCapabilityKind<?>>) SFMResourceTypes.getCapabilities()::iterator) {
                     String directions = DirectionQualifier.EVERY_DIRECTION
                             .stream()
-                            .filter(dir -> SFMCapabilityDiscovery.discoverCapabilityFromLevel(level, cap, pos, dir).isPresent())
+                            .filter(dir -> SFMBlockCapabilityDiscovery
+                                    .discoverCapabilityFromLevel(level, cap, pos, dir).isPresent())
                             .map(dir -> dir == null ? "NULL DIRECTION" : DirectionQualifier.directionToString(dir))
                             .collect(Collectors.joining(", ", "[", "]"));
                     if (!directions.equals("[]")) {
@@ -127,7 +128,7 @@ public record ServerboundNetworkToolUsePacket(
                     payload.append(messages[i]).append("\n");
                     MutableBoolean foundExports = new MutableBoolean(false);
                     //noinspection unchecked,rawtypes
-                    SFMResourceTypes.registry().entrySet()
+                    SFMResourceTypes.registry().getEntries()
                             .stream()
                             .map(entry -> ServerboundContainerExportsInspectionRequestPacket.buildInspectionResults(
                                     (ResourceKey) entry.getKey(),

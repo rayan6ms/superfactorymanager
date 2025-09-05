@@ -1,8 +1,9 @@
 package ca.teamdman.sfm.common.cablenetwork;
 
+import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
-import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
@@ -23,16 +24,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+/// When a {@link ManagerBlockEntity} is ticking many times in a row, there is worldly context that changes infrequently.
+/// This class stores a cache of the cables and capabilities that the manager is aware of, to avoid repeated expensive lookups.
 public class CableNetwork {
     protected final Level level;
     protected final LongSet cablePositions = new LongOpenHashSet();
-    protected final LevelCapabilityCache levelCapabilityCache = new LevelCapabilityCache();
+    protected final SFMBlockCapabilityCacheForLevel levelCapabilityCache = new SFMBlockCapabilityCacheForLevel();
 
     public CableNetwork(Level level) {
         this.level = level;
     }
 
-    public LevelCapabilityCache getLevelCapabilityCache() {
+    public SFMBlockCapabilityCacheForLevel getLevelCapabilityCache() {
         return levelCapabilityCache;
     }
 
@@ -162,7 +165,7 @@ public class CableNetwork {
             @Nullable Direction direction,
             TranslatableLogger logger
     ) {
-       return SFMCapabilityDiscovery.discoverCapabilityFromNetwork(
+       return SFMBlockCapabilityDiscovery.discoverCapabilityFromNetwork(
                this,
                capKind,
                pos,
