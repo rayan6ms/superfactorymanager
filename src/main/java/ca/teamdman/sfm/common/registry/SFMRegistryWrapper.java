@@ -8,7 +8,10 @@ import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.*;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
 
 public record SFMRegistryWrapper<V>(
         @MCVersionDependentBehaviour
@@ -22,8 +25,8 @@ public record SFMRegistryWrapper<V>(
         return registry.getKeys();
     }
 
-    public @NotNull Collection<V> getValues() {
-        return registry.getValues();
+    public @NotNull Iterable<V> getValues() {
+        return registry;
     }
 
     public @Nullable ResourceLocation getKey(V value) {
