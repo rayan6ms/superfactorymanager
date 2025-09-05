@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.capability;
 
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.LevelAccessor;
@@ -14,12 +15,14 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CauldronCapabilityProviderMapper implements SFMBlockCapabilityProvider<IFluidHandler> {
+
+public class CauldronBlockCapabilityProvider implements @MCVersionDependentBehaviour SFMBlockCapabilityProvider<IFluidHandler> {
     @Override
     public boolean matchesCapabilityKind(SFMBlockCapabilityKind<?> capabilityKind) {
         return SFMWellKnownCapabilities.FLUID_HANDLER.equals(capabilityKind);
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public SFMBlockCapabilityResult<IFluidHandler> getCapability(
             SFMBlockCapabilityKind<IFluidHandler> capabilityKind,
@@ -69,12 +72,18 @@ public class CauldronCapabilityProviderMapper implements SFMBlockCapabilityProvi
         }
 
         @Override
-        public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
+        public boolean isFluidValid(
+                int tank,
+                @NotNull FluidStack stack
+        ) {
             return stack.getFluid() == Fluids.WATER || stack.getFluid() == Fluids.LAVA;
         }
 
         @Override
-        public int fill(FluidStack resource, FluidAction action) {
+        public int fill(
+                FluidStack resource,
+                FluidAction action
+        ) {
             var state = level.getBlockState(pos);
             if (state.getBlock() == Blocks.CAULDRON) { // if empty
                 if (resource.getFluid() == Fluids.WATER) {
@@ -119,7 +128,10 @@ public class CauldronCapabilityProviderMapper implements SFMBlockCapabilityProvi
         }
 
         @Override
-        public @NotNull FluidStack drain(FluidStack resource, FluidAction action) {
+        public @NotNull FluidStack drain(
+                FluidStack resource,
+                FluidAction action
+        ) {
             var state = level.getBlockState(pos);
             if (state.getBlock() instanceof LayeredCauldronBlock) {
                 int waterLevel = state.getValue(LayeredCauldronBlock.LEVEL);
@@ -158,7 +170,10 @@ public class CauldronCapabilityProviderMapper implements SFMBlockCapabilityProvi
         }
 
         @Override
-        public @NotNull FluidStack drain(int maxDrain, FluidAction action) {
+        public @NotNull FluidStack drain(
+                int maxDrain,
+                FluidAction action
+        ) {
             var state = level.getBlockState(pos);
             if (state.getBlock() instanceof LayeredCauldronBlock) {
                 int waterLevel = state.getValue(LayeredCauldronBlock.LEVEL);
