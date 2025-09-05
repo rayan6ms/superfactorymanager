@@ -4,6 +4,7 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.SFMBlockCapabilityCacheForLevel;
 import ca.teamdman.sfm.common.registry.SFMBlockCapabilityProviders;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -21,6 +22,7 @@ public class SFMBlockCapabilityProviderCache {
     private static final Object2ObjectOpenHashMap<SFMBlockCapabilityKind<?>, ArrayList<SFMBlockCapabilityProvider<?>>>
             BLOCK_CAPABILITY_PROVIDERS_BY_KIND = new Object2ObjectOpenHashMap<>();
 
+    @MCVersionDependentBehaviour
     public static <CAP> SFMBlockCapabilityResult<CAP> getCapabilityFromLevel(
             SFMBlockCapabilityKind<CAP> capKind,
             Level level,
