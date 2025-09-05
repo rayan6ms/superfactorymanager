@@ -35,8 +35,7 @@ public class SFMResourceTypes {
             SFM.MOD_ID
     );
     private static final Supplier<IForgeRegistry<ResourceType<?, ?, ?>>> REGISTRY = REGISTERER.makeRegistry(
-            () -> new RegistryBuilder<ResourceType<?, ?, ?>>().setName(
-                    REGISTRY_ID));
+            () -> new RegistryBuilder<ResourceType<?, ?, ?>>().setName(REGISTRY_ID));
     public static final RegistryObject<ResourceType<ItemStack, Item, IItemHandler>> ITEM = REGISTERER.register(
             "item",
             ItemResourceType::new
@@ -79,8 +78,8 @@ public class SFMResourceTypes {
     }
 
     @MCVersionDependentBehaviour
-    public static IForgeRegistry<ResourceType<?, ?, ?>> registry() {
-        return REGISTRY.get();
+    public static SFMRegistryWrapper<ResourceType<?, ?, ?>> registry() {
+        return new SFMRegistryWrapper<>(REGISTRY.get());
     }
 
     /* TODO: add support for new resource types

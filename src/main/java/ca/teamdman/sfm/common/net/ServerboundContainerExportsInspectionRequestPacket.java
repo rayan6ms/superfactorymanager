@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.net;
 
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
-import ca.teamdman.sfm.common.capability.SFMCapabilityDiscovery;
 import ca.teamdman.sfm.common.compat.SFMModCompat;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMPackets;
@@ -73,7 +73,7 @@ public record ServerboundContainerExportsInspectionRequestPacket(
             @Nullable Direction direction
     ) {
         StringBuilder sb = new StringBuilder();
-        SFMBlockCapabilityResult<CAP> capResult = SFMCapabilityDiscovery.discoverCapabilityFromLevel(
+        SFMBlockCapabilityResult<CAP> capResult = SFMBlockCapabilityDiscovery.discoverCapabilityFromLevel(
                 level,
                 resourceType.CAPABILITY_KIND,
                 pos,
