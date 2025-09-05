@@ -3,7 +3,7 @@ package ca.teamdman.sfm.common.registry;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.capability.BlockEntityCapabilityProvider;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProvider;
-import ca.teamdman.sfm.common.capability.ae2.EnergyAcceptorCapabilityProviderMapper;
+import ca.teamdman.sfm.common.capability.ae2.EnergyAcceptorBlockCapabilityProvider;
 import ca.teamdman.sfm.common.compat.SFMModCompat;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
@@ -24,7 +24,7 @@ public class SFMBlockCapabilityProviders {
     public static final ResourceLocation
             REGISTRY_ID = SFMResourceLocation.fromSFMPath("capability_provider_mappers");
 
-    public static final @Nullable Supplier<EnergyAcceptorCapabilityProviderMapper>
+    public static final @Nullable Supplier<EnergyAcceptorBlockCapabilityProvider>
             AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER;
 
     private static final DeferredRegister<SFMBlockCapabilityProvider<?>>
@@ -40,7 +40,7 @@ public class SFMBlockCapabilityProviders {
         if (SFMModCompat.isAE2Loaded()) {
             AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER = REGISTERER.register(
                     "ae2/energy_acceptor",
-                    EnergyAcceptorCapabilityProviderMapper::new
+                    EnergyAcceptorBlockCapabilityProvider::new
             );
 //            MAPPERS.register("ae2/interface", InterfaceCapabilityProviderMapper::new);
         } else {
