@@ -10,11 +10,12 @@ import appeng.api.storage.MEStorage;
 import appeng.api.storage.StorageHelper;
 import appeng.blockentity.misc.InterfaceBlockEntity;
 import appeng.capabilities.Capabilities;
-import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProviderOld;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProvider;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
-import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -32,43 +33,50 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
-public class InterfaceCapabilityProviderMapper implements SFMBlockCapabilityProviderOld {
+public class InterfaceCapabilityProviderMapper implements SFMBlockCapabilityProvider<Object> {
     @Override
-    public @Nullable ICapabilityProvider getProviderFor(LevelAccessor level, @Stored BlockPos pos) {
+    public boolean matchesCapabilityKind(SFMBlockCapabilityKind<?> capabilityKind) {
+        return SFMWellKnownCapabilities.ITEM_HANDLER.equals(capabilityKind)
+               || SFMWellKnownCapabilities.FLUID_HANDLER.equals(capabilityKind);
+    }
+
+    @Override
+    public SFMBlockCapabilityResult<Object> getCapability(
+            SFMBlockCapabilityKind<Object> capabilityKind,
+            LevelAccessor level,
+            BlockPos pos,
+            BlockState state,
+            @Nullable BlockEntity blockEntity,
+            @Nullable Direction direction
+    ) {
         var be = level.getBlockEntity(pos);
         if (!(be instanceof InterfaceBlockEntity in)) {
             return null;
         }
 
-        if (!in.getConfig().isEmpty() || in.getMainNode() == null || in.getGridNode() == null || !in.getGridNode().isActive()) {
+        if (!in.getConfig().isEmpty() || in.getMainNode() == null || in.getGridNode() == null || !in
+                .getGridNode()
+                .isActive()) {
             return null;
         }
 
-        var cap = be.getCapability(Capabilities.STORAGE_MONITORABLE_ACCESSOR);
-        if (!cap.isPresent()) {
-            return null;
-        }
-
-        return new InterfaceCapabilityProvider(level, pos);
+        return SFMBlockCapabilityResult.of(
+                be.getCapability(Capabilities.STORAGE_MONITORABLE_ACCESSOR)
+                        .lazyMap(aeHandler -> {
+                            // TODO: rework the InterfaceHandler to accept the aeHandler instance instead
+                            return new InterfaceHandler(
+                                    level,
+                                    pos
+                            );
+                        }).cast()
+        );
     }
 
-    private record InterfaceCapabilityProvider(LevelAccessor level, BlockPos pos) implements ICapabilityProvider {
-        @Override
-        public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-            if (cap == SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind() || cap == SFMWellKnownCapabilities.FLUID_HANDLER.capabilityKind()) {
-                return LazyOptional.of(() -> new InterfaceHandler(level, pos)).cast();
-            }
 
-            var in = interfaceAt(level, pos);
-            if (in != null) {
-                return in.getCapability(cap, side);
-            }
-
-            return LazyOptional.empty();
-        }
-    }
-
-    private static @Nullable InterfaceBlockEntity interfaceAt(LevelAccessor level,@NotStored BlockPos pos) {
+    private static @Nullable InterfaceBlockEntity interfaceAt(
+            LevelAccessor level,
+            @NotStored BlockPos pos
+    ) {
         var be = level.getBlockEntity(pos);
         if (be instanceof InterfaceBlockEntity in) {
             return in;
@@ -77,75 +85,10 @@ public class InterfaceCapabilityProviderMapper implements SFMBlockCapabilityProv
     }
 
     @MethodsReturnNonnullByDefault
-    record InterfaceHandler(LevelAccessor level, BlockPos pos) implements IItemHandler, IFluidHandler {
-        @Nullable InterfaceBlockEntity getInterface() {
-            return interfaceAt(this.level, this.pos);
-        }
-
-        @Nullable IEnergyService getEnergy() {
-            var in = this.getInterface();
-            if (in == null) {
-                return null;
-            }
-
-            var grid = in.getMainNode().getGrid();
-            if (grid == null) {
-                return null;
-            }
-
-            return grid.getEnergyService();
-        }
-
-        LazyOptional<IStorageMonitorableAccessor> getCapability() {
-            var in = this.getInterface();
-            if (in == null) {
-                return LazyOptional.empty();
-            }
-
-            if (!in.getConfig().isEmpty() || in.getMainNode() == null || in.getGridNode() == null || !in.getGridNode().isActive()) {
-                return LazyOptional.empty();
-            }
-
-            return in.getCapability(Capabilities.STORAGE_MONITORABLE_ACCESSOR);
-        }
-
-        <T> @Nullable T withStorage(Function<MEStorage, T> callback) {
-            var cap = this.getCapability();
-            if (cap.isPresent()) {
-                //noinspection DataFlowIssue
-                return callback.apply(cap.map(c -> c.getInventory(IActionSource.empty())).orElse(null));
-            }
-            return null;
-        }
-
-        <T> @Nullable T withBaseItemHandler(Function<IItemHandler, T> callback) {
-            var in = this.getInterface();
-            if (in == null) {
-                return null;
-            }
-
-            var maybeCap = in.getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind());
-            if (maybeCap.isPresent()) {
-                //noinspection DataFlowIssue
-                return callback.apply(maybeCap.orElse(null));
-            }
-            return null;
-        }
-
-        <T> @Nullable T withBaseFluidHandler(Function<IFluidHandler, T> callback) {
-            var in = this.getInterface();
-            if (in == null) {
-                return null;
-            }
-
-            var maybeCap = in.getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capabilityKind());
-            if (maybeCap.isPresent()) {
-                //noinspection DataFlowIssue
-                return callback.apply(maybeCap.orElse(null));
-            }
-            return null;
-        }
-
+    record InterfaceHandler(
+            LevelAccessor level,
+            BlockPos pos
+    ) implements IItemHandler, IFluidHandler {
         @Override
         public int getSlots() {
             Integer slots = this.withStorage(s -> {
@@ -187,7 +130,11 @@ public class InterfaceCapabilityProviderMapper implements SFMBlockCapabilityProv
         }
 
         @Override
-        public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+        public ItemStack insertItem(
+                int slot,
+                @NotNull ItemStack stack,
+                boolean simulate
+        ) {
             if (stack.isEmpty()) {
                 return stack;
             }
@@ -229,7 +176,11 @@ public class InterfaceCapabilityProviderMapper implements SFMBlockCapabilityProv
         }
 
         @Override
-        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+        public ItemStack extractItem(
+                int slot,
+                int amount,
+                boolean simulate
+        ) {
             if (amount <= 0) {
                 return ItemStack.EMPTY;
             }
@@ -273,7 +224,10 @@ public class InterfaceCapabilityProviderMapper implements SFMBlockCapabilityProv
         }
 
         @Override
-        public boolean isItemValid(int slot, @NotNull ItemStack stack) {
+        public boolean isItemValid(
+                int slot,
+                @NotNull ItemStack stack
+        ) {
             return SFMItemUtils.isSameItemSameTags(this.getStackInSlot(slot), stack);
         }
 
@@ -328,7 +282,10 @@ public class InterfaceCapabilityProviderMapper implements SFMBlockCapabilityProv
         }
 
         @Override
-        public boolean isFluidValid(int tank, @NotNull FluidStack stack) {
+        public boolean isFluidValid(
+                int tank,
+                @NotNull FluidStack stack
+        ) {
             if (this.getCapability().isPresent()) {
                 return this.getFluidInTank(tank).isFluidEqual(stack);
             }
@@ -338,7 +295,10 @@ public class InterfaceCapabilityProviderMapper implements SFMBlockCapabilityProv
         }
 
         @Override
-        public int fill(FluidStack resource, FluidAction action) {
+        public int fill(
+                FluidStack resource,
+                FluidAction action
+        ) {
             Integer inserted = this.withStorage(s -> {
                 var key = AEFluidKey.of(resource);
                 if (key == null) {
@@ -374,7 +334,10 @@ public class InterfaceCapabilityProviderMapper implements SFMBlockCapabilityProv
         }
 
         @Override
-        public FluidStack drain(FluidStack resource, FluidAction action) {
+        public FluidStack drain(
+                FluidStack resource,
+                FluidAction action
+        ) {
             var stack = this.withStorage(s -> {
                 var key = AEFluidKey.of(resource);
                 if (key == null) {
@@ -406,7 +369,10 @@ public class InterfaceCapabilityProviderMapper implements SFMBlockCapabilityProv
         }
 
         @Override
-        public FluidStack drain(int maxDrain, FluidAction action) {
+        public FluidStack drain(
+                int maxDrain,
+                FluidAction action
+        ) {
             var stack = this.withStorage(s -> {
                 for (var stored : s.getAvailableStacks()) {
                     if (stored.getKey() instanceof AEFluidKey key) {
@@ -442,6 +408,76 @@ public class InterfaceCapabilityProviderMapper implements SFMBlockCapabilityProv
                 case EXECUTE -> Actionable.MODULATE;
                 case SIMULATE -> Actionable.SIMULATE;
             };
+        }
+
+        @Nullable InterfaceBlockEntity getInterface() {
+            return interfaceAt(this.level, this.pos);
+        }
+
+        @Nullable IEnergyService getEnergy() {
+            var in = this.getInterface();
+            if (in == null) {
+                return null;
+            }
+
+            var grid = in.getMainNode().getGrid();
+            if (grid == null) {
+                return null;
+            }
+
+            return grid.getEnergyService();
+        }
+
+        LazyOptional<IStorageMonitorableAccessor> getCapability() {
+            var in = this.getInterface();
+            if (in == null) {
+                return LazyOptional.empty();
+            }
+
+            if (!in.getConfig().isEmpty() || in.getMainNode() == null || in.getGridNode() == null || !in
+                    .getGridNode()
+                    .isActive()) {
+                return LazyOptional.empty();
+            }
+
+            return in.getCapability(Capabilities.STORAGE_MONITORABLE_ACCESSOR);
+        }
+
+        <T> @Nullable T withStorage(Function<MEStorage, T> callback) {
+            var cap = this.getCapability();
+            if (cap.isPresent()) {
+                //noinspection DataFlowIssue
+                return callback.apply(cap.map(c -> c.getInventory(IActionSource.empty())).orElse(null));
+            }
+            return null;
+        }
+
+        <T> @Nullable T withBaseItemHandler(Function<IItemHandler, T> callback) {
+            var in = this.getInterface();
+            if (in == null) {
+                return null;
+            }
+
+            var maybeCap = in.getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind());
+            if (maybeCap.isPresent()) {
+                //noinspection DataFlowIssue
+                return callback.apply(maybeCap.orElse(null));
+            }
+            return null;
+        }
+
+        <T> @Nullable T withBaseFluidHandler(Function<IFluidHandler, T> callback) {
+            var in = this.getInterface();
+            if (in == null) {
+                return null;
+            }
+
+            var maybeCap = in.getCapability(SFMWellKnownCapabilities.FLUID_HANDLER.capabilityKind());
+            if (maybeCap.isPresent()) {
+                //noinspection DataFlowIssue
+                return callback.apply(maybeCap.orElse(null));
+            }
+            return null;
         }
     }
 }

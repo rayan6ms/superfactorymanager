@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.capability.BlockEntityCapabilityProvider;
-import ca.teamdman.sfm.common.capability.CauldronCapabilityProviderMapper;
+import ca.teamdman.sfm.common.capability.CauldronBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProvider;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
@@ -32,8 +32,9 @@ public class SFMBlockCapabilityProviders {
     private static final Registry<SFMBlockCapabilityProvider<?>> REGISTRY
             = REGISTERER.makeRegistry(registryBuilder -> {});
 
-    public static final Supplier<CauldronCapabilityProviderMapper>
-            CAULDRON_MAPPER = REGISTERER.register("cauldron", CauldronCapabilityProviderMapper::new);
+    @MCVersionDependentBehaviour
+    public static final Supplier<CauldronBlockCapabilityProvider>
+            CAULDRON_MAPPER = REGISTERER.register("cauldron", CauldronBlockCapabilityProvider::new);
 
     public static final Supplier<BlockEntityCapabilityProvider>
             BLOCK_ENTITY = REGISTERER.register("block_entity", BlockEntityCapabilityProvider::new);
