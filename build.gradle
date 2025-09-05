@@ -43,7 +43,7 @@ sourceSets {
         }
         java {
             exclude "ca/teamdman/sfm/common/capability/ae2/InterfaceCapabilityProviderMapper.java"
-            exclude "ca/teamdman/sfm/common/capability/ae2/EnergyAcceptorCapabilityProviderMapper.java"
+//            exclude "ca/teamdman/sfm/common/capability/ae2/EnergyAcceptorCapabilityProviderMapper.java"
 //            exclude "ca/teamdman/sfm/common/program/linting/MekanismSideConfigProgramLinter.java"
         }
         java {
@@ -77,7 +77,7 @@ sourceSets {
             exclude "ca/teamdman/sfm/gametest/tests/compat/multiple/**"
             exclude "ca/teamdman/sfm/gametest/tests/compat/thermal/**"
             exclude "ca/teamdman/sfm/gametest/tests/compat/industrialforegoing/**"
-            exclude "ca/teamdman/sfm/gametest/tests/compat/ae2/**"
+//            exclude "ca/teamdman/sfm/gametest/tests/compat/ae2/**"
 //            exclude "ca/teamdman/sfm/gametest/tests/compat/mekanism/**"
             exclude "ca/teamdman/sfm/gametest/tests/compat/dank/**"
         }

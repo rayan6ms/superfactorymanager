@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.common.capability.ae2;
 
-import appeng.blockentity.networking.EnergyAcceptorBlockEntity;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
@@ -28,15 +27,15 @@ public class EnergyAcceptorCapabilityProviderMapper implements SFMBlockCapabilit
             @Nullable BlockEntity blockEntity,
             @Nullable Direction direction
     ) {
-        if (blockEntity instanceof EnergyAcceptorBlockEntity energyAcceptor) {
-            return SFMBlockCapabilityResult.of(
-                    energyAcceptor.getCapability(SFMWellKnownCapabilities.ENERGY.capabilityKind())
-                            .lazyMap(EnergyAcceptorEnergyStorageWrapper::new)
-
-            );
-        } else {
-            return SFMBlockCapabilityResult.empty();
-        }
+        IEnergyStorage energyStorage = level.getCapability(
+                capabilityKind.capabilityKind(),
+                pos,
+                state,
+                blockEntity,
+                direction
+        );
+        if (energyStorage == null) return SFMBlockCapabilityResult.empty();
+        return SFMBlockCapabilityResult.of(new EnergyAcceptorEnergyStorageWrapper(energyStorage));
     }
 
     public record EnergyAcceptorEnergyStorageWrapper(
