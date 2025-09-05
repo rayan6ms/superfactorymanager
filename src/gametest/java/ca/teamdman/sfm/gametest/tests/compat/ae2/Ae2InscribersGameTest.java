@@ -4,7 +4,6 @@ import appeng.blockentity.misc.InscriberBlockEntity;
 import appeng.core.definitions.AEBlocks;
 import appeng.core.definitions.AEItems;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
-import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
@@ -82,35 +81,17 @@ public class Ae2InscribersGameTest extends SFMGameTestDefinition {
         var last1 = ((InscriberBlockEntity) helper.getBlockEntity(lastPos1));
         var last2 = ((InscriberBlockEntity) helper.getBlockEntity(lastPos2));
         var last3 = ((InscriberBlockEntity) helper.getBlockEntity(lastPos3));
-        silicon1
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind())
-                .resolve()
-                .get()
+        helper.getItemHandler(siliconPos1)
                 .insertItem(0, new ItemStack(AEItems.SILICON_PRESS), false);
-        silicon2
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind())
-                .resolve()
-                .get()
+        helper.getItemHandler(siliconPos2)
                 .insertItem(0, new ItemStack(AEItems.SILICON_PRESS), false);
-        silicon3
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind())
-                .resolve()
-                .get()
+        helper.getItemHandler(siliconPos3)
                 .insertItem(0, new ItemStack(AEItems.SILICON_PRESS), false);
-        engineering
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind())
-                .resolve()
-                .get()
+        helper.getItemHandler(engineeringPos)
                 .insertItem(0, new ItemStack(AEItems.ENGINEERING_PROCESSOR_PRESS), false);
-        calculation
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind())
-                .resolve()
-                .get()
+        helper.getItemHandler(calculationPos)
                 .insertItem(0, new ItemStack(AEItems.CALCULATION_PROCESSOR_PRESS), false);
-        logic
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind())
-                .resolve()
-                .get()
+        helper.getItemHandler(logicPos)
                 .insertItem(0, new ItemStack(AEItems.LOGIC_PROCESSOR_PRESS), false);
 
         Stream
@@ -132,13 +113,9 @@ public class Ae2InscribersGameTest extends SFMGameTestDefinition {
         helper.setBlock(materialsPos, SFMBlocks.TEST_BARREL_BLOCK.get());
         helper.setBlock(resultsPos, SFMBlocks.TEST_BARREL_BLOCK.get());
         //noinspection DataFlowIssue,OptionalGetWithoutIsPresent
-        var materials = helper
-                .getBlockEntity(materialsPos)
-                .getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind())
-                .resolve()
-                .get();
+        var materials = helper.getItemHandler(materialsPos);
         //noinspection DataFlowIssue,OptionalGetWithoutIsPresent
-        var results = helper.getBlockEntity(resultsPos).getCapability(SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind()).resolve().get();
+        var results = helper.getItemHandler(resultsPos);
         materials.insertItem(0, new ItemStack(Items.REDSTONE, 64), false);
         materials.insertItem(1, new ItemStack(Items.REDSTONE, 64), false);
         materials.insertItem(2, new ItemStack(Items.REDSTONE, 64), false);
