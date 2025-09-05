@@ -51,7 +51,8 @@ public class SFMBlockCapabilityProviders {
     }
 
     public static ArrayList<SFMBlockCapabilityProvider<?>> getAllProviders() {
-        ArrayList<SFMBlockCapabilityProvider<?>> providers = new ArrayList<>(registry().getValues());
+        ArrayList<SFMBlockCapabilityProvider<?>> providers = new ArrayList<>();
+        registry().forEach(providers::add);
         providers.sort(
                 Comparator
                         .comparingInt((SFMBlockCapabilityProvider<?> provider) -> provider.priority())
