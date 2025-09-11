@@ -8,6 +8,7 @@ NAME "Changelog"
 
 ---- 4.26.0 ----
 -- Add block tag support for FallingAnvilHandler, fixes #376
+---- See SFMBlockTags.java; sfm:anvil_disenchanting and sfm:anvil_printing_press_forming
 -- AE2 energy acceptor mod compat to fix fe:: not working, fixes #322
 -- Update AE2 inscriber example to use retain since inscribers have a max stack size greater than 1 in 1.21.1
 -- TODO: more zh_cn changes, describe better lol, also include the contributions from crowdin
