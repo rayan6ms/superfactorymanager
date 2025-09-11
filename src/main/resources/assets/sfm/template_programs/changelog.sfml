@@ -7,12 +7,15 @@ NAME "Changelog"
 -- https://github.com/TeamDman/SuperFactoryManager/issues/new
 
 ---- 4.26.0 ----
+-- Add block tag support for FallingAnvilHandler, fixes #376
+-- AE2 energy acceptor mod compat to fix fe:: not working, fixes #322
+-- Update AE2 inscriber example to use retain since inscribers have a max stack size greater than 1 in 1.21.1
+-- TODO: more zh_cn changes, describe better lol, also include the contributions from crowdin
 -- Reduce code entropy between Minecraft versions
 ---- Fixed mixed localization keys: itemGroup.sfm -> item_group.sfm
----- Standardized capability stuff, before and after 1.20.3 NeoForge rework now much cleaner
 ---- Standardized resource location object construction
--- WIP: AE2 energy acceptor mod compat to fix fe:: not working, fixes #322
--- Update AE2 example to use retain since inscribers don't have a max stack size of 1 in 1.21.1
+---- Standardized capability stuff, before and after 1.20.3 NeoForge rework now much cleaner
+------ SFM can now add capability wrappers for mod compatibility like the #322 fix above
 
 
 ---- 4.25.0 ----
