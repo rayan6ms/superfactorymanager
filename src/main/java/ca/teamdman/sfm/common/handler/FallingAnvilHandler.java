@@ -1,10 +1,10 @@
 package ca.teamdman.sfm.common.handler;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.registry.SFMBlockTags;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
+import ca.teamdman.sfm.common.registry.SFMBlockTags;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMRecipeTypes;
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
