@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.client.registry;
+package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.tags.BlockTags;
