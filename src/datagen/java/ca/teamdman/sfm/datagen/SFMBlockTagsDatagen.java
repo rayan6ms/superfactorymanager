@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.datagen;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.registry.SFMBlockTags;
+import ca.teamdman.sfm.common.registry.SFMBlockTags;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticBlockTagsDataGen;
 import net.minecraft.tags.BlockTags;
