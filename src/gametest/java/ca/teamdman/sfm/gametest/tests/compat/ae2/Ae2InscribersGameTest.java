@@ -16,9 +16,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.StandingSignBlock;
-import net.minecraft.world.level.block.entity.SignBlockEntity;
 
 import java.util.stream.Stream;
+
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 /**
  * Migrated from SFMAppliedEnergisticsCompatGameTests.ae2_inscribers
@@ -125,22 +126,18 @@ public class Ae2InscribersGameTest extends SFMGameTestDefinition {
         materials.insertItem(8, new ItemStack(AEItems.SILICON, 64), false);
 
         // put signs on them lol
+        BlockPos inputSignPos = materialsPos.offset(0, 1, 0);
         helper.setBlock(
-                materialsPos.offset(0, 1, 0),
+                inputSignPos,
                 Blocks.OAK_SIGN.defaultBlockState().setValue(StandingSignBlock.ROTATION, 8)
         );
-        ((SignBlockEntity) helper.getBlockEntity(materialsPos.offset(0, 1, 0))).setMessage(
-                0,
-                Component.literal("input")
-        );
+        helper.setSignText(inputSignPos, Component.literal("input"));
+        BlockPos outputSignPos = resultsPos.offset(0, 1, 0);
         helper.setBlock(
-                resultsPos.offset(0, 1, 0),
+                outputSignPos,
                 Blocks.OAK_SIGN.defaultBlockState().setValue(StandingSignBlock.ROTATION, 8)
         );
-        ((SignBlockEntity) helper.getBlockEntity(resultsPos.offset(0, 1, 0))).setMessage(
-                0,
-                Component.literal("output")
-        );
+        helper.setSignText(outputSignPos, Component.literal("output"));
 
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
         manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
@@ -159,21 +156,32 @@ public class Ae2InscribersGameTest extends SFMGameTestDefinition {
                 .save(manager.getDisk());
 
         manager.setProgram("""
+                                   NAME "AE2 Inscribers"
+                                   
+                                   -- labels:
+                                   -- logic, engineering, calculation, silicon, last => inscribers
+                                   -- materials, results => chests
                                    EVERY 20 TICKS DO
                                        INPUT FROM materials
-                                       OUTPUT gold_ingot TO logic SLOTS 2
-                                       OUTPUT diamond TO engineering SLOTS 2
-                                       OUTPUT certus_quartz_crystal TO calculation SLOTS 2
-                                       OUTPUT silicon TO silicon SLOTS 2
-                                       OUTPUT redstone TO last SLOTS 2
-                                       OUTPUT printed_silicon TO last SLOTS 1
-                                       OUTPUT printed_calculation_processor, printed_engineering_processor, printed_logic_processor TO last SLOTS 0
-
-                                       FORGET
+                                   
+                                       OUTPUT RETAIN 2 gold_ingot TO EACH logic SLOTS 2
+                                       OUTPUT RETAIN 2 diamond TO EACH engineering SLOTS 2
+                                       OUTPUT RETAIN 2 certus_quartz_crystal TO EACH calculation SLOTS 2
+                                   
+                                       OUTPUT RETAIN 2 silicon TO EACH silicon SLOTS 2
+                                   
+                                       OUTPUT RETAIN 2 redstone TO EACH last SLOTS 2
+                                       OUTPUT RETAIN 2 printed_silicon TO EACH last SLOTS 1
+                                   
+                                       OUTPUT
+                                           RETAIN 2 printed_calculation_processor,
+                                           RETAIN 2 printed_engineering_processor,
+                                           RETAIN 2 printed_logic_processor
+                                       TO EACH last SLOTS 0
+                                   FORGET
                                        INPUT FROM logic, engineering, calculation, silicon west side
                                        output to materials
-
-                                       FORGET
+                                   FORGET
                                        INPUT FROM last west SIDE
                                        OUTPUT TO results
                                    END

@@ -152,7 +152,7 @@ runs {
     client {
         modSource project.sourceSets.gametest
         // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
     }
 
     client_teamy {
@@ -161,7 +161,7 @@ runs {
 
         modSource project.sourceSets.gametest
         // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
-        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
 
         // THIS CAN CAUSE PROBLEMS! DISABLE AND REGEN RUNS IF ENCOUNTERING WEIRD ISSUES!
         // Plays nice with: https://github.com/JetBrains/JetBrainsRuntime/releases/tag/jbr-release-17.0.14b1367.22
@@ -173,7 +173,7 @@ runs {
 
     server {
         modSource project.sourceSets.gametest
-        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
         argument '--nogui'
     }
 
@@ -182,7 +182,7 @@ runs {
     // The gametest system is also enabled by default for other run configs under the /test command.
     gameTestServer {
         modSource project.sourceSets.gametest
-        systemProperty 'forge.enabledGameTestNamespaces', project.mod_id
+        systemProperty 'neoforge.enabledGameTestNamespaces', project.mod_id
     }
 
     clientData {

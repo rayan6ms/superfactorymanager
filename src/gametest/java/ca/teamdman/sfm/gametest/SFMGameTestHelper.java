@@ -13,6 +13,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.GameTestInfo;
+import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.SignBlockEntity;
+import net.minecraft.world.level.block.entity.SignText;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -70,6 +74,26 @@ public class SFMGameTestHelper extends GameTestHelper {
                 pos,
                 direction
         );
+    }
+
+    public void setSignText(
+            BlockPos signPos,
+            Component... text
+    ) {
+        BlockEntity blockEntity = getBlockEntity(signPos);
+        if (!(blockEntity instanceof SignBlockEntity signBlockEntity)) {
+            fail("Block entity was not an instance of SignBlockEntity, got " + blockEntity, signPos);
+            return;
+        }
+        if (text.length > 4) {
+            fail("Text array was too long, max length is 4, got " + text.length, signPos);
+            return;
+        }
+        SignText newText = new SignText();
+        for (int i = 0; i < text.length; i++) {
+            newText.setMessage(i, text[i]);
+        }
+        signBlockEntity.setText(newText, false);
     }
 
     public IEnergyStorage getEnergyStorage(
