@@ -37,7 +37,11 @@ public class SFMGameTestDiscovery {
                         throw new RuntimeException("Class " + clazz.getName() + " does not extend SFMGameTestDefinition");
                     }
                     try {
-                        return (SFMGameTestDefinition) clazz.getConstructor().newInstance();
+                        SFMGameTestDefinition sfmGameTestDefinition = (SFMGameTestDefinition) clazz
+                                .getConstructor()
+                                .newInstance();
+                        SFM.LOGGER.info("Discovered SFM game test: {}", sfmGameTestDefinition.testName());
+                        return sfmGameTestDefinition;
                     } catch (ReflectiveOperationException e) {
                         throw new RuntimeException("Failed to instantiate test builder for " + clazz.getName(), e);
                     }
