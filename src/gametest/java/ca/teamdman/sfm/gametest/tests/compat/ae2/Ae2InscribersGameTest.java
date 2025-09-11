@@ -16,9 +16,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.StandingSignBlock;
-import net.minecraft.world.level.block.entity.SignBlockEntity;
 
 import java.util.stream.Stream;
+
+import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 /**
  * Migrated from SFMAppliedEnergisticsCompatGameTests.ae2_inscribers
@@ -125,22 +126,18 @@ public class Ae2InscribersGameTest extends SFMGameTestDefinition {
         materials.insertItem(8, new ItemStack(AEItems.SILICON, 64), false);
 
         // put signs on them lol
+        BlockPos inputSignPos = materialsPos.offset(0, 1, 0);
         helper.setBlock(
-                materialsPos.offset(0, 1, 0),
+                inputSignPos,
                 Blocks.OAK_SIGN.defaultBlockState().setValue(StandingSignBlock.ROTATION, 8)
         );
-        ((SignBlockEntity) helper.getBlockEntity(materialsPos.offset(0, 1, 0))).setMessage(
-                0,
-                Component.literal("input")
-        );
+        helper.setSignText(inputSignPos, Component.literal("input"));
+        BlockPos outputSignPos = resultsPos.offset(0, 1, 0);
         helper.setBlock(
-                resultsPos.offset(0, 1, 0),
+                outputSignPos,
                 Blocks.OAK_SIGN.defaultBlockState().setValue(StandingSignBlock.ROTATION, 8)
         );
-        ((SignBlockEntity) helper.getBlockEntity(resultsPos.offset(0, 1, 0))).setMessage(
-                0,
-                Component.literal("output")
-        );
+        helper.setSignText(outputSignPos, Component.literal("output"));
 
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
         manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));

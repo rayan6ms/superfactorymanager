@@ -77,7 +77,7 @@ public class Ae2EnergyAcceptorGameTest extends SFMGameTestDefinition {
         helper.succeedIfManagerDidThingWithoutLagging(
                 manager, () -> {
                     assertTrue(
-                            cube.getEnergy(0).smallerThan(EnergyCubeTier.ULTIMATE.getMaxEnergy()),
+                            cube.getEnergy(0) < EnergyCubeTier.ULTIMATE.getMaxEnergy(),
                             "Mekanism cube did not output FE to AE2 acceptor"
                     );
                 }
