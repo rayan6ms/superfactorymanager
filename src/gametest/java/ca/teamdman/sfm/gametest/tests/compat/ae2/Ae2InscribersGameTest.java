@@ -156,21 +156,32 @@ public class Ae2InscribersGameTest extends SFMGameTestDefinition {
                 .save(manager.getDisk());
 
         manager.setProgram("""
+                                   NAME "AE2 Inscribers"
+                                   
+                                   -- labels:
+                                   -- logic, engineering, calculation, silicon, last => inscribers
+                                   -- materials, results => chests
                                    EVERY 20 TICKS DO
                                        INPUT FROM materials
-                                       OUTPUT gold_ingot TO logic SLOTS 2
-                                       OUTPUT diamond TO engineering SLOTS 2
-                                       OUTPUT certus_quartz_crystal TO calculation SLOTS 2
-                                       OUTPUT silicon TO silicon SLOTS 2
-                                       OUTPUT redstone TO last SLOTS 2
-                                       OUTPUT printed_silicon TO last SLOTS 1
-                                       OUTPUT printed_calculation_processor, printed_engineering_processor, printed_logic_processor TO last SLOTS 0
-
-                                       FORGET
+                                   
+                                       OUTPUT RETAIN 2 gold_ingot TO EACH logic SLOTS 2
+                                       OUTPUT RETAIN 2 diamond TO EACH engineering SLOTS 2
+                                       OUTPUT RETAIN 2 certus_quartz_crystal TO EACH calculation SLOTS 2
+                                   
+                                       OUTPUT RETAIN 2 silicon TO EACH silicon SLOTS 2
+                                   
+                                       OUTPUT RETAIN 2 redstone TO EACH last SLOTS 2
+                                       OUTPUT RETAIN 2 printed_silicon TO EACH last SLOTS 1
+                                   
+                                       OUTPUT
+                                           RETAIN 2 printed_calculation_processor,
+                                           RETAIN 2 printed_engineering_processor,
+                                           RETAIN 2 printed_logic_processor
+                                       TO EACH last SLOTS 0
+                                   FORGET
                                        INPUT FROM logic, engineering, calculation, silicon west side
                                        output to materials
-
-                                       FORGET
+                                   FORGET
                                        INPUT FROM last west SIDE
                                        OUTPUT TO results
                                    END

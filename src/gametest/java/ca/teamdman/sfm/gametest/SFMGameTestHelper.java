@@ -76,23 +76,6 @@ public class SFMGameTestHelper extends GameTestHelper {
         );
     }
 
-    public IEnergyStorage getEnergyStorage(
-            @NotStored BlockPos pos,
-            @Nullable Direction direction
-    ) {
-        return discoverCapability(
-                SFMWellKnownCapabilities.ENERGY,
-                pos,
-                direction
-        );
-    }
-
-    public IItemHandler getItemHandler(
-            @NotStored BlockPos pos
-    ) {
-        return getItemHandler(pos, null);
-    }
-
     public void setSignText(
             BlockPos signPos,
             Component... text
@@ -111,6 +94,23 @@ public class SFMGameTestHelper extends GameTestHelper {
             newText.setMessage(i, text[i]);
         }
         signBlockEntity.setText(newText, false);
+    }
+
+    public IEnergyStorage getEnergyStorage(
+            @NotStored BlockPos pos,
+            @Nullable Direction direction
+    ) {
+        return discoverCapability(
+                SFMWellKnownCapabilities.ENERGY,
+                pos,
+                direction
+        );
+    }
+
+    public IItemHandler getItemHandler(
+            @NotStored BlockPos pos
+    ) {
+        return getItemHandler(pos, null);
     }
 
     public void assertManagerDidThingWithoutLagging(
