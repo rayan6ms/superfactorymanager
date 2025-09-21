@@ -15,7 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 /**
- * Registers SFM's optional built-in resource packs so they appear in the Resource Packs screen.
+ * Registers SFM's optional built-in resource packs, so they appear in the Resource Packs screen.
  */
 @Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.MOD, modid = SFM.MOD_ID, value = Dist.CLIENT)
 public class SFMPackFinders {
@@ -36,6 +36,7 @@ public class SFMPackFinders {
         if (!Files.exists(classicRoot.resolve("pack.mcmeta"))) return;
 
         event.addRepositorySource((consumer, factory) -> {
+            @SuppressWarnings("resource")
             PathPackResources packResources = new PathPackResources(CLASSIC_PACK_DISPLAY_NAME, classicRoot);
             Pack pack = Pack.create(
                     CLASSIC_PACK_ID,
