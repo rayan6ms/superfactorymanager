@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.client.registry;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
@@ -38,7 +39,7 @@ public class SFMPackFinders {
         event.addRepositorySource((consumer, factory) -> {
             @SuppressWarnings("resource")
             PathPackResources packResources = new PathPackResources(CLASSIC_PACK_DISPLAY_NAME, classicRoot);
-            Pack pack = Pack.create(
+            @MCVersionDependentBehaviour Pack pack = Pack.create(
                     CLASSIC_PACK_ID,
                     false, // not required; user can enable/disable
                     () -> packResources,
