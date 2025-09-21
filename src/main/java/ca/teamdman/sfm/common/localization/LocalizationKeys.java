@@ -2,7 +2,6 @@ package ca.teamdman.sfm.common.localization;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMCreativeTabs;
 import ca.teamdman.sfm.common.registry.SFMItems;
 
 import java.util.ArrayList;
@@ -187,9 +186,8 @@ public final class LocalizationKeys {
             "Super Factory Manager"
     );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
-    public static final LocalizationEntry ITEM_GROUP = new LocalizationEntry(
-            SFMCreativeTabs.SFMCreativeModeTab.DISPLAY_NAME_TRANSLATION_KEY,
-//            "item_group.sfm.main",
+    public static final LocalizationEntry CREATIVE_TAB = new LocalizationEntry(
+            "item_group.sfm",
             "Super Factory Manager"
     );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
