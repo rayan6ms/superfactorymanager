@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.localization;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.SFMCreativeTabs;
 import ca.teamdman.sfm.common.registry.SFMItems;
 
 import java.util.ArrayList;
@@ -187,7 +188,8 @@ public final class LocalizationKeys {
     );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry ITEM_GROUP = new LocalizationEntry(
-            "item_group.sfm.main",
+            SFMCreativeTabs.SFMCreativeModeTab.DISPLAY_NAME_TRANSLATION_KEY,
+//            "item_group.sfm.main",
             "Super Factory Manager"
     );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
@@ -821,13 +823,9 @@ public final class LocalizationKeys {
             "gui.sfm.logs.missing_adjacent_cable",
             "No adjacent cable found for %s"
     );
-    public static final LocalizationEntry LOGS_MISSING_CAPABILITY_PROVIDER = new LocalizationEntry(
-            "gui.sfm.logs.missing_capability_provider",
-            "No capabilityKind provider found for %s %s direction=%s"
-    );
     public static final LocalizationEntry LOGS_EMPTY_CAPABILITY = new LocalizationEntry(
             "gui.sfm.logs.empty_capability",
-            "Received an empty capabilityKind %s %s direction=%s"
+            "Received an empty capability result for %s %s direction=%s"
     );
     public static final LocalizationEntry MANAGER_GUI_VIEW_EXAMPLES_BUTTON_TOOLTIP = new LocalizationEntry(
             "gui.sfm.manager.button.view_examples.tooltip",
@@ -1061,11 +1059,11 @@ public final class LocalizationKeys {
             "Preferred Editor"
     );
     public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V1 = new LocalizationEntry(
-            "gui.sfm.program_editor_config.preferred_editor.default",
+            "gui.sfm.program_editor_config.preferred_editor.v1",
             "V1 (Default)"
     );
     public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V2 = new LocalizationEntry(
-            "gui.sfm.program_editor_config.preferred_editor.ask",
+            "gui.sfm.program_editor_config.preferred_editor.v2",
             "V2"
     );
 

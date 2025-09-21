@@ -17,13 +17,19 @@ public class SFMCreativeTabs {
     @SuppressWarnings("NotNullFieldNotInitialized")
     public static CreativeModeTab TAB;
 
+
+    public static class SFMCreativeModeTab {
+        public static final String DISPLAY_NAME_TRANSLATION_KEY = "item_group." + SFM.MOD_ID;
+        public static final Component DISPLAY_NAME = Component.translatable(DISPLAY_NAME_TRANSLATION_KEY);
+    }
+
     @SubscribeEvent
     public static void onRegister(CreativeModeTabEvent.Register event) {
         TAB = event.registerCreativeModeTab(
                 SFMResourceLocation.fromSFMPath("main"),
                 builder ->
                         // Set name of tab to display
-                        builder.title(Component.translatable("item_group." + SFM.MOD_ID))
+                        builder.title(SFMCreativeModeTab.DISPLAY_NAME)
                                 // Set icon of creative tab
                                 .icon(() -> new ItemStack(SFMBlocks.MANAGER_BLOCK.get()))
                                 // Add default items to tab
