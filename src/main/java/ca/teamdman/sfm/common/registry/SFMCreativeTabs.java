@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -18,6 +19,11 @@ public class SFMCreativeTabs {
             Registries.CREATIVE_MODE_TAB,
             SFM.MOD_ID
     );
+
+    public static class SFMCreativeModeTab {
+        public static final String DISPLAY_NAME_TRANSLATION_KEY = "item_group." + SFM.MOD_ID;
+        public static final Component DISPLAY_NAME = Component.translatable(DISPLAY_NAME_TRANSLATION_KEY);
+    }
 
     @SuppressWarnings("unused")
     public static final RegistryObject<CreativeModeTab> MAIN_TAB = CREATIVE_TABS.register(
