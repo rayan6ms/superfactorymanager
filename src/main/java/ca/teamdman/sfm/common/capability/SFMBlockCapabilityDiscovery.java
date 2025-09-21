@@ -89,7 +89,7 @@ public class SFMBlockCapabilityDiscovery {
             );
             levelCapabilityCache.putCapability(pos, capKind, direction, cap);
         } else {
-            logger.warn(x -> x.accept(LocalizationKeys.LOGS_MISSING_CAPABILITY_PROVIDER.get(
+            logger.warn(x -> x.accept(LocalizationKeys.LOGS_EMPTY_CAPABILITY.get(
                     pos,
                     capKind.getName(),
                     direction
