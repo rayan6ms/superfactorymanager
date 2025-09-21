@@ -19,7 +19,7 @@ sourceSets {
         }
         java {
             exclude "ca/teamdman/sfm/common/capability/ae2/InterfaceCapabilityProvider.java"
-            exclude "ca/teamdman/sfm/common/capability/ae2/EnergyAcceptorCapabilityProvider.java"
+            exclude "ca/teamdman/sfm/common/capability/ae2/EnergyAcceptorBlockCapabilityProvider.java"
             exclude "ca/teamdman/sfm/common/program/linting/MekanismSideConfigProgramLinter.java"
         }
         java {
