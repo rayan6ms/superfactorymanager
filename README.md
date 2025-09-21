@@ -3,7 +3,7 @@
 
 # Super Factory Manager 4
 
-[![](https://cf.way2muchnoise.eu/full_306935_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/super-factory-manager) [![Discord](https://img.shields.io/discord/967118679370264627.svg?colorB=7289DA&logo=data:image/png)](https://discord.gg/5mbUY3mu6m) [![GitHub Sponsors](https://img.shields.io/github/sponsors/TeamDman)](https://github.com/sponsors/TeamDman)
+[![](https://cf.way2muchnoise.eu/full_306935_downloads.svg)](https://www.curseforge.com/minecraft/mc-mods/super-factory-manager) [![Discord](https://img.shields.io/discord/967118679370264627.svg?colorB=7289DA&logo=data:image/png)](https://discord.gg/5mbUY3mu6m) [![GitHub Sponsors](https://img.shields.io/github/sponsors/TeamDman)](https://github.com/sponsors/TeamDman) [![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/TeamDman/SuperFactoryManager)
 
 [![image](media/banner.png)](https://www.youtube.com/watch?v=W5wY23VxZAc)
 
