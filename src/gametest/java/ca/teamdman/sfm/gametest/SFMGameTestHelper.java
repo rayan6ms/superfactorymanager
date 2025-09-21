@@ -89,11 +89,12 @@ public class SFMGameTestHelper extends GameTestHelper {
             fail("Text array was too long, max length is 4, got " + text.length, signPos);
             return;
         }
-        SignText newText = new SignText();
+        var newText = new SignText();
         for (int i = 0; i < text.length; i++) {
-            newText.setMessage(i, text[i]);
+            newText.setMessage(i , text[i]);
         }
         signBlockEntity.setText(newText, false);
+        signBlockEntity.setText(newText, true);
     }
 
     public IEnergyStorage getEnergyStorage(
