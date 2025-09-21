@@ -7,8 +7,10 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.resources.model.BakedModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.level.BlockAndTintGetter;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.model.BakedModelWrapper;
@@ -23,8 +25,18 @@ public class CableFacadeBlockModelWrapper extends BakedModelWrapper<BakedModel> 
     private static final ChunkRenderTypeSet SOLID = ChunkRenderTypeSet.of(RenderType.solid());
     private static final ChunkRenderTypeSet ALL = ChunkRenderTypeSet.all();
 
-    public CableFacadeBlockModelWrapper(BakedModel originalModel) {
-        super(originalModel);
+    public CableFacadeBlockModelWrapper(BakedModel originalCableModel) {
+        super(originalCableModel);
+    }
+
+    @Override
+    public @NotNull ModelData getModelData(
+            @NotNull BlockAndTintGetter level,
+            @NotNull BlockPos pos,
+            @NotNull BlockState state,
+            @NotNull ModelData modelData
+    ) {
+        return this.originalModel.getModelData(level, pos, state, modelData);
     }
 
     @Override
