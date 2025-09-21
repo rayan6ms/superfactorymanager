@@ -1,6 +1,8 @@
 package ca.teamdman.sfm.client.registry;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.Pack;
 import net.minecraft.server.packs.repository.PackSource;
@@ -35,14 +37,15 @@ public class SFMPackFinders {
         // Require a valid pack.mcmeta to register
         if (!Files.exists(classicRoot.resolve("pack.mcmeta"))) return;
 
-        event.addRepositorySource((consumer, factory) -> {
+        event.addRepositorySource((consumer) -> {
             @SuppressWarnings("resource")
-            PathPackResources packResources = new PathPackResources(CLASSIC_PACK_DISPLAY_NAME, classicRoot);
-            Pack pack = Pack.create(
+            PathPackResources packResources = new PathPackResources(CLASSIC_PACK_DISPLAY_NAME, true, classicRoot);
+            @MCVersionDependentBehaviour Pack pack = Pack.readMetaAndCreate(
                     CLASSIC_PACK_ID,
+                    Component.literal(CLASSIC_PACK_DISPLAY_NAME), // TODO: add to LocalizationKeys
                     false, // not required; user can enable/disable
-                    () -> packResources,
-                    factory,
+                    (packId) -> packResources,
+        PackType.CLIENT_RESOURCES,
                     Pack.Position.TOP, // prefer above mod_resources so it overrides
                     PackSource.BUILT_IN
             );
