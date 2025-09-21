@@ -33,7 +33,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
-public class InterfaceCapabilityProviderMapper implements SFMBlockCapabilityProvider<Object> {
+
+@SuppressWarnings("unused") // will reintroduce it later once I figure out the performance characteristics
+public class InterfaceCapabilityProvider implements SFMBlockCapabilityProvider<Object> {
     @Override
     public boolean matchesCapabilityKind(SFMBlockCapabilityKind<?> capabilityKind) {
         return SFMWellKnownCapabilities.ITEM_HANDLER.equals(capabilityKind)

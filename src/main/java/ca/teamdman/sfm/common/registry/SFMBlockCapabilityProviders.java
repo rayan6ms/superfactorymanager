@@ -45,7 +45,7 @@ public class SFMBlockCapabilityProviders {
 //                    "ae2/energy_acceptor",
 //                    EnergyAcceptorBlockCapabilityProvider::new
 //            );
-////            MAPPERS.register("ae2/interface", InterfaceCapabilityProviderMapper::new);
+////            MAPPERS.register("ae2/interface", InterfaceCapabilityProvider::new);
 //        } else {
 //            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER = null;
 //        }
