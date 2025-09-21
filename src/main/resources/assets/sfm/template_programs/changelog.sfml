@@ -11,7 +11,7 @@ NAME "Changelog"
 ---- See SFMBlockTags.java; sfm:anvil_disenchanting and sfm:anvil_printing_press_forming
 -- AE2 energy acceptor mod compat to fix fe:: not working, fixes #322
 -- Update AE2 inscriber example to use retain since inscribers have a max stack size greater than 1 in 1.21.1
--- TODO: more zh_cn changes, describe better lol, also include the contributions from crowdin
+-- More zh_cn changes improvements, thank you @ZHAY10086, @XYHXH, and others!
 -- Reduce code entropy between Minecraft versions
 ---- Fixed mixed localization keys: itemGroup.sfm -> item_group.sfm
 ---- Standardized resource location object construction
