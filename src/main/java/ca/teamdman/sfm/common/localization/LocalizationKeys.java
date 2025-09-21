@@ -185,7 +185,6 @@ public final class LocalizationKeys {
             "mod.name",
             "Super Factory Manager"
     );
-    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry CREATIVE_TAB = new LocalizationEntry(
             "item_group.sfm",
             "Super Factory Manager"
