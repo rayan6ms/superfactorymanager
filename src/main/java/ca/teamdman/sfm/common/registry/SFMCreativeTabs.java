@@ -24,7 +24,7 @@ public class SFMCreativeTabs {
             "main",
             () -> CreativeModeTab
                     .builder()
-                    .title(LocalizationKeys.ITEM_GROUP.getComponent())
+                    .title(LocalizationKeys.CREATIVE_TAB.getComponent())
                     .icon(() -> new ItemStack(SFMBlocks.MANAGER_BLOCK.get()))
                     .displayItems(SFMCreativeTabs::populateMainCreativeTab)
                     .build()

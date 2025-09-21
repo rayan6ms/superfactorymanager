@@ -36,6 +36,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.concurrent.ConcurrentLinkedDeque;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -134,7 +135,8 @@ public class ClientExportHelper {
                 .get();
 
         Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Collection<ResourceType<?, ?, ?>> resourceTypes = SFMResourceTypes.registry().getValues();
+        Collection<ResourceType<?, ?, ?>> resourceTypes = new ArrayList<>();
+        SFMResourceTypes.registry().getValues().forEach(resourceTypes::add);
 
         // Ensure the folder exists
         var gameDir = FMLPaths.GAMEDIR.get();
