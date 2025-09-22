@@ -20,6 +20,7 @@ NAME "Changelog"
 ---- Standardized capability stuff, before and after 1.20.3 NeoForge rework now much cleaner
 ------ SFM can now add capability wrappers for mod compatibility like the #322 fix above
 -- Add missing mod icon for mods screen
+-- Updated to NeoForge v21.1.206 for MC1.21.1
 
 
 ---- 4.25.0 ----
