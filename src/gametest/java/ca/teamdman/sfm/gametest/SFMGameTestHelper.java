@@ -16,7 +16,6 @@ import net.minecraft.gametest.framework.GameTestInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
-import net.minecraft.world.level.block.entity.SignText;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
@@ -35,6 +34,7 @@ public class SFMGameTestHelper extends GameTestHelper {
     public SFMGameTestHelper(GameTestInfo pTestInfo) {
         super(pTestInfo);
     }
+
     public SFMGameTestHelper(GameTestHelper helper) {
         super(helper.testInfo);
     }
@@ -89,11 +89,10 @@ public class SFMGameTestHelper extends GameTestHelper {
             fail("Text array was too long, max length is 4, got " + text.length, signPos);
             return;
         }
-        var newText = new SignText();
+        var newText = signBlockEntity.getFrontText();
         for (int i = 0; i < text.length; i++) {
-            newText.setMessage(i , text[i]);
+            newText = newText.setMessage(i, text[i]);
         }
-        signBlockEntity.setText(newText, false);
         signBlockEntity.setText(newText, true);
     }
 
@@ -174,21 +173,23 @@ public class SFMGameTestHelper extends GameTestHelper {
 
         LongStream
                 .range(getTick() + 1, timeoutTicks - getTick())
-                .forEach(i -> runAfterDelay(i, () -> {
-                    if (hasExecuted.get()) {
-                        triggers.remove(startTimerTrigger);
-                        triggers.remove(endTimerTrigger);
-                        assertion.run();
-                        SFMGameTestMethodHelpers.assertTrue(
-                                endTime.get() - startTime.get() < 80_000_000,
-                                "Program took too long to run: took " + NumberFormat
-                                        .getInstance(Locale.getDefault())
-                                        .format(endTime.get() - startTime.get()) + "ns"
-                        );
-                        hasExecuted.set(false); // prevent the assertion from running again
-                        onSuccess.run();
-                    }
-                }));
+                .forEach(i -> runAfterDelay(
+                        i, () -> {
+                            if (hasExecuted.get()) {
+                                triggers.remove(startTimerTrigger);
+                                triggers.remove(endTimerTrigger);
+                                assertion.run();
+                                SFMGameTestMethodHelpers.assertTrue(
+                                        endTime.get() - startTime.get() < 80_000_000,
+                                        "Program took too long to run: took " + NumberFormat
+                                                .getInstance(Locale.getDefault())
+                                                .format(endTime.get() - startTime.get()) + "ns"
+                                );
+                                hasExecuted.set(false); // prevent the assertion from running again
+                                onSuccess.run();
+                            }
+                        }
+                ));
     }
 
     public void succeedIfManagerDidThingWithoutLagging(
