@@ -338,11 +338,11 @@ public final class LocalizationKeys {
     );
     public static final LocalizationEntry WATER_TANK_ITEM_TOOLTIP_1 = new LocalizationEntry(
             () -> SFMBlocks.WATER_TANK_BLOCK.get().getDescriptionId() + ".tooltip.1",
-            () -> "Requires two adjacent water sources"
+            () -> "Requires two adjacent water sources."
     );
     public static final LocalizationEntry WATER_TANK_ITEM_TOOLTIP_2 = new LocalizationEntry(
             () -> SFMBlocks.WATER_TANK_BLOCK.get().getDescriptionId() + ".tooltip.2",
-            () -> "More effective when also adjacent to other active water tanks"
+            () -> "More effective when also adjacent to other active water tanks."
     );
     public static final LocalizationEntry LABEL_GUN_GUI_TITLE = new LocalizationEntry(
             "gui.sfm.title.labelgun",
