@@ -7,6 +7,8 @@ NAME "Changelog"
 -- https://github.com/TeamDman/SuperFactoryManager/issues/new
 
 ---- 4.26.0 ----
+-- Add new textures from #343, thanks MHanHanBing
+-- Add optional "Classic" resource pack to restore old textures
 -- Add block tag support for FallingAnvilHandler, fixes #376
 ---- See SFMBlockTags.java; sfm:anvil_disenchanting and sfm:anvil_printing_press_forming
 -- AE2 energy acceptor mod compat to fix fe:: not working, fixes #322
