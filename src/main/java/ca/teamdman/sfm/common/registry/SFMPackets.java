@@ -17,7 +17,7 @@ import java.util.IdentityHashMap;
 import java.util.Locale;
 import java.util.function.Supplier;
 
-@EventBusSubscriber(modid = SFM.MOD_ID)
+@EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class SFMPackets {
     private static final IdentityHashMap<Class<? extends SFMPacket>, SFMPacketDaddy<? extends SFMPacket>> DADDY_MAP = new IdentityHashMap<>();
     private static final IdentityHashMap<Class<? extends SFMPacket>, CustomPacketPayload.Type<? extends SFMWrappedPacket<? extends SFMPacket>>> TYPE_MAP = new IdentityHashMap<>();
