@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.datagen;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.block.FancyCableBlock;
 import ca.teamdman.sfm.common.block.WaterTankBlock;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
@@ -13,6 +14,7 @@ import net.minecraftforge.client.model.generators.ModelBuilder;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.data.event.GatherDataEvent;
 
+@SuppressWarnings("DataFlowIssue")
 public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStatesAndModelsDataGen {
     public SFMBlockStatesAndModelsDatagen(GatherDataEvent event) {
         super(event, SFM.MOD_ID);
@@ -21,30 +23,108 @@ public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStates
     @SuppressWarnings("DataFlowIssue")
     @Override
     protected void registerStatesAndModels() {
-        simpleBlock(SFMBlocks.MANAGER_BLOCK.get(), models().cubeBottomTop(
-                SFMBlocks.MANAGER_BLOCK.getId().getPath(),
-                modLoc("block/manager_side"),
-                modLoc("block/manager_bot"),
-                modLoc("block/manager_top")
-        ).texture("particle", "#top"));
+        registerManager();
+        registerTunnelledManager();
+        registerTestBarrelTank();
+        registerCable();
+        registerCableFacade();
+        registerFancyCable();
+        registerPrintingPress();
+        registerWaterTank();
+        registerTestBarrel();
+        registerBuffer();
+    }
 
-//        simpleBlock(SFMBlocks.TUNNELLED_MANAGER_BLOCK.get(), models().cubeBottomTop(
-//                SFMBlocks.TUNNELLED_MANAGER_BLOCK.getId().getPath(),
-//                modLoc("block/tunnelled_manager_side"),
-//                modLoc("block/tunnelled_manager_bot"),
-//                modLoc("block/tunnelled_manager_top")
-//        ).texture("particle", "#top"));
+    private void registerTestBarrel() {
+        ModelFile barrelModel = models().getExistingFile(mcLoc("block/barrel"));
+        ModelFile barrelOpenModel = models().getExistingFile(mcLoc("block/barrel_open"));
 
-        simpleBlock(SFMBlocks.TEST_BARREL_TANK_BLOCK.get(), models().cubeAll(
-                SFMBlocks.TEST_BARREL_TANK_BLOCK.getId().getPath(),
-                modLoc("block/test_barrel_tank")
-        ).texture("particle", "#all"));
+        getVariantBuilder(SFMBlocks.TEST_BARREL_BLOCK.get())
+                .forAllStates(state -> {
+                    Direction facing = state.getValue(BlockStateProperties.FACING);
+                    boolean open = state.getValue(BlockStateProperties.OPEN);
+                    int x;
+                    int y;
 
-        simpleBlock(SFMBlocks.CABLE_BLOCK.get());
-        simpleBlock(SFMBlocks.CABLE_FACADE_BLOCK.get(), cubeAll(SFMBlocks.CABLE_BLOCK.get()));
-        registerFancyCableBlock();
+                    switch (facing) {
+                        case DOWN -> {
+                            x = 180;
+                            y = 0;
+                        }
+                        case NORTH -> {
+                            x = 90;
+                            y = 0;
+                        }
+                        case SOUTH -> {
+                            x = 90;
+                            y = 180;
+                        }
+                        case WEST -> {
+                            x = 90;
+                            y = 270;
+                        }
+                        case EAST -> {
+                            x = 90;
+                            y = 90;
+                        }
+                        default -> { // up
+                            x = 0;
+                            y = 0;
+                        }
+                    }
+
+                    return ConfiguredModel.builder()
+                            .modelFile(open ? barrelOpenModel : barrelModel)
+                            .rotationX(x)
+                            .rotationY(y)
+                            .build();
+                });
+    }
+
+    private void registerPrintingPress() {
         simpleBlock(SFMBlocks.PRINTING_PRESS_BLOCK.get(), models().getExistingFile(modLoc("block/printing_press")));
+    }
 
+    private void registerCableFacade() {
+        simpleBlock(SFMBlocks.CABLE_FACADE_BLOCK.get(), cubeAll(SFMBlocks.CABLE_BLOCK.get()));
+    }
+
+    private void registerCable() {
+        simpleBlock(SFMBlocks.CABLE_BLOCK.get());
+    }
+
+    private void registerTestBarrelTank() {
+        simpleBlock(
+                SFMBlocks.TEST_BARREL_TANK_BLOCK.get(), models().cubeAll(
+                        SFMBlocks.TEST_BARREL_TANK_BLOCK.getId().getPath(),
+                        modLoc("block/test_barrel_tank")
+                ).texture("particle", "#all")
+        );
+    }
+
+    private void registerTunnelledManager() {
+        simpleBlock(
+                SFMBlocks.TUNNELLED_MANAGER_BLOCK.get(), models().cubeBottomTop(
+                        SFMBlocks.TUNNELLED_MANAGER_BLOCK.getId().getPath(),
+                        modLoc("block/tunnelled_manager_side"),
+                        modLoc("block/tunnelled_manager_bot"),
+                        modLoc("block/tunnelled_manager_top")
+                ).texture("particle", "#top")
+        );
+    }
+
+    private void registerManager() {
+        simpleBlock(
+                SFMBlocks.MANAGER_BLOCK.get(), models().cubeBottomTop(
+                        SFMBlocks.MANAGER_BLOCK.getId().getPath(),
+                        modLoc("block/manager_side"),
+                        modLoc("block/manager_bot"),
+                        modLoc("block/manager_top")
+                ).texture("particle", "#top")
+        );
+    }
+
+    private void registerWaterTank() {
         ModelFile waterIntakeModelActive = models()
                 .cubeAll(
                         SFMBlocks.WATER_TANK_BLOCK.getId().getPath() + "_active",
@@ -64,55 +144,9 @@ public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStates
                                 : waterIntakeModelInactive
                         )
                         .build());
-
-        {
-            ModelFile barrelModel = models().getExistingFile(mcLoc("block/barrel"));
-            ModelFile barrelOpenModel = models().getExistingFile(mcLoc("block/barrel_open"));
-
-            getVariantBuilder(SFMBlocks.TEST_BARREL_BLOCK.get())
-                    .forAllStates(state -> {
-                        Direction facing = state.getValue(BlockStateProperties.FACING);
-                        boolean open = state.getValue(BlockStateProperties.OPEN);
-                        int x;
-                        int y;
-
-                        switch (facing) {
-                            case DOWN -> {
-                                x = 180;
-                                y = 0;
-                            }
-                            case NORTH -> {
-                                x = 90;
-                                y = 0;
-                            }
-                            case SOUTH -> {
-                                x = 90;
-                                y = 180;
-                            }
-                            case WEST -> {
-                                x = 90;
-                                y = 270;
-                            }
-                            case EAST -> {
-                                x = 90;
-                                y = 90;
-                            }
-                            default -> { // up
-                                x = 0;
-                                y = 0;
-                            }
-                        }
-
-                        return ConfiguredModel.builder()
-                                .modelFile(open ? barrelOpenModel : barrelModel)
-                                .rotationX(x)
-                                .rotationY(y)
-                                .build();
-                    });
-        }
     }
 
-    private void registerFancyCableBlock() {
+    private void registerFancyCable() {
         var coreModel = models().withExistingParent(modLoc("block/fancy_cable_core").getPath(), "block/block")
                 .element()
                 .from(4, 4, 4)
@@ -196,5 +230,18 @@ public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStates
                     .condition(FancyCableBlock.DIRECTION_PROPERTIES.get(direction), true)
                     .end();
         }
+    }
+
+    private void registerBuffer() {
+        getVariantBuilder(SFMBlocks.BUFFER_BLOCK.get())
+                .forAllStates(state -> {
+                    BufferBlock.ContainedResource containedResource = state.getValue(BufferBlock.CONTAINED_RESOURCE);
+                    ModelFile modelFile = models().cubeAll(
+                            SFMBlocks.BUFFER_BLOCK.getId().getPath() + "_" + containedResource.getSerializedName(),
+                            modLoc("block/buffer_" + containedResource.getSerializedName())
+                    );
+                    return ConfiguredModel.builder().modelFile(modelFile).build();
+                });
+
     }
 }

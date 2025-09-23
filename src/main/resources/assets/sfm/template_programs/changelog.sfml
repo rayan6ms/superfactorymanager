@@ -6,6 +6,13 @@ NAME "Changelog"
 -- SFM submit new issue:
 -- https://github.com/TeamDman/SuperFactoryManager/issues/new
 
+---- 4.27.0 ----
+-- Add tunnelled manager block from #189, thanks @Qther
+---- When capabilities are queried, will pass through to the opposite side
+---- Hopper -> Manager -> Chest
+-- Add resource buffer block
+---- Holds one stack worth of any of the resource types supported by SFM
+
 ---- 4.26.0 ----
 -- Add new textures from #343, thanks MHanHanBing
 -- Add optional "Classic" resource pack to restore old textures

@@ -18,10 +18,16 @@ import java.util.Set;
 public class SFMBlocks {
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(ForgeRegistries.BLOCKS, SFM.MOD_ID);
     public static final RegistryObject<ManagerBlock> MANAGER_BLOCK = BLOCKS.register("manager", ManagerBlock::new);
-    //    public static final RegistryObject<TunnelledManagerBlock> TUNNELLED_MANAGER_BLOCK = BLOCKS.register(
-//            "tunnelled_manager",
-//            TunnelledManagerBlock::new
-//    );
+    public static final RegistryObject<BufferBlock> BUFFER_BLOCK = BLOCKS.register("buffer", ()-> new BufferBlock(
+            BlockBehaviour.Properties
+                    .of(Material.PISTON)
+                    .destroyTime(1.5f)
+                    .sound(SoundType.METAL)
+    ));
+        public static final RegistryObject<TunnelledManagerBlock> TUNNELLED_MANAGER_BLOCK = BLOCKS.register(
+            "tunnelled_manager",
+            TunnelledManagerBlock::new
+    );
     public static final RegistryObject<PrintingPressBlock> PRINTING_PRESS_BLOCK = BLOCKS.register(
             "printing_press",
             PrintingPressBlock::new
@@ -42,6 +48,7 @@ public class SFMBlocks {
                             .sound(SoundType.METAL)
             )
     );
+
     public static final RegistryObject<CableFacadeBlock> CABLE_FACADE_BLOCK = BLOCKS.register(
             "cable_facade",
             () -> new CableFacadeBlock(BlockBehaviour.Properties
@@ -49,6 +56,7 @@ public class SFMBlocks {
                                                .destroyTime(1f)
                                                .sound(SoundType.METAL))
     );
+
     public static final RegistryObject<FancyCableBlock> FANCY_CABLE_BLOCK = BLOCKS.register(
             "fancy_cable",
             () -> new FancyCableBlock(BlockBehaviour.Properties
@@ -56,6 +64,7 @@ public class SFMBlocks {
                                               .destroyTime(1f)
                                               .sound(SoundType.METAL))
     );
+
     public static final RegistryObject<FancyCableFacadeBlock> FANCY_CABLE_FACADE_BLOCK = BLOCKS.register(
             "fancy_cable_facade",
             () -> new FancyCableFacadeBlock(BlockBehaviour.Properties
@@ -63,7 +72,9 @@ public class SFMBlocks {
                                                     .destroyTime(1f)
                                                     .sound(SoundType.METAL))
     );
+
     //    public static final RegistryObject<BatteryBlock> BATTERY_BLOCK = BLOCKS.register("battery", BatteryBlock::new);
+
     public static final RegistryObject<TestBarrelBlock> TEST_BARREL_BLOCK = BLOCKS.register(
             "test_barrel",
             TestBarrelBlock::new
