@@ -42,5 +42,6 @@ public class BatteryBlockEntity extends BlockEntity {
     @Override
     public void invalidateCaps() {
         CAPABILITY.invalidate();
+        super.invalidateCaps();
     }
 }

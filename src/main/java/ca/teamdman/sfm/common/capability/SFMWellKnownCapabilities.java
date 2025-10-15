@@ -1,9 +1,17 @@
 package ca.teamdman.sfm.common.capability;
 
+import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.resourcetype.ResourceType;
+import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.stream.Stream;
+
+import static net.minecraftforge.common.capabilities.CapabilityManager.get;
 
 /// In between Forge for Minecraft 1.19.2 and NeoForge for Minecraft 1.20.3,
 /// the {@code ForgeCapabilities} class is changed to {@code BuiltInCapabilities}
@@ -15,4 +23,23 @@ public class SFMWellKnownCapabilities {
             = new SFMBlockCapabilityKind<>(ForgeCapabilities.FLUID_HANDLER);
     public static final SFMBlockCapabilityKind<IItemHandler> ITEM_HANDLER
             = new SFMBlockCapabilityKind<>(ForgeCapabilities.ITEM_HANDLER);
+    public static final SFMBlockCapabilityKind<IRedstoneSignalStorage> REDSTONE_HANDLER
+            = new SFMBlockCapabilityKind<>(get(new CapabilityToken<>() {
+    }));
+
+    @SuppressWarnings("unchecked")
+    public static <STACK, ITEM, CAP> @Nullable ResourceType<STACK, ITEM, CAP> getResourceTypeForCapability(
+            SFMBlockCapabilityKind<CAP> capabilityKind
+    ) {
+        return (ResourceType<STACK, ITEM, CAP>) SFMResourceTypes
+                .registry()
+                .streamValues()
+                .filter(resourceType -> resourceType.CAPABILITY_KIND.equals(capabilityKind))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public static Stream<SFMBlockCapabilityKind<?>> streamCapabilities() {
+        return SFMResourceTypes.registry().streamValues().map(ResourceType::getCapabilityKind);
+    }
 }

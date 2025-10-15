@@ -5,6 +5,7 @@ import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
+import ca.teamdman.sfm.common.capability.energystorage.EnergyAcceptorEnergyStorageWrapper;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -41,44 +42,4 @@ public class EnergyAcceptorBlockCapabilityProvider implements SFMBlockCapability
         }
     }
 
-    public record EnergyAcceptorEnergyStorageWrapper(
-            IEnergyStorage inner
-    ) implements IEnergyStorage {
-        @Override
-        public int receiveEnergy(
-                int maxReceive,
-                boolean simulate
-        ) {
-            return inner.receiveEnergy(maxReceive, simulate);
-        }
-
-        @Override
-        public int extractEnergy(
-                int maxExtract,
-                boolean simulate
-        ) {
-            return inner.extractEnergy(maxExtract, simulate);
-        }
-
-        @Override
-        public int getEnergyStored() {
-            return inner.getEnergyStored();
-        }
-
-        @Override
-        public int getMaxEnergyStored() {
-            // #322: AE always reports zero, we want SFM to be able to insert energy
-            return Integer.MAX_VALUE;
-        }
-
-        @Override
-        public boolean canExtract() {
-            return inner.canExtract();
-        }
-
-        @Override
-        public boolean canReceive() {
-            return inner.canReceive();
-        }
-    }
 }

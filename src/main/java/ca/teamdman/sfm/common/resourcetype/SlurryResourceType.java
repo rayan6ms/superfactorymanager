@@ -1,11 +1,16 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.block.BufferBlock;
+import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
+import mekanism.api.chemical.ChemicalTankBuilder;
 import mekanism.api.chemical.slurry.ISlurryHandler;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
+import mekanism.common.lib.transmitter.TransmissionType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraftforge.common.capabilities.CapabilityManager;
@@ -22,6 +27,22 @@ public class SlurryResourceType extends RegistryBackedResourceType<SlurryStack, 
 
     public SlurryResourceType() {
         super(CAP);
+    }
+
+    @Override
+    public ISlurryHandler createHandlerForBufferBlock(BufferBlockEntityContents contents) {
+        return (ChemicalTankBuilder.BasicSlurryTank) ChemicalTankBuilder.SLURRY.create(
+                Long.MAX_VALUE,
+                extracting -> {
+                    ResourceType<?, ?, ?> resourceType = SFMMekanismCompat.getResourceType(TransmissionType.SLURRY);
+                    boolean isValid = resourceType != null && contents.allowInsertion(resourceType);
+                    if (isValid) {
+                        contents.lastUsedResource = BufferBlock.ContainedResource.Chemical;
+                    }
+                    return isValid;
+                },
+                null
+        );
     }
 
     @Override
@@ -91,7 +112,7 @@ public class SlurryResourceType extends RegistryBackedResourceType<SlurryStack, 
     }
 
     @Override
-    public boolean matchesCapabilityType(Object o) {
+    public boolean matchesCapabilityHandler(Object o) {
         return o instanceof ISlurryHandler;
     }
 

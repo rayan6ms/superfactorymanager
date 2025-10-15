@@ -3,6 +3,7 @@ package ca.teamdman.sfm.common.registry;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.capability.BlockEntityCapabilityProvider;
 import ca.teamdman.sfm.common.capability.CauldronBlockCapabilityProvider;
+import ca.teamdman.sfm.common.capability.RedstoneSignalCapabilityProvider;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProvider;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
@@ -39,6 +40,9 @@ public class SFMBlockCapabilityProviders {
 
     public static final Supplier<BlockEntityCapabilityProvider>
             BLOCK_ENTITY = REGISTERER.register("block_entity", BlockEntityCapabilityProvider::new);
+
+    public static final Supplier<RedstoneSignalCapabilityProvider>
+            REDSTONE = REGISTERER.register("redstone", RedstoneSignalCapabilityProvider::new);
 
     static {
 //        if (SFMModCompat.isAE2Loaded()) {

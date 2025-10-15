@@ -56,7 +56,7 @@ public interface IInputResourceTracker {
 
     default boolean matchesCapabilityType(Object capability) {
         for (ResourceType<?, ?, ?> resourceType : getResourceLimit().resourceIds().getReferencedResourceTypes()) {
-            if (resourceType.matchesCapabilityType(capability)) {
+            if (resourceType.matchesCapabilityHandler(capability)) {
                 return true;
             }
         }

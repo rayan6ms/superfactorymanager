@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.item.*;
+import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -15,22 +16,37 @@ import net.minecraftforge.registries.RegistryObject;
 public class SFMItems {
     static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, SFM.MOD_ID);
     public static final RegistryObject<BlockItem> MANAGER_ITEM = register("manager", SFMBlocks.MANAGER_BLOCK);
-//    public static final RegistryObject<BlockItem> TUNNELLED_MANAGER_ITEM = register(
-//            "tunnelled_manager",
-//            SFMBlocks.TUNNELLED_MANAGER_BLOCK
-//    );
+
+    public static RegistryObject<BlockItem> BUFFER_ITEM = null;
+    static {
+        if (SFMEnvironmentUtils.isInIDE()) {
+            BUFFER_ITEM = register("buffer", SFMBlocks.BUFFER_BLOCK);
+        }
+    }
+
+    public static final RegistryObject<BlockItem> TUNNELLED_MANAGER_ITEM = register(
+            "tunnelled_manager",
+            SFMBlocks.TUNNELLED_MANAGER_BLOCK
+    );
+
     public static final RegistryObject<BlockItem> CABLE_ITEM = register("cable", SFMBlocks.CABLE_BLOCK);
+
     public static final RegistryObject<BlockItem> FANCY_CABLE_ITEM = register(
             "fancy_cable",
             SFMBlocks.FANCY_CABLE_BLOCK
     );
+
     public static final RegistryObject<PrintingPressBlockItem> PRINTING_PRESS_ITEM = ITEMS.register(
             "printing_press",
             PrintingPressBlockItem::new
     );
+
     //    public static final  RegistryObject<Item>   BATTERY_ITEM    = register("battery", SFMBlocks.BATTERY_BLOCK);
+
     public static final RegistryObject<BlockItem> WATER_TANK_ITEM = register("water_tank", SFMBlocks.WATER_TANK_BLOCK);
+
     public static final RegistryObject<DiskItem> DISK_ITEM = ITEMS.register("disk", DiskItem::new);
+
     public static final RegistryObject<LabelGunItem> LABEL_GUN_ITEM = ITEMS.register(
             "labelgun", // TODO: rename on a major version update to label_gun
             LabelGunItem::new
