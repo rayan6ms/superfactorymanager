@@ -12,6 +12,9 @@
     "resource=item": {
       "model": "sfm:block/buffer_item"
     },
+    "resource=redstone": {
+      "model": "sfm:block/buffer_redstone"
+    },
     "resource=unknown": {
       "model": "sfm:block/buffer_unknown"
     }
