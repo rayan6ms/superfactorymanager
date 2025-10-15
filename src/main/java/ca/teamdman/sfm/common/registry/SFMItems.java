@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.item.*;
+import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -14,7 +15,12 @@ public class SFMItems {
     private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, SFM.MOD_ID);
     public static final RegistryObject<BlockItem> MANAGER_ITEM = register("manager", SFMBlocks.MANAGER_BLOCK);
 
-    public static final RegistryObject<BlockItem> BUFFER_ITEM = register("buffer", SFMBlocks.BUFFER_BLOCK);
+    public static RegistryObject<BlockItem> BUFFER_ITEM = null;
+    static {
+        if (SFMEnvironmentUtils.isInIDE()) {
+            BUFFER_ITEM = register("buffer", SFMBlocks.BUFFER_BLOCK);
+        }
+    }
 
     public static final RegistryObject<BlockItem> TUNNELLED_MANAGER_ITEM = register(
             "tunnelled_manager",
