@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
@@ -31,10 +32,14 @@ public class PigmentResourceType extends RegistryBackedResourceType<PigmentStack
     @Override
     public IPigmentHandler createHandlerForBufferBlock(BufferBlockEntityContents contents) {
         return (ChemicalTankBuilder.BasicPigmentTank) ChemicalTankBuilder.PIGMENT.create(
-                Long.MAX_VALUE,
+                contents.tier.getLongScalarMaxStackSize(),
                 extracting -> {
                     ResourceType<?, ?, ?> resourceType = SFMMekanismCompat.getResourceType(TransmissionType.PIGMENT);
-                    return resourceType != null && contents.allowInsertion(resourceType);
+                    boolean isValid = resourceType != null && contents.allowInsertion(resourceType);
+                    if (isValid) {
+                        contents.lastUsedResource = BufferBlock.ContainedResource.Chemical;
+                    }
+                    return isValid;
                 },
                 null
         );

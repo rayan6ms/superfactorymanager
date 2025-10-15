@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
@@ -32,7 +33,7 @@ public class MekanismEnergyResourceType extends ScalarResourceType<FloatingLong,
     public IStrictEnergyHandler createHandlerForBufferBlock(BufferBlockEntityContents contents) {
         return new IMekanismStrictEnergyHandler() {
             private final List<IEnergyContainer> containers = List.of(BasicEnergyContainer.create(
-                    FloatingLong.MAX_VALUE,
+                    FloatingLong.create(contents.tier.getLongScalarMaxStackSize()),
                     null
             ));
 
@@ -51,6 +52,9 @@ public class MekanismEnergyResourceType extends ScalarResourceType<FloatingLong,
                 boolean canReceive = !this.getEnergy(0).isZero() || contents.isEmpty();
                 if (!canReceive) {
                     return amount;
+                }
+                if (action.execute() && contents.isEmpty()) {
+                    contents.lastUsedResource = BufferBlock.ContainedResource.Energy;
                 }
                 return IMekanismStrictEnergyHandler.super.insertEnergy(container, amount, side, action);
             }

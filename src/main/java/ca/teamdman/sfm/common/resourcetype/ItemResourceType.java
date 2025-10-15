@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import net.minecraft.resources.ResourceLocation;
@@ -40,13 +41,17 @@ public class ItemResourceType extends RegistryBackedResourceType<ItemStack, Item
 
     @Override
     public IItemHandler createHandlerForBufferBlock(BufferBlockEntityContents contents) {
-        return new ItemStackHandler() {
+        return new ItemStackHandler(contents.tier.numSlots) {
             @Override
             public boolean isItemValid(
                     int slot,
                     @NotNull ItemStack stack
             ) {
-                return !this.getStackInSlot(0).isEmpty() || contents.isEmpty();
+                boolean isValid = !this.getStackInSlot(0).isEmpty() || contents.isEmpty();
+                if (isValid) {
+                    contents.lastUsedResource = BufferBlock.ContainedResource.Item;
+                }
+                return isValid;
             }
         };
     }

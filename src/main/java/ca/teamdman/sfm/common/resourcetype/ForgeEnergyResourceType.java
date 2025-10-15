@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
@@ -60,10 +61,14 @@ public class ForgeEnergyResourceType extends IntegerResourceType<IEnergyStorage>
 
     @Override
     public IEnergyStorage createHandlerForBufferBlock(BufferBlockEntityContents contents) {
-        return new EnergyStorage(Integer.MAX_VALUE) {
+        return new EnergyStorage(contents.tier.getIntScalarMaxStackSize()) {
             @Override
             public boolean canReceive() {
-                return this.energy > 0 || contents.isEmpty();
+                boolean isValid = this.energy > 0 || contents.isEmpty();
+                if (isValid) {
+                    contents.lastUsedResource = BufferBlock.ContainedResource.Energy;
+                }
+                return isValid;
             }
         };
     }

@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
@@ -32,10 +33,14 @@ public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, I
     @Override
     public IGasHandler createHandlerForBufferBlock(BufferBlockEntityContents contents) {
         return (ChemicalTankBuilder.BasicGasTank) ChemicalTankBuilder.GAS.create(
-                Long.MAX_VALUE,
+                contents.tier.getIntScalarMaxStackSize(),
                 extracting -> {
                     ResourceType<?, ?, ?> resourceType = SFMMekanismCompat.getResourceType(TransmissionType.GAS);
-                    return resourceType != null && contents.allowInsertion(resourceType);
+                    boolean isValid = resourceType != null && contents.allowInsertion(resourceType);
+                    if (isValid) {
+                        contents.lastUsedResource = BufferBlock.ContainedResource.Chemical;
+                    }
+                    return isValid;
                 },
                 null
         );

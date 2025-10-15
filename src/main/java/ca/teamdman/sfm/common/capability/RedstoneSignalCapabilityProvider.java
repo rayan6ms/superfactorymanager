@@ -29,7 +29,7 @@ public class RedstoneSignalCapabilityProvider implements SFMBlockCapabilityProvi
             // Wrap in try-catch since getSignal doesn't explicitly allow the null direction
             @SuppressWarnings("DataFlowIssue")
             int signal = state.getSignal(levelAccessor, pos, direction);
-            return SFMBlockCapabilityResult.of(new RedstoneSignalStorage(signal));
+            return SFMBlockCapabilityResult.of(new RedstoneSignalStorage(signal, 15));
         } catch (Throwable t) {
             return SFMBlockCapabilityResult.empty();
         }

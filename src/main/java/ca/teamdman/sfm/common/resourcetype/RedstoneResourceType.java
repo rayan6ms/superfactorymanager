@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.IRedstoneSignalStorage;
 import ca.teamdman.sfm.common.capability.RedstoneSignalStorage;
@@ -16,10 +17,14 @@ public class RedstoneResourceType extends IntegerResourceType<IRedstoneSignalSto
 
     @Override
     public IRedstoneSignalStorage createHandlerForBufferBlock(BufferBlockEntityContents contents) {
-        return new RedstoneSignalStorage(0) {
+        return new RedstoneSignalStorage(0, contents.tier.getIntScalarMaxStackSize()) {
             @Override
             public boolean canReceive() {
-                return this.getStoredAmount() > 0 || contents.isEmpty();
+                boolean isValid = this.getStoredAmount() > 0 || contents.isEmpty();
+                if (isValid) {
+                    contents.lastUsedResource = BufferBlock.ContainedResource.Redstone;
+                }
+                return isValid;
             }
         };
     }
