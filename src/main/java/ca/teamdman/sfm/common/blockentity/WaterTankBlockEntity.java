@@ -76,6 +76,7 @@ public class WaterTankBlockEntity extends BlockEntity {
     @Override
     public void invalidateCaps() {
         TANK_CAPABILITY.invalidate();
+        super.invalidateCaps();
     }
 
     private void updateTank() {
