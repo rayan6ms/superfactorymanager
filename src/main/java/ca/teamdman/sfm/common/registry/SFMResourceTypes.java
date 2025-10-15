@@ -1,7 +1,6 @@
 package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.compat.SFMModCompat;
 import ca.teamdman.sfm.common.resourcetype.FluidResourceType;
 import ca.teamdman.sfm.common.resourcetype.ForgeEnergyResourceType;
@@ -26,7 +25,6 @@ import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
-import java.util.stream.Stream;
 
 public class SFMResourceTypes {
     public static final ResourceLocation REGISTRY_ID = SFMResourceLocation.fromSFMPath("resource_type");
@@ -67,10 +65,6 @@ public class SFMResourceTypes {
                 resourceTypeId,
                 i -> registry().getValue(resourceTypeId)
         );
-    }
-
-    public static Stream<SFMBlockCapabilityKind<?>> getCapabilities() {
-        return REGISTERER.getEntries().stream().map(RegistryObject::get).map(resourceType -> resourceType.CAPABILITY_KIND);
     }
 
     public static void register(IEventBus bus) {

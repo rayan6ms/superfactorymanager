@@ -1,5 +1,7 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.block.BufferBlock;
+import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -9,8 +11,10 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
 
@@ -33,6 +37,23 @@ public class ItemResourceType extends RegistryBackedResourceType<ItemStack, Item
     @Override
     public ItemStack copy(ItemStack stack) {
         return stack.copy();
+    }
+
+    @Override
+    public IItemHandler createHandlerForBufferBlock(BufferBlockEntityContents contents) {
+        return new ItemStackHandler(contents.tier.numSlots) {
+            @Override
+            public boolean isItemValid(
+                    int slot,
+                    @NotNull ItemStack stack
+            ) {
+                boolean isValid = !this.getStackInSlot(0).isEmpty() || contents.isEmpty();
+                if (isValid) {
+                    contents.lastUsedResource = BufferBlock.ContainedResource.Item;
+                }
+                return isValid;
+            }
+        };
     }
 
     @Override
@@ -67,7 +88,7 @@ public class ItemResourceType extends RegistryBackedResourceType<ItemStack, Item
     }
 
     @Override
-    public boolean matchesCapabilityType(Object o) {
+    public boolean matchesCapabilityHandler(Object o) {
         return o instanceof IItemHandler;
     }
 
