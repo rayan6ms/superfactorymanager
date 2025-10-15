@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
@@ -7,6 +8,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.IForgeRegistry;
 
@@ -46,6 +48,16 @@ public class FluidResourceType extends RegistryBackedResourceType<FluidStack, Fl
     }
 
     @Override
+    public IFluidHandler createHandlerForBufferBlock(BufferBlockEntityContents contents) {
+        return new FluidTank(Integer.MAX_VALUE) {
+            @Override
+            public boolean isFluidValid(FluidStack stack) {
+                return this.getFluidAmount() > 0 || contents.isEmpty();
+            }
+        };
+    }
+
+    @Override
     public long getAmount(FluidStack stack) {
         return stack.getAmount();
     }
@@ -80,7 +92,7 @@ public class FluidResourceType extends RegistryBackedResourceType<FluidStack, Fl
     }
 
     @Override
-    public boolean matchesCapabilityType(Object o) {
+    public boolean matchesCapabilityHandler(Object o) {
         return o instanceof IFluidHandler;
     }
 

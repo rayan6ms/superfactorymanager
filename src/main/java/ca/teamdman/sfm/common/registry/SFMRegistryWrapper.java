@@ -12,6 +12,8 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Stream;
+import java.util.stream.StreamSupport;
 
 public record SFMRegistryWrapper<V>(
         @MCVersionDependentBehaviour
@@ -29,6 +31,10 @@ public record SFMRegistryWrapper<V>(
 
     public @NotNull Iterable<V> getValues() {
         return registry;
+    }
+
+    public @NotNull Stream<V> streamValues() {
+        return StreamSupport.stream(registry.spliterator(), false);
     }
 
     public @Nullable ResourceLocation getKey(V value) {
