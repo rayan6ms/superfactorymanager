@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.capability;
 
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.neoforged.neoforge.common.capabilities.Capability;
+import org.jetbrains.annotations.NotNull;
 
 /// In NeoForge for Minecraft 1.20.3, the {@code Capability<CAP>} type is replaced with {@code BlockCapability<CAP, CONTEXT>}.
 /// We use {@link SFMBlockCapabilityKind} to wrap the capability kind.
@@ -15,5 +16,10 @@ public record SFMBlockCapabilityKind<CAP>(
 ) {
     public String getName() {
         return capabilityKind.getName();
+    }
+
+    @Override
+    public @NotNull String toString() {
+        return "SFMBlockCapabilityKind[" + getName() + "]";
     }
 }

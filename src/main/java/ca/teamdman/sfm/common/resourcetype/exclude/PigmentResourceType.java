@@ -1,12 +1,17 @@
 package ca.teamdman.sfm.common.resourcetype.exclude;
 
+import ca.teamdman.sfm.common.block.BufferBlock;
+import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
+import mekanism.api.chemical.ChemicalTankBuilder;
 import mekanism.api.chemical.pigment.IPigmentHandler;
 import mekanism.api.chemical.pigment.Pigment;
 import mekanism.api.chemical.pigment.PigmentStack;
 import net.minecraft.core.Registry;
+import mekanism.common.lib.transmitter.TransmissionType;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.common.capabilities.CapabilityManager;
@@ -23,6 +28,22 @@ public class PigmentResourceType extends RegistryBackedResourceType<PigmentStack
 
     public PigmentResourceType() {
         super(CAP);
+    }
+
+    @Override
+    public IPigmentHandler createHandlerForBufferBlock(BufferBlockEntityContents contents) {
+        return (ChemicalTankBuilder.BasicPigmentTank) ChemicalTankBuilder.PIGMENT.create(
+                contents.tier.getLongScalarMaxStackSize(),
+                extracting -> {
+                    ResourceType<?, ?, ?> resourceType = SFMMekanismCompat.getResourceType(TransmissionType.PIGMENT);
+                    boolean isValid = resourceType != null && contents.allowInsertion(resourceType);
+                    if (isValid) {
+                        contents.lastUsedResource = BufferBlock.ContainedResource.Chemical;
+                    }
+                    return isValid;
+                },
+                null
+        );
     }
 
     @Override
@@ -92,7 +113,7 @@ public class PigmentResourceType extends RegistryBackedResourceType<PigmentStack
     }
 
     @Override
-    public boolean matchesCapabilityType(Object o) {
+    public boolean matchesCapabilityHandler(Object o) {
         return o instanceof IPigmentHandler;
     }
 

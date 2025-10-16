@@ -94,7 +94,7 @@ public class SFMBlockCapabilityDiscovery {
             LevelAccessor level,
             BlockPos pos
     ) {
-        return SFMResourceTypes.getCapabilities().anyMatch(cap -> {
+        return SFMWellKnownCapabilities.streamCapabilities().anyMatch(cap -> {
             for (Direction direction : SFMDirections.DIRECTIONS_WITH_NULL) {
                 if (discoverCapabilityFromLevel(level, cap, pos, direction).isPresent()) {
                     return true;

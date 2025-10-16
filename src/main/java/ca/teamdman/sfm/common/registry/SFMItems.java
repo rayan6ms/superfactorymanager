@@ -3,6 +3,8 @@ package ca.teamdman.sfm.common.registry;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.item.*;
 import net.minecraft.core.registries.BuiltInRegistries;
+import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
@@ -12,25 +14,39 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.function.Supplier;
 
 public class SFMItems {
-
     static final DeferredRegister<Item> ITEMS = DeferredRegister.create(BuiltInRegistries.ITEM, SFM.MOD_ID);
     public static final Supplier<BlockItem> MANAGER_ITEM = register("manager", SFMBlocks.MANAGER_BLOCK);
-//    public static final Supplier<BlockItem> TUNNELLED_MANAGER_ITEM = register(
-//            "tunnelled_manager",
-//            SFMBlocks.TUNNELLED_MANAGER_BLOCK
-//    );
+
+    public static Supplier<BlockItem> BUFFER_ITEM = null;
+    static {
+        if (SFMEnvironmentUtils.isInIDE()) {
+            BUFFER_ITEM = register("buffer", SFMBlocks.BUFFER_BLOCK);
+        }
+    }
+
+    public static final Supplier<BlockItem> TUNNELLED_MANAGER_ITEM = register(
+            "tunnelled_manager",
+            SFMBlocks.TUNNELLED_MANAGER_BLOCK
+    );
+
     public static final Supplier<BlockItem> CABLE_ITEM = register("cable", SFMBlocks.CABLE_BLOCK);
+
     public static final Supplier<BlockItem> FANCY_CABLE_ITEM = register(
             "fancy_cable",
             SFMBlocks.FANCY_CABLE_BLOCK
     );
+
     public static final Supplier<PrintingPressBlockItem> PRINTING_PRESS_ITEM = ITEMS.register(
             "printing_press",
             PrintingPressBlockItem::new
     );
+
     //    public static final  Supplier<Item>   BATTERY_ITEM    = register("battery", SFMBlocks.BATTERY_BLOCK);
+
     public static final Supplier<BlockItem> WATER_TANK_ITEM = register("water_tank", SFMBlocks.WATER_TANK_BLOCK);
+
     public static final Supplier<DiskItem> DISK_ITEM = ITEMS.register("disk", DiskItem::new);
+
     public static final Supplier<LabelGunItem> LABEL_GUN_ITEM = ITEMS.register(
             "labelgun", // TODO: rename on a major version update to label_gun
             LabelGunItem::new
