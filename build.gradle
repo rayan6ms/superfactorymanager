@@ -38,10 +38,6 @@ sourceSets {
             exclude "ca/teamdman/sfm/common/program/linting/MekanismSideConfigProgramLinter.java"
         }
         java {
-            exclude "ca/teamdman/sfm/common/block/TunnelledManagerBlock.java"
-            exclude "ca/teamdman/sfm/common/blockentity/TunnelledManagerBlockEntity.java"
-        }
-        java {
             exclude "ca/teamdman/sfm/common/block/BatteryBlock.java"
             exclude "ca/teamdman/sfm/common/blockentity/BatteryBlockEntity.java"
         }

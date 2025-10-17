@@ -1,7 +1,9 @@
 package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.capability.BufferBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.CauldronBlockCapabilityProvider;
+import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -91,15 +93,46 @@ public class SFMBlockCapabilities {
                 Blocks.LAVA_CAULDRON,
                 Blocks.WATER_CAULDRON
         );
-//        SFMResourceTypes.getCapabilities().forEach(cap -> {
-//            event.registerBlock(
-//                    cap,
-//                    createProvider(cap),
-//                    SFMBlocks.TUNNELLED_MANAGER_BLOCK.get()
-//            );
-//        });
+        SFMResourceTypes.registry().streamValues().forEach(resourceType -> {
+            registerCapabilitiesForResourceType(event, resourceType);
+        });
     }
 
+    private static <STACK, ITEM, CAP> void registerCapabilitiesForResourceType(
+            RegisterCapabilitiesEvent event,
+            ResourceType<STACK, ITEM, CAP> resourceType
+    ) {
+        BlockCapability<CAP, @Nullable Direction> resourceTypeBlockCapability = resourceType
+                .capabilityKind()
+                .capabilityKind();
+
+        event.registerBlock(
+                resourceTypeBlockCapability,
+                createProvider(resourceTypeBlockCapability),
+                SFMBlocks.TUNNELLED_MANAGER_BLOCK.get()
+        );
+
+        BufferBlockCapabilityProvider bufferCapabilityProvider = new BufferBlockCapabilityProvider();
+        IBlockCapabilityProvider<?, @Nullable Direction> providerForKind
+                = bufferCapabilityProvider.createForKind(resourceType.capabilityKind());
+        assert providerForKind != null; // the buffer supports all resource types
+        event.registerBlockEntity(
+                resourceTypeBlockCapability,
+                SFMBlockEntities.BUFFER_BLOCK_ENTITY.get(),
+                (blockEntity, direction) -> {
+                    //noinspection unchecked
+                    return (CAP) providerForKind.getCapability(
+                            blockEntity.getLevel(),
+                            blockEntity.getBlockPos(),
+                            blockEntity.getBlockState(),
+                            blockEntity,
+                            direction
+                    );
+                }
+        );
+    }
+
+    @SuppressWarnings("Convert2Lambda")
     private static <T> IBlockCapabilityProvider<T, @Nullable Direction> createProvider(BlockCapability<?, @Nullable Direction> cap) {
         return new IBlockCapabilityProvider<>() {
             @Override
@@ -117,5 +150,4 @@ public class SFMBlockCapabilities {
             }
         };
     }
-
 }

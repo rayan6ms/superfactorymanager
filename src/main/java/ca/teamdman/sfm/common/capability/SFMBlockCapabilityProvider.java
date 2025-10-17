@@ -1,12 +1,11 @@
 package ca.teamdman.sfm.common.capability;
 
-import ca.teamdman.sfm.common.registry.SFMBlockCapabilityProviders;
-import net.minecraft.core.BlockPos;
+import ca.teamdman.sfm.common.registry.SFMGlobalBlockCapabilityProviders;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.CauldronBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider;
 import org.jetbrains.annotations.Nullable;
 
 /// In NeoForge for Minecraft before 1.20.3, capabilities are queried from {@link BlockEntity}.
@@ -17,26 +16,20 @@ import org.jetbrains.annotations.Nullable;
 /// Additionally, mods can participate in the registration of capabilities to blocks in that version.
 ///
 /// Prior to this version, for SFM to get a {@link SFMWellKnownCapabilities#FLUID_HANDLER} for {@link CauldronBlock},
-/// it has its own mechanism for indirection via {@link SFMBlockCapabilityProviders} and {@link SFMBlockCapabilityProviderCache}
+/// it has its own mechanism for indirection via {@link SFMGlobalBlockCapabilityProviders}
 ///
 /// For per-mod compat, like to fix <a href="https://github.com/TeamDman/SuperFactoryManager/issues/322">#322</a>,
 /// SFM keeps this indirection mechanism for 1.20.3 and later as well.
 ///
 /// TODO: Fix <a href="https://github.com/TeamDman/SuperFactoryManager/issues/352">#352</a> using this.
-public interface SFMBlockCapabilityProvider<CAP> {
-    ///  Used to determine which providers to ask when we are looking for a specific capability kind
-    boolean matchesCapabilityKind(SFMBlockCapabilityKind<?> capabilityKind);
-
-    ///  Returns a capability for the given block at the given position in the given level if it has one.
-    SFMBlockCapabilityResult<CAP> getCapability(
-            SFMBlockCapabilityKind<CAP> capabilityKind,
-            Level level,
-            BlockPos pos,
-            BlockState state,
-            @Nullable
-            BlockEntity blockEntity,
-            @Nullable Direction direction
-    );
+///
+/// This class is used for both global registration of capabilities and local registration.
+/// For example, SFM adds {@link CauldronBlock} support for {@link net.neoforged.neoforge.fluids.capability.IFluidHandler}
+/// in a global way, which lets other mods use cauldrons as fluid containers without needing to add support themselves.
+///
+/// However, this class is also used for local registrations, which only SFM sees from the way SFM discovers capabilities.
+public interface SFMBlockCapabilityProvider {
+    @Nullable IBlockCapabilityProvider<?, @Nullable Direction> createForKind(SFMBlockCapabilityKind<?> capabilityKind);
 
     ///  Higher priority providers are checked first. The Default priority is 0.
     default int priority() {

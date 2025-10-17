@@ -2,24 +2,14 @@ package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
-import ca.teamdman.sfm.common.resourcetype.FluidResourceType;
-import ca.teamdman.sfm.common.resourcetype.ForgeEnergyResourceType;
-import ca.teamdman.sfm.common.resourcetype.ItemResourceType;
-import ca.teamdman.sfm.common.resourcetype.ResourceType;
+import ca.teamdman.sfm.common.resourcetype.*;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.material.Fluid;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.energy.IEnergyStorage;
-import net.neoforged.neoforge.fluids.FluidStack;
-import net.neoforged.neoforge.fluids.capability.IFluidHandler;
-import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,21 +23,32 @@ public class SFMResourceTypes {
             REGISTRY_ID,
             SFM.MOD_ID
     );
+
     public static final Registry<ResourceType<?, ?, ?>> REGISTRY = REGISTERER.makeRegistry(
             registryBuilder->{});
 
-    public static final Supplier<ResourceType<ItemStack, Item, IItemHandler>> ITEM = REGISTERER.register(
+    public static final Supplier<ItemResourceType> ITEM = REGISTERER.register(
             "item",
             ItemResourceType::new
     );
-    public static final Supplier<ResourceType<FluidStack, Fluid, IFluidHandler>> FLUID = REGISTERER.register(
+
+    public static final Supplier<FluidResourceType> FLUID = REGISTERER.register(
             "fluid",
             FluidResourceType::new
     );
-    public static final Supplier<ResourceType<Integer, Class<Integer>, IEnergyStorage>> FORGE_ENERGY = REGISTERER.register(
+
+    public static final Supplier<ForgeEnergyResourceType> FORGE_ENERGY = REGISTERER.register(
             "forge_energy",
             ForgeEnergyResourceType::new
     );
+
+    public static final Supplier<RedstoneResourceType> REDSTONE = REGISTERER.register(
+            "redstone",
+            RedstoneResourceType::new
+    );
+
+
+
     private static final Object2ObjectOpenHashMap<ResourceLocation, ResourceType<?, ?, ?>> DEFERRED_TYPES_BY_ID = new Object2ObjectOpenHashMap<>();
 
 //    static {

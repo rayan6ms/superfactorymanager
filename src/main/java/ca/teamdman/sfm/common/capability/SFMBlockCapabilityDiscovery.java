@@ -7,6 +7,7 @@ import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.program.LimitedInputSlot;
 import ca.teamdman.sfm.common.program.LimitedOutputSlot;
 import ca.teamdman.sfm.common.program.ProgramContext;
+import ca.teamdman.sfm.common.registry.SFMGlobalBlockCapabilityProviders;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
@@ -16,6 +17,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider;
 import net.neoforged.neoforge.common.extensions.ILevelExtension;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,12 +37,11 @@ import org.jetbrains.annotations.Nullable;
 /// This class helps keep related capability discovery logic in one place and out of the {@link CableNetwork}.
 ///
 /// The methods by which capabilities are retrieved change in Minecraft 1.20.3.
-/// To discover the right capability for a given block position, we use {@link SFMBlockCapabilityProviderCache} to
-/// iterate over the appropriate {@link SFMBlockCapabilityProvider} to find a {@link SFMBlockCapabilityResult}.
+/// To discover the right capability for a given block position, we iterate over
+/// the appropriate {@link SFMBlockCapabilityProvider} to find a {@link SFMBlockCapabilityResult}.
 ///
 /// The discovery results from {@link CableNetwork#getCapability(SFMBlockCapabilityKind, BlockPos, Direction, TranslatableLogger)}
 /// will be cached in the {@link CableNetwork#getLevelCapabilityCache()}
-/// so the {@link SFMBlockCapabilityProviderCache} can focus on its job.
 public class SFMBlockCapabilityDiscovery {
     public static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromNetwork(
             CableNetwork cableNetwork,
@@ -84,7 +87,7 @@ public class SFMBlockCapabilityDiscovery {
                     pos.immutable(),
                     () -> {
                         levelCapabilityCache.remove(pos, capKind, direction);
-                        return false; // remove this invalidation listener; no longer valid
+                        return false; // remove this invalidation listener; we will create a new one when needed.
                     }
             );
             levelCapabilityCache.putCapability(pos, capKind, direction, cap);
@@ -105,7 +108,7 @@ public class SFMBlockCapabilityDiscovery {
         if (!(levelExt instanceof Level level)) {
             return false;
         }
-        return SFMResourceTypes.getCapabilities().anyMatch(cap -> {
+        return SFMWellKnownCapabilities.streamCapabilities().anyMatch(cap -> {
             for (Direction direction : SFMDirections.DIRECTIONS_WITH_NULL) {
                 if (discoverCapabilityFromLevel(level, cap, pos, direction).isPresent()) {
                     return true;
@@ -122,14 +125,21 @@ public class SFMBlockCapabilityDiscovery {
             @NotStored BlockPos pos,
             @Nullable Direction direction
     ) {
-        return SFMBlockCapabilityProviderCache.getCapabilityFromLevel(
-                capKind,
-                level,
-                pos,
-                level.getBlockState(pos),
-                level.getBlockEntity(pos),
-                direction
-        );
+        BlockState blockState = level.getBlockState(pos);
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        for (IBlockCapabilityProvider<CAP, @Nullable Direction> provider : SFMGlobalBlockCapabilityProviders.getProvidersForKind(capKind)) {
+            CAP capability = provider.getCapability(
+                    level,
+                    pos,
+                    blockState,
+                    blockEntity,
+                    direction
+            );
+            if (capability != null) {
+                return SFMBlockCapabilityResult.of(capability);
+            }
+        }
+        return SFMBlockCapabilityResult.empty();
     }
 
     private static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromCache(

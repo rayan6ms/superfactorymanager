@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.capability;
 
+import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -17,7 +18,15 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CauldronBlockCapabilityProvider implements @MCVersionDependentBehaviour IBlockCapabilityProvider<IFluidHandler, @Nullable Direction> {
+public class CauldronBlockCapabilityProvider implements SFMBlockCapabilityProvider, IBlockCapabilityProvider<IFluidHandler, Direction> {
+    @Override
+    public @Nullable IBlockCapabilityProvider<?, @Nullable Direction> createForKind(SFMBlockCapabilityKind<?> capabilityKind) {
+        if (!capabilityKind.matchesResourceType(SFMResourceTypes.FLUID.get())) {
+            return null;
+        }
+        return this;
+    }
+
     @MCVersionDependentBehaviour
     @Override
     public @Nullable IFluidHandler getCapability(
