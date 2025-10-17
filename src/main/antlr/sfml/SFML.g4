@@ -93,7 +93,7 @@ side            : TOP
                 | SOUTH
                 | WEST
                 ;
-slotqualifier   : SLOTS rangeset;
+slotqualifier   : SLOTS | SLOT rangeset;
 rangeset        : range (COMMA range)*;
 range           : number (DASH number)? ;
 
@@ -193,6 +193,7 @@ INPUT   : I N P U T ;
 OUTPUT  : O U T P U T ;
 WHERE   : W H E R E ;
 SLOTS   : S L O T S ;
+SLOT   : S L O T ;
 RETAIN  : R E T A I N ;
 EACH    : E A C H ;
 EXCEPT  : E X C E P T ;
