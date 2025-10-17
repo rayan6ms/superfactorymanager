@@ -72,13 +72,6 @@ public final class SFMBlockEntities {
                     .build(null)
     );
 
-//    public static final RegistryObject<BlockEntityType<BatteryBlockEntity>> BATTERY_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register(
-//            "battery",
-//            () -> BlockEntityType.Builder
-//                    .of(BatteryBlockEntity::new, SFMBlocks.BATTERY_BLOCK.get())
-//                    .build(null)
-//    );
-
     public static final Supplier<BlockEntityType<TestBarrelBlockEntity>> TEST_BARREL_BLOCK_ENTITY = BLOCK_ENTITY_TYPES.register(
             "test_barrel",
             () -> BlockEntityType.Builder

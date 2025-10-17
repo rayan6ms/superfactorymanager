@@ -77,8 +77,6 @@ public class SFMBlocks {
                                                     .sound(SoundType.METAL))
     );
 
-    //    public static final RegistryObject<BatteryBlock> BATTERY_BLOCK = BLOCKS.register("battery", BatteryBlock::new);
-
     public static final RegistryObject<TestBarrelBlock> TEST_BARREL_BLOCK = BLOCKS.register(
             "test_barrel",
             TestBarrelBlock::new
