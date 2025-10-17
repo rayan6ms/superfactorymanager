@@ -24,7 +24,7 @@ import java.util.function.Supplier;
 /// This class is used in doc comments because it's a plural lol.
 /// Check out {@link SFMBlockCapabilityProvider} for more information about what a Block Capability Provider is.
 @SuppressWarnings({"unused"})
-public class SFMBlockCapabilityProviders {
+public class SFMGlobalBlockCapabilityProviders {
     public static final ResourceLocation
             REGISTRY_ID = SFMResourceLocation.fromSFMPath("capability_provider_mappers");
 
