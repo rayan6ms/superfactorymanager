@@ -43,13 +43,7 @@ public class SFMBlockCapabilityProviderCache {
                 return capability;
             }
         }
-        if (blockEntity == null) {
-            return SFMBlockCapabilityResult.empty();
-        }
-        return SFMBlockCapabilityResult.of(blockEntity.getCapability(
-                capKind.capabilityKind(),
-                direction
-        ));
+        return SFMBlockCapabilityResult.empty();
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
