@@ -93,7 +93,7 @@ side            : TOP
                 | SOUTH
                 | WEST
                 ;
-slotqualifier   : SLOTS | SLOT rangeset;
+slotqualifier   : (SLOTS | SLOT) rangeset;
 rangeset        : range (COMMA range)*;
 range           : number (DASH number)? ;
 
@@ -142,7 +142,7 @@ label           : (identifier)   #RawLabel
                 | string                  #StringLabel
                 ;
 
-emptyslots      : EMPTY SLOTS IN ;
+emptyslots      : EMPTY (SLOTS | SLOT) IN ;
 
 identifier : (IDENTIFIER | REDSTONE | GLOBAL | SECOND | SECONDS) ;
 
