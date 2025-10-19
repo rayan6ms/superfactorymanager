@@ -58,10 +58,12 @@ public class SFMScreenChangeHelpers {
     public static ISFMTextEditScreen createProgramEditScreen(
             ISFMTextEditScreenOpenContext openContext
     ) {
+        ResourceLocation preferredEditorId = SFMResourceLocation.parse(
+                SFMConfig.CLIENT_TEXT_EDITOR_CONFIG.preferredEditor.get());
         ISFMTextEditorRegistration textEditorRegistration = Objects.requireNonNullElse(
                 SFMTextEditors
                         .registry()
-                        .get(SFMResourceLocation.parse(SFMConfig.CLIENT_TEXT_EDITOR_CONFIG.preferredEditor.get())),
+                        .getValue(preferredEditorId),
                 SFMTextEditors.V1.get()
         );
         return textEditorRegistration.createScreen(openContext);

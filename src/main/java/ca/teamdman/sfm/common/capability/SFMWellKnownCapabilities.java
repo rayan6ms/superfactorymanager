@@ -41,6 +41,6 @@ public class SFMWellKnownCapabilities {
     }
 
     public static Stream<SFMBlockCapabilityKind<?>> streamCapabilities() {
-        return SFMResourceTypes.registry().streamValues().map(ResourceType::getCapabilityKind);
+        return SFMResourceTypes.registry().streamValues().map(ResourceType::capabilityKind);
     }
 }

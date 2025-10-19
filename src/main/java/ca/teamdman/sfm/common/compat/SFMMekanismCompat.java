@@ -3,6 +3,7 @@ package ca.teamdman.sfm.common.compat;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.linting.IProgramLinter;
 import ca.teamdman.sfm.common.program.linting.MekanismSideConfigProgramLinter;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegister;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.*;
 import ca.teamdman.sfm.common.resourcetype.exclude.GasResourceType;
@@ -139,7 +140,7 @@ public class SFMMekanismCompat {
         return sb.toString();
     }
 
-    public static void registerResourceTypes(DeferredRegister<ResourceType<?, ?, ?>> types) {
+    public static void registerResourceTypes(SFMDeferredRegister<ResourceType<?, ?, ?>> types) {
         types.register(
                 "gas",
                 GasResourceType::new
@@ -163,7 +164,7 @@ public class SFMMekanismCompat {
         );
     }
 
-    public static void registerProgramLinters(DeferredRegister<IProgramLinter> types) {
+    public static void registerProgramLinters(SFMDeferredRegister<IProgramLinter> types) {
         types.register(
                 "mekanism",
                 MekanismSideConfigProgramLinter::new

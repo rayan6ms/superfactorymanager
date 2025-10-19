@@ -171,11 +171,12 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
         //noinspection DataFlowIssue
         SpecialRecipeBuilder
                 .special(SFMRecipeSerializers.DISK_RESET.get())
-                .save(writer, BuiltInRegistries.RECIPE_SERIALIZER.getKey(SFMRecipeSerializers.DISK_RESET.get()).getPath());
+                .save(writer, SFMRecipeSerializers.DISK_RESET.getPath());
+
         //noinspection DataFlowIssue
         SpecialRecipeBuilder
                 .special(SFMRecipeSerializers.LABEL_GUN_RESET.get())
-                .save(writer, BuiltInRegistries.RECIPE_SERIALIZER.getKey(SFMRecipeSerializers.LABEL_GUN_RESET.get()).getPath());
+                .save(writer, SFMRecipeSerializers.LABEL_GUN_RESET.getPath());
     }
 
 //    private void addPrintingPressRecipe(

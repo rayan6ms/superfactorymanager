@@ -3,55 +3,109 @@ package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
-import org.jetbrains.annotations.NotNull;
+import net.neoforged.neoforge.registries.RegistryManager;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-public record SFMRegistryWrapper<V>(
-        @MCVersionDependentBehaviour
-        Registry<V> registry
-) implements Iterable<V> {
-    @MCVersionDependentBehaviour
-    public @Nullable V getValue(ResourceLocation resourceTypeId) {
-        return registry.get(resourceTypeId);
+/// Helps reduce {@link ca.teamdman.sfm.common.util.MCVersionDependentBehaviour}
+public final class SFMRegistryWrapper<T> implements Iterable<T> {
+    private @Nullable @MCVersionDependentBehaviour Registry<T> maybeInner;
+    private final ResourceKey<? extends Registry<T>> registryKey;
+
+    public SFMRegistryWrapper(
+            @MCVersionDependentBehaviour
+            Registry<T> inner
+    ) {
+        this.maybeInner = inner;
+        this.registryKey = inner.key();
+    }
+
+    public SFMRegistryWrapper(ResourceKey<? extends Registry<T>> registryKey) {
+        this.maybeInner = null;
+        this.registryKey = registryKey;
     }
 
     @MCVersionDependentBehaviour
-    public @NotNull Set<ResourceLocation> getKeys() {
-        return registry.keySet();
-    }
-
-    public @NotNull Iterable<V> getValues() {
-        return registry;
-    }
-
-    public @NotNull Stream<V> streamValues() {
-        return StreamSupport.stream(registry.spliterator(), false);
-    }
-
-    public @Nullable ResourceLocation getKey(V value) {
-        return registry.getKey(value);
-    }
-
-    public @NotNull Optional<ResourceKey<V>> getResourceKey(V value) {
-        return registry.getResourceKey(value);
+    public @Nullable T getValue(ResourceLocation resourceTypeId) {
+        return getInner().get(resourceTypeId);
     }
 
     @MCVersionDependentBehaviour
-    public @NotNull Set<Map.Entry<ResourceKey<V>, V>> getEntries() {
-        return registry.entrySet();
+    public Set<ResourceLocation> getKeys() {
+        return getInner().keySet();
+    }
+
+    public Iterable<T> iterValues() {
+        return getInner();
+    }
+
+    public Collection<T> getValues() {
+        return streamValues().collect(Collectors.toList());
+    }
+
+    public Stream<T> streamValues() {
+        return StreamSupport.stream(getInner().spliterator(), false);
+    }
+
+    public @Nullable ResourceLocation getKey(T value) {
+        return getInner().getKey(value);
+    }
+
+    public Optional<ResourceKey<T>> getResourceKey(T value) {
+        return getInner().getResourceKey(value);
+    }
+
+    @MCVersionDependentBehaviour
+    public Set<Map.Entry<ResourceKey<T>, T>> getEntries() {
+        return getInner().entrySet();
     }
 
     @Override
-    public @NotNull Iterator<V> iterator() {
-        return registry.iterator();
+    public Iterator<T> iterator() {
+        return getInner().iterator();
     }
+
+    public ResourceKey<? extends Registry<T>> getRegistryKey() {
+        return registryKey;
+    }
+
+    public boolean containsKey(ResourceLocation location) {
+        return getInner().containsKey(location);
+    }
+
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public @MCVersionDependentBehaviour Registry<T> getInner() {
+        if (maybeInner == null) {
+            maybeInner = (Registry<T>) BuiltInRegistries.REGISTRY.get((ResourceKey) registryKey);
+        }
+        return maybeInner;
+    }
+
+    @SuppressWarnings("rawtypes")
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        var that = (SFMRegistryWrapper) obj;
+        return Objects.equals(this.getInner(), that.getInner());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getInner());
+    }
+
+    @Override
+    public String toString() {
+        return "SFMRegistryWrapper[" +
+               "inner=" + maybeInner + ']';
+    }
+
 }

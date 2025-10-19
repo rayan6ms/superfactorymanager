@@ -5,6 +5,7 @@ import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.SFMASTUtils;
 import ca.teamdman.sfm.common.util.SFMDirections;
@@ -139,7 +140,7 @@ public record ServerboundContainerExportsInspectionRequestPacket(
         if (!result.isBlank()) {
             BlockEntity be = level.getBlockEntity(pos);
             //noinspection DataFlowIssue
-            if (be != null && direction == null && BuiltInRegistries.BLOCK_ENTITY_TYPE
+            if (be != null && direction == null && SFMWellKnownRegistries.BLOCK_ENTITY_TYPES
                     .getKey(be.getType())
                     .getNamespace()
                     .equals("mekanism")) {

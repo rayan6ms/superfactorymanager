@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.common.capability;
 
-import ca.teamdman.sfm.common.registry.SFMBlockCapabilityProviders;
+import ca.teamdman.sfm.common.registry.SFMGlobalBlockCapabilityProviders;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.common.util.NonNullConsumer;
@@ -11,7 +11,7 @@ import org.jetbrains.annotations.NotNull;
 /// Between Minecraft 1.20 and Minecraft 1.20.1, SFM switches from using Forge to NeoForge.
 /// The package path for many classes changes in this transition.
 /// To minimize entropy in the SFM codebase, we wrap the different optional types in {@link SFMBlockCapabilityResult}
-/// Capabilities are retrieved by querying {@link SFMBlockCapabilityProviders} with a {@link SFMBlockCapabilityKind}
+/// Capabilities are retrieved by querying {@link SFMGlobalBlockCapabilityProviders} with a {@link SFMBlockCapabilityKind}
 ///
 /// This class helps keep {@link MCVersionDependentBehaviour} out of other classes.
 @MCVersionDependentBehaviour

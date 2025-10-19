@@ -11,8 +11,6 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 
 import java.util.function.Supplier;
 
-import java.util.function.Supplier;
-
 @MCVersionDependentBehaviour
 public class SFMCreativeTabs {
     private static final DeferredRegister<CreativeModeTab> CREATIVE_TABS = DeferredRegister.create(
@@ -42,10 +40,10 @@ public class SFMCreativeTabs {
             CreativeModeTab.Output output
     ) {
         output.acceptAll(
-                SFMItems.ITEMS
-                        .getEntries()
+                SFMItems.REGISTERER
+                        .getOurEntries()
                         .stream()
-                        .map(Supplier::get)
+                        .map(SFMRegistryObject::get)
                         .map(ItemStack::new)
                         .toList()
         );

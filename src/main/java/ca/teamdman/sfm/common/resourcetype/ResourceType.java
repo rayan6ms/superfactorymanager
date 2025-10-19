@@ -31,7 +31,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
         this.CAPABILITY_KIND = CAPABILITY_KIND;
     }
 
-    public SFMBlockCapabilityKind<CAP> getCapabilityKind() {
+    public SFMBlockCapabilityKind<CAP> capabilityKind() {
         return CAPABILITY_KIND;
     }
 

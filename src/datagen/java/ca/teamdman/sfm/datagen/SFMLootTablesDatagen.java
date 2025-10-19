@@ -2,11 +2,13 @@ package ca.teamdman.sfm.datagen;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticLootTablesDataGen;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.registries.DeferredHolder;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -30,14 +32,13 @@ public class SFMLootTablesDatagen extends MCVersionAgnosticLootTablesDataGen {
     }
 
     @Override
-    protected Set<? extends Block> getExpectedBlocks() {
-        Set<? extends Block> exclude = Set.of(
-                SFMBlocks.TEST_BARREL_BLOCK.get(),
-                SFMBlocks.TEST_BARREL_TANK_BLOCK.get()
-//                SFMBlocks.BATTERY_BLOCK.get()
+    protected Set<? extends SFMRegistryObject<Block>> getExpectedBlocks() {
+        Set<SFMRegistryObject<? extends Block>> exclude = Set.of(
+                SFMBlocks.TEST_BARREL_BLOCK,
+                SFMBlocks.TEST_BARREL_TANK_BLOCK
         );
-        Set<? extends Block> rtn = SFMBlocks.getBlocks().stream().map(DeferredHolder::get).collect(Collectors.toSet());
-        rtn.removeIf(exclude::contains);
-        return rtn;
+        HashSet<SFMRegistryObject<Block>> ourBlocks = new HashSet<>(SFMBlocks.REGISTERER.getOurEntries());
+        ourBlocks.removeIf(exclude::contains);
+        return ourBlocks;
     }
 }

@@ -25,16 +25,15 @@ import java.util.ArrayList;
 public class BufferBlockEntity extends BlockEntity {
     private final BufferBlockEntityContents contents;
     private final ArrayList<LazyOptional<?>> toInvalidate = new ArrayList<>();
-    private final BufferBlockTier tier;
 
     public BufferBlockEntity(
             BlockPos pPos,
             BlockState pBlockState
     ) {
         super(SFMBlockEntities.BUFFER_BLOCK_ENTITY.get(), pPos, pBlockState);
-        this.tier = pBlockState.getBlock() instanceof BufferBlock bufferBlock
-                ? bufferBlock.tier
-                : BufferBlockTier.Unit;
+        BufferBlockTier tier = pBlockState.getBlock() instanceof BufferBlock bufferBlock
+                               ? bufferBlock.tier
+                               : BufferBlockTier.Unit;
         this.contents = new BufferBlockEntityContents(tier);
     }
 

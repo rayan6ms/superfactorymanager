@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.datagen.version_plumbing;
 
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.loot.LootTableProvider;
@@ -40,30 +41,29 @@ public abstract class MCVersionAgnosticLootTablesDataGen extends LootTableProvid
     }
 
     /// Blocks present here but not involved when populating the writer will cause a validation error
-    protected abstract Set<? extends Block> getExpectedBlocks();
+    protected abstract Set<? extends SFMRegistryObject<Block>> getExpectedBlocks();
 
     private MyBlockLoot createBlockLoot() {
         BlockLootWriter writer = new BlockLootWriter();
         populate(writer);
         ArrayList<BlockLootBehaviour> behaviours = writer.finish();
-        Set<? extends Block> expectedBlocks = getExpectedBlocks();
-        Set<? extends Block> seenBlocks = behaviours.stream()
+        Set<? extends SFMRegistryObject<Block>> expectedBlocks = getExpectedBlocks();
+        Set<SFMRegistryObject<? extends Block>> seenBlocks = behaviours.stream()
                 .map(BlockLootBehaviour::getInvolvedBlocks)
                 .flatMap(List::stream)
-                .map(Supplier::get)
                 .collect(Collectors.toSet());
-        Set<? extends Block> notSeen = expectedBlocks.stream()
+        Set<SFMRegistryObject<? extends Block>> notSeen = expectedBlocks.stream()
                 .filter(block -> !seenBlocks.contains(block))
                 .collect(Collectors.toSet());
-        Set<? extends Block> notExpected = seenBlocks.stream()
+        Set<SFMRegistryObject<? extends Block>> notExpected = seenBlocks.stream()
                 .filter(block -> !expectedBlocks.contains(block))
                 .collect(Collectors.toSet());
         List<String> problems = new ArrayList<>();
-        for (Block expected : notSeen) {
-            problems.add("Expected block " + BuiltInRegistries.BLOCK.getId(expected) + " not seen");
+        for (SFMRegistryObject<? extends Block> expected : notSeen) {
+            problems.add("Expected block " + expected.getId() + " not seen");
         }
-        for (Block unexpected : notExpected) {
-            problems.add("Unexpected block " + BuiltInRegistries.BLOCK.getId(unexpected) + " seen");
+        for (SFMRegistryObject<? extends Block> unexpected : notExpected) {
+            problems.add("Unexpected block " + unexpected.getId() + " seen");
         }
         if (!problems.isEmpty()) {
             throw new IllegalStateException("Loot table problems:\n" + String.join("\n", problems));
@@ -81,17 +81,17 @@ public abstract class MCVersionAgnosticLootTablesDataGen extends LootTableProvid
 //    }
 
     private interface BlockLootBehaviour {
-        List<Supplier<? extends Block>> getInvolvedBlocks();
+        List<SFMRegistryObject<? extends Block>> getInvolvedBlocks();
 
         void apply(BiConsumer<ResourceLocation, LootTable.Builder> writer);
     }
 
     private record DropOtherBlockLootBehaviour(
-            Supplier<? extends Block> block,
-            Supplier<? extends Block> other
+            SFMRegistryObject<? extends Block> block,
+            SFMRegistryObject<? extends Block> other
     ) implements BlockLootBehaviour {
         @Override
-        public List<Supplier<? extends Block>> getInvolvedBlocks() {
+        public List<SFMRegistryObject<? extends Block>> getInvolvedBlocks() {
             return List.of(block, other);
         }
 
@@ -109,14 +109,14 @@ public abstract class MCVersionAgnosticLootTablesDataGen extends LootTableProvid
         private final ArrayList<BlockLootBehaviour> behaviours = new ArrayList<>();
 
         public void dropSelf(
-                Supplier<? extends Block> block
+                SFMRegistryObject<? extends Block> block
         ) {
             behaviours.add(new DropOtherBlockLootBehaviour(block, block));
         }
 
         public void dropOther(
-                Supplier<? extends Block> block,
-                Supplier<? extends Block> other
+                SFMRegistryObject<? extends Block> block,
+                SFMRegistryObject<? extends Block> other
         ) {
             behaviours.add(new DropOtherBlockLootBehaviour(block, other));
         }

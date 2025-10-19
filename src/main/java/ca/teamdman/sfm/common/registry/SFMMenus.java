@@ -21,11 +21,12 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.function.Supplier;
 
 public class SFMMenus {
-    private static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(
-            BuiltInRegistries.MENU,
+    private static final SFMDeferredRegister<MenuType<?>> MENU_TYPES
+            = SFMDeferredRegister.createForExistingRegistry(
+            SFMWellKnownRegistries.MENU_TYPES,
             SFM.MOD_ID
     );
-    public static final Supplier<MenuType<ManagerContainerMenu>> MANAGER_MENU = MENU_TYPES.register(
+    public static final SFMRegistryObject<MenuType<ManagerContainerMenu>> MANAGER_MENU = MENU_TYPES.register(
             "manager",
             () -> IMenuTypeExtension.create(
                     new IContainerFactory<>() {
@@ -62,7 +63,8 @@ public class SFMMenus {
                         }
                     })
     );
-    public static final Supplier<MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK_MENU = MENU_TYPES.register(
+
+    public static final SFMRegistryObject<MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK_MENU = MENU_TYPES.register(
             "test_barrel_tank",
             () -> IMenuTypeExtension.create(
                     new IContainerFactory<>() {

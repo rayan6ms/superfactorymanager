@@ -11,12 +11,14 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.function.Supplier;
 
 public class SFMRecipeTypes {
-    private static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(
-            BuiltInRegistries.RECIPE_TYPE,
+    private static final SFMDeferredRegister<RecipeType<?>> RECIPE_TYPES
+            = SFMDeferredRegister.createForExistingRegistry(
+            SFMWellKnownRegistries.RECIPE_TYPES,
             SFM.MOD_ID
     );
 
-    public static final Supplier<RecipeType<PrintingPressRecipe>> PRINTING_PRESS = RECIPE_TYPES.register(
+    public static final SFMRegistryObject<RecipeType<PrintingPressRecipe>> PRINTING_PRESS
+            = RECIPE_TYPES.register(
             "printing_press",
             () -> RecipeType.simple(SFMResourceLocation.fromSFMPath("printing_press"))
     );

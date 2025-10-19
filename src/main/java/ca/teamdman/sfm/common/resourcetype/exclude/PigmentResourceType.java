@@ -4,6 +4,7 @@ import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
+import ca.teamdman.sfm.common.registry.SFMRegistryWrapper;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.ChemicalTankBuilder;
@@ -13,6 +14,9 @@ import mekanism.api.chemical.pigment.PigmentStack;
 import net.minecraft.core.Registry;
 import mekanism.common.lib.transmitter.TransmissionType;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
+import net.minecraftforge.common.capabilities.CapabilityManager;
+import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import net.neoforged.neoforge.common.capabilities.CapabilityManager;
 import net.neoforged.neoforge.common.capabilities.CapabilityToken;
@@ -124,9 +128,8 @@ public class PigmentResourceType extends RegistryBackedResourceType<PigmentStack
 
 
     @Override
-    public Registry<Pigment> getRegistry() {
-        throw new NotImplementedException();
-//        return MekanismAPI.pigmentRegistry();
+    public SFMRegistryWrapper<Pigment> getRegistry() {
+        return new SFMRegistryWrapper<>(MekanismAPI.pigmentRegistry());
     }
 
     @Override
