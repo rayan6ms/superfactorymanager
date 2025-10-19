@@ -45,11 +45,6 @@ public class SFMItems {
             () -> new LabelGunItem(new Item.Properties().stacksTo(1).tab(SFMCreativeTabs.TAB))
     );
 
-    public static final SFMRegistryObject<DebugStickItem> DEBUG_STICK_ITEM = REGISTRY.register(
-            "debug_stick",
-            () -> new DebugStickItem(new Item.Properties().stacksTo(1).tab(SFMCreativeTabs.TAB))
-    );
-
     public static final SFMRegistryObject<NetworkToolItem> NETWORK_TOOL_ITEM = REGISTRY.register(
             "network_tool",
             NetworkToolItem::new
