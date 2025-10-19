@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.common.capability;
 
-import ca.teamdman.sfm.common.registry.SFMBlockCapabilityProviders;
+import ca.teamdman.sfm.common.registry.SFMGlobalBlockCapabilityProviders;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -18,7 +18,7 @@ import org.jetbrains.annotations.Nullable;
 /// Additionally, mods can participate in the registration of capabilities to blocks in that version.
 ///
 /// Prior to this version, for SFM to get a {@link SFMWellKnownCapabilities#FLUID_HANDLER} for {@link CauldronBlock},
-/// it has its own mechanism for indirection via {@link SFMBlockCapabilityProviders} and {@link SFMBlockCapabilityProviderCache}
+/// it has its own mechanism for indirection via {@link SFMGlobalBlockCapabilityProviders} and {@link SFMBlockCapabilityProviderDiscovery}
 ///
 /// For per-mod compat, like to fix <a href="https://github.com/TeamDman/SuperFactoryManager/issues/322">#322</a>,
 /// SFM keeps this indirection mechanism for 1.20.3 and later as well.

@@ -3,7 +3,7 @@ package ca.teamdman.sfm.common.capability;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.SFMBlockCapabilityCacheForLevel;
-import ca.teamdman.sfm.common.registry.SFMBlockCapabilityProviders;
+import ca.teamdman.sfm.common.registry.SFMGlobalBlockCapabilityProviders;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.core.BlockPos;
@@ -18,7 +18,7 @@ import java.util.ArrayList;
 /// This cache is for reducing duplicate computation when looking up capabilities by kind.
 /// The first time a capability kind is requested, we identify the {@link SFMBlockCapabilityProvider} that match and sort them by priority.
 /// The capabilities for stochastic {@link ManagerBlockEntity} operations are cached in the {@link CableNetwork} using a {@link SFMBlockCapabilityCacheForLevel}.
-public class SFMBlockCapabilityProviderCache {
+public class SFMBlockCapabilityProviderDiscovery {
     private static final Object2ObjectOpenHashMap<SFMBlockCapabilityKind<?>, ArrayList<SFMBlockCapabilityProvider<?>>>
             BLOCK_CAPABILITY_PROVIDERS_BY_KIND = new Object2ObjectOpenHashMap<>();
 
@@ -43,13 +43,7 @@ public class SFMBlockCapabilityProviderCache {
                 return capability;
             }
         }
-        if (blockEntity == null) {
-            return SFMBlockCapabilityResult.empty();
-        }
-        return SFMBlockCapabilityResult.of(blockEntity.getCapability(
-                capKind.capabilityKind(),
-                direction
-        ));
+        return SFMBlockCapabilityResult.empty();
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -66,7 +60,7 @@ public class SFMBlockCapabilityProviderCache {
             SFMBlockCapabilityKind<CAP> capabilityKind
     ) {
         ArrayList<SFMBlockCapabilityProvider<CAP>> rtn = new ArrayList<>();
-        for (SFMBlockCapabilityProvider<?> mapper : SFMBlockCapabilityProviders.getAllProviders()) {
+        for (SFMBlockCapabilityProvider<?> mapper : SFMGlobalBlockCapabilityProviders.getAllProviders()) {
             if (mapper.matchesCapabilityKind(capabilityKind)) {
                 // This cast is safe because we just checked the capability kind
                 @SuppressWarnings("unchecked")

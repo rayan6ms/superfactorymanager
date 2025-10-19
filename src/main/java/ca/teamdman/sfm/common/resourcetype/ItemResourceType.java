@@ -3,6 +3,8 @@ package ca.teamdman.sfm.common.resourcetype;
 import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
+import ca.teamdman.sfm.common.registry.SFMRegistryWrapper;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -12,8 +14,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.event.entity.player.ItemTooltipEvent;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.stream.Stream;
@@ -24,8 +24,8 @@ public class ItemResourceType extends RegistryBackedResourceType<ItemStack, Item
     }
 
     @Override
-    public IForgeRegistry<Item> getRegistry() {
-        return ForgeRegistries.ITEMS;
+    public SFMRegistryWrapper<Item> getRegistry() {
+        return SFMWellKnownRegistries.ITEMS;
     }
 
 
