@@ -2,11 +2,12 @@ package ca.teamdman.sfm.datagen;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticLootTablesDataGen;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.registries.RegistryObject;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class SFMLootTablesDatagen extends MCVersionAgnosticLootTablesDataGen {
@@ -29,14 +30,13 @@ public class SFMLootTablesDatagen extends MCVersionAgnosticLootTablesDataGen {
     }
 
     @Override
-    protected Set<? extends RegistryObject<Block>> getExpectedBlocks() {
-        Set<RegistryObject<? extends Block>> exclude = Set.of(
+    protected Set<? extends SFMRegistryObject<Block>> getExpectedBlocks() {
+        Set<SFMRegistryObject<? extends Block>> exclude = Set.of(
                 SFMBlocks.TEST_BARREL_BLOCK,
                 SFMBlocks.TEST_BARREL_TANK_BLOCK
-//                SFMBlocks.BATTERY_BLOCK
         );
-        Set<? extends RegistryObject<Block>> rtn = SFMBlocks.getBlocks();
-        rtn.removeIf(exclude::contains);
-        return rtn;
+        HashSet<SFMRegistryObject<Block>> ourBlocks = new HashSet<>(SFMBlocks.REGISTERER.getOurEntries());
+        ourBlocks.removeIf(exclude::contains);
+        return ourBlocks;
     }
 }

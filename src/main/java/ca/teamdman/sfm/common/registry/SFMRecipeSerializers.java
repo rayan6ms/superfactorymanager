@@ -7,26 +7,25 @@ import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SimpleCraftingRecipeSerializer;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 
 public class SFMRecipeSerializers {
-    private static final DeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS = DeferredRegister.create(
-            ForgeRegistries.RECIPE_SERIALIZERS,
-            SFM.MOD_ID
-    );
+    private static final SFMDeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS
+            = SFMDeferredRegister.createForExistingRegistry(SFMWellKnownRegistries.RECIPE_SERIALIZERS, SFM.MOD_ID);
 
-    public static final RegistryObject<RecipeSerializer<PrintingPressRecipe>> PRINTING_PRESS = RECIPE_SERIALIZERS.register(
+    public static final SFMRegistryObject<PrintingPressRecipe.Serializer> PRINTING_PRESS
+            = RECIPE_SERIALIZERS.register(
             "printing_press",
             PrintingPressRecipe.Serializer::new
     );
 
-    public static final RegistryObject<SimpleCraftingRecipeSerializer<DiskResetRecipe>> DISK_RESET = RECIPE_SERIALIZERS.register(
+    public static final SFMRegistryObject<SimpleCraftingRecipeSerializer<DiskResetRecipe>> DISK_RESET
+            = RECIPE_SERIALIZERS.register(
             "disk_reset",
             () -> new SimpleCraftingRecipeSerializer<>(DiskResetRecipe::new)
     );
-    public static final RegistryObject<SimpleCraftingRecipeSerializer<LabelGunResetRecipe>> LABEL_GUN_RESET = RECIPE_SERIALIZERS.register(
+
+    public static final SFMRegistryObject<SimpleCraftingRecipeSerializer<LabelGunResetRecipe>> LABEL_GUN_RESET
+            = RECIPE_SERIALIZERS.register(
             "label_gun_reset",
             () -> new SimpleCraftingRecipeSerializer<>(LabelGunResetRecipe::new)
     );

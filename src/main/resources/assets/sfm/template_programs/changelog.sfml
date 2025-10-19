@@ -12,6 +12,13 @@ NAME "Changelog"
 ---- Hopper -> Manager -> Chest
 -- Add resource buffer block
 ---- Holds one stack worth of any of the resource types supported by SFM
+-- Fix capabilities not being invalidated properly on 1.20.3+
+-- Add support for "SLOT" for when "SLOTS" isn't appropriate
+every 20 ticks do
+    input from chest slot 5
+    output to chest slot 9
+end
+
 
 ---- 4.26.0 ----
 -- Add new textures from #343, thanks MHanHanBing

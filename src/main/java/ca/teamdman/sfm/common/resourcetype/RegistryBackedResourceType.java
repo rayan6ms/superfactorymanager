@@ -1,9 +1,9 @@
 package ca.teamdman.sfm.common.resourcetype;
 
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.registry.SFMRegistryWrapper;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.registries.IForgeRegistry;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Collection;
@@ -45,7 +45,7 @@ public abstract class RegistryBackedResourceType<STACK,ITEM,CAP> extends Resourc
         return getRegistry().getValues();
     }
 
-    public abstract IForgeRegistry<ITEM> getRegistry();
+    public abstract SFMRegistryWrapper<ITEM> getRegistry();
 
     @Override
     public @Nullable ITEM getItemFromRegistryKey(ResourceLocation location) {

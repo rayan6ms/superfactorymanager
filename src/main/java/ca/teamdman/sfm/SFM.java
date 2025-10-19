@@ -5,7 +5,6 @@ import ca.teamdman.sfm.client.registry.SFMTextEditorActions;
 import ca.teamdman.sfm.client.registry.SFMTextEditors;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.registry.*;
-import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import net.minecraftforge.fml.ModLoadingContext;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -28,11 +27,9 @@ public class SFM {
         SFMResourceTypes.register(bus);
         SFMProgramLinters.register(bus);
         SFMBlockEntities.register(bus);
-        SFMBlockCapabilityProviders.register(bus);
-        if (SFMEnvironmentUtils.isClient()) {
-            SFMTextEditors.register(bus);
-            SFMTextEditorActions.register(bus);
-        }
+        SFMGlobalBlockCapabilityProviders.register(bus);
+        SFMTextEditors.register(bus);
+        SFMTextEditorActions.register(bus);
         SFMMenus.register(bus);
         SFMRecipeTypes.register(bus);
         SFMRecipeSerializers.register(bus);

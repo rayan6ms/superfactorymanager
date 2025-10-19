@@ -15,16 +15,14 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.extensions.IForgeMenuType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.network.IContainerFactory;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 
 public class SFMMenus {
-    private static final DeferredRegister<MenuType<?>> MENU_TYPES = DeferredRegister.create(
-            ForgeRegistries.MENU_TYPES,
+    private static final SFMDeferredRegister<MenuType<?>> MENU_TYPES
+            = SFMDeferredRegister.createForExistingRegistry(
+            SFMWellKnownRegistries.MENU_TYPES,
             SFM.MOD_ID
     );
-    public static final RegistryObject<MenuType<ManagerContainerMenu>> MANAGER_MENU = MENU_TYPES.register(
+    public static final SFMRegistryObject<MenuType<ManagerContainerMenu>> MANAGER_MENU = MENU_TYPES.register(
             "manager",
             () -> IForgeMenuType.create(
                     new IContainerFactory<>() {
@@ -61,7 +59,8 @@ public class SFMMenus {
                         }
                     })
     );
-    public static final RegistryObject<MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK_MENU = MENU_TYPES.register(
+
+    public static final SFMRegistryObject<MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK_MENU = MENU_TYPES.register(
             "test_barrel_tank",
             () -> IForgeMenuType.create(
                     new IContainerFactory<>() {

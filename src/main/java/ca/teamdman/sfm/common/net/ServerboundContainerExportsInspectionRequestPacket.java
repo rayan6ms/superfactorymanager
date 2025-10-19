@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.compat.SFMModCompat;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.SFMASTUtils;
 import ca.teamdman.sfm.common.util.SFMDirections;
@@ -20,7 +21,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraftforge.registries.ForgeRegistries;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -140,7 +140,7 @@ public record ServerboundContainerExportsInspectionRequestPacket(
         if (!result.isBlank()) {
             BlockEntity be = level.getBlockEntity(pos);
             //noinspection DataFlowIssue
-            if (be != null && direction == null && ForgeRegistries.BLOCK_ENTITY_TYPES
+            if (be != null && direction == null && SFMWellKnownRegistries.BLOCK_ENTITY_TYPES
                     .getKey(be.getType())
                     .getNamespace()
                     .equals("mekanism")) {

@@ -9,7 +9,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.CreativeModeTabEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.registries.RegistryObject;
 
 @MCVersionDependentBehaviour
 @Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -27,10 +26,9 @@ public class SFMCreativeTabs {
                                 // Set icon of creative tab
                                 .icon(() -> new ItemStack(SFMBlocks.MANAGER_BLOCK.get()))
                                 // Add default items to tab
-                                .displayItems((params, output) -> output.acceptAll(SFMItems.ITEMS
-                                                                                           .getEntries()
+                                .displayItems((params, output) -> output.acceptAll(SFMItems.REGISTERER.getOurEntries()
                                                                                            .stream()
-                                                                                           .map(RegistryObject::get)
+                                                                                           .map(SFMRegistryObject::get)
                                                                                            .map(ItemStack::new)
                                                                                            .toList()))
         );
