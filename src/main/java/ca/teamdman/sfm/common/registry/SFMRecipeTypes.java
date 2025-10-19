@@ -5,17 +5,16 @@ import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 
 public class SFMRecipeTypes {
-    private static final DeferredRegister<RecipeType<?>> RECIPE_TYPES = DeferredRegister.create(
-            ForgeRegistries.RECIPE_TYPES,
+    private static final SFMDeferredRegister<RecipeType<?>> RECIPE_TYPES
+            = SFMDeferredRegister.createForExistingRegistry(
+            SFMWellKnownRegistries.RECIPE_TYPES,
             SFM.MOD_ID
     );
 
-    public static final RegistryObject<RecipeType<PrintingPressRecipe>> PRINTING_PRESS = RECIPE_TYPES.register(
+    public static final SFMRegistryObject<RecipeType<PrintingPressRecipe>> PRINTING_PRESS
+            = RECIPE_TYPES.register(
             "printing_press",
             () -> RecipeType.simple(SFMResourceLocation.fromSFMPath("printing_press"))
     );

@@ -177,8 +177,8 @@ public class SFMTextEditorConfigScreen extends Screen {
                         .setSize(buttonWidth, buttonHeight)
                         .setText(LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V1)
                         .setOnPress(button -> {
-                            assert SFMTextEditors.V1.getKey() != null;
-                            config.preferredEditor.set(SFMTextEditors.V1.getKey().location().toString());
+                            //noinspection OptionalGetWithoutIsPresent
+                            config.preferredEditor.set(SFMTextEditors.V1.getId().get().location().toString());
                             updateButtonStates();
                         })
                         .build();
@@ -188,8 +188,8 @@ public class SFMTextEditorConfigScreen extends Screen {
                         .setSize(buttonWidth, buttonHeight)
                         .setText(LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V2)
                         .setOnPress(button -> {
-                            assert SFMTextEditors.V2.getKey() != null;
-                            config.preferredEditor.set(SFMTextEditors.V2.getKey().location().toString());
+                            //noinspection OptionalGetWithoutIsPresent
+                            config.preferredEditor.set(SFMTextEditors.V2.getId().get().location().toString());
                             updateButtonStates();
                         })
                         .build();
@@ -224,9 +224,9 @@ public class SFMTextEditorConfigScreen extends Screen {
                 config.intellisenseLevel.get() != SFMTextEditorIntellisenseLevel.ADVANCED;
 
         String currentEditor = config.preferredEditor.get();
-        assert SFMTextEditors.V1.getKey() != null;
-        assert SFMTextEditors.V2.getKey() != null;
-        preferredEditorV1Button.active = !currentEditor.equals(SFMTextEditors.V1.getKey().location().toString());
-        preferredEditorV2Button.active = !currentEditor.equals(SFMTextEditors.V2.getKey().location().toString());
+        //noinspection OptionalGetWithoutIsPresent
+        preferredEditorV1Button.active = !currentEditor.equals(SFMTextEditors.V1.getId().get().location().toString());
+        //noinspection OptionalGetWithoutIsPresent
+        preferredEditorV2Button.active = !currentEditor.equals(SFMTextEditors.V2.getId().get().location().toString());
     }
 }

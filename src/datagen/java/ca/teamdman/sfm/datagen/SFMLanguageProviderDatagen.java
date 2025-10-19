@@ -2,9 +2,9 @@ package ca.teamdman.sfm.datagen;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticLanguageDataGen;
 import net.minecraftforge.data.event.GatherDataEvent;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,14 +24,14 @@ public class SFMLanguageProviderDatagen extends MCVersionAgnosticLanguageDataGen
             seen.add(entry.key().get());
         }
         List<String> unmapped = new ArrayList<>();
-        ForgeRegistries.ITEMS
+        SFMWellKnownRegistries.ITEMS
                 .getEntries()
                 .stream()
                 .filter(entry -> entry.getKey().location().getNamespace().equals(SFM.MOD_ID))
                 .filter(entry -> !seen.contains(entry.getValue().getDescriptionId()))
                 .map(entry -> entry.getValue().toString())
                 .forEach(unmapped::add);
-        ForgeRegistries.BLOCKS
+        SFMWellKnownRegistries.BLOCKS
                 .getEntries()
                 .stream()
                 .filter(entry -> entry.getKey().location().getNamespace().equals(SFM.MOD_ID))

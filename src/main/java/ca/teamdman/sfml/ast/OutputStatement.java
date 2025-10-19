@@ -5,6 +5,7 @@ import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.*;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.Stored;
@@ -14,7 +15,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayDeque;
 import java.util.List;
@@ -567,7 +567,7 @@ public class OutputStatement implements IOStatement {
                 .append(")\n");
         BlockEntity inputBlockEntity = level.getBlockEntity(slot.getPos());
         if (inputBlockEntity != null) {
-            ResourceLocation inputBlockEntityType = ForgeRegistries.BLOCK_ENTITY_TYPES.getKey(inputBlockEntity.getType());
+            ResourceLocation inputBlockEntityType = SFMWellKnownRegistries.BLOCK_ENTITY_TYPES.getKey(inputBlockEntity.getType());
             report
                     .append("Block Entity: ")
                     .append(inputBlockEntity.getClass().getName())
@@ -578,7 +578,7 @@ public class OutputStatement implements IOStatement {
             report.append("Block Entity: null\n");
         }
         BlockState blockState = level.getBlockState(slot.getPos());
-        ResourceLocation blockType = ForgeRegistries.BLOCKS.getKey(blockState.getBlock());
+        ResourceLocation blockType = SFMWellKnownRegistries.BLOCKS.getKey(blockState.getBlock());
         report
                 .append("Block: ")
                 .append(blockState.getBlock().getClass().getName())

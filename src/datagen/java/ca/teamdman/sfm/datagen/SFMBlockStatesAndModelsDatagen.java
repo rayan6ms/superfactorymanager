@@ -96,7 +96,7 @@ public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStates
     private void registerTestBarrelTank() {
         simpleBlock(
                 SFMBlocks.TEST_BARREL_TANK_BLOCK.get(), models().cubeAll(
-                        SFMBlocks.TEST_BARREL_TANK_BLOCK.getId().getPath(),
+                        SFMBlocks.TEST_BARREL_TANK_BLOCK.getPath(),
                         modLoc("block/test_barrel_tank")
                 ).texture("particle", "#all")
         );
@@ -105,7 +105,7 @@ public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStates
     private void registerTunnelledManager() {
         simpleBlock(
                 SFMBlocks.TUNNELLED_MANAGER_BLOCK.get(), models().cubeBottomTop(
-                        SFMBlocks.TUNNELLED_MANAGER_BLOCK.getId().getPath(),
+                        SFMBlocks.TUNNELLED_MANAGER_BLOCK.getPath(),
                         modLoc("block/tunnelled_manager_side"),
                         modLoc("block/tunnelled_manager_bot"),
                         modLoc("block/tunnelled_manager_top")
@@ -116,7 +116,7 @@ public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStates
     private void registerManager() {
         simpleBlock(
                 SFMBlocks.MANAGER_BLOCK.get(), models().cubeBottomTop(
-                        SFMBlocks.MANAGER_BLOCK.getId().getPath(),
+                        SFMBlocks.MANAGER_BLOCK.getPath(),
                         modLoc("block/manager_side"),
                         modLoc("block/manager_bot"),
                         modLoc("block/manager_top")
@@ -127,12 +127,12 @@ public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStates
     private void registerWaterTank() {
         ModelFile waterIntakeModelActive = models()
                 .cubeAll(
-                        SFMBlocks.WATER_TANK_BLOCK.getId().getPath() + "_active",
+                        SFMBlocks.WATER_TANK_BLOCK.getPath() + "_active",
                         modLoc("block/water_intake_active")
                 );
         ModelFile waterIntakeModelInactive = models()
                 .cubeAll(
-                        SFMBlocks.WATER_TANK_BLOCK.getId().getPath() + "_inactive",
+                        SFMBlocks.WATER_TANK_BLOCK.getPath() + "_inactive",
                         modLoc("block/water_intake_inactive")
                 );
         getVariantBuilder(SFMBlocks.WATER_TANK_BLOCK.get())
@@ -237,7 +237,7 @@ public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStates
                 .forAllStates(state -> {
                     BufferBlock.ContainedResource containedResource = state.getValue(BufferBlock.CONTAINED_RESOURCE);
                     ModelFile modelFile = models().cubeAll(
-                            SFMBlocks.BUFFER_BLOCK.getId().getPath() + "_" + containedResource.getSerializedName(),
+                            SFMBlocks.BUFFER_BLOCK.getPath() + "_" + containedResource.getSerializedName(),
                             modLoc("block/buffer_" + containedResource.getSerializedName())
                     );
                     return ConfiguredModel.builder().modelFile(modelFile).build();

@@ -7,62 +7,85 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.registries.DeferredRegister;
-import net.minecraftforge.registries.ForgeRegistries;
-import net.minecraftforge.registries.RegistryObject;
 
 public class SFMItems {
-    private static final DeferredRegister<Item> ITEMS = DeferredRegister.create(ForgeRegistries.ITEMS, SFM.MOD_ID);
-    public static final RegistryObject<BlockItem> MANAGER_ITEM = register("manager", SFMBlocks.MANAGER_BLOCK);
+    private static final SFMDeferredRegister<Item> REGISTRY = SFMDeferredRegister.createForExistingRegistry(
+            SFMWellKnownRegistries.ITEMS,
+            SFM.MOD_ID
+    );
 
-    public static RegistryObject<BlockItem> BUFFER_ITEM = null;
+    public static final SFMRegistryObject<BlockItem> MANAGER_ITEM = register("manager", SFMBlocks.MANAGER_BLOCK);
+
+    public static final SFMRegistryObject<BlockItem> TUNNELLED_MANAGER_ITEM = register(
+            "tunnelled_manager",
+            SFMBlocks.TUNNELLED_MANAGER_BLOCK
+    );
+
+    public static final SFMRegistryObject<BlockItem> CABLE_ITEM = register("cable", SFMBlocks.CABLE_BLOCK);
+
+    public static final SFMRegistryObject<BlockItem> FANCY_CABLE_ITEM = register(
+            "fancy_cable",
+            SFMBlocks.FANCY_CABLE_BLOCK
+    );
+
+    public static final SFMRegistryObject<PrintingPressBlockItem> PRINTING_PRESS_ITEM = REGISTRY.register(
+            "printing_press",
+            PrintingPressBlockItem::new
+    );
+
+    public static final SFMRegistryObject<BlockItem> WATER_TANK_ITEM = register(
+            "water_tank",
+            SFMBlocks.WATER_TANK_BLOCK
+    );
+
+    public static final SFMRegistryObject<DiskItem> DISK_ITEM = REGISTRY.register("disk", DiskItem::new);
+
+    public static final SFMRegistryObject<LabelGunItem> LABEL_GUN_ITEM = REGISTRY.register(
+            "labelgun",
+            () -> new LabelGunItem(new Item.Properties().stacksTo(1).tab(SFMCreativeTabs.TAB))
+    );
+
+    public static final SFMRegistryObject<DebugStickItem> DEBUG_STICK_ITEM = REGISTRY.register(
+            "debug_stick",
+            () -> new DebugStickItem(new Item.Properties().stacksTo(1).tab(SFMCreativeTabs.TAB))
+    );
+
+    public static final SFMRegistryObject<NetworkToolItem> NETWORK_TOOL_ITEM = REGISTRY.register(
+            "network_tool",
+            NetworkToolItem::new
+    );
+
+    public static final SFMRegistryObject<FormItem> FORM_ITEM = REGISTRY.register("form", FormItem::new);
+
+    public static final SFMRegistryObject<ExperienceShardItem> EXPERIENCE_SHARD_ITEM = REGISTRY.register(
+            "xp_shard",
+            ExperienceShardItem::new
+    );
+
+    public static final SFMRegistryObject<ExperienceGoopItem> EXPERIENCE_GOOP_ITEM = REGISTRY.register(
+            "xp_goop",
+            ExperienceGoopItem::new
+    );
+
+    public static SFMRegistryObject<BlockItem> BUFFER_ITEM = null;
+
     static {
         if (SFMEnvironmentUtils.isInIDE()) {
             BUFFER_ITEM = register("buffer", SFMBlocks.BUFFER_BLOCK);
         }
     }
 
-    public static final RegistryObject<BlockItem> TUNNELLED_MANAGER_ITEM = register(
-            "tunnelled_manager",
-            SFMBlocks.TUNNELLED_MANAGER_BLOCK
-    );
-
-    public static final RegistryObject<BlockItem> CABLE_ITEM = register("cable", SFMBlocks.CABLE_BLOCK);
-
-    public static final RegistryObject<BlockItem> FANCY_CABLE_ITEM = register("fancy_cable", SFMBlocks.FANCY_CABLE_BLOCK);
-
-    public static final RegistryObject<PrintingPressBlockItem> PRINTING_PRESS_ITEM = ITEMS.register(
-            "printing_press",
-            PrintingPressBlockItem::new
-    );
-
-    //    public static final  RegistryObject<Item>   BATTERY_ITEM    = register("battery", SFMBlocks.BATTERY_BLOCK);
-
-    public static final RegistryObject<BlockItem> WATER_TANK_ITEM = register("water_tank", SFMBlocks.WATER_TANK_BLOCK);
-
-    public static final RegistryObject<DiskItem> DISK_ITEM = ITEMS.register("disk", DiskItem::new);
-
-    public static final RegistryObject<LabelGunItem> LABEL_GUN_ITEM = ITEMS.register(
-            "labelgun", // TODO: rename on a major version update to label_gun
-            LabelGunItem::new
-    );
-
-    public static final RegistryObject<NetworkToolItem> NETWORK_TOOL_ITEM = ITEMS.register("network_tool", NetworkToolItem::new);
-
-    public static final RegistryObject<FormItem> FORM_ITEM = ITEMS.register("form", FormItem::new);
-
-    public static final RegistryObject<ExperienceShardItem> EXPERIENCE_SHARD_ITEM = ITEMS.register("xp_shard", ExperienceShardItem::new);
-
-    public static final RegistryObject<ExperienceGoopItem> EXPERIENCE_GOOP_ITEM = ITEMS.register("xp_goop", ExperienceGoopItem::new);
-
     public static void register(IEventBus bus) {
-        ITEMS.register(bus);
+        REGISTRY.register(bus);
     }
 
-    private static RegistryObject<BlockItem> register(
+    private static SFMRegistryObject<BlockItem> register(
             String name,
-            RegistryObject<? extends Block> block
+            SFMRegistryObject<? extends Block> block
     ) {
-        return ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties().tab(SFMCreativeTabs.TAB)));
+        return REGISTRY.register(
+                name,
+                () -> new BlockItem(block.get(), new Item.Properties().tab(SFMCreativeTabs.TAB))
+        );
     }
 }
