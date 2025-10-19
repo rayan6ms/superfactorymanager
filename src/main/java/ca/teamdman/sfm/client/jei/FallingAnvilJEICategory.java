@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IJeiHelpers;
@@ -22,7 +23,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -85,7 +85,7 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
                     .addSlot(RecipeIngredientRole.OUTPUT, 50, 18)
                     .addItemStacks(Arrays.stream(formRecipe.PARENT.FORM.getItems()).map(FormItem::createFormFromReference).toList());
         } else if (recipe instanceof FallingAnvilDisenchantRecipe) {
-            Collection<Enchantment> enchants = ForgeRegistries.ENCHANTMENTS.getValues();
+            Collection<Enchantment> enchants = SFMWellKnownRegistries.ENCHANTMENTS.getValues();
 
             var tools = List.of(
                     Items.DIAMOND_HELMET,

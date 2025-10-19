@@ -1,6 +1,8 @@
 package ca.teamdman.sfm.common.util;
 
 import ca.teamdman.sfm.SFM;
+import net.minecraft.core.Registry;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 
 public class SFMResourceLocation {
@@ -15,5 +17,8 @@ public class SFMResourceLocation {
     }
     public static ResourceLocation parse(String expanded) {
         return new ResourceLocation(expanded);
+    }
+    public static <T> ResourceKey<Registry<T>> createSFMRegistryKey(String path) {
+        return ResourceKey.createRegistryKey(SFMResourceLocation.fromSFMPath(path));
     }
 }

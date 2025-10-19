@@ -27,8 +27,8 @@ import java.util.Comparator;
 import java.util.List;
 
 public class LabelGunItem extends Item {
-    public LabelGunItem() {
-        super(new Properties().stacksTo(1));
+    public LabelGunItem(Properties properties) {
+        super(properties);
     }
 
     public static void setActiveLabel(

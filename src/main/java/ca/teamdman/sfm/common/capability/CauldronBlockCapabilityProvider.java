@@ -16,7 +16,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 
-public class CauldronBlockCapabilityProvider implements @MCVersionDependentBehaviour SFMBlockCapabilityProvider<IFluidHandler> {
+public class CauldronBlockCapabilityProvider implements SFMBlockCapabilityProvider<IFluidHandler> {
     @Override
     public boolean matchesCapabilityKind(SFMBlockCapabilityKind<?> capabilityKind) {
         return SFMWellKnownCapabilities.FLUID_HANDLER.equals(capabilityKind);
