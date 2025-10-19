@@ -7,10 +7,11 @@ import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.function.Supplier;
 
 /// A pointer to something that is registered in a registry.
 /// Helps reduce {@link ca.teamdman.sfm.common.util.MCVersionDependentBehaviour}
-public class SFMRegistryObject<T> {
+public class SFMRegistryObject<T> implements Supplier<T> {
     private final ResourceKey<? extends Registry<T>> registryKey;
     private final RegistryObject<? extends T> inner;
 
@@ -34,6 +35,7 @@ public class SFMRegistryObject<T> {
         return new SFMRegistryWrapper<>(registryKey);
     }
 
+    @Override
     public T get() {
         return inner.get();
     }
