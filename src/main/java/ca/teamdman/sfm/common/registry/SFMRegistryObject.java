@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.registry;
 
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -11,20 +12,25 @@ import java.util.function.Supplier;
 
 /// A pointer to something that is registered in a registry.
 /// Helps reduce {@link ca.teamdman.sfm.common.util.MCVersionDependentBehaviour}
-public class SFMRegistryObject<T> implements Supplier<T> {
+@MCVersionDependentBehaviour
+public class SFMRegistryObject<R, T extends R> implements Supplier<T> {
+    /// The registry that this object is registered in
     private final ResourceKey<? extends Registry<T>> registryKey;
-    private final RegistryObject<? extends T> inner;
+
+    /// This is null when this is an empty entry for a conditional registration in the not-enabled code path.
+    /// Because disabled objects are
+    private final @Nullable RegistryObject<? extends T> inner;
 
     public SFMRegistryObject(
             ResourceKey<? extends Registry<T>> registryKey,
-            RegistryObject<? extends T> object
+            @Nullable RegistryObject<? extends T> object
     ) {
         this.registryKey = registryKey;
         this.inner = object;
     }
 
     public Optional<ResourceKey<T>> getId() {
-        return getRegistry().getResourceKey(inner.get());
+        return getRegistry().getKey(get());
     }
 
     public @Nullable String getPath() {
@@ -37,20 +43,23 @@ public class SFMRegistryObject<T> implements Supplier<T> {
 
     @Override
     public T get() {
+        if (inner == null) {
+            throw new IllegalStateException("Tried to get a registry object that was conditionally not registered.");
+        }
         return inner.get();
     }
 
     @Override
     public final boolean equals(Object o) {
-        if (!(o instanceof SFMRegistryObject<?> that)) return false;
+        if (!(o instanceof SFMRegistryObject<?,?> that)) return false;
 
-        return registryKey.equals(that.registryKey) && inner.equals(that.inner);
+        return registryKey.equals(that.registryKey) && get().equals(that.get());
     }
 
     @Override
     public int hashCode() {
         int result = registryKey.hashCode();
-        result = 31 * result + inner.hashCode();
+        result = 31 * result + get().hashCode();
         return result;
     }
 

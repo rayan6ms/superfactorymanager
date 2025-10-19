@@ -1,7 +1,6 @@
 package ca.teamdman.sfm.common.registry;
 
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientRayCastHelpers;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.blockentity.TestBarrelTankBlockEntity;
@@ -18,11 +17,10 @@ import net.minecraftforge.network.IContainerFactory;
 
 public class SFMMenus {
     private static final SFMDeferredRegister<MenuType<?>> MENU_TYPES
-            = SFMDeferredRegister.createForExistingRegistry(
-            SFMWellKnownRegistries.MENU_TYPES,
-            SFM.MOD_ID
-    );
-    public static final SFMRegistryObject<MenuType<ManagerContainerMenu>> MANAGER_MENU = MENU_TYPES.register(
+            = new SFMDeferredRegisterBuilder<MenuType<?>>()
+            .registry(SFMWellKnownRegistries.MENU_TYPES.registryKey())
+            .build();
+    public static final SFMRegistryObject<MenuType<?>, MenuType<ManagerContainerMenu>> MANAGER_MENU = MENU_TYPES.register(
             "manager",
             () -> IForgeMenuType.create(
                     new IContainerFactory<>() {
@@ -60,7 +58,7 @@ public class SFMMenus {
                     })
     );
 
-    public static final SFMRegistryObject<MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK_MENU = MENU_TYPES.register(
+    public static final SFMRegistryObject<MenuType<?>, MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK_MENU = MENU_TYPES.register(
             "test_barrel_tank",
             () -> IForgeMenuType.create(
                     new IContainerFactory<>() {

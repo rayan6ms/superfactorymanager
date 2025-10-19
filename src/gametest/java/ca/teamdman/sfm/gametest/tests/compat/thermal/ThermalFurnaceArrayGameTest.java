@@ -59,7 +59,7 @@ public class ThermalFurnaceArrayGameTest extends SFMGameTestDefinition {
                 .receiveEnergy(Integer.MAX_VALUE, false);
 
         // set up furnaces
-        var furnaceBlock = SFMWellKnownRegistries.BLOCKS.getValue(SFMResourceLocation.fromNamespaceAndPath(
+        var furnaceBlock = SFMWellKnownRegistries.BLOCKS.get(SFMResourceLocation.fromNamespaceAndPath(
                 "thermal",
                 "machine_furnace"
         ));

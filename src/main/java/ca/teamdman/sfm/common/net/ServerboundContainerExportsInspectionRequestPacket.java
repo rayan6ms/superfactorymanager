@@ -41,7 +41,7 @@ public record ServerboundContainerExportsInspectionRequestPacket(
             sb.append("-- ").append(direction).append("\n");
             int len = sb.length();
             //noinspection unchecked,rawtypes
-            SFMResourceTypes.registry().getEntries().stream().map(entry -> buildInspectionResults(
+            SFMResourceTypes.registry().entries().stream().map(entry -> buildInspectionResults(
                             (ResourceKey) entry.getKey(),
                             entry.getValue(),
                             level,
@@ -142,7 +142,7 @@ public record ServerboundContainerExportsInspectionRequestPacket(
             BlockEntity be = level.getBlockEntity(pos);
             //noinspection DataFlowIssue
             if (be != null && direction == null && SFMWellKnownRegistries.BLOCK_ENTITY_TYPES
-                    .getKey(be.getType())
+                    .getId(be.getType())
                     .getNamespace()
                     .equals("mekanism")) {
                 return "-- "
