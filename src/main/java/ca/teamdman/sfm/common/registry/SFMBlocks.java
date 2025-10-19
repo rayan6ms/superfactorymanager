@@ -18,7 +18,9 @@ import java.util.function.Supplier;
 
 public class SFMBlocks {
     private static final DeferredRegister<Block> BLOCKS = DeferredRegister.create(BuiltInRegistries.BLOCK, SFM.MOD_ID);
+
     public static final Supplier<ManagerBlock> MANAGER_BLOCK = BLOCKS.register("manager", ManagerBlock::new);
+
     public static final Supplier<BufferBlock> BUFFER_BLOCK = BLOCKS.register(
             "buffer", () -> new BufferBlock(
                     BlockBehaviour.Properties.of()
@@ -32,10 +34,12 @@ public class SFMBlocks {
             "tunnelled_manager",
             TunnelledManagerBlock::new
     );
+
     public static final Supplier<PrintingPressBlock> PRINTING_PRESS_BLOCK = BLOCKS.register(
             "printing_press",
             PrintingPressBlock::new
     );
+
     public static final Supplier<WaterTankBlock> WATER_TANK_BLOCK = BLOCKS.register(
             "water_tank",
             WaterTankBlock::new
