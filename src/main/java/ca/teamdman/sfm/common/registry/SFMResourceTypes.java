@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.common.registry;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.compat.SFMModCompat;
 import ca.teamdman.sfm.common.resourcetype.*;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
@@ -16,18 +15,21 @@ public class SFMResourceTypes {
             = SFMResourceLocation.createSFMRegistryKey("resource_type");
 
     private static final SFMDeferredRegister<ResourceType<?, ?, ?>> REGISTERER
-            = SFMDeferredRegister.createForCustomRegistry(REGISTRY_ID, SFM.MOD_ID);
+            = new SFMDeferredRegisterBuilder<ResourceType<?, ?, ?>>()
+            .registry(REGISTRY_ID)
+            .createNewRegistry()
+            .build();
 
-    public static final SFMRegistryObject<ItemResourceType> ITEM
+    public static final SFMRegistryObject<ResourceType<?,?,?>,ItemResourceType> ITEM
             = REGISTERER.register("item", ItemResourceType::new);
 
-    public static final SFMRegistryObject<FluidResourceType> FLUID
+    public static final SFMRegistryObject<ResourceType<?,?,?>,FluidResourceType> FLUID
             = REGISTERER.register("fluid", FluidResourceType::new);
 
-    public static final SFMRegistryObject<ForgeEnergyResourceType> FORGE_ENERGY
+    public static final SFMRegistryObject<ResourceType<?,?,?>,ForgeEnergyResourceType> FORGE_ENERGY
             = REGISTERER.register("forge_energy", ForgeEnergyResourceType::new);
 
-    public static final SFMRegistryObject<RedstoneResourceType> REDSTONE
+    public static final SFMRegistryObject<ResourceType<?,?,?>,RedstoneResourceType> REDSTONE
             = REGISTERER.register("redstone", RedstoneResourceType::new);
 
     private static final Object2ObjectOpenHashMap<ResourceLocation, ResourceType<?, ?, ?>> DEFERRED_TYPES_BY_ID
@@ -48,7 +50,7 @@ public class SFMResourceTypes {
     ) {
         return DEFERRED_TYPES_BY_ID.computeIfAbsent(
                 resourceTypeId,
-                i -> registry().getValue(resourceTypeId)
+                i -> registry().get(resourceTypeId)
         );
     }
 

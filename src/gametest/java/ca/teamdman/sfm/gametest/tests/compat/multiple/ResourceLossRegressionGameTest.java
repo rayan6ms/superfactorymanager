@@ -58,7 +58,7 @@ public class ResourceLossRegressionGameTest extends SFMGameTestDefinition {
         assert bin != null;
         bin.setStackInSlot(0, new ItemStack(Items.WHEAT_SEEDS, Integer.MAX_VALUE));
 
-        var phytoBlock = SFMWellKnownRegistries.BLOCKS.getValue(SFMResourceLocation.fromNamespaceAndPath("thermal", "machine_insolator"));
+        var phytoBlock = SFMWellKnownRegistries.BLOCKS.get(SFMResourceLocation.fromNamespaceAndPath("thermal", "machine_insolator"));
         assert phytoBlock != null;
         helper.setBlock(rightPos, phytoBlock);
         MachineInsolatorTile phyto = (MachineInsolatorTile) helper.getBlockEntity(rightPos);

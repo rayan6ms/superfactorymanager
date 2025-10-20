@@ -3,8 +3,8 @@ package ca.teamdman.sfm.common.util;
 import ca.teamdman.sfm.common.program.LimitedInputSlot;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import ca.teamdman.sfml.ast.Number;
 import ca.teamdman.sfml.ast.*;
+import ca.teamdman.sfml.ast.Number;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -29,7 +29,7 @@ public class SFMASTUtils {
         potential = resourceType.withCount(potential, toMove);
         STACK stack = potential;
 
-        return SFMResourceTypes.registry().getResourceKey(resourceType)
+        return SFMResourceTypes.registry().getKey(resourceType)
                 .map(x -> {
                     //noinspection unchecked,rawtypes
                     return (ResourceKey<ResourceType<STACK, ITEM, CAP>>) (ResourceKey) x;

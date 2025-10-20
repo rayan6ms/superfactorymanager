@@ -26,7 +26,6 @@ import net.minecraft.world.level.block.Blocks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilRecipe> {
@@ -85,8 +84,6 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
                     .addSlot(RecipeIngredientRole.OUTPUT, 50, 18)
                     .addItemStacks(Arrays.stream(formRecipe.PARENT.FORM.getItems()).map(FormItem::createFormFromReference).toList());
         } else if (recipe instanceof FallingAnvilDisenchantRecipe) {
-            Collection<Enchantment> enchants = SFMWellKnownRegistries.ENCHANTMENTS.getValues();
-
             var tools = List.of(
                     Items.DIAMOND_HELMET,
                     Items.DIAMOND_CHESTPLATE,
@@ -132,7 +129,7 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
             );
             var enchanted = new ArrayList<ItemStack>();
             var books = new ArrayList<ItemStack>();
-            for (Enchantment enchant : enchants) {
+            for (Enchantment enchant : SFMWellKnownRegistries.ENCHANTMENTS.values()) {
                 for (Item tool : tools) {
                     var stack = new ItemStack(tool);
                     if (enchant.canEnchant(stack)) {

@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.common.registry;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.compat.SFMModCompat;
 import ca.teamdman.sfm.common.program.linting.FlowProgramLinter;
 import ca.teamdman.sfm.common.program.linting.IProgramLinter;
@@ -14,17 +13,20 @@ public class SFMProgramLinters {
     public static final ResourceKey<Registry<IProgramLinter>> REGISTRY_ID
             = SFMResourceLocation.createSFMRegistryKey("program_linters");
 
-    private static final SFMDeferredRegister<IProgramLinter> REGISTERER = SFMDeferredRegister.createForCustomRegistry(
-            REGISTRY_ID,
-            SFM.MOD_ID
-    );
+    private static final SFMDeferredRegister<IProgramLinter> REGISTERER =
+            new SFMDeferredRegisterBuilder<IProgramLinter>()
+                    .registry(REGISTRY_ID)
+                    .createNewRegistry()
+                    .build();
 
-    public static final SFMRegistryObject<FlowProgramLinter> FLOW = REGISTERER.register(
+    public static final SFMRegistryObject<IProgramLinter, FlowProgramLinter> FLOW
+            = REGISTERER.register(
             "flow",
             FlowProgramLinter::new
     );
 
-    public static final SFMRegistryObject<ResourcesProgramLinter> RESOURCE = REGISTERER.register(
+    public static final SFMRegistryObject<IProgramLinter, ResourcesProgramLinter> RESOURCE
+            = REGISTERER.register(
             "resources",
             ResourcesProgramLinter::new
     );
@@ -36,10 +38,13 @@ public class SFMProgramLinters {
     }
 
     public static SFMRegistryWrapper<IProgramLinter> registry() {
+
         return REGISTERER.registry();
     }
 
     public static void register(IEventBus bus) {
+
         REGISTERER.register(bus);
     }
+
 }
