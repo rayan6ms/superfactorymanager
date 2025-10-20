@@ -51,6 +51,9 @@ public class SFMDeferredRegisterBuilder<T> {
         if (registryKey == null) {
             throw new IllegalStateException("Registry key must be set!");
         }
+        if (namespace == null) {
+            throw new IllegalStateException("Namespace must be set!");
+        }
         boolean enabled = this.onlyIf.getAsBoolean();
 
         if (SFMEnvironmentUtils.isInIDE()) {
