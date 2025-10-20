@@ -16,19 +16,23 @@ public class SFMResourceTypes {
     public static final ResourceKey<Registry<ResourceType<?, ?, ?>>> REGISTRY_ID
             = SFMResourceLocation.createSFMRegistryKey("resource_type");
 
-    private static final SFMDeferredRegister<ResourceType<?, ?, ?>> REGISTERER
-            = SFMDeferredRegister.createForCustomRegistry(REGISTRY_ID, SFM.MOD_ID);
+    private static final SFMDeferredRegister<ResourceType<?, ?, ?>> REGISTERER =
+            new SFMDeferredRegisterBuilder<ResourceType<?, ?, ?>>()
+                    .namespace(SFM.MOD_ID)
+                    .registry(REGISTRY_ID)
+                    .createNewRegistry()
+                    .build();
 
-    public static final SFMRegistryObject<ItemResourceType> ITEM
+    public static final SFMRegistryObject<ResourceType<?, ?, ?>, ItemResourceType> ITEM
             = REGISTERER.register("item", ItemResourceType::new);
 
-    public static final SFMRegistryObject<FluidResourceType> FLUID
+    public static final SFMRegistryObject<ResourceType<?, ?, ?>, FluidResourceType> FLUID
             = REGISTERER.register("fluid", FluidResourceType::new);
 
-    public static final SFMRegistryObject<ForgeEnergyResourceType> FORGE_ENERGY
+    public static final SFMRegistryObject<ResourceType<?, ?, ?>, ForgeEnergyResourceType> FORGE_ENERGY
             = REGISTERER.register("forge_energy", ForgeEnergyResourceType::new);
 
-    public static final SFMRegistryObject<RedstoneResourceType> REDSTONE
+    public static final SFMRegistryObject<ResourceType<?, ?, ?>, RedstoneResourceType> REDSTONE
             = REGISTERER.register("redstone", RedstoneResourceType::new);
 
     private static final Object2ObjectOpenHashMap<ResourceLocation, ResourceType<?, ?, ?>> DEFERRED_TYPES_BY_ID
@@ -41,23 +45,27 @@ public class SFMResourceTypes {
     }
 
     public static int getResourceTypeCount() {
+
         return REGISTERER.size();
     }
 
     public static @Nullable ResourceType<?, ?, ?> fastLookup(
             ResourceLocation resourceTypeId
     ) {
+
         return DEFERRED_TYPES_BY_ID.computeIfAbsent(
                 resourceTypeId,
-                i -> registry().getValue(resourceTypeId)
+                i -> registry().get(resourceTypeId)
         );
     }
 
     public static void register(IEventBus bus) {
+
         REGISTERER.register(bus);
     }
 
     public static SFMRegistryWrapper<ResourceType<?, ?, ?>> registry() {
+
         return REGISTERER.registry();
     }
 
