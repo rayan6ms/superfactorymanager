@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.registry;
 
+import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.compat.SFMModCompat;
 import ca.teamdman.sfm.common.program.linting.FlowProgramLinter;
 import ca.teamdman.sfm.common.program.linting.IProgramLinter;
@@ -15,6 +16,7 @@ public class SFMProgramLinters {
 
     private static final SFMDeferredRegister<IProgramLinter> REGISTERER =
             new SFMDeferredRegisterBuilder<IProgramLinter>()
+                    .namespace(SFM.MOD_ID)
                     .registry(REGISTRY_ID)
                     .createNewRegistry()
                     .build();

@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.registry;
 
+import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.item.*;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import net.minecraft.world.item.BlockItem;
@@ -9,6 +10,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 
 public class SFMItems {
     public static final SFMDeferredRegister<Item> REGISTERER = new SFMDeferredRegisterBuilder<Item>()
+            .namespace(SFM.MOD_ID)
             .registry(SFMWellKnownRegistries.ITEMS.registryKey())
             .build();
 

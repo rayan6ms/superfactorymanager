@@ -21,9 +21,9 @@ public class SFMGlobalBlockCapabilityProviders {
     public static final ResourceKey<Registry<SFMBlockCapabilityProvider<?>>> REGISTRY_ID =
             SFMResourceLocation.createSFMRegistryKey("capability_provider_mappers");
 
-    /// Conditionally present
-    public static final SFMRegistryObject<SFMBlockCapabilityProvider<?>, EnergyAcceptorBlockCapabilityProvider>
-            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER;
+//    /// Conditionally present
+//    public static final SFMRegistryObject<SFMBlockCapabilityProvider<?>, EnergyAcceptorBlockCapabilityProvider>
+//            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER;
 
     private static final SFMDeferredRegister<SFMBlockCapabilityProvider<?>> REGISTERER =
             new SFMDeferredRegisterBuilder<SFMBlockCapabilityProvider<?>>()
@@ -54,7 +54,7 @@ public class SFMGlobalBlockCapabilityProviders {
 //        } else {
 //
 //            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER = REGISTERER.registerEmpty(
-//                    SFMResourceLocation.fromSFMPath("ae2/energy_acceptor")
+//                    "ae2/energy_acceptor"
 //            );
 //
 //        }
