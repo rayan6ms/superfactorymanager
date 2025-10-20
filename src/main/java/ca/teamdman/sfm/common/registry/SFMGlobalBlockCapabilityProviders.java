@@ -56,7 +56,7 @@ public class SFMGlobalBlockCapabilityProviders {
         } else {
 
             AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER = REGISTERER.registerEmpty(
-                    SFMResourceLocation.fromSFMPath("ae2/energy_acceptor")
+                    "ae2/energy_acceptor"
             );
 
         }

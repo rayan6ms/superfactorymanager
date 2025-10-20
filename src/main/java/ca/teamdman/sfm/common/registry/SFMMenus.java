@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.registry;
 
 
+import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ClientRayCastHelpers;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.blockentity.TestBarrelTankBlockEntity;
@@ -16,10 +17,12 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.network.IContainerFactory;
 
 public class SFMMenus {
-    private static final SFMDeferredRegister<MenuType<?>> MENU_TYPES
-            = new SFMDeferredRegisterBuilder<MenuType<?>>()
-            .registry(SFMWellKnownRegistries.MENU_TYPES.registryKey())
-            .build();
+    private static final SFMDeferredRegister<MenuType<?>> MENU_TYPES =
+            new SFMDeferredRegisterBuilder<MenuType<?>>()
+                    .namespace(SFM.MOD_ID)
+                    .registry(SFMWellKnownRegistries.MENU_TYPES.registryKey())
+                    .build();
+
     public static final SFMRegistryObject<MenuType<?>, MenuType<ManagerContainerMenu>> MANAGER_MENU = MENU_TYPES.register(
             "manager",
             () -> IForgeMenuType.create(
@@ -30,6 +33,7 @@ public class SFMMenus {
                                 Inventory inv,
                                 FriendlyByteBuf data
                         ) {
+
                             return new ManagerContainerMenu(
                                     windowId,
                                     inv,
@@ -42,6 +46,7 @@ public class SFMMenus {
                                 int windowId,
                                 Inventory inv
                         ) {
+
                             if (SFMEnvironmentUtils.isClient()) {
                                 BlockEntity be = ClientRayCastHelpers.getLookBlockEntity();
                                 if (!(be instanceof ManagerBlockEntity mbe)) {
@@ -68,6 +73,7 @@ public class SFMMenus {
                                 Inventory inv,
                                 FriendlyByteBuf data
                         ) {
+
                             return new TestBarrelTankContainerMenu(
                                     windowId,
                                     inv,
@@ -80,6 +86,7 @@ public class SFMMenus {
                                 int windowId,
                                 Inventory inv
                         ) {
+
                             if (SFMEnvironmentUtils.isClient()) {
                                 BlockEntity be = ClientRayCastHelpers.getLookBlockEntity();
                                 if (!(be instanceof TestBarrelTankBlockEntity blockEntity)) {
@@ -97,6 +104,7 @@ public class SFMMenus {
     );
 
     public static void register(IEventBus bus) {
+
         MENU_TYPES.register(bus);
     }
 

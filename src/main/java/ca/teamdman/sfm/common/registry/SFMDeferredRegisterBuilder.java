@@ -66,6 +66,6 @@ public class SFMDeferredRegisterBuilder<T> {
             inner = null;
         }
 
-        return new SFMDeferredRegister<>(registryKey, inner);
+        return new SFMDeferredRegister<>(registryKey, namespace, inner);
     }
 }
