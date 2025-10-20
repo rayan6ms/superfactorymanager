@@ -22,7 +22,7 @@ public record SuggestedResourceIntellisenseAction<STACK, ITEM, CAP>(
                 item,
                 Component.literal(
                         new ResourceIdentifier<>(
-                                Objects.requireNonNull(SFMResourceTypes.registry().getKey(resourceType)),
+                                Objects.requireNonNull(SFMResourceTypes.registry().getId(resourceType)),
                                 resourceType.getRegistryKeyForItem(item)
                         ).toStringCondensed()
                 )

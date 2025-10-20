@@ -14,8 +14,9 @@ import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
 /// Helps reduce {@link ca.teamdman.sfm.common.util.MCVersionDependentBehaviour}
+@MCVersionDependentBehaviour
 public final class SFMRegistryWrapper<T> implements Iterable<T> {
-    private @Nullable @MCVersionDependentBehaviour IForgeRegistry<T> maybeInner;
+    private @Nullable IForgeRegistry<T> maybeInner;
     private final ResourceKey<? extends Registry<T>> registryKey;
 
     public SFMRegistryWrapper(
@@ -32,54 +33,52 @@ public final class SFMRegistryWrapper<T> implements Iterable<T> {
     }
 
     @MCVersionDependentBehaviour
-    public @Nullable T getValue(ResourceLocation resourceTypeId) {
-        return getInner().getValue(resourceTypeId);
+    public @Nullable T get(ResourceLocation resourceTypeId) {
+        return getInnerRegistry().getValue(resourceTypeId);
     }
 
     @MCVersionDependentBehaviour
-    public Set<ResourceLocation> getKeys() {
-        return getInner().getKeys();
+    public Set<ResourceLocation> keys() {
+        return getInnerRegistry().getKeys();
     }
 
-    public Iterable<T> iterValues() {
-        return getInner();
+    public Iterable<T> values() {
+        return getInnerRegistry();
     }
 
-    public Collection<T> getValues() {
-        return getInner().getValues();
+    public Stream<T> stream() {
+        return StreamSupport.stream(getInnerRegistry().spliterator(), false);
     }
 
-    public Stream<T> streamValues() {
-        return StreamSupport.stream(getInner().spliterator(), false);
+    public @Nullable ResourceLocation getId(T value) {
+        return getInnerRegistry().getKey(value);
     }
 
-    public @Nullable ResourceLocation getKey(T value) {
-        return getInner().getKey(value);
-    }
-
-    public Optional<ResourceKey<T>> getResourceKey(T value) {
-        return getInner().getResourceKey(value);
+    public Optional<ResourceKey<T>> getKey(T value) {
+        return getInnerRegistry().getResourceKey(value);
     }
 
     @MCVersionDependentBehaviour
-    public Set<Map.Entry<ResourceKey<T>, T>> getEntries() {
-        return getInner().getEntries();
+    public Set<Map.Entry<ResourceKey<T>, T>> entries() {
+        return getInnerRegistry().getEntries();
     }
 
     @Override
     public Iterator<T> iterator() {
-        return getInner().iterator();
+        return getInnerRegistry().iterator();
     }
 
-    public ResourceKey<Registry<T>> getRegistryKey() {
-        return getInner().getRegistryKey();
+    public ResourceKey<Registry<T>> registryKey() {
+        return getInnerRegistry().getRegistryKey();
     }
 
-    public boolean containsKey(ResourceLocation location) {
-        return getInner().containsKey(location);
+    public boolean contains(ResourceLocation location) {
+        return getInnerRegistry().containsKey(location);
     }
 
-    public @MCVersionDependentBehaviour IForgeRegistry<T> getInner() {
+    /// If this is for a registry not enabled during creation via {@link SFMDeferredRegisterBuilder}
+    /// then this method will probably throw.
+    public @MCVersionDependentBehaviour IForgeRegistry<T> getInnerRegistry() {
         if (maybeInner == null) {
             maybeInner = RegistryManager.ACTIVE.getRegistry(registryKey);
         }
@@ -92,12 +91,12 @@ public final class SFMRegistryWrapper<T> implements Iterable<T> {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (SFMRegistryWrapper) obj;
-        return Objects.equals(this.getInner(), that.getInner());
+        return Objects.equals(this.getInnerRegistry(), that.getInnerRegistry());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getInner());
+        return Objects.hash(getInnerRegistry());
     }
 
     @Override

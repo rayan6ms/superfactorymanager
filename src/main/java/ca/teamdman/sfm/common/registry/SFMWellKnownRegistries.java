@@ -7,6 +7,7 @@ import ca.teamdman.sfm.client.text_editor.action.ITextEditAction;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProvider;
 import ca.teamdman.sfm.common.program.linting.IProgramLinter;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.RecipeSerializer;
@@ -19,6 +20,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 
 /// Helps reduce {@link ca.teamdman.sfm.common.util.MCVersionDependentBehaviour}
 @SuppressWarnings("unused")
+@MCVersionDependentBehaviour
 public class SFMWellKnownRegistries {
     public static final SFMRegistryWrapper<Block> BLOCKS
             = new SFMRegistryWrapper<>(ForgeRegistries.BLOCKS);
