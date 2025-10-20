@@ -17,83 +17,98 @@ import java.util.function.Supplier;
 
 
 public class SFMBlocks {
-    public static final SFMDeferredRegister<Block> REGISTERER
-            = SFMDeferredRegister.createForExistingRegistry(SFMWellKnownRegistries.BLOCKS, SFM.MOD_ID);
+    public static final SFMDeferredRegister<Block> REGISTERER =
+            new SFMDeferredRegisterBuilder<Block>()
+                    .namespace(SFM.MOD_ID)
+                    .registry(SFMWellKnownRegistries.BLOCKS.registryKey())
+                    .build();
 
-    public static final SFMRegistryObject<ManagerBlock> MANAGER_BLOCK
-            = REGISTERER.register("manager", ManagerBlock::new);
+    public static final SFMRegistryObject<Block, ManagerBlock> MANAGER_BLOCK
+            =
+            REGISTERER.register("manager", ManagerBlock::new);
 
-    public static final SFMRegistryObject<BufferBlock> BUFFER_BLOCK = REGISTERER.register(
+    public static final SFMRegistryObject<Block,BufferBlock> BUFFER_BLOCK = REGISTERER.register(
             "buffer", () -> new BufferBlock(
                     BlockBehaviour.Properties.of()
-                            .destroyTime(1.5f)
-                            .sound(SoundType.METAL),
-                    BufferBlockTier.MaxUnit
-            )
-    );
+                                    .destroyTime(1.5f)
+                                    .sound(SoundType.METAL),
+                            BufferBlockTier.MaxUnit
+                    )
+            );
 
-    public static final SFMRegistryObject<TunnelledManagerBlock> TUNNELLED_MANAGER_BLOCK
-            = REGISTERER.register("tunnelled_manager", TunnelledManagerBlock::new);
+    public static final SFMRegistryObject<Block, TunnelledManagerBlock> TUNNELLED_MANAGER_BLOCK
+            =
+            REGISTERER.register("tunnelled_manager", TunnelledManagerBlock::new);
 
-    public static final SFMRegistryObject<PrintingPressBlock> PRINTING_PRESS_BLOCK
-            = REGISTERER.register("printing_press", PrintingPressBlock::new);
+    public static final SFMRegistryObject<Block, PrintingPressBlock> PRINTING_PRESS_BLOCK
+            =
+            REGISTERER.register("printing_press", PrintingPressBlock::new);
 
-    public static final SFMRegistryObject<WaterTankBlock> WATER_TANK_BLOCK
-            = REGISTERER.register("water_tank", WaterTankBlock::new);
+    public static final SFMRegistryObject<Block, WaterTankBlock> WATER_TANK_BLOCK
+            =
+            REGISTERER.register("water_tank", WaterTankBlock::new);
 
-    public static final SFMRegistryObject<TestBarrelBlock> TEST_BARREL_BLOCK
-            = REGISTERER.register("test_barrel", TestBarrelBlock::new);
+    public static final SFMRegistryObject<Block, TestBarrelBlock> TEST_BARREL_BLOCK
+            =
+            REGISTERER.register("test_barrel", TestBarrelBlock::new);
 
-    public static final SFMRegistryObject<TestBarrelTankBlock> TEST_BARREL_TANK_BLOCK // TODO: remove this one
-            = REGISTERER.register("test_barrel_tank", TestBarrelTankBlock::new);
+    public static final SFMRegistryObject<Block, TestBarrelTankBlock> TEST_BARREL_TANK_BLOCK // TODO: remove this one
+            =
+            REGISTERER.register("test_barrel_tank", TestBarrelTankBlock::new);
 
     // TODO: pull out properties from other block constructors to enable mutating in inheriting class constructors
 
-    public static final SFMRegistryObject<CableBlock> CABLE_BLOCK = REGISTERER.register(
-            "cable",
-            () -> new CableBlock(
-                    BlockBehaviour.Properties
-                            .of()
+    public static final SFMRegistryObject<Block, CableBlock> CABLE_BLOCK =
+            REGISTERER.register(
+                    "cable",
+                    () -> new CableBlock(
+                            BlockBehaviour.Properties
+                                    .of()
                             .instrument(NoteBlockInstrument.BASS)
-                            .destroyTime(1f)
-                            .sound(SoundType.METAL)
-            )
-    );
+                                    .destroyTime(1f)
+                                    .sound(SoundType.METAL)
+                    )
+            );
 
-    public static final SFMRegistryObject<CableFacadeBlock> CABLE_FACADE_BLOCK = REGISTERER.register(
-            "cable_facade",
-            () -> new CableFacadeBlock(
-                    BlockBehaviour.Properties
-                            .of()
+    public static final SFMRegistryObject<Block, CableFacadeBlock> CABLE_FACADE_BLOCK =
+            REGISTERER.register(
+                    "cable_facade",
+                    () -> new CableFacadeBlock(
+                            BlockBehaviour.Properties
+                                    .of()
                             .instrument(NoteBlockInstrument.BASS)
-                            .destroyTime(1f)
-                            .sound(SoundType.METAL)
-            )
-    );
+                                    .destroyTime(1f)
+                                    .sound(SoundType.METAL)
+                    )
+            );
 
-    public static final SFMRegistryObject<FancyCableBlock> FANCY_CABLE_BLOCK = REGISTERER.register(
-            "fancy_cable",
-            () -> new FancyCableBlock(
-                    BlockBehaviour.Properties
-                            .of()
+    public static final SFMRegistryObject<Block, FancyCableBlock> FANCY_CABLE_BLOCK =
+            REGISTERER.register(
+                    "fancy_cable",
+                    () -> new FancyCableBlock(
+                            BlockBehaviour.Properties
+                                    .of()
                             .instrument(NoteBlockInstrument.BASS)
-                            .destroyTime(1f)
-                            .sound(SoundType.METAL)
-            )
-    );
+                                    .destroyTime(1f)
+                                    .sound(SoundType.METAL)
+                    )
+            );
 
-    public static final SFMRegistryObject<FancyCableFacadeBlock> FANCY_CABLE_FACADE_BLOCK = REGISTERER.register(
-            "fancy_cable_facade",
-            () -> new FancyCableFacadeBlock(
-                    BlockBehaviour.Properties
-                            .of()
+    public static final SFMRegistryObject<Block, FancyCableFacadeBlock> FANCY_CABLE_FACADE_BLOCK =
+            REGISTERER.register(
+                    "fancy_cable_facade",
+                    () -> new FancyCableFacadeBlock(
+                            BlockBehaviour.Properties
+                                    .of()
                             .instrument(NoteBlockInstrument.BASS)
-                            .destroyTime(1f)
-                            .sound(SoundType.METAL)
-            )
-    );
+                                    .destroyTime(1f)
+                                    .sound(SoundType.METAL)
+                    )
+            );
 
     public static void register(IEventBus bus) {
+
         REGISTERER.register(bus);
     }
+
 }

@@ -63,7 +63,7 @@ public class SFMScreenChangeHelpers {
         ISFMTextEditorRegistration textEditorRegistration = Objects.requireNonNullElse(
                 SFMTextEditors
                         .registry()
-                        .getValue(preferredEditorId),
+                        .get(preferredEditorId),
                 SFMTextEditors.V1.get()
         );
         return textEditorRegistration.createScreen(openContext);

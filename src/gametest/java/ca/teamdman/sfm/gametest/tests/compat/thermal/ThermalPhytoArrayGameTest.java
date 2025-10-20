@@ -74,7 +74,7 @@ public class ThermalPhytoArrayGameTest extends SFMGameTestDefinition {
         tank.setFluidInTank(0, new FluidStack(Fluids.WATER, Integer.MAX_VALUE));
 
         // set up phytos
-        var phytoBlock = SFMWellKnownRegistries.BLOCKS.getValue(SFMResourceLocation.fromNamespaceAndPath("thermal", "machine_insolator"));
+        var phytoBlock = SFMWellKnownRegistries.BLOCKS.get(SFMResourceLocation.fromNamespaceAndPath("thermal", "machine_insolator"));
         SFM.LOGGER.debug("Setting up phytos with block {}", phytoBlock);
         for (int x = 0; x < 25; x++) {
             for (int z = 1; z < 25; z++) {

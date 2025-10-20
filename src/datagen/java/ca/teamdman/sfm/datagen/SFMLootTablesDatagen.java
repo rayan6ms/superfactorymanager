@@ -32,12 +32,12 @@ public class SFMLootTablesDatagen extends MCVersionAgnosticLootTablesDataGen {
     }
 
     @Override
-    protected Set<? extends SFMRegistryObject<Block>> getExpectedBlocks() {
-        Set<SFMRegistryObject<? extends Block>> exclude = Set.of(
+    protected Set<? extends SFMRegistryObject<Block, ? extends Block>> getExpectedBlocks() {
+        Set<SFMRegistryObject<Block, ? extends Block>> exclude = Set.of(
                 SFMBlocks.TEST_BARREL_BLOCK,
                 SFMBlocks.TEST_BARREL_TANK_BLOCK
         );
-        HashSet<SFMRegistryObject<Block>> ourBlocks = new HashSet<>(SFMBlocks.REGISTERER.getOurEntries());
+        HashSet<SFMRegistryObject<Block, ? extends Block>> ourBlocks = new HashSet<>(SFMBlocks.REGISTERER.getOurEntries());
         ourBlocks.removeIf(exclude::contains);
         return ourBlocks;
     }

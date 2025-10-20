@@ -5,7 +5,6 @@ import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -47,7 +46,7 @@ public abstract class ScalarResourceType<STACK, CAP> extends ResourceType<STACK,
     }
 
     @Override
-    public Collection<Class<STACK>> getItems() {
+    public Iterable<Class<STACK>> getItems() {
         return List.of(item);
     }
 

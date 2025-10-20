@@ -13,28 +13,33 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.function.Supplier;
 
 public class SFMRecipeSerializers {
-    private static final SFMDeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS
-            = SFMDeferredRegister.createForExistingRegistry(SFMWellKnownRegistries.RECIPE_SERIALIZERS, SFM.MOD_ID);
+    private static final SFMDeferredRegister<RecipeSerializer<?>> RECIPE_SERIALIZERS =
+            new SFMDeferredRegisterBuilder<RecipeSerializer<?>>()
+                    .namespace(SFM.MOD_ID)
+                    .registry(SFMWellKnownRegistries.RECIPE_SERIALIZERS.registryKey())
+                    .build();
 
-    public static final SFMRegistryObject<RecipeSerializer<PrintingPressRecipe>> PRINTING_PRESS
+    public static final SFMRegistryObject<RecipeSerializer<?>, PrintingPressRecipe.Serializer> PRINTING_PRESS
             = RECIPE_SERIALIZERS.register(
             "printing_press",
             PrintingPressRecipe.Serializer::new
     );
 
-    public static final SFMRegistryObject<SimpleCraftingRecipeSerializer<DiskResetRecipe>> DISK_RESET
+    public static final SFMRegistryObject<RecipeSerializer<?>, SimpleCraftingRecipeSerializer<DiskResetRecipe>> DISK_RESET
             = RECIPE_SERIALIZERS.register(
             "disk_reset",
             () -> new SimpleCraftingRecipeSerializer<>(DiskResetRecipe::new)
     );
 
-    public static final SFMRegistryObject<SimpleCraftingRecipeSerializer<LabelGunResetRecipe>> LABEL_GUN_RESET
+    public static final SFMRegistryObject<RecipeSerializer<?>, SimpleCraftingRecipeSerializer<LabelGunResetRecipe>> LABEL_GUN_RESET
             = RECIPE_SERIALIZERS.register(
             "label_gun_reset",
             () -> new SimpleCraftingRecipeSerializer<>(LabelGunResetRecipe::new)
     );
 
     public static void register(IEventBus bus) {
+
         RECIPE_SERIALIZERS.register(bus);
     }
+
 }

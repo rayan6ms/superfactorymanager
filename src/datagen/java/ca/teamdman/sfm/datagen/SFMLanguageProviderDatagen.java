@@ -26,14 +26,14 @@ public class SFMLanguageProviderDatagen extends MCVersionAgnosticLanguageDataGen
         }
         List<String> unmapped = new ArrayList<>();
         SFMWellKnownRegistries.ITEMS
-                .getEntries()
+                .entries()
                 .stream()
                 .filter(entry -> entry.getKey().location().getNamespace().equals(SFM.MOD_ID))
                 .filter(entry -> !seen.contains(entry.getValue().getDescriptionId()))
                 .map(entry -> entry.getValue().toString())
                 .forEach(unmapped::add);
         SFMWellKnownRegistries.BLOCKS
-                .getEntries()
+                .entries()
                 .stream()
                 .filter(entry -> entry.getKey().location().getNamespace().equals(SFM.MOD_ID))
                 .filter(entry -> !seen.contains(entry.getValue().getDescriptionId()))

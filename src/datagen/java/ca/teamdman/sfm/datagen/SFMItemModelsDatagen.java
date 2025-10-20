@@ -46,21 +46,21 @@ public class SFMItemModelsDatagen extends MCVersionAgnosticItemModelsDataGen {
     }
 
     @SuppressWarnings({"OptionalGetWithoutIsPresent", "SameParameterValue"})
-    private ItemModelBuilder getBuilder(SFMRegistryObject<? extends Item> item) {
+    private ItemModelBuilder getBuilder(SFMRegistryObject<Item, ? extends Item> item) {
         ResourceKey<? extends Item> resourceKey = item.getId().get();
         return getBuilder(resourceKey.location().toString());
     }
 
     private void justParent(
-            SFMRegistryObject<? extends Item> item,
-            SFMRegistryObject<? extends Block> block
+            SFMRegistryObject<Item, ? extends Item> item,
+            SFMRegistryObject<Block, ? extends Block> block
     ) {
         justParent(item, block, "");
     }
 
     private void justParent(
-            SFMRegistryObject<? extends Item> item,
-            SFMRegistryObject<? extends Block> block,
+            SFMRegistryObject<Item,? extends Item> item,
+            SFMRegistryObject<Block, ? extends Block> block,
             String extra
     ) {
         withExistingParent(
@@ -70,7 +70,7 @@ public class SFMItemModelsDatagen extends MCVersionAgnosticItemModelsDataGen {
     }
 
     private void basicItem(
-            SFMRegistryObject<? extends Item> item
+            SFMRegistryObject<Item, ? extends Item> item
     ) {
         withExistingParent(
                 item.getPath(),

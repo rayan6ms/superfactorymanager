@@ -27,7 +27,7 @@ public class SFMModCompat {
             @NotStored BlockPos pos
     ) {
         Block block = level.getBlockState(pos).getBlock();
-        ResourceLocation blockId = SFMWellKnownRegistries.BLOCKS.getKey(block);
+        ResourceLocation blockId = SFMWellKnownRegistries.BLOCKS.getId(block);
         assert blockId != null;
         return blockId.getNamespace().equals("mekanism");
     }

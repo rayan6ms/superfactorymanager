@@ -21,12 +21,13 @@ import net.neoforged.neoforge.registries.DeferredRegister;
 import java.util.function.Supplier;
 
 public class SFMMenus {
-    private static final SFMDeferredRegister<MenuType<?>> MENU_TYPES
-            = SFMDeferredRegister.createForExistingRegistry(
-            SFMWellKnownRegistries.MENU_TYPES,
-            SFM.MOD_ID
-    );
-    public static final SFMRegistryObject<MenuType<ManagerContainerMenu>> MANAGER_MENU = MENU_TYPES.register(
+    private static final SFMDeferredRegister<MenuType<?>> MENU_TYPES =
+            new SFMDeferredRegisterBuilder<MenuType<?>>()
+                    .namespace(SFM.MOD_ID)
+                    .registry(SFMWellKnownRegistries.MENU_TYPES.registryKey())
+                    .build();
+
+    public static final SFMRegistryObject<MenuType<?>, MenuType<ManagerContainerMenu>> MANAGER_MENU = MENU_TYPES.register(
             "manager",
             () -> IMenuTypeExtension.create(
                     new IContainerFactory<>() {
@@ -36,6 +37,7 @@ public class SFMMenus {
                                 Inventory inv,
                                 FriendlyByteBuf data
                         ) {
+
                             return new ManagerContainerMenu(
                                     windowId,
                                     inv,
@@ -48,6 +50,7 @@ public class SFMMenus {
                                 int windowId,
                                 Inventory inv
                         ) {
+
                             if (SFMEnvironmentUtils.isClient()) {
                                 BlockEntity be = ClientRayCastHelpers.getLookBlockEntity();
                                 if (!(be instanceof ManagerBlockEntity mbe)) {
@@ -64,7 +67,7 @@ public class SFMMenus {
                     })
     );
 
-    public static final SFMRegistryObject<MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK_MENU = MENU_TYPES.register(
+    public static final SFMRegistryObject<MenuType<?>, MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK_MENU = MENU_TYPES.register(
             "test_barrel_tank",
             () -> IMenuTypeExtension.create(
                     new IContainerFactory<>() {
@@ -74,6 +77,7 @@ public class SFMMenus {
                                 Inventory inv,
                                 FriendlyByteBuf data
                         ) {
+
                             return new TestBarrelTankContainerMenu(
                                     windowId,
                                     inv,
@@ -86,6 +90,7 @@ public class SFMMenus {
                                 int windowId,
                                 Inventory inv
                         ) {
+
                             if (SFMEnvironmentUtils.isClient()) {
                                 BlockEntity be = ClientRayCastHelpers.getLookBlockEntity();
                                 if (!(be instanceof TestBarrelTankBlockEntity blockEntity)) {
@@ -103,6 +108,7 @@ public class SFMMenus {
     );
 
     public static void register(IEventBus bus) {
+
         MENU_TYPES.register(bus);
     }
 
