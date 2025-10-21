@@ -3,8 +3,8 @@ package ca.teamdman.sfm.common.resourcetype;
 import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
+import ca.teamdman.sfm.common.registry.SFMRegistryWrapper;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
@@ -24,8 +24,8 @@ public class ItemResourceType extends RegistryBackedResourceType<ItemStack, Item
     }
 
     @Override
-    public Registry<Item> getRegistry() {
-        return BuiltInRegistries.ITEM;
+    public SFMRegistryWrapper<Item> getRegistry() {
+        return SFMWellKnownRegistries.ITEMS;
     }
 
 

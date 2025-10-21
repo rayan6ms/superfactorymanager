@@ -4,18 +4,18 @@ import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
+import ca.teamdman.sfm.common.registry.SFMRegistryWrapper;
 import mekanism.api.Action;
+import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.ChemicalTankBuilder;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasHandler;
 import mekanism.common.lib.transmitter.TransmissionType;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.neoforged.neoforge.common.capabilities.CapabilityManager;
 import net.neoforged.neoforge.common.capabilities.CapabilityToken;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.stream.Stream;
 
@@ -124,9 +124,8 @@ public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, I
 
 
     @Override
-    public Registry<Gas> getRegistry() {
-        throw new NotImplementedException();
-//        return MekanismAPI.gasRegistry();
+    public SFMRegistryWrapper<Gas> getRegistry() {
+        return new SFMRegistryWrapper<>(MekanismAPI.gasRegistry());
     }
 
     @Override

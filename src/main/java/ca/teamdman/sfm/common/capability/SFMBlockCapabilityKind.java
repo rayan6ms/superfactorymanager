@@ -27,16 +27,11 @@ public record SFMBlockCapabilityKind<CAP>(
         return "SFMBlockCapabilityKind[" + getName() + "]";
     }
 
-    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
-    public boolean matchesResourceType(ResourceType<?,?,?> resourceType) {
-        return resourceType.CAPABILITY_KIND.equals(this);
-    }
-
     @SuppressWarnings("unchecked")
     public @Nullable ResourceType<?,?,CAP> getResourceType() {
         return (ResourceType<Object, Object, CAP>) SFMResourceTypes
                 .registry()
-                .streamValues()
+                .stream()
                 .filter(resourceType -> resourceType.CAPABILITY_KIND.equals(this))
                 .findFirst()
                 .orElse(null);

@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.common.capability;
 
-import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -18,13 +17,30 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CauldronBlockCapabilityProvider implements SFMBlockCapabilityProvider, IBlockCapabilityProvider<IFluidHandler, Direction> {
+
+public class CauldronBlockCapabilityProvider implements SFMBlockCapabilityProvider<IFluidHandler>, IBlockCapabilityProvider<IFluidHandler, Direction> {
     @Override
-    public @Nullable IBlockCapabilityProvider<?, @Nullable Direction> createForKind(SFMBlockCapabilityKind<?> capabilityKind) {
-        if (!capabilityKind.matchesResourceType(SFMResourceTypes.FLUID.get())) {
-            return null;
+    public boolean matchesCapabilityKind(SFMBlockCapabilityKind<?> capabilityKind) {
+        return SFMWellKnownCapabilities.FLUID_HANDLER.equals(capabilityKind);
+    }
+
+    @MCVersionDependentBehaviour
+    @Override
+    public SFMBlockCapabilityResult<IFluidHandler> getCapability(
+            SFMBlockCapabilityKind<IFluidHandler> capabilityKind,
+            LevelAccessor level,
+            BlockPos pos,
+            BlockState state,
+            @Nullable BlockEntity blockEntity,
+            @Nullable Direction direction
+    ) {
+        if (state.getBlock() == Blocks.CAULDRON
+            || state.getBlock() == Blocks.WATER_CAULDRON
+            || state.getBlock() == Blocks.LAVA_CAULDRON) {
+            return SFMBlockCapabilityResult.of(new CauldronFluidHandler(level, pos));
+        } else {
+            return SFMBlockCapabilityResult.empty();
         }
-        return this;
     }
 
     @MCVersionDependentBehaviour

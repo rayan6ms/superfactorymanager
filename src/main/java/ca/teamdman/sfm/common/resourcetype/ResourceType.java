@@ -17,7 +17,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -216,7 +215,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
 
     public abstract Set<ResourceLocation> getRegistryKeys();
 
-    public abstract Collection<ITEM> getItems();
+    public abstract Iterable<ITEM> getItems();
 
     public abstract ITEM getItem(STACK stack);
 
@@ -231,7 +230,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     }
 
     public String displayAsCode() {
-        ResourceLocation thisKey = SFMResourceTypes.registry().getKey(this);
+        ResourceLocation thisKey = SFMResourceTypes.registry().getId(this);
         return thisKey != null ? thisKey.toString() : "null";
     }
 

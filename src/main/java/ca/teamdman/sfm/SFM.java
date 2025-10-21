@@ -5,7 +5,6 @@ import ca.teamdman.sfm.client.registry.SFMTextEditorActions;
 import ca.teamdman.sfm.client.registry.SFMTextEditors;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.registry.*;
-import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
 import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
@@ -31,10 +30,8 @@ public class SFM {
         SFMProgramLinters.register(bus);
         SFMBlockEntities.register(bus);
         SFMGlobalBlockCapabilityProviders.register(bus);
-        if (SFMEnvironmentUtils.isClient()) {
-            SFMTextEditors.register(bus);
-            SFMTextEditorActions.register(bus);
-        }
+        SFMTextEditors.register(bus);
+        SFMTextEditorActions.register(bus);
         SFMMenus.register(bus);
         SFMRecipeTypes.register(bus);
         SFMRecipeSerializers.register(bus);

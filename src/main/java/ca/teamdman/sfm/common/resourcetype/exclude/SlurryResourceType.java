@@ -4,17 +4,18 @@ import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
+import ca.teamdman.sfm.common.registry.SFMRegistryWrapper;
 import mekanism.api.Action;
+import mekanism.api.MekanismAPI;
 import mekanism.api.chemical.ChemicalTankBuilder;
 import mekanism.api.chemical.slurry.ISlurryHandler;
 import mekanism.api.chemical.slurry.Slurry;
 import mekanism.api.chemical.slurry.SlurryStack;
 import mekanism.common.lib.transmitter.TransmissionType;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.TagKey;
 import net.neoforged.neoforge.common.capabilities.CapabilityManager;
 import net.neoforged.neoforge.common.capabilities.CapabilityToken;
-import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.stream.Stream;
 
@@ -121,9 +122,8 @@ public class SlurryResourceType extends RegistryBackedResourceType<SlurryStack, 
     }
 
     @Override
-    public Registry<Slurry> getRegistry() {
-        throw new NotImplementedException();
-//        return MekanismAPI.slurryRegistry();
+    public SFMRegistryWrapper<Slurry> getRegistry() {
+        return new SFMRegistryWrapper<>(MekanismAPI.slurryRegistry());
     }
 
     @Override

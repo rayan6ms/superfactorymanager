@@ -102,7 +102,7 @@ public class BufferBlock extends BaseEntityBlock {
         }
 
         public static ContainedResource from(ResourceType<?, ?, ?> resourceType) {
-            String name = Objects.requireNonNull(SFMResourceTypes.registry().getKey(resourceType)).getPath();
+            String name = Objects.requireNonNull(SFMResourceTypes.registry().getId(resourceType)).getPath();
             if (name.equals("item")) {
                 return Item;
             } else if (name.equals("fluid")) {

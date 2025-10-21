@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IJeiHelpers;
@@ -11,7 +12,6 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.StringTag;
 import net.minecraft.network.chat.Component;
@@ -129,7 +129,7 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
             );
             var enchanted = new ArrayList<ItemStack>();
             var books = new ArrayList<ItemStack>();
-            for (Enchantment enchant : BuiltInRegistries.ENCHANTMENT) {
+            for (Enchantment enchant : SFMWellKnownRegistries.ENCHANTMENTS.values()) {
                 for (Item tool : tools) {
                     var stack = new ItemStack(tool);
                     if (enchant.canEnchant(stack)) {

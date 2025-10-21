@@ -3,8 +3,8 @@ package ca.teamdman.sfm.common.resourcetype;
 import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
+import ca.teamdman.sfm.common.registry.SFMRegistryWrapper;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
@@ -21,8 +21,8 @@ public class FluidResourceType extends RegistryBackedResourceType<FluidStack, Fl
     }
 
     @Override
-    public Registry<Fluid> getRegistry() {
-        return BuiltInRegistries.FLUID;
+    public SFMRegistryWrapper<Fluid> getRegistry() {
+        return SFMWellKnownRegistries.FLUIDS;
     }
 
     @Override

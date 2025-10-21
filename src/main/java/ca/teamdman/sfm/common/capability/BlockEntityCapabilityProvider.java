@@ -2,37 +2,39 @@ package ca.teamdman.sfm.common.capability;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider;
+import net.neoforged.neoforge.common.extensions.ILevelExtension;
 import org.jetbrains.annotations.Nullable;
 
 /// In NeoForge for Minecraft 1.20.3, the way capabilities are discovered changed.
 /// See {@link SFMBlockCapabilityProvider} for more information.
 /// This is the fallback provider for the "built-in" behaviour provided by the modding framework.
-public class BlockEntityCapabilityProvider implements SFMBlockCapabilityProvider {
-    @SuppressWarnings("Convert2Lambda")
+public class BlockEntityCapabilityProvider implements SFMBlockCapabilityProvider<Object> {
+
     @Override
-    public @Nullable IBlockCapabilityProvider<?, @Nullable Direction> createForKind(SFMBlockCapabilityKind<?> capabilityKind) {
-        return new IBlockCapabilityProvider<>() {
-            @Override
-            public @Nullable Object getCapability(
-                    Level level,
-                    BlockPos pos,
-                    BlockState state,
-                    @Nullable BlockEntity blockEntity,
-                    Direction context
-            ) {
-                return level.getCapability(
-                        capabilityKind.capabilityKind(),
-                        pos,
-                        state,
-                        blockEntity,
-                        context
-                );
-            }
-        };
+    public boolean matchesCapabilityKind(SFMBlockCapabilityKind<?> capabilityKind) {
+        return true;
+    }
+
+    @Override
+    public SFMBlockCapabilityResult<Object> getCapability(
+            SFMBlockCapabilityKind<Object> capabilityKind,
+            LevelAccessor level,
+            BlockPos pos,
+            BlockState state,
+            @Nullable BlockEntity blockEntity,
+            @Nullable Direction direction
+    ) {
+        if (!(level instanceof ILevelExtension capLevel)) return SFMBlockCapabilityResult.empty();
+        return SFMBlockCapabilityResult.of(capLevel.getCapability(
+                capabilityKind.capabilityKind(),
+                pos,
+                state,
+                blockEntity,
+                direction
+        ));
     }
 
     @Override

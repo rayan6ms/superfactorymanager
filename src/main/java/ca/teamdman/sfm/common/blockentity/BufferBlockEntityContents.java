@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.blockentity;
 
 import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.block.BufferBlockTier;
+import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import org.jetbrains.annotations.Nullable;
 
@@ -24,9 +25,8 @@ public class BufferBlockEntityContents {
 
     public BufferBlock.ContainedResource lastUsedResource = BufferBlock.ContainedResource.Unknown;
 
-
     /// Should return None if querying for a resource type when other resource types are not empty.
-    public <CAP> @Nullable CAP getCapability(
+    public <CAP> SFMBlockCapabilityResult<CAP> getCapability(
             ResourceType<?, ?, CAP> type
     ) {
         // Discover existing handler
@@ -36,25 +36,25 @@ public class BufferBlockEntityContents {
             // The handler is present.
             if (!type.isHandlerEmpty(handler)) {
                 // When the handler is not empty, assume that it's the one in use.
-                return handler;
+                return SFMBlockCapabilityResult.of(handler);
             } else {
                 // When the handler is empty, make sure all other handlers are empty before allowing access.
                 if (isEmpty()) {
-                    return handler;
+                    return SFMBlockCapabilityResult.of(handler);
                 } else {
-                    return null;
+                    return SFMBlockCapabilityResult.empty();
                 }
             }
         } else {
             // The handler is absent.
             // We can only create a new one if all other handlers are empty.
             if (!isEmpty()) {
-                return null;
+                return SFMBlockCapabilityResult.empty();
             }
 
             handler = type.createHandlerForBufferBlock(this);
             contents.put(type, handler);
-            return handler;
+            return SFMBlockCapabilityResult.of(handler);
         }
     }
 

@@ -7,7 +7,6 @@ import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.program.LimitedInputSlot;
 import ca.teamdman.sfm.common.program.LimitedOutputSlot;
 import ca.teamdman.sfm.common.program.ProgramContext;
-import ca.teamdman.sfm.common.registry.SFMGlobalBlockCapabilityProviders;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
@@ -17,9 +16,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.capabilities.IBlockCapabilityProvider;
 import net.neoforged.neoforge.common.extensions.ILevelExtension;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 /// ```
 /// INPUT item::, fluid:: FROM a
 /// OUTPUT item::, fluid:: TO b
-///```
+/// ```
 ///
 /// the {@link SFMResourceTypes} being moved are each tied to a {@link SFMBlockCapabilityKind}.
 /// See {@link OutputStatement#moveTo(ProgramContext, LimitedInputSlot, LimitedOutputSlot)} for details.
@@ -37,11 +33,12 @@ import org.jetbrains.annotations.Nullable;
 /// This class helps keep related capability discovery logic in one place and out of the {@link CableNetwork}.
 ///
 /// The methods by which capabilities are retrieved change in Minecraft 1.20.3.
-/// To discover the right capability for a given block position, we iterate over
-/// the appropriate {@link SFMBlockCapabilityProvider} to find a {@link SFMBlockCapabilityResult}.
+/// To discover the right capability for a given block position, we use {@link SFMBlockCapabilityProviderDiscovery} to
+/// iterate over the appropriate {@link SFMBlockCapabilityProvider} to find a {@link SFMBlockCapabilityResult}.
 ///
 /// The discovery results from {@link CableNetwork#getCapability(SFMBlockCapabilityKind, BlockPos, Direction, TranslatableLogger)}
 /// will be cached in the {@link CableNetwork#getLevelCapabilityCache()}
+/// so the {@link SFMBlockCapabilityProviderDiscovery} can focus on its job.
 public class SFMBlockCapabilityDiscovery {
     public static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromNetwork(
             CableNetwork cableNetwork,
@@ -125,21 +122,14 @@ public class SFMBlockCapabilityDiscovery {
             @NotStored BlockPos pos,
             @Nullable Direction direction
     ) {
-        BlockState blockState = level.getBlockState(pos);
-        BlockEntity blockEntity = level.getBlockEntity(pos);
-        for (IBlockCapabilityProvider<CAP, @Nullable Direction> provider : SFMGlobalBlockCapabilityProviders.getProvidersForKind(capKind)) {
-            CAP capability = provider.getCapability(
-                    level,
-                    pos,
-                    blockState,
-                    blockEntity,
-                    direction
-            );
-            if (capability != null) {
-                return SFMBlockCapabilityResult.of(capability);
-            }
-        }
-        return SFMBlockCapabilityResult.empty();
+        return SFMBlockCapabilityProviderDiscovery.getCapabilityFromLevel(
+                capKind,
+                level,
+                pos,
+                level.getBlockState(pos),
+                level.getBlockEntity(pos),
+                direction
+        );
     }
 
     private static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromCache(

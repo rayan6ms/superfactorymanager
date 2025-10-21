@@ -238,7 +238,7 @@ public record ServerboundOutputInspectionRequestPacket(
         //noinspection OptionalGetWithoutIsPresent
         ResourceKey<ResourceType<STACK, ITEM, CAP>> resourceTypeResourceKey = SFMResourceTypes
                 .registry()
-                .getResourceKey(limitedInputSlot.type)
+                .getKey(limitedInputSlot.type)
                 .map(x -> {
                     //noinspection unchecked,rawtypes
                     return (ResourceKey<ResourceType<STACK, ITEM, CAP>>) (ResourceKey) x;
