@@ -84,7 +84,6 @@ public class SFMDeferredRegister<T> {
     public <I extends T> SFMRegistryObject<T, I> registerEmpty(
             String name
     ) {
-        //noinspection DataFlowIssue
         return new SFMRegistryObject<T, I>(
                 (ResourceKey<? extends Registry<I>>) registryKey,
                 null
