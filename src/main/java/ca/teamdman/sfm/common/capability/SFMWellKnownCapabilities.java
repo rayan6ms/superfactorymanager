@@ -30,18 +30,6 @@ public class SFMWellKnownCapabilities {
             = new SFMBlockCapabilityKind<>(CapabilityManager.get(new CapabilityToken<>() {
     }));
 
-    @SuppressWarnings("unchecked")
-    public static <STACK, ITEM, CAP> @Nullable ResourceType<STACK, ITEM, CAP> getResourceTypeForCapability(
-            SFMBlockCapabilityKind<CAP> capabilityKind
-    ) {
-        return (ResourceType<STACK, ITEM, CAP>) SFMResourceTypes
-                .registry()
-                .stream()
-                .filter(resourceType -> resourceType.CAPABILITY_KIND.equals(capabilityKind))
-                .findFirst()
-                .orElse(null);
-    }
-
     public static Stream<SFMBlockCapabilityKind<?>> streamCapabilities() {
         return SFMResourceTypes.registry().stream().map(ResourceType::capabilityKind);
     }

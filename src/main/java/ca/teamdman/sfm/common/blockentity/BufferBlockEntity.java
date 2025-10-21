@@ -5,9 +5,7 @@ import ca.teamdman.sfm.common.block.BufferBlockTier;
 import ca.teamdman.sfm.common.capability.BufferBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
-import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
-import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -46,6 +44,7 @@ public class BufferBlockEntity extends BlockEntity {
         super.invalidateCaps();
     }
 
+    @SuppressWarnings("unchecked")
     @MCVersionDependentBehaviour
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(
@@ -53,14 +52,10 @@ public class BufferBlockEntity extends BlockEntity {
             @Nullable Direction side
     ) {
         SFMBlockCapabilityKind<T> capKind = new SFMBlockCapabilityKind<>(cap);
-        ResourceType<?, ?, T> resourceType = SFMWellKnownCapabilities.getResourceTypeForCapability(capKind);
-        if (resourceType == null) {
-            return LazyOptional.empty();
-        }
-        BufferBlockCapabilityProvider<?, ?, T> provider = new BufferBlockCapabilityProvider<>(resourceType);
+        BufferBlockCapabilityProvider bufferBlockCapabilityProvider = new BufferBlockCapabilityProvider();
         assert level != null;
-        SFMBlockCapabilityResult<T> found = provider.getCapability(
-                capKind,
+        SFMBlockCapabilityResult<T> found = (SFMBlockCapabilityResult<T>) bufferBlockCapabilityProvider.getCapability(
+                (SFMBlockCapabilityKind<Object>) capKind,
                 level,
                 getBlockPos(),
                 getBlockState(),

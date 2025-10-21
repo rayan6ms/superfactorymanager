@@ -1,8 +1,11 @@
 package ca.teamdman.sfm.common.capability;
 
+import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.neoforged.neoforge.common.capabilities.Capability;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 /// In NeoForge for Minecraft 1.20.3, the {@code Capability<CAP>} type is replaced with {@code BlockCapability<CAP, CONTEXT>}.
 /// We use {@link SFMBlockCapabilityKind} to wrap the capability kind.
@@ -12,7 +15,7 @@ import org.jetbrains.annotations.NotNull;
 /// This class helps keep {@link MCVersionDependentBehaviour} out of other classes.
 @MCVersionDependentBehaviour
 public record SFMBlockCapabilityKind<CAP>(
-        Capability<CAP> capabilityKind
+        Capability<? extends CAP> capabilityKind
 ) {
     public String getName() {
         return capabilityKind.getName();
@@ -21,5 +24,15 @@ public record SFMBlockCapabilityKind<CAP>(
     @Override
     public @NotNull String toString() {
         return "SFMBlockCapabilityKind[" + getName() + "]";
+    }
+
+    @SuppressWarnings("unchecked")
+    public <STACK, ITEM> @Nullable ResourceType<STACK, ITEM, CAP> getResourceType() {
+        return (ResourceType<STACK, ITEM, CAP>) SFMResourceTypes
+                .registry()
+                .stream()
+                .filter(resourceType -> resourceType.CAPABILITY_KIND.equals(this))
+                .findFirst()
+                .orElse(null);
     }
 }

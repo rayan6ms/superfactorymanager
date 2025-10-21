@@ -126,10 +126,6 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     /// Checks if the provided handler is an instance of the capability associated with this resource type
     public abstract boolean matchesCapabilityHandler(Object o);
 
-    public boolean matchesCapabilityKind(SFMBlockCapabilityKind<?> capabilityKind) {
-        return CAPABILITY_KIND.equals(capabilityKind);
-    }
-
     public void forEachCapability(
             ProgramContext programContext,
             LabelAccess labelAccess,

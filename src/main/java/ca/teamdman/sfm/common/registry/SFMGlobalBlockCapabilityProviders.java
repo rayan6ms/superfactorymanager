@@ -64,7 +64,7 @@ public class SFMGlobalBlockCapabilityProviders {
 //        }
 //    }
 
-    /// Gets all registered Block Capability Providers, sorted by priority (highest priority first).
+    /// Gets all registered Block Capability Providers, sorted by priority (the highest priority first).
     public static ArrayList<SFMBlockCapabilityProvider<?>> getAllProviders() {
 
         return REGISTERER
