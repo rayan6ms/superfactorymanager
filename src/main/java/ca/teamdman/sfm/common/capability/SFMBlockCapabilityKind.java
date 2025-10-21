@@ -28,8 +28,8 @@ public record SFMBlockCapabilityKind<CAP>(
     }
 
     @SuppressWarnings("unchecked")
-    public @Nullable ResourceType<?,?,CAP> getResourceType() {
-        return (ResourceType<Object, Object, CAP>) SFMResourceTypes
+    public <STACK, ITEM> @Nullable ResourceType<STACK, ITEM, CAP> getResourceType() {
+        return (ResourceType<STACK, ITEM, CAP>) SFMResourceTypes
                 .registry()
                 .stream()
                 .filter(resourceType -> resourceType.CAPABILITY_KIND.equals(this))

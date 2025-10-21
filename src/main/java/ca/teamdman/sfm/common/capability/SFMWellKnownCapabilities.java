@@ -9,7 +9,6 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
@@ -27,18 +26,6 @@ public class SFMWellKnownCapabilities {
             = new SFMBlockCapabilityKind<>(Capabilities.ItemHandler.BLOCK);
     public static final SFMBlockCapabilityKind<IRedstoneSignalStorage> REDSTONE_HANDLER
             = SFMCapabilities.REDSTONE_HANDLER;
-
-    @SuppressWarnings("unchecked")
-    public static <STACK, ITEM, CAP> @Nullable ResourceType<STACK, ITEM, CAP> getResourceTypeForCapability(
-            SFMBlockCapabilityKind<CAP> capabilityKind
-    ) {
-        return (ResourceType<STACK, ITEM, CAP>) SFMResourceTypes
-                .registry()
-                .stream()
-                .filter(resourceType -> resourceType.CAPABILITY_KIND.equals(capabilityKind))
-                .findFirst()
-                .orElse(null);
-    }
 
     public static Stream<SFMBlockCapabilityKind<?>> streamCapabilities() {
         return SFMResourceTypes.registry().stream().map(ResourceType::capabilityKind);
