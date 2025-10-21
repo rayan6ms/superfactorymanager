@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.RegistryObject;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -18,12 +19,11 @@ public class SFMRegistryObject<R, T extends R> implements Supplier<T> {
     private final ResourceKey<? extends Registry<T>> registryKey;
 
     /// This is null when this is an empty entry for a conditional registration in the not-enabled code path.
-    /// Because disabled objects are
-    private final RegistryObject<? extends T> inner;
+    private final @UnknownNullability RegistryObject<? extends T> inner;
 
     public SFMRegistryObject(
             ResourceKey<? extends Registry<T>> registryKey,
-            RegistryObject<? extends T> object
+            @UnknownNullability RegistryObject<? extends T> object
     ) {
         this.registryKey = registryKey;
         this.inner = object;
