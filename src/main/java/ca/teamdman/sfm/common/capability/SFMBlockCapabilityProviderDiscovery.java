@@ -52,11 +52,12 @@ public class SFMBlockCapabilityProviderDiscovery {
     ) {
         return (ArrayList<SFMBlockCapabilityProvider<CAP>>) (ArrayList) BLOCK_CAPABILITY_PROVIDERS_BY_KIND.computeIfAbsent(
                 capabilityKind,
-                __ -> getCapabilityProvidersForKind(capabilityKind)
+                __ -> (ArrayList<SFMBlockCapabilityProvider<?>>) (ArrayList)
+                        getCapabilityProvidersForKind(capabilityKind)
         );
     }
 
-    private static <CAP> ArrayList<SFMBlockCapabilityProvider<?>> getCapabilityProvidersForKind(
+    private static <CAP> ArrayList<SFMBlockCapabilityProvider<CAP>> getCapabilityProvidersForKind(
             SFMBlockCapabilityKind<CAP> capabilityKind
     ) {
         ArrayList<SFMBlockCapabilityProvider<CAP>> rtn = new ArrayList<>();
@@ -68,7 +69,7 @@ public class SFMBlockCapabilityProviderDiscovery {
                 rtn.add(typedMapper);
             }
         }
-        return (ArrayList<SFMBlockCapabilityProvider<?>>) (ArrayList) rtn;
+        return rtn;
     }
 
 }

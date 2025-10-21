@@ -19,11 +19,11 @@ public class SFMRegistryObject<R, T extends R> implements Supplier<T> {
 
     /// This is null when this is an empty entry for a conditional registration in the not-enabled code path.
     /// Because disabled objects are
-    private final @Nullable RegistryObject<? extends T> inner;
+    private final RegistryObject<? extends T> inner;
 
     public SFMRegistryObject(
             ResourceKey<? extends Registry<T>> registryKey,
-            @Nullable RegistryObject<? extends T> object
+            RegistryObject<? extends T> object
     ) {
         this.registryKey = registryKey;
         this.inner = object;
@@ -43,9 +43,6 @@ public class SFMRegistryObject<R, T extends R> implements Supplier<T> {
 
     @Override
     public T get() {
-        if (inner == null) {
-            throw new IllegalStateException("Tried to get a registry object that was conditionally not registered.");
-        }
         return inner.get();
     }
 

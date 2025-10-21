@@ -8,7 +8,6 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
@@ -28,18 +27,6 @@ public class SFMWellKnownCapabilities {
     public static final SFMBlockCapabilityKind<IRedstoneSignalStorage> REDSTONE_HANDLER
             = new SFMBlockCapabilityKind<>(get(new CapabilityToken<>() {
     }));
-
-    @SuppressWarnings("unchecked")
-    public static <STACK, ITEM, CAP> @Nullable ResourceType<STACK, ITEM, CAP> getResourceTypeForCapability(
-            SFMBlockCapabilityKind<CAP> capabilityKind
-    ) {
-        return (ResourceType<STACK, ITEM, CAP>) SFMResourceTypes
-                .registry()
-                .stream()
-                .filter(resourceType -> resourceType.CAPABILITY_KIND.equals(capabilityKind))
-                .findFirst()
-                .orElse(null);
-    }
 
     public static Stream<SFMBlockCapabilityKind<?>> streamCapabilities() {
         return SFMResourceTypes.registry().stream().map(ResourceType::capabilityKind);
