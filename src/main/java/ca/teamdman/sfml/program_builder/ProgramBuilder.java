@@ -115,7 +115,7 @@ public class ProgramBuilder {
                 } else {
                     ResourceLocation resourceTypeId = Objects.requireNonNull(SFMResourceTypes
                                                                                      .registry()
-                                                                                     .getKey(resourceType));
+                                                                                     .getId(resourceType));
                     if (disallowedResourceTypes.contains(resourceTypeId.toString())) {
                         errors.add(LocalizationKeys.PROGRAM_ERROR_DISALLOWED_RESOURCE_TYPE.get(
                                 referencedResource));

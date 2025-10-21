@@ -173,7 +173,8 @@ public class SFMTextEditorConfigScreen extends Screen {
                         .setSize(buttonWidth, buttonHeight)
                         .setText(LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V1)
                         .setOnPress(button -> {
-                            config.preferredEditor.set(SFMTextEditors.V1.getKey().location().toString());
+                            //noinspection OptionalGetWithoutIsPresent
+                            config.preferredEditor.set(SFMTextEditors.V1.getId().get().location().toString());
                             updateButtonStates();
                         })
                         .build();
@@ -183,10 +184,11 @@ public class SFMTextEditorConfigScreen extends Screen {
                         .setSize(buttonWidth, buttonHeight)
                         .setText(LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V2)
                         .setOnPress(button -> {
-                        config.preferredEditor.set(SFMTextEditors.V2.getKey().location().toString());
-                        updateButtonStates();
-                    })
-                    .build();
+                            //noinspection OptionalGetWithoutIsPresent
+                            config.preferredEditor.set(SFMTextEditors.V2.getId().get().location().toString());
+                            updateButtonStates();
+                        })
+                        .build();
         if (editorSelectorFeatureFlag) {
             // This behaviour is not ready for release.
             this.addRenderableWidget(preferredEditorV1Button);
@@ -218,7 +220,9 @@ public class SFMTextEditorConfigScreen extends Screen {
                 config.intellisenseLevel.get() != SFMTextEditorIntellisenseLevel.ADVANCED;
 
         String currentEditor = config.preferredEditor.get();
-        preferredEditorV1Button.active = !currentEditor.equals(SFMTextEditors.V1.getKey().location().toString());
-        preferredEditorV2Button.active = !currentEditor.equals(SFMTextEditors.V2.getKey().location().toString());
+        //noinspection OptionalGetWithoutIsPresent
+        preferredEditorV1Button.active = !currentEditor.equals(SFMTextEditors.V1.getId().get().location().toString());
+        //noinspection OptionalGetWithoutIsPresent
+        preferredEditorV2Button.active = !currentEditor.equals(SFMTextEditors.V2.getId().get().location().toString());
     }
 }

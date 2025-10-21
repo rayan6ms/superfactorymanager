@@ -2,15 +2,17 @@ package ca.teamdman.sfm.common.capability;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.common.extensions.ILevelExtension;
 import org.jetbrains.annotations.Nullable;
 
 /// In NeoForge for Minecraft 1.20.3, the way capabilities are discovered changed.
 /// See {@link SFMBlockCapabilityProvider} for more information.
 /// This is the fallback provider for the "built-in" behaviour provided by the modding framework.
 public class BlockEntityCapabilityProvider implements SFMBlockCapabilityProvider<Object> {
+
     @Override
     public boolean matchesCapabilityKind(SFMBlockCapabilityKind<?> capabilityKind) {
         return true;
@@ -19,13 +21,14 @@ public class BlockEntityCapabilityProvider implements SFMBlockCapabilityProvider
     @Override
     public SFMBlockCapabilityResult<Object> getCapability(
             SFMBlockCapabilityKind<Object> capabilityKind,
-            Level level,
+            LevelAccessor level,
             BlockPos pos,
             BlockState state,
             @Nullable BlockEntity blockEntity,
             @Nullable Direction direction
     ) {
-        return SFMBlockCapabilityResult.of(level.getCapability(
+        if (!(level instanceof ILevelExtension capLevel)) return SFMBlockCapabilityResult.empty();
+        return SFMBlockCapabilityResult.of(capLevel.getCapability(
                 capabilityKind.capabilityKind(),
                 pos,
                 state,

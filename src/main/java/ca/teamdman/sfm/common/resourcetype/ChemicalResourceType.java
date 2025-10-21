@@ -1,13 +1,15 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.registry.SFMRegistryWrapper;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
+import mekanism.api.chemical.BasicChemicalTank;
 import mekanism.api.chemical.Chemical;
 import mekanism.api.chemical.ChemicalStack;
 import mekanism.api.chemical.IChemicalHandler;
 import mekanism.common.capabilities.Capabilities;
-import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 
@@ -20,6 +22,14 @@ public class ChemicalResourceType extends RegistryBackedResourceType<ChemicalSta
 
     public ChemicalResourceType() {
         super(CAP);
+    }
+
+    @Override
+    public IChemicalHandler createHandlerForBufferBlock(BufferBlockEntityContents contents) {
+        return (BasicChemicalTank) BasicChemicalTank.create(
+                contents.tier.getLongScalarMaxStackSize(),
+                null
+        );
     }
 
     @Override
@@ -94,14 +104,13 @@ public class ChemicalResourceType extends RegistryBackedResourceType<ChemicalSta
     }
 
     @Override
-    public boolean matchesCapabilityType(Object o) {
+    public boolean matchesCapabilityHandler(Object o) {
         return o instanceof IChemicalHandler;
     }
 
-
     @Override
-    public Registry<Chemical> getRegistry() {
-        return MekanismAPI.CHEMICAL_REGISTRY;
+    public SFMRegistryWrapper<Chemical> getRegistry() {
+        return new SFMRegistryWrapper<>(MekanismAPI.CHEMICAL_REGISTRY);
     }
 
     @Override

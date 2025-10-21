@@ -4,6 +4,7 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
@@ -14,7 +15,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 
@@ -57,7 +57,7 @@ public class ThermalFurnaceArrayGameTest extends SFMGameTestDefinition {
                 .receiveEnergy(Integer.MAX_VALUE, false);
 
         // set up furnaces
-        var furnaceBlock = ForgeRegistries.BLOCKS.getValue(SFMResourceLocation.fromNamespaceAndPath(
+        var furnaceBlock = SFMWellKnownRegistries.BLOCKS.get(SFMResourceLocation.fromNamespaceAndPath(
                 "thermal",
                 "machine_furnace"
         ));
