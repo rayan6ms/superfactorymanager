@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.neoforged.neoforge.registries.DeferredHolder;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.Optional;
 import java.util.function.Supplier;
@@ -19,11 +20,11 @@ public class SFMRegistryObject<R, T extends R> implements Supplier<T> {
 
     /// This is null when this is an empty entry for a conditional registration in the not-enabled code path.
     /// Because disabled objects are
-    private final DeferredHolder<R, T> inner;
+    private final @UnknownNullability DeferredHolder<R, T> inner;
 
     public SFMRegistryObject(
             ResourceKey<? extends Registry<T>> registryKey,
-            DeferredHolder<R, T> object
+            @UnknownNullability DeferredHolder<R, T> object
     ) {
         this.registryKey = registryKey;
         this.inner = object;
