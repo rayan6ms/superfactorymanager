@@ -1,14 +1,17 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.block.BufferBlock;
+import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.BuiltInRegistries;
+import ca.teamdman.sfm.common.registry.SFMRegistryWrapper;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.material.Fluid;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
+import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
 import java.util.stream.Stream;
 
@@ -18,8 +21,8 @@ public class FluidResourceType extends RegistryBackedResourceType<FluidStack, Fl
     }
 
     @Override
-    public Registry<Fluid> getRegistry() {
-        return BuiltInRegistries.FLUID;
+    public SFMRegistryWrapper<Fluid> getRegistry() {
+        return SFMWellKnownRegistries.FLUIDS;
     }
 
     @Override
@@ -43,6 +46,20 @@ public class FluidResourceType extends RegistryBackedResourceType<FluidStack, Fl
         int finalAmount = amount > Integer.MAX_VALUE ? Integer.MAX_VALUE : (int) amount;
         fluidStack.setAmount(finalAmount);
         return fluidStack;
+    }
+
+    @Override
+    public IFluidHandler createHandlerForBufferBlock(BufferBlockEntityContents contents) {
+        return new FluidTank(contents.tier.getIntMaxStackSize()) {
+            @Override
+            public boolean isFluidValid(FluidStack stack) {
+                boolean isValid = this.getFluidAmount() > 0 || contents.isEmpty();
+                if (isValid) {
+                    contents.lastUsedResource = BufferBlock.ContainedResource.Fluid;
+                }
+                return isValid;
+            }
+        };
     }
 
     @Override
@@ -80,7 +97,7 @@ public class FluidResourceType extends RegistryBackedResourceType<FluidStack, Fl
     }
 
     @Override
-    public boolean matchesCapabilityType(Object o) {
+    public boolean matchesCapabilityHandler(Object o) {
         return o instanceof IFluidHandler;
     }
 

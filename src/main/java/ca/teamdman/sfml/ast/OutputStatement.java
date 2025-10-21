@@ -5,12 +5,12 @@ import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.*;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -219,7 +219,7 @@ public class OutputStatement implements IOStatement {
         // THIS SHOULD NEVER HAPPEN
         // will void items if it does
         if (!resourceType.isEmpty(extractedRemainder)) {
-            ResourceLocation resourceTypeName = SFMResourceTypes.registry().getKey(resourceType);
+            ResourceLocation resourceTypeName = SFMResourceTypes.registry().getId(resourceType);
             String stackName = resourceType.getItem(extractPotential).toString();
             Level level = context.getManager().getLevel();
             assert level != null;
@@ -567,7 +567,7 @@ public class OutputStatement implements IOStatement {
                 .append(")\n");
         BlockEntity inputBlockEntity = level.getBlockEntity(slot.getPos());
         if (inputBlockEntity != null) {
-            ResourceLocation inputBlockEntityType = BuiltInRegistries.BLOCK_ENTITY_TYPE.getKey(inputBlockEntity.getType());
+            ResourceLocation inputBlockEntityType = SFMWellKnownRegistries.BLOCK_ENTITY_TYPES.getId(inputBlockEntity.getType());
             report
                     .append("Block Entity: ")
                     .append(inputBlockEntity.getClass().getName())
@@ -578,7 +578,7 @@ public class OutputStatement implements IOStatement {
             report.append("Block Entity: null\n");
         }
         BlockState blockState = level.getBlockState(slot.getPos());
-        ResourceLocation blockType = BuiltInRegistries.BLOCK.getKey(blockState.getBlock());
+        ResourceLocation blockType = SFMWellKnownRegistries.BLOCKS.getId(blockState.getBlock());
         report
                 .append("Block: ")
                 .append(blockState.getBlock().getClass().getName())

@@ -16,6 +16,9 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 
+/// TODO: fix invalidation not being present on 1.20.3+ lol
+/// Add test.
+/// See {@link net.neoforged.neoforge.capabilities.BlockCapability} and {@link net.neoforged.neoforge.capabilities.BlockCapabilityCache}
 public class SFMBlockCapabilityCacheForLevel {
     // Position => Capability => Direction => LazyOptional
     // We don't use an EnumMap here for Direction because we need to support the null key

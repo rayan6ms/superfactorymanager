@@ -59,7 +59,7 @@ public class InterfaceCapabilityProvider implements SFMBlockCapabilityProvider<O
             return null;
         }
 
-        return SFMBlockCapabilityResult.of(
+        return SFMBlockCapabilityResult.create(
                 be.getCapability(Capabilities.STORAGE_MONITORABLE_ACCESSOR)
                         .lazyMap(aeHandler -> {
                             // TODO: rework the InterfaceHandler to accept the aeHandler instance instead

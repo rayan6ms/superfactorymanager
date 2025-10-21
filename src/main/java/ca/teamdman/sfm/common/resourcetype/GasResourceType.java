@@ -1,13 +1,18 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.block.BufferBlock;
+import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
+import ca.teamdman.sfm.common.registry.SFMRegistryWrapper;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
+import mekanism.api.chemical.ChemicalTankBuilder;
 import mekanism.api.chemical.gas.Gas;
 import mekanism.api.chemical.gas.GasStack;
 import mekanism.api.chemical.gas.IGasHandler;
 import mekanism.common.capabilities.Capabilities;
-import net.minecraft.core.Registry;
+import mekanism.common.lib.transmitter.TransmissionType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 
@@ -21,6 +26,22 @@ public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, I
 
     public GasResourceType() {
         super(CAP);
+    }
+
+    @Override
+    public IGasHandler createHandlerForBufferBlock(BufferBlockEntityContents contents) {
+        return (ChemicalTankBuilder.BasicGasTank) ChemicalTankBuilder.GAS.create(
+                contents.tier.getIntScalarMaxStackSize(),
+                extracting -> {
+                    ResourceType<?, ?, ?> resourceType = SFMMekanismCompat.getResourceType(TransmissionType.GAS);
+                    boolean isValid = resourceType != null && contents.allowInsertion(resourceType);
+                    if (isValid) {
+                        contents.lastUsedResource = BufferBlock.ContainedResource.Chemical;
+                    }
+                    return isValid;
+                },
+                null
+        );
     }
 
     @Override
@@ -95,14 +116,14 @@ public class GasResourceType extends RegistryBackedResourceType<GasStack, Gas, I
     }
 
     @Override
-    public boolean matchesCapabilityType(Object o) {
+    public boolean matchesCapabilityHandler(Object o) {
         return o instanceof IGasHandler;
     }
 
 
     @Override
-    public Registry<Gas> getRegistry() {
-        return MekanismAPI.GAS_REGISTRY;
+    public SFMRegistryWrapper<Gas> getRegistry() {
+        return new SFMRegistryWrapper<>(MekanismAPI.GAS_REGISTRY);
     }
 
     @Override

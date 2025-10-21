@@ -17,7 +17,32 @@ import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CauldronBlockCapabilityProvider implements @MCVersionDependentBehaviour IBlockCapabilityProvider<IFluidHandler, @Nullable Direction> {
+
+public class CauldronBlockCapabilityProvider implements SFMBlockCapabilityProvider<IFluidHandler>, IBlockCapabilityProvider<IFluidHandler, Direction> {
+    @Override
+    public boolean matchesCapabilityKind(SFMBlockCapabilityKind<?> capabilityKind) {
+        return SFMWellKnownCapabilities.FLUID_HANDLER.equals(capabilityKind);
+    }
+
+    @MCVersionDependentBehaviour
+    @Override
+    public SFMBlockCapabilityResult<IFluidHandler> getCapability(
+            SFMBlockCapabilityKind<IFluidHandler> capabilityKind,
+            LevelAccessor level,
+            BlockPos pos,
+            BlockState state,
+            @Nullable BlockEntity blockEntity,
+            @Nullable Direction direction
+    ) {
+        if (state.getBlock() == Blocks.CAULDRON
+            || state.getBlock() == Blocks.WATER_CAULDRON
+            || state.getBlock() == Blocks.LAVA_CAULDRON) {
+            return SFMBlockCapabilityResult.of(new CauldronFluidHandler(level, pos));
+        } else {
+            return SFMBlockCapabilityResult.empty();
+        }
+    }
+
     @MCVersionDependentBehaviour
     @Override
     public @Nullable IFluidHandler getCapability(

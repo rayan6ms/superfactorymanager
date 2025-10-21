@@ -3,15 +3,15 @@ package ca.teamdman.sfm.datagen;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticItemModelsDataGen;
 import net.minecraft.client.renderer.block.model.BlockModel;
-import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
+import net.neoforged.neoforge.client.model.generators.ItemModelBuilder;
 import net.neoforged.neoforge.client.model.generators.ModelFile;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
-
-import java.util.function.Supplier;
 
 public class SFMItemModelsDatagen extends MCVersionAgnosticItemModelsDataGen {
     public SFMItemModelsDatagen(
@@ -24,11 +24,12 @@ public class SFMItemModelsDatagen extends MCVersionAgnosticItemModelsDataGen {
     @Override
     protected void registerModels() {
         justParent(SFMItems.MANAGER_ITEM, SFMBlocks.MANAGER_BLOCK);
-//        justParent(SFMItems.TUNNELLED_MANAGER_ITEM, SFMBlocks.TUNNELLED_MANAGER_BLOCK);
+        justParent(SFMItems.TUNNELLED_MANAGER_ITEM, SFMBlocks.TUNNELLED_MANAGER_BLOCK);
         justParent(SFMItems.CABLE_ITEM, SFMBlocks.CABLE_BLOCK);
         justParent(SFMItems.FANCY_CABLE_ITEM, SFMBlocks.FANCY_CABLE_BLOCK, "_core");
         justParent(SFMItems.PRINTING_PRESS_ITEM, SFMBlocks.PRINTING_PRESS_BLOCK);
         justParent(SFMItems.WATER_TANK_ITEM, SFMBlocks.WATER_TANK_BLOCK, "_active");
+        justParent(SFMItems.BUFFER_ITEM, SFMBlocks.BUFFER_BLOCK, "_item");
         basicItem(SFMItems.DISK_ITEM);
         basicItem(SFMItems.LABEL_GUN_ITEM);
         basicItem(SFMItems.EXPERIENCE_GOOP_ITEM);
@@ -36,7 +37,7 @@ public class SFMItemModelsDatagen extends MCVersionAgnosticItemModelsDataGen {
         basicItem(SFMItems.NETWORK_TOOL_ITEM);
 
         // force custom renderer
-        getBuilder(BuiltInRegistries.ITEM.getKey(SFMItems.FORM_ITEM.get()).toString())
+        getBuilder(SFMItems.FORM_ITEM)
                 .parent(new ModelFile.UncheckedModelFile("builtin/entity"))
                 .guiLight(BlockModel.GuiLight.FRONT);
         getBuilder("form_base")
@@ -44,27 +45,39 @@ public class SFMItemModelsDatagen extends MCVersionAgnosticItemModelsDataGen {
                 .texture("layer0", modLoc("item/form"));
     }
 
+    @SuppressWarnings({"OptionalGetWithoutIsPresent", "SameParameterValue"})
+    private ItemModelBuilder getBuilder(SFMRegistryObject<Item, ? extends Item> item) {
+        ResourceKey<? extends Item> resourceKey = item.getId().get();
+        return getBuilder(resourceKey.location().toString());
+    }
+
     private void justParent(
-            Supplier<? extends Item> item, Supplier<? extends Block> block
+            SFMRegistryObject<Item, ? extends Item> item,
+            SFMRegistryObject<Block, ? extends Block> block
     ) {
         justParent(item, block, "");
     }
 
     private void justParent(
-            Supplier<? extends Item> item, Supplier<? extends Block> block, String extra
+            SFMRegistryObject<Item,? extends Item> item,
+            SFMRegistryObject<Block, ? extends Block> block,
+            String extra
     ) {
-        var blockPath = BuiltInRegistries.BLOCK.getKey(block.get()).getPath();
-        var itemPath = BuiltInRegistries.ITEM.getKey(item.get()).getPath();
-        withExistingParent(blockPath, SFM.MOD_ID + ":block/" + itemPath + extra);
+        withExistingParent(
+                block.getPath(),
+                SFM.MOD_ID + ":block/" + item.getPath() + extra
+        );
     }
 
     private void basicItem(
-            Supplier<? extends Item> item
+            SFMRegistryObject<Item, ? extends Item> item
     ) {
-        var itemPath = BuiltInRegistries.ITEM.getKey(item.get()).getPath();
-        withExistingParent(itemPath, mcLoc("item/generated")).texture(
+        withExistingParent(
+                item.getPath(),
+                mcLoc("item/generated")
+        ).texture(
                 "layer0",
-                modLoc("item/" + itemPath)
+                modLoc("item/" + item.getPath())
         );
     }
 }

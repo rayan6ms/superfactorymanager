@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
@@ -16,7 +17,6 @@ import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -29,6 +29,10 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
         this.CAPABILITY_KIND = CAPABILITY_KIND;
     }
 
+    public SFMBlockCapabilityKind<CAP> capabilityKind() {
+        return CAPABILITY_KIND;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -39,6 +43,22 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     @Override
     public int hashCode() {
         return Objects.hashCode(CAPABILITY_KIND);
+    }
+
+    /// Creates a new empty handler for use in a {@link BufferBlockEntityContents}.
+    /// This handler should only accept items when the buffer is empty or when the handler is already not empty.
+    ///
+    /// Note that in the implementations, we always check if this.hasAnything() before contents.isEmpty() since the former
+    /// should be a less expensive check.
+    public abstract CAP createHandlerForBufferBlock(BufferBlockEntityContents contents);
+
+    public boolean isHandlerEmpty(CAP cap) {
+        for (int slot = 0; slot < getSlots(cap); slot++) {
+            if (!isEmpty(getStackInSlot(cap, slot))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     public abstract long getAmount(STACK stack);
@@ -102,7 +122,8 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
         return resourceId.matchesResourceLocation(stackId);
     }
 
-    public abstract boolean matchesCapabilityType(Object o);
+    /// Checks if the provided handler is an instance of the capability associated with this resource type
+    public abstract boolean matchesCapabilityHandler(Object o);
 
     public void forEachCapability(
             ProgramContext programContext,
@@ -194,7 +215,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
 
     public abstract Set<ResourceLocation> getRegistryKeys();
 
-    public abstract Collection<ITEM> getItems();
+    public abstract Iterable<ITEM> getItems();
 
     public abstract ITEM getItem(STACK stack);
 
@@ -209,7 +230,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     }
 
     public String displayAsCode() {
-        ResourceLocation thisKey = SFMResourceTypes.registry().getKey(this);
+        ResourceLocation thisKey = SFMResourceTypes.registry().getId(this);
         return thisKey != null ? thisKey.toString() : "null";
     }
 
