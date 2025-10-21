@@ -16,6 +16,7 @@ public class BlockEntityCapabilityProvider implements SFMBlockCapabilityProvider
         return true;
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public SFMBlockCapabilityResult<Object> getCapability(
             SFMBlockCapabilityKind<Object> capabilityKind,
@@ -28,7 +29,7 @@ public class BlockEntityCapabilityProvider implements SFMBlockCapabilityProvider
         if (blockEntity != null) {;
             var result = blockEntity.getCapability(capabilityKind.capabilityKind(), direction);
             if (result.isPresent()) {
-                return SFMBlockCapabilityResult.of(result);
+                return (SFMBlockCapabilityResult<Object>) SFMBlockCapabilityResult.of(result);
             }
         }
         return SFMBlockCapabilityResult.empty();

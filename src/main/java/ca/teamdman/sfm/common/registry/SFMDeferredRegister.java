@@ -83,12 +83,23 @@ public class SFMDeferredRegister<T> {
     public <I extends T> SFMRegistryObject<T, I> registerEmpty(
             String name
     ) {
-        // todo: use name and namespace() to register a thing properly?
-
+        //noinspection DataFlowIssue
         return new SFMRegistryObject<T, I>(
                 (ResourceKey<? extends Registry<I>>) registryKey,
                 null
-        );
+        ) {
+            @Override
+            public I get() {
+
+                throw new IllegalStateException(
+                        "Tried to get a registry object that was conditionally not registered - "
+                        + registryKey
+                        + " "
+                        + namespace()
+                        + ":"
+                        + name);
+            }
+        };
     }
 
     public SFMRegistryWrapper<T> registry() {
