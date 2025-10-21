@@ -15,7 +15,7 @@ import org.jetbrains.annotations.Nullable;
 /// This class helps keep {@link MCVersionDependentBehaviour} out of other classes.
 @MCVersionDependentBehaviour
 public record SFMBlockCapabilityKind<CAP>(
-        Capability<? extends CAP> capabilityKind
+        Capability<CAP> capabilityKind
 ) {
     public String getName() {
         return capabilityKind.getName();
