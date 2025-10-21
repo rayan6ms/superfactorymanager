@@ -4,6 +4,7 @@ import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.SFMDirections;
@@ -92,7 +93,7 @@ public record ServerboundNetworkToolUsePacket(
                     }
                 }
                 payload.append("---- capabilityKind directions ----\n");
-                for (var cap : (Iterable<SFMBlockCapabilityKind<?>>) SFMResourceTypes.getCapabilities()::iterator) {
+                for (var cap : (Iterable<SFMBlockCapabilityKind<?>>) SFMWellKnownCapabilities.streamCapabilities()::iterator) {
                     String directions = DirectionQualifier.EVERY_DIRECTION
                             .stream()
                             .filter(dir -> SFMBlockCapabilityDiscovery
@@ -127,7 +128,7 @@ public record ServerboundNetworkToolUsePacket(
                     payload.append(messages[i]).append("\n");
                     MutableBoolean foundExports = new MutableBoolean(false);
                     //noinspection unchecked,rawtypes
-                    SFMResourceTypes.registry().getEntries()
+                    SFMResourceTypes.registry().entries()
                             .stream()
                             .map(entry -> ServerboundContainerExportsInspectionRequestPacket.buildInspectionResults(
                                     (ResourceKey) entry.getKey(),

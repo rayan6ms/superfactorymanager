@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.logging.TranslatableLogEvent;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
@@ -18,7 +19,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
-import net.neoforged.registries.ForgeRegistries;
 import org.apache.logging.log4j.Level;
 
 import java.util.ArrayDeque;
@@ -58,7 +58,7 @@ public class ResourceLossRegressionGameTest extends SFMGameTestDefinition {
         assert bin != null;
         bin.setStackInSlot(0, new ItemStack(Items.WHEAT_SEEDS, Integer.MAX_VALUE));
 
-        var phytoBlock = ForgeRegistries.BLOCKS.getValue(SFMResourceLocation.fromNamespaceAndPath("thermal", "machine_insolator"));
+        var phytoBlock = SFMWellKnownRegistries.BLOCKS.get(SFMResourceLocation.fromNamespaceAndPath("thermal", "machine_insolator"));
         assert phytoBlock != null;
         helper.setBlock(rightPos, phytoBlock);
         MachineInsolatorTile phyto = (MachineInsolatorTile) helper.getBlockEntity(rightPos);

@@ -5,6 +5,7 @@ import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.SFMASTUtils;
 import ca.teamdman.sfm.common.util.SFMDirections;
@@ -13,7 +14,6 @@ import it.unimi.dsi.fastutil.ints.Int2ObjectArrayMap;
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -39,7 +39,7 @@ public record ServerboundContainerExportsInspectionRequestPacket(
             sb.append("-- ").append(direction).append("\n");
             int len = sb.length();
             //noinspection unchecked,rawtypes
-            SFMResourceTypes.registry().getEntries().stream().map(entry -> buildInspectionResults(
+            SFMResourceTypes.registry().entries().stream().map(entry -> buildInspectionResults(
                             (ResourceKey) entry.getKey(),
                             entry.getValue(),
                             level,
@@ -138,8 +138,8 @@ public record ServerboundContainerExportsInspectionRequestPacket(
         if (!result.isBlank()) {
             BlockEntity be = level.getBlockEntity(pos);
             //noinspection DataFlowIssue
-            if (be != null && direction == null && BuiltInRegistries.BLOCK_ENTITY_TYPE
-                    .getKey(be.getType())
+            if (be != null && direction == null && SFMWellKnownRegistries.BLOCK_ENTITY_TYPES
+                    .getId(be.getType())
                     .getNamespace()
                     .equals("mekanism")) {
                 return "-- "

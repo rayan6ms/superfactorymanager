@@ -194,6 +194,9 @@ public class SFMKeyMappings {
         if (keyMapping.getKey().equals(InputConstants.UNKNOWN)) {
             return false;
         }
+        if (keyMapping.getKey().getType() == InputConstants.Type.MOUSE) {
+            SFM.LOGGER.warn("Attempted to use a mouse key to check if InputConstants.isKeyDown, use .isDown directly on the KeyMapping instead: {}", keyMapping.getKey());
+        }
         // We cannot use keyMapping.isDown because it fails when a screen is open
         // https://github.com/mekanism/Mekanism/blob/f92b48a49e0766cd3aa78e95c9c4a47ba90402f5/src/main/java/mekanism/client/key/MekKeyHandler.java
         long windowHandle = Minecraft.getInstance().getWindow().getWindow();

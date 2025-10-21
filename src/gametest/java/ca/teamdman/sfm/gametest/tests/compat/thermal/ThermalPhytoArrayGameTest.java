@@ -7,6 +7,7 @@ import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
@@ -21,7 +22,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.registries.ForgeRegistries;
 
 import java.util.ArrayList;
 
@@ -74,7 +74,7 @@ public class ThermalPhytoArrayGameTest extends SFMGameTestDefinition {
         tank.setFluidInTank(0, new FluidStack(Fluids.WATER, Integer.MAX_VALUE));
 
         // set up phytos
-        var phytoBlock = ForgeRegistries.BLOCKS.getValue(SFMResourceLocation.fromNamespaceAndPath("thermal", "machine_insolator"));
+        var phytoBlock = SFMWellKnownRegistries.BLOCKS.get(SFMResourceLocation.fromNamespaceAndPath("thermal", "machine_insolator"));
         SFM.LOGGER.debug("Setting up phytos with block {}", phytoBlock);
         for (int x = 0; x < 25; x++) {
             for (int z = 1; z < 25; z++) {

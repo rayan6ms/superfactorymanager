@@ -338,11 +338,11 @@ public final class LocalizationKeys {
     );
     public static final LocalizationEntry WATER_TANK_ITEM_TOOLTIP_1 = new LocalizationEntry(
             () -> SFMBlocks.WATER_TANK_BLOCK.get().getDescriptionId() + ".tooltip.1",
-            () -> "Requires two adjacent water sources"
+            () -> "Requires two adjacent water sources."
     );
     public static final LocalizationEntry WATER_TANK_ITEM_TOOLTIP_2 = new LocalizationEntry(
             () -> SFMBlocks.WATER_TANK_BLOCK.get().getDescriptionId() + ".tooltip.2",
-            () -> "More effective when also adjacent to other active water tanks"
+            () -> "More effective when also adjacent to other active water tanks."
     );
     public static final LocalizationEntry LABEL_GUN_GUI_TITLE = new LocalizationEntry(
             "gui.sfm.title.labelgun",
@@ -951,11 +951,16 @@ public final class LocalizationKeys {
             () -> SFMBlocks.FANCY_CABLE_FACADE_BLOCK.get().getDescriptionId(),
             () -> "Fancy Inventory Cable Facade"
     );
-    //    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
-//    public static final LocalizationEntry TUNNELLED_MANAGER_BLOCK = new LocalizationEntry(
-//            () -> SFMBlocks.TUNNELLED_MANAGER_BLOCK.get().getDescriptionId(),
-//            () -> "Tunnelled Factory Manager"
-//    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TUNNELLED_MANAGER_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TUNNELLED_MANAGER_BLOCK.get().getDescriptionId(),
+            () -> "Tunnelled Factory Manager"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry BUFFER_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.BUFFER_BLOCK.get().getDescriptionId(),
+            () -> "Resource Buffer"
+    );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry TEST_BARREL_TANK_BLOCK = new LocalizationEntry(
             () -> SFMBlocks.TEST_BARREL_TANK_BLOCK.get().getDescriptionId(),
