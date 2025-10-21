@@ -3,6 +3,7 @@ package ca.teamdman.sfm.common.compat;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.linting.IProgramLinter;
 import ca.teamdman.sfm.common.program.linting.MekanismSideConfigProgramLinter;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegister;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ChemicalResourceType;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
@@ -19,7 +20,6 @@ import mekanism.common.tile.interfaces.ISideConfiguration;
 import mekanism.common.util.UnitDisplayUtils;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.registries.DeferredRegister;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
@@ -36,23 +36,23 @@ public class SFMMekanismCompat {
             case FLUID -> SFMResourceTypes.FLUID.get();
 //            case GAS -> {
 //                ResourceLocation id = SFMResourceLocation.fromSFMPath("gas");
-//                yield SFMResourceTypes.registry().getValue(id);
+//                yield SFMResourceTypes.registry().get(id);
 //            }
 //            case INFUSION -> {
 //                ResourceLocation id = SFMResourceLocation.fromSFMPath("infusion");
-//                yield SFMResourceTypes.registry().getValue(id);
+//                yield SFMResourceTypes.registry().get(id);
 //            }
 //            case PIGMENT -> {
 //                ResourceLocation id = SFMResourceLocation.fromSFMPath("pigment");
-//                yield SFMResourceTypes.registry().getValue(id);
+//                yield SFMResourceTypes.registry().get(id);
 //            }
 //            case SLURRY -> {
 //                ResourceLocation id = SFMResourceLocation.fromSFMPath("slurry");
-//                yield SFMResourceTypes.registry().getValue(id);
+//                yield SFMResourceTypes.registry().get(id);
 //            }
             case ENERGY -> SFMResourceTypes.FORGE_ENERGY.get();
             case CHEMICAL -> SFMResourceTypes.registry()
-                    .getValue(SFMResourceLocation.fromSFMPath("chemical"));
+                    .get(SFMResourceLocation.fromSFMPath("chemical"));
             default -> null;
         };
     }
@@ -98,7 +98,7 @@ public class SFMMekanismCompat {
                 continue;
             }
 
-            var maybeResourceTypeKe = SFMResourceTypes.registry().getResourceKey(resourceType);
+            var maybeResourceTypeKe = SFMResourceTypes.registry().getKey(resourceType);
             if (maybeResourceTypeKe.isEmpty()) {
                 continue;
             }
@@ -149,9 +149,11 @@ public class SFMMekanismCompat {
         return sb.toString();
     }
 
-    public static void registerResourceTypes(DeferredRegister<ResourceType<?, ?, ?>> types) {
+    public static void registerResourceTypes(SFMDeferredRegister<ResourceType<?, ?, ?>> types) {
         types.register("chemical", ChemicalResourceType::new);
-        types.register("gas", ChemicalResourceType::new
+        types.register(
+                "gas",
+                ChemicalResourceType::new
         );
         types.register(
                 "infusion",
@@ -172,7 +174,7 @@ public class SFMMekanismCompat {
 //        );
     }
 
-    public static void registerProgramLinters(DeferredRegister<IProgramLinter> types) {
+    public static void registerProgramLinters(SFMDeferredRegister<IProgramLinter> types) {
         types.register(
                 "mekanism",
                 MekanismSideConfigProgramLinter::new

@@ -35,8 +35,8 @@ import java.util.Locale;
 import java.util.function.IntFunction;
 
 public class LabelGunItem extends Item {
-    public LabelGunItem() {
-        super(new Properties().stacksTo(1));
+    public LabelGunItem(Properties properties) {
+        super(properties);
     }
 
     public static void setActiveLabel(

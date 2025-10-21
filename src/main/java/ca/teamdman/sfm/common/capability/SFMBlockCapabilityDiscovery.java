@@ -25,7 +25,7 @@ import org.jetbrains.annotations.Nullable;
 /// ```
 /// INPUT item::, fluid:: FROM a
 /// OUTPUT item::, fluid:: TO b
-///```
+/// ```
 ///
 /// the {@link SFMResourceTypes} being moved are each tied to a {@link SFMBlockCapabilityKind}.
 /// See {@link OutputStatement#moveTo(ProgramContext, LimitedInputSlot, LimitedOutputSlot)} for details.
@@ -33,12 +33,12 @@ import org.jetbrains.annotations.Nullable;
 /// This class helps keep related capability discovery logic in one place and out of the {@link CableNetwork}.
 ///
 /// The methods by which capabilities are retrieved change in Minecraft 1.20.3.
-/// To discover the right capability for a given block position, we use {@link SFMBlockCapabilityProviderCache} to
+/// To discover the right capability for a given block position, we use {@link SFMBlockCapabilityProviderDiscovery} to
 /// iterate over the appropriate {@link SFMBlockCapabilityProvider} to find a {@link SFMBlockCapabilityResult}.
 ///
 /// The discovery results from {@link CableNetwork#getCapability(SFMBlockCapabilityKind, BlockPos, Direction, TranslatableLogger)}
 /// will be cached in the {@link CableNetwork#getLevelCapabilityCache()}
-/// so the {@link SFMBlockCapabilityProviderCache} can focus on its job.
+/// so the {@link SFMBlockCapabilityProviderDiscovery} can focus on its job.
 public class SFMBlockCapabilityDiscovery {
     public static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromNetwork(
             CableNetwork cableNetwork,
@@ -84,7 +84,7 @@ public class SFMBlockCapabilityDiscovery {
                     pos.immutable(),
                     () -> {
                         levelCapabilityCache.remove(pos, capKind, direction);
-                        return false; // remove this invalidation listener; no longer valid
+                        return false; // remove this invalidation listener; we will create a new one when needed.
                     }
             );
             levelCapabilityCache.putCapability(pos, capKind, direction, cap);
@@ -105,7 +105,7 @@ public class SFMBlockCapabilityDiscovery {
         if (!(levelExt instanceof Level level)) {
             return false;
         }
-        return SFMResourceTypes.getCapabilities().anyMatch(cap -> {
+        return SFMWellKnownCapabilities.streamCapabilities().anyMatch(cap -> {
             for (Direction direction : SFMDirections.DIRECTIONS_WITH_NULL) {
                 if (discoverCapabilityFromLevel(level, cap, pos, direction).isPresent()) {
                     return true;
@@ -122,7 +122,7 @@ public class SFMBlockCapabilityDiscovery {
             @NotStored BlockPos pos,
             @Nullable Direction direction
     ) {
-        return SFMBlockCapabilityProviderCache.getCapabilityFromLevel(
+        return SFMBlockCapabilityProviderDiscovery.getCapabilityFromLevel(
                 capKind,
                 level,
                 pos,

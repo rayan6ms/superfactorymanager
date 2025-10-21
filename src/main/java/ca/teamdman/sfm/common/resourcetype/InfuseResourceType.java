@@ -1,13 +1,18 @@
 package ca.teamdman.sfm.common.resourcetype;
 
+import ca.teamdman.sfm.common.block.BufferBlock;
+import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
+import ca.teamdman.sfm.common.registry.SFMRegistryWrapper;
 import mekanism.api.Action;
 import mekanism.api.MekanismAPI;
+import mekanism.api.chemical.ChemicalTankBuilder;
 import mekanism.api.chemical.infuse.IInfusionHandler;
 import mekanism.api.chemical.infuse.InfuseType;
 import mekanism.api.chemical.infuse.InfusionStack;
 import mekanism.common.capabilities.Capabilities;
-import net.minecraft.core.Registry;
+import mekanism.common.lib.transmitter.TransmissionType;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.TagKey;
 
@@ -20,6 +25,22 @@ public class InfuseResourceType extends RegistryBackedResourceType<InfusionStack
 
     public InfuseResourceType() {
         super(CAP);
+    }
+
+    @Override
+    public IInfusionHandler createHandlerForBufferBlock(BufferBlockEntityContents contents) {
+        return (ChemicalTankBuilder.BasicInfusionTank) ChemicalTankBuilder.INFUSION.create(
+                contents.tier.getIntScalarMaxStackSize(),
+                extracting -> {
+                    ResourceType<?, ?, ?> resourceType = SFMMekanismCompat.getResourceType(TransmissionType.INFUSION);
+                    boolean isValid = resourceType != null && contents.allowInsertion(resourceType);
+                    if (isValid) {
+                        contents.lastUsedResource = BufferBlock.ContainedResource.Chemical;
+                    }
+                    return isValid;
+                },
+                null
+        );
     }
 
     @Override
@@ -89,7 +110,7 @@ public class InfuseResourceType extends RegistryBackedResourceType<InfusionStack
     }
 
     @Override
-    public boolean matchesCapabilityType(Object o) {
+    public boolean matchesCapabilityHandler(Object o) {
         return o instanceof IInfusionHandler;
     }
 
@@ -100,8 +121,8 @@ public class InfuseResourceType extends RegistryBackedResourceType<InfusionStack
 
 
     @Override
-    public Registry<InfuseType> getRegistry() {
-        return MekanismAPI.INFUSE_TYPE_REGISTRY;
+    public SFMRegistryWrapper<InfuseType> getRegistry() {
+        return new SFMRegistryWrapper<>(MekanismAPI.INFUSE_TYPE_REGISTRY);
     }
 
     @Override

@@ -2,7 +2,7 @@ package ca.teamdman.sfm.gametest.tests.compat.multiple;
 
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
-import ca.teamdman.sfm.common.capability.ae2.EnergyAcceptorBlockCapabilityProvider;
+import ca.teamdman.sfm.common.capability.energystorage.EnergyAcceptorEnergyStorageWrapper;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -44,7 +44,7 @@ public class CapabilityDiscoveryMapperGameTest extends SFMGameTestDefinition {
                 Direction.EAST
         ).unwrap();
 
-        if (found instanceof EnergyAcceptorBlockCapabilityProvider.EnergyAcceptorEnergyStorageWrapper) {
+        if (found instanceof EnergyAcceptorEnergyStorageWrapper) {
             helper.fail("Should not have found EnergyAcceptorEnergyStorageWrapper for non-AE energy block");
         } else {
             helper.succeed();

@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.common.compat;
 
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.util.NotStored;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -26,7 +26,7 @@ public class SFMModCompat {
             @NotStored BlockPos pos
     ) {
         Block block = level.getBlockState(pos).getBlock();
-        ResourceLocation blockId = BuiltInRegistries.BLOCK.getKey(block);
+        ResourceLocation blockId = SFMWellKnownRegistries.BLOCKS.getId(block);
         assert blockId != null;
         return blockId.getNamespace().equals("mekanism");
     }
