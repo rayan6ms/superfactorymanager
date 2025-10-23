@@ -38,6 +38,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
 
     /// @return {@link #AST_NODE_CONTEXTS}.get({@code index})
     public Optional<ASTNode> getNodeAtIndex(int index) {
+
         if (index < 0 || index >= AST_NODE_CONTEXTS.size()) return Optional.empty();
         WeakReference<ASTNode> nodeRef = AST_NODE_CONTEXTS.get(index).getFirst();
         return Optional.ofNullable(nodeRef.get());
@@ -49,6 +50,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
             ASTNode node,
             ASTNode otherNode
     ) {
+
         trackNode(node, AST_NODE_CONTEXTS.get(getIndexForNode(otherNode)).getSecond());
     }
 
@@ -712,7 +714,9 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     public NumberRangeSet visitSlotqualifier(@Nullable SFMLParser.SlotqualifierContext ctx) {
 
         NumberRangeSet numberRangeSet = visitRangeset(ctx == null ? null : ctx.rangeset());
-        trackNode(numberRangeSet, ctx);
+        if (ctx != null) {
+            trackNode(numberRangeSet, ctx);
+        }
         return numberRangeSet;
     }
 
@@ -863,6 +867,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
             ASTNode node,
             ParserRuleContext ctx
     ) {
+
         WeakReference<ASTNode> nodeRef = new WeakReference<>(node);
 
         AST_NODE_CONTEXTS.add(new Pair<>(nodeRef, ctx));
