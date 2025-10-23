@@ -168,23 +168,24 @@ public class SFMGameTestHelper extends GameTestHelper {
         triggers.add(0, startTimerTrigger);
         triggers.add(endTimerTrigger);
 
+        Runnable checker = () -> {
+            if (hasExecuted.get()) {
+                triggers.remove(startTimerTrigger);
+                triggers.remove(endTimerTrigger);
+                assertion.run();
+                SFMGameTestMethodHelpers.assertTrue(
+                        endTime.get() - startTime.get() < 80_000_000,
+                        "Program took too long to run: took " + NumberFormat
+                                .getInstance(Locale.getDefault())
+                                .format(endTime.get() - startTime.get()) + "ns"
+                );
+                hasExecuted.set(false); // prevent the assertion from running again
+                onSuccess.run();
+            }
+        };
         LongStream
                 .range(getTick() + 1, timeoutTicks - getTick())
-                .forEach(i -> runAfterDelay(i, () -> {
-                    if (hasExecuted.get()) {
-                        triggers.remove(startTimerTrigger);
-                        triggers.remove(endTimerTrigger);
-                        assertion.run();
-                        SFMGameTestMethodHelpers.assertTrue(
-                                endTime.get() - startTime.get() < 80_000_000,
-                                "Program took too long to run: took " + NumberFormat
-                                        .getInstance(Locale.getDefault())
-                                        .format(endTime.get() - startTime.get()) + "ns"
-                        );
-                        hasExecuted.set(false); // prevent the assertion from running again
-                        onSuccess.run();
-                    }
-                }));
+                .forEach(i -> runAfterDelay(i, checker));
     }
 
     public void succeedIfManagerDidThingWithoutLagging(
