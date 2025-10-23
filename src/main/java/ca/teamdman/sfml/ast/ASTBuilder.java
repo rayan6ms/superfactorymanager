@@ -9,16 +9,21 @@ import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jetbrains.annotations.Nullable;
 
+import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
+    /// Used for linting and for label gun pull behaviour
     private final Set<Label> USED_LABELS = new HashSet<>();
 
+    /// Used for linting and for energy-specific timer minimum interval restrictions
     private final Set<ResourceIdentifier<?, ?, ?>> USED_RESOURCES = new HashSet<>();
 
-    private final List<Pair<ASTNode, ParserRuleContext>> AST_NODE_CONTEXTS = new LinkedList<>(); // TODO: optimize this using a tree or something.
+    /// Used for program editor context actions; ctrl+space on a token
+    private final List<Pair<WeakReference<ASTNode>, ParserRuleContext>> AST_NODE_CONTEXTS = new LinkedList<>();
 
+    /// @return hierarchy of nodes; e.g., Program > Trigger > Block > IOStatement > LabelAccess > Label
     public List<Pair<ASTNode, ParserRuleContext>> getNodesUnderCursor(int cursorPos) {
 
         return AST_NODE_CONTEXTS
@@ -26,31 +31,41 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
                 .filter(pair -> pair.getSecond() != null)
                 .filter(pair -> pair.getSecond().start.getStartIndex() <= cursorPos
                                 && pair.getSecond().stop.getStopIndex() >= cursorPos)
+                .map(pair -> Pair.of(pair.getFirst().get(), pair.getSecond()))
+                .filter(pair -> pair.getFirst() != null)
                 .collect(Collectors.toList());
     }
 
+    /// @return {@link #AST_NODE_CONTEXTS}.get({@code index})
     public Optional<ASTNode> getNodeAtIndex(int index) {
-
         if (index < 0 || index >= AST_NODE_CONTEXTS.size()) return Optional.empty();
-        return Optional.ofNullable(AST_NODE_CONTEXTS.get(index).getFirst());
+        WeakReference<ASTNode> nodeRef = AST_NODE_CONTEXTS.get(index).getFirst();
+        return Optional.ofNullable(nodeRef.get());
     }
 
+    /// Used by {@link ForgetStatement} to track the provenance of dynamically generated {@link InputStatement} instances.
+    /// We should use weak references for these dynamically generated nodes to let them get garbage collected; <a href="https://github.com/TeamDman/SuperFactoryManager/issues/405">#405</a>.
     public void setLocationFromOtherNode(
             ASTNode node,
             ASTNode otherNode
     ) {
-
         trackNode(node, AST_NODE_CONTEXTS.get(getIndexForNode(otherNode)).getSecond());
     }
 
+    /// Used for client-server collaboration to make context menu actions work.
+    /// The client calls {@link #getNodesUnderCursor(int)} and then {@link ca.teamdman.sfm.client.ProgramTokenContextActions#getContextAction(String, int)} to build the pick list.
+    /// When a context action is invoked, a packet is sent to the server containing the index of the node so that the
+    /// packet handler can do its work with the server's instance of the {@link ASTNode}.
     public int getIndexForNode(ASTNode node) {
 
-        return AST_NODE_CONTEXTS
-                .stream()
-                .filter(pair -> pair.getFirst() == node)
-                .map(AST_NODE_CONTEXTS::indexOf)
-                .findFirst()
-                .orElse(-1);
+        for (int i = 0; i < AST_NODE_CONTEXTS.size(); i++) {
+            Pair<WeakReference<ASTNode>, ParserRuleContext> pair = AST_NODE_CONTEXTS.get(i);
+            // Intentional reference equality check, don't forget the `.get()`!
+            if (pair.getFirst().get() == node) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     public Optional<ParserRuleContext> getContextForNode(ASTNode node) {
@@ -843,12 +858,14 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         return block;
     }
 
+    /// Tracks an {@link ASTNode} and its {@link ParserRuleContext} for later retrieval for editor context actions.
     private void trackNode(
             ASTNode node,
             ParserRuleContext ctx
     ) {
+        WeakReference<ASTNode> nodeRef = new WeakReference<>(node);
 
-        AST_NODE_CONTEXTS.add(new Pair<>(node, ctx));
+        AST_NODE_CONTEXTS.add(new Pair<>(nodeRef, ctx));
     }
 
 }

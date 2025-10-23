@@ -6,7 +6,7 @@ NAME "Changelog"
 -- SFM submit new issue:
 -- https://github.com/TeamDman/SuperFactoryManager/issues/new
 
----- 4.27.0 ----
+---- 4.27.0 (pre) ----
 -- Add tunnelled manager block from #189, thanks @Qther
 ---- When capabilities are queried, will pass through to the opposite side
 ---- Hopper -> Manager -> Chest
@@ -18,6 +18,16 @@ every 20 ticks do
     input from chest slot 5
     output to chest slot 9
 end
+-- Fix memory leak caused by forget statements, thanks @__stdcall for the report, #405
+EVERY 20 TICKS DO
+  INPUT FROM a,b
+  OUTPUT TO c
+FORGET -- creates new object that wasn't being discarded properly
+  INPUT FROM b,d
+  OUTPUT TO e
+FORGET b -- you can specify labels, though I doubt anyone uses it lol
+  OUTPUT TO f -- this sees `INPUT FROM d`
+END
 
 
 ---- 4.26.0 ----

@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.gametest.declarative;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
-import ca.teamdman.sfm.common.program.DefaultProgramBehaviour;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
+import ca.teamdman.sfm.common.program.ExecuteProgramBehaviour;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
@@ -118,7 +118,7 @@ public class SFMDeclarativeTestBuilder {
         ProgramContext programContext = new ProgramContext(
                 new Program(new ASTBuilder(), "temp lol", List.of(), Set.of(), Set.of()),
                 manager,
-                DefaultProgramBehaviour::new
+                ExecuteProgramBehaviour::new
         );
         for (BoolExpr expr : expressions) {
             boolean passed = expr.test(programContext);
