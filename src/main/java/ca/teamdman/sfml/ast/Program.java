@@ -61,7 +61,7 @@ public record Program(
      * @return {@code true} if a trigger entered its body
      */
     public boolean tick(ManagerBlockEntity manager) {
-        var context = new ProgramContext(this, manager, new DefaultProgramBehaviour());
+        var context = new ProgramContext(this, manager, new ExecuteProgramBehaviour());
 
         // log if there are unprocessed redstone pulses
         int unprocessedRedstonePulseCount = manager.getUnprocessedRedstonePulseCount();

@@ -11,9 +11,9 @@ import ca.teamdman.sfm.common.resourcetype.exclude.InfuseResourceType;
 import ca.teamdman.sfm.common.resourcetype.exclude.PigmentResourceType;
 import ca.teamdman.sfm.common.resourcetype.exclude.SlurryResourceType;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
-import ca.teamdman.sfml.ast.DirectionQualifier;
 import ca.teamdman.sfml.ast.IOStatement;
 import ca.teamdman.sfml.ast.ResourceIdentifier;
+import ca.teamdman.sfml.ast.Side;
 import mekanism.api.RelativeSide;
 import mekanism.api.math.FloatingLong;
 import mekanism.common.lib.transmitter.TransmissionType;
@@ -108,7 +108,8 @@ public class SFMMekanismCompat {
                 sb.append("INPUT ").append(resourceTypeKey.location()).append(":: FROM target ");
                 sb.append(outputSides
                                   .stream()
-                                  .map(DirectionQualifier::directionToString)
+                                  .map(Side::fromDirection)
+                                  .map(Side::toString)
                                   .collect(Collectors.joining(", ")));
                 sb.append(" SIDE\n");
             }
@@ -131,7 +132,8 @@ public class SFMMekanismCompat {
                 sb.append("OUTPUT ").append(resourceTypeKey.location()).append(":: TO target ");
                 sb.append(inputSides
                                   .stream()
-                                  .map(DirectionQualifier::directionToString)
+                                  .map(Side::fromDirection)
+                                  .map(Side::toString)
                                   .collect(Collectors.joining(", ")));
                 sb.append(" SIDE\n");
             }

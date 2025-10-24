@@ -1,13 +1,13 @@
 package ca.teamdman.sfm.gametest.declarative;
 
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SFMTestSpec {
     private final List<SFMTestBlockEntitySpec<?>> blocks = new ArrayList<>();
-    private @Nullable String program = null;
+    private @UnknownNullability String program = null;
     private final List<String> preConditions = new ArrayList<>();
     private final List<String> postConditions = new ArrayList<>();
 
