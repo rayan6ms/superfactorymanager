@@ -82,8 +82,8 @@ tagMatcher  : identifier COLON identifier (SLASH identifier)*
             ;
 
 
-sidequalifier   : EACH SIDE                 #EachSide
-                | side(COMMA side)* SIDE    #ListedSides
+sidequalifier   : EACH SIDE                  #EachSide
+                | side (COMMA side)* SIDE    #ListedSides
                 ;
 
 side            : TOP
@@ -92,7 +92,13 @@ side            : TOP
                 | EAST
                 | SOUTH
                 | WEST
+                | LEFT
+                | RIGHT
+                | FRONT
+                | BACK
+                | NULL
                 ;
+
 slotqualifier   : (SLOTS | SLOT) rangeset;
 rangeset        : range (COMMA range)*;
 range           : number (DASH number)? ;
@@ -127,7 +133,6 @@ setOp           : OVERALL
                 | ONE
                 | LONE
                 ;
-
 
 
 
@@ -222,6 +227,11 @@ EAST    : E A S T ;
 SOUTH   : S O U T H ;
 WEST    : W E S T ;
 SIDE    : S I D E ;
+LEFT    : L E F T ;
+RIGHT   : R I G H T ;
+FRONT   : F R O N T ;
+BACK    : B A C K ;
+NULL    : N U L L ;
 
 
 // TIMER TRIGGERS

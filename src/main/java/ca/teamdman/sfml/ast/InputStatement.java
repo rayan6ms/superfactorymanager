@@ -67,10 +67,10 @@ public final class InputStatement implements IOStatement {
         // log cache miss
         context.getLogger().trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_CACHE_MISS.get()));
 
-        // prepare cache state
+        // prepare the cache state
         limitedInputSlotsCache = new ArrayDeque<>(27);
 
-        // monkey patch the results acceptor to update the cache before returning results
+        // monkey-patch the result acceptor to update the cache before returning results
         {
             var original = slotConsumer;
             slotConsumer = slot -> {

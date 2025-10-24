@@ -29,13 +29,15 @@ import java.util.Locale;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.LongStream;
 
 public class SFMGameTestHelper extends GameTestHelper {
     public SFMGameTestHelper(GameTestInfo pTestInfo) {
+
         super(pTestInfo);
     }
+
     public SFMGameTestHelper(GameTestHelper helper) {
+
         super(helper.testInfo);
     }
 
@@ -44,6 +46,7 @@ public class SFMGameTestHelper extends GameTestHelper {
             @NotStored BlockPos localPos,
             @Nullable Direction direction
     ) {
+
         SFMBlockCapabilityResult<CAP> found = SFMBlockCapabilityDiscovery.discoverCapabilityFromLevel(
                 getLevel(),
                 capKind,
@@ -58,6 +61,7 @@ public class SFMGameTestHelper extends GameTestHelper {
             @NotStored BlockPos pos,
             @Nullable Direction direction
     ) {
+
         return discoverCapability(
                 SFMWellKnownCapabilities.FLUID_HANDLER,
                 pos,
@@ -69,6 +73,7 @@ public class SFMGameTestHelper extends GameTestHelper {
             @NotStored BlockPos pos,
             @Nullable Direction direction
     ) {
+
         return discoverCapability(
                 SFMWellKnownCapabilities.ITEM_HANDLER,
                 pos,
@@ -80,6 +85,7 @@ public class SFMGameTestHelper extends GameTestHelper {
             BlockPos signPos,
             Component... text
     ) {
+
         BlockEntity blockEntity = getBlockEntity(signPos);
         if (!(blockEntity instanceof SignBlockEntity signBlockEntity)) {
             fail("Block entity was not an instance of SignBlockEntity, got " + blockEntity, signPos);
@@ -101,6 +107,7 @@ public class SFMGameTestHelper extends GameTestHelper {
             @NotStored BlockPos pos,
             @Nullable Direction direction
     ) {
+
         return discoverCapability(
                 SFMWellKnownCapabilities.ENERGY,
                 pos,
@@ -111,6 +118,7 @@ public class SFMGameTestHelper extends GameTestHelper {
     public IItemHandler getItemHandler(
             @NotStored BlockPos pos
     ) {
+
         return getItemHandler(pos, null);
     }
 
@@ -119,6 +127,7 @@ public class SFMGameTestHelper extends GameTestHelper {
             Runnable assertion,
             Runnable onSuccess
     ) {
+
         SFMGameTestMethodHelpers.assertManagerRunning(manager); // the program should already be compiled so we can monkey patch it
         manager.enableRebuildProgramLock();
         var hasExecuted = new AtomicBoolean(false);
@@ -131,6 +140,7 @@ public class SFMGameTestHelper extends GameTestHelper {
         Trigger startTimerTrigger = new Trigger() {
             @Override
             public boolean shouldTick(ProgramContext context) {
+
                 return oldFirstTrigger != null
                        ? oldFirstTrigger.shouldTick(context)
                        : context.getManager().getTick() % 20 == 0;
@@ -138,11 +148,13 @@ public class SFMGameTestHelper extends GameTestHelper {
 
             @Override
             public void tick(ProgramContext context) {
+
                 startTime.set(System.nanoTime());
             }
 
             @Override
             public Block getBlock() {
+
                 return new Block(Collections.emptyList());
             }
         };
@@ -150,6 +162,7 @@ public class SFMGameTestHelper extends GameTestHelper {
         Trigger endTimerTrigger = new Trigger() {
             @Override
             public boolean shouldTick(ProgramContext context) {
+
                 return oldFirstTrigger != null
                        ? oldFirstTrigger.shouldTick(context)
                        : context.getManager().getTick() % 20 == 0;
@@ -157,6 +170,7 @@ public class SFMGameTestHelper extends GameTestHelper {
 
             @Override
             public void tick(ProgramContext context) {
+
                 if (!hasExecuted.get()) {
                     hasExecuted.set(true);
                     endTime.set(System.nanoTime());
@@ -165,6 +179,7 @@ public class SFMGameTestHelper extends GameTestHelper {
 
             @Override
             public Block getBlock() {
+
                 return new Block(Collections.emptyList());
             }
         };
@@ -172,23 +187,27 @@ public class SFMGameTestHelper extends GameTestHelper {
         triggers.add(0, startTimerTrigger);
         triggers.add(endTimerTrigger);
 
-        LongStream
-                .range(getTick() + 1, timeoutTicks - getTick())
-                .forEach(i -> runAfterDelay(i, () -> {
-                    if (hasExecuted.get()) {
-                        triggers.remove(startTimerTrigger);
-                        triggers.remove(endTimerTrigger);
-                        assertion.run();
-                        SFMGameTestMethodHelpers.assertTrue(
-                                endTime.get() - startTime.get() < 80_000_000,
-                                "Program took too long to run: took " + NumberFormat
-                                        .getInstance(Locale.getDefault())
-                                        .format(endTime.get() - startTime.get()) + "ns"
-                        );
-                        hasExecuted.set(false); // prevent the assertion from running again
-                        onSuccess.run();
+        long bound = timeoutTicks - getTick();
+        for (long i = getTick() + 1; i < bound; i++) {
+            /// We cannot reuse the {@link Runnable} object because it is used as the key in a dict.
+            runAfterDelay(
+                    i, () -> {
+                        if (hasExecuted.get()) {
+                            triggers.remove(startTimerTrigger);
+                            triggers.remove(endTimerTrigger);
+                            assertion.run();
+                            SFMGameTestMethodHelpers.assertTrue(
+                                    endTime.get() - startTime.get() < 80_000_000,
+                                    "Program took too long to run: took " + NumberFormat
+                                            .getInstance(Locale.getDefault())
+                                            .format(endTime.get() - startTime.get()) + "ns"
+                            );
+                            hasExecuted.set(false); // prevent the assertion from running again
+                            onSuccess.run();
+                        }
                     }
-                }));
+            );
+        }
     }
 
     public void succeedIfManagerDidThingWithoutLagging(
@@ -206,4 +225,5 @@ public class SFMGameTestHelper extends GameTestHelper {
                 this::succeed
         );
     }
+
 }
