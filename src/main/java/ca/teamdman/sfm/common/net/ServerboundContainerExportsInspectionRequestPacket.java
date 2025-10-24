@@ -25,7 +25,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 public record ServerboundContainerExportsInspectionRequestPacket(
@@ -105,36 +104,34 @@ public record ServerboundContainerExportsInspectionRequestPacket(
                     sb.append(inputStatement.toStringPretty()).append("\n");
                 });
 
-                    List<ResourceLimit> resourceLimitList = new ArrayList<>();
-                    slotContents.forEach((slot, stack) -> {
-                        ResourceLocation stackId = resourceType.getRegistryKeyForStack(stack);
-                        ResourceIdentifier<STACK, ITEM, CAP> resourceIdentifier = new ResourceIdentifier<>(
-                                resourceTypeResourceKey,
-                                stackId
-                        );
-                        ResourceLimit resourceLimit = new ResourceLimit(
-                                new ResourceIdSet(List.of(resourceIdentifier)),
-                                Limit.MAX_QUANTITY_NO_RETENTION, With.ALWAYS_TRUE
-                        );
-                        resourceLimitList.add(resourceLimit);
-                    });
-                    InputStatement inputStatement = new InputStatement(
-                            new LabelAccess(
-                                    List.of(new Label("target")),
-                                    new DirectionQualifier(direction == null
-                                                           ? EnumSet.noneOf(Direction.class)
-                                                           : EnumSet.of(direction)),
-                                    NumberRangeSet.MAX_RANGE,
-                                    RoundRobin.disabled()
-                            ),
-                            new ResourceLimits(
-                                    resourceLimitList.stream().distinct().toList(),
-                                    ResourceIdSet.EMPTY
-                            ),
-                            false
+                List<ResourceLimit> resourceLimitList = new ArrayList<>();
+                slotContents.forEach((slot, stack) -> {
+                    ResourceLocation stackId = resourceType.getRegistryKeyForStack(stack);
+                    ResourceIdentifier<STACK, ITEM, CAP> resourceIdentifier = new ResourceIdentifier<>(
+                            resourceTypeResourceKey,
+                            stackId
                     );
-                    sb.append(inputStatement.toStringPretty());
-                }
+                    ResourceLimit resourceLimit = new ResourceLimit(
+                            new ResourceIdSet(List.of(resourceIdentifier)),
+                            Limit.MAX_QUANTITY_NO_RETENTION, With.ALWAYS_TRUE
+                    );
+                    resourceLimitList.add(resourceLimit);
+                });
+                InputStatement inputStatement = new InputStatement(
+                        new LabelAccess(
+                                List.of(new Label("target")),
+                                new SideQualifier(List.of(Side.fromDirection(direction))),
+                                NumberRangeSet.MAX_RANGE,
+                                RoundRobin.disabled()
+                        ),
+                        new ResourceLimits(
+                                resourceLimitList.stream().distinct().toList(),
+                                ResourceIdSet.EMPTY
+                        ),
+                        false
+                );
+                sb.append(inputStatement.toStringPretty());
+            }
 
         }
         String result = sb.toString();

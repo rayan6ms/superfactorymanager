@@ -17,16 +17,19 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNING_MEKANISM_BAD_SIDE_CONFIG;
-import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNING_MEKANISM_USED_WITHOUT_DIRECTION;
+import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNING_MEKANISM_USED_WITH_NULL_DIRECTION;
 
 public class MekanismSideConfigProgramLinter implements IProgramLinter {
 
@@ -94,7 +97,7 @@ public class MekanismSideConfigProgramLinter implements IProgramLinter {
     ) {
         if (!SFMModCompat.isMekanismLoaded()) return;
 
-        DirectionQualifier directions = statement.labelAccess().directions();
+        SideQualifier sides = statement.labelAccess().sides();
         Stream<Pair<ca.teamdman.sfml.ast.Label, BlockPos>> mekanismBlocks = statement
                 .labelAccess()
                 .getLabelledPositions(labelPositionHolder)
@@ -102,10 +105,9 @@ public class MekanismSideConfigProgramLinter implements IProgramLinter {
                 .filter(pair -> level.isLoaded(pair.getSecond()))
                 .filter(pair -> SFMModCompat.isMekanismBlock(level, pair.getSecond()));
 
-        if (directions.equals(DirectionQualifier.NULL_DIRECTION)) {
-            // No side specified
+        if (sides.sides().contains(Side.NULL)) {
             mekanismBlocks.forEach(pair ->
-                                           warnings.add(PROGRAM_WARNING_MEKANISM_USED_WITHOUT_DIRECTION.get(
+                                           warnings.add(PROGRAM_WARNING_MEKANISM_USED_WITH_NULL_DIRECTION.get(
                                                    pair.getFirst(),
                                                    statement.toStringPretty()
                                            ))
@@ -130,14 +132,16 @@ public class MekanismSideConfigProgramLinter implements IProgramLinter {
 
             mekanismBlocks.forEach(pair -> {
                 BlockPos blockPos = pair.getSecond();
-                if (level.getBlockEntity(blockPos) instanceof ISideConfiguration mekBlockEntity) {
+                BlockEntity blockEntity = level.getBlockEntity(blockPos);
+                if (blockEntity instanceof ISideConfiguration mekBlockEntity) {
                     TileComponentConfig config = mekBlockEntity.getConfig();
+                    BlockState blockState = blockEntity.getBlockState();
                     for (TransmissionType transmissionType : referencedTransmissionTypes) {
                         boolean anySuccess = false;
                         ConfigInfo transmissionConfig = config.getConfig(transmissionType);
                         if (transmissionConfig != null) {
                             Set<Direction> activeSides = transmissionConfig.getSides(dataTypePredicate);
-                            for (Direction direction : directions) {
+                            for (Direction direction : sides.resolve(blockState)) {
                                 if (activeSides.contains(direction)) {
                                     anySuccess = true;
                                     break;
@@ -162,7 +166,7 @@ public class MekanismSideConfigProgramLinter implements IProgramLinter {
             LabelPositionHolder labelPositionHolder,
             Level level
     ) {
-        DirectionQualifier directions = statement.labelAccess().directions();
+        SideQualifier sides = statement.labelAccess().sides();
         Stream<Pair<ca.teamdman.sfml.ast.Label, BlockPos>> mekanismBlocks =
                 statement.labelAccess()
                         .getLabelledPositions(labelPositionHolder)
@@ -190,20 +194,22 @@ public class MekanismSideConfigProgramLinter implements IProgramLinter {
 
         mekanismBlocks.forEach(pair -> {
             BlockPos blockPos = pair.getSecond();
-            if (level.getBlockEntity(blockPos) instanceof ISideConfiguration mekBlockEntity) {
+            BlockEntity blockEntity = level.getBlockEntity(blockPos);
+            if (blockEntity instanceof ISideConfiguration mekBlockEntity) {
+                BlockState blockState = blockEntity.getBlockState();
                 TileComponentConfig mekBlockEntityConfig = mekBlockEntity.getConfig();
+                Collection<Direction> directions = sides.resolve(blockState);
                 for (TransmissionType transmissionType : referencedTransmissionTypes) {
                     ConfigInfo transmissionConfig = mekBlockEntityConfig.getConfig(transmissionType);
                     if (transmissionConfig != null) {
                         Set<Direction> activeSides = transmissionConfig.getSides(dataTypePredicate);
                         boolean anySuccess = directions.stream().anyMatch(activeSides::contains);
                         if (!anySuccess) {
-                            // pick the first direction from the statement
-                            Direction statementSide = directions.iterator().next();
-                            if (statementSide != null) {
+                            @Nullable Direction directionToEnable = sides.getNonNullDirection(blockState);
+                            if (directionToEnable != null) {
                                 RelativeSide relativeSide = RelativeSide.fromDirections(
                                         mekBlockEntity.getDirection(),
-                                        statementSide
+                                        directionToEnable
                                 );
                                 transmissionConfig.setDataType(fixed, relativeSide);
                                 mekBlockEntityConfig.sideChanged(transmissionType, relativeSide);
