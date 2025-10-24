@@ -26,3 +26,15 @@ EVERY 20 TICKS DO
     INPUT EXCEPT cobblestone FROM z
     OUTPUT 5 EXCEPT copper_ingot TO b
 END
+
+-- note that EXCEPT is a statement-level modifier
+EVERY 20 TICKS DO
+    INPUT
+        *iron*,
+        *copper*
+    EXCEPT
+        *block* -- iron_block and copper_block will both be excluded
+    FROM chest
+
+    OUTPUT TO chest2
+END

@@ -3,8 +3,6 @@ package ca.teamdman.sfm.common.util;
 import net.minecraft.core.Direction;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.function.BiConsumer;
 
 public class SFMDirections {
@@ -20,41 +18,6 @@ public class SFMDirections {
             Direction.UP,
             Direction.DOWN
     };
-
-    public static class NullableDirectionIterator implements Iterator<Direction> {
-        private int index = 0;
-
-        @Override
-        public boolean hasNext() {
-            return index < DIRECTIONS_WITH_NULL.length;
-        }
-
-        @Override
-        public @Nullable Direction next() {
-            if (hasNext()) {
-                return DIRECTIONS_WITH_NULL[index++];
-            }
-            throw new NoSuchElementException();
-        }
-    }
-
-    public static class SingleNullDirectionIterator implements Iterator<Direction> {
-        private boolean hasNext = true;
-
-        @Override
-        public boolean hasNext() {
-            return hasNext;
-        }
-
-        @Override
-        public @Nullable Direction next() {
-            if (hasNext) {
-                hasNext = false;
-                return null;
-            }
-            throw new NoSuchElementException();
-        }
-    }
 
     public record NullableDirectionEnumMap<T>(T[] buckets) {
         public NullableDirectionEnumMap() {

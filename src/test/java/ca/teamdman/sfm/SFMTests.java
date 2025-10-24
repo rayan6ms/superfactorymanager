@@ -8,13 +8,11 @@ import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -46,7 +44,7 @@ public class SFMTests {
     public void roundRobinByBlockDistinct() {
         LabelAccess labelAccess = new LabelAccess(
                 Stream.of("a", "b", "c").map(Label::new).toList(),
-                new DirectionQualifier(EnumSet.of(Direction.DOWN)),
+                new SideQualifier(List.of(Side.BOTTOM)),
                 NumberRangeSet.MAX_RANGE,
                 new RoundRobin(RoundRobin.Behaviour.BY_BLOCK)
         );
