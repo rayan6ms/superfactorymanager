@@ -28,6 +28,7 @@ FORGET -- creates new object that wasn't being discarded properly
 FORGET b -- you can specify labels, though I doubt anyone uses it lol
   OUTPUT TO f -- this sees `INPUT FROM d`
 END
+-- Update tag_matching.sfml and filtering.sfml examples, thanks @Final and @MikMouk for the motivation
 
 
 ---- 4.26.0 ----
