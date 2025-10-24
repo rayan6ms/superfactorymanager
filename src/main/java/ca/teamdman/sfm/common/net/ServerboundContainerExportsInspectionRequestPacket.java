@@ -25,7 +25,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.EnumSet;
 import java.util.List;
 
 public record ServerboundContainerExportsInspectionRequestPacket(
@@ -121,9 +120,7 @@ public record ServerboundContainerExportsInspectionRequestPacket(
                 InputStatement inputStatement = new InputStatement(
                         new LabelAccess(
                                 List.of(new Label("target")),
-                                new DirectionQualifier(direction == null
-                                                       ? EnumSet.noneOf(Direction.class)
-                                                       : EnumSet.of(direction)),
+                                new SideQualifier(List.of(Side.fromDirection(direction))),
                                 NumberRangeSet.MAX_RANGE,
                                 RoundRobin.disabled()
                         ),

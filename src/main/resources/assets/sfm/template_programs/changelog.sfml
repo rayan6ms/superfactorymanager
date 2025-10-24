@@ -29,6 +29,11 @@ FORGET b -- you can specify labels, though I doubt anyone uses it lol
   OUTPUT TO f -- this sees `INPUT FROM d`
 END
 -- Update tag_matching.sfml and filtering.sfml examples, thanks @Final and @MikMouk for the motivation
+-- Add relative directions, #380
+EVERY 20 TICKS DO
+  INPUT FROM machine LEFT SIDE -- relative to the facing property of the block state, null side if not applicable
+  OUTPUT TO machine2 RIGHT SIDE
+END
 
 
 ---- 4.26.0 ----

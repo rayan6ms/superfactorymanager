@@ -27,7 +27,7 @@ public record ForgetStatement(
             InputStatement newInputStatement = new InputStatement(
                     new LabelAccess(
                             newLabels,
-                            oldInputStatement.labelAccess().directions(),
+                            oldInputStatement.labelAccess().sides(),
                             oldInputStatement.labelAccess().slots(),
                             oldInputStatement.labelAccess().roundRobin()
                     ),

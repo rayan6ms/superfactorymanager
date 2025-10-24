@@ -337,15 +337,15 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     public LabelAccess visitLabelAccess(SFMLParser.LabelAccessContext ctx) {
 
         var directionQualifierCtx = ctx.sidequalifier();
-        DirectionQualifier directionQualifier;
+        SideQualifier sideQualifier;
         if (directionQualifierCtx == null) {
-            directionQualifier = DirectionQualifier.NULL_DIRECTION;
+            sideQualifier = SideQualifier.NULL;
         } else {
-            directionQualifier = (DirectionQualifier) visit(directionQualifierCtx);
+            sideQualifier = (SideQualifier) visit(directionQualifierCtx);
         }
         LabelAccess labelAccess = new LabelAccess(
                 ctx.label().stream().map(this::visit).map(Label.class::cast).collect(Collectors.toList()),
-                directionQualifier,
+                sideQualifier,
                 visitSlotqualifier(ctx.slotqualifier()),
                 visitRoundrobin(ctx.roundrobin())
         );
@@ -817,26 +817,23 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     }
 
     @Override
-    public DirectionQualifier visitEachSide(SFMLParser.EachSideContext ctx) {
+    public SideQualifier visitEachSide(SFMLParser.EachSideContext ctx) {
 
-        var rtn = DirectionQualifier.EVERY_DIRECTION;
+        var rtn = SideQualifier.ALL;
         trackNode(rtn, ctx);
         return rtn;
     }
 
     @Override
-    public DirectionQualifier visitListedSides(SFMLParser.ListedSidesContext ctx) {
+    public SideQualifier visitListedSides(SFMLParser.ListedSidesContext ctx) {
 
-        DirectionQualifier directionQualifier = new DirectionQualifier(
-                EnumSet.copyOf(
-                        ctx.side().stream()
-                                .map(this::visitSide)
-                                .map(DirectionQualifier::lookup)
-                                .toList()
-                )
+        SideQualifier sideQualifier = new SideQualifier(
+                ctx.side().stream()
+                        .map(this::visitSide)
+                        .toList()
         );
-        trackNode(directionQualifier, ctx);
-        return directionQualifier;
+        trackNode(sideQualifier, ctx);
+        return sideQualifier;
     }
 
     @Override
