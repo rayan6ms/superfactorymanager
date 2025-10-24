@@ -121,7 +121,7 @@ public class ProgramLinter {
             Level level
     ) {
 //        if (!SFMModCompat.isMekanismLoaded()) return;
-//        DirectionQualifier directions = statement.labelAccess().directions();
+//        SideQualifier sides = statement.labelAccess().sides();
 //        Stream<Pair<Label, BlockPos>> mekanismBlocks = statement
 //                .labelAccess()
 //                .getLabelledPositions(labelPositionHolder)
@@ -148,8 +148,11 @@ public class ProgramLinter {
 //        }
 //        mekanismBlocks.forEach(pair -> {
 //            BlockPos blockPos = pair.getSecond();
-//            if (level.getBlockEntity(blockPos) instanceof ISideConfiguration mekBlockEntity) {
+//            BlockEntity blockEntity = level.getBlockEntity(blockPos);
+//            if (blockEntity instanceof ISideConfiguration mekBlockEntity) {
 //                TileComponentConfig mekBlockEntityConfig = mekBlockEntity.getConfig();
+//                BlockState blockState = blockEntity.getBlockState();
+//                Iterable<@Nullable Direction> directions = sides.resolve(blockState);
 //                for (TransmissionType transmissionType : referencedTransmissionTypes) {
 //                    boolean anySuccess = false;
 //                    ConfigInfo transmissionConfig = mekBlockEntityConfig.getConfig(transmissionType);
@@ -163,12 +166,11 @@ public class ProgramLinter {
 //                        }
 //                        if (!anySuccess) {
 //                            // we want to enable the side for the transmission type
-//                            // pick the first direction in the statement
-//                            Direction statementSide = directions.iterator().next();
-//                            if (statementSide != null) {
+//                            @Nullable Direction directionToEnable = sides.getNonNullDirection(blockState);
+//                            if (directionToEnable != null) {
 //                                RelativeSide relativeSide = RelativeSide.fromDirections(
 //                                        mekBlockEntity.getDirection(),
-//                                        statementSide
+//                                        directionToEnable
 //                                );
 //                                transmissionConfig.setDataType(
 //                                        fixed,
@@ -191,18 +193,18 @@ public class ProgramLinter {
             ArrayList<TranslatableContents> warnings
     ) {
 //        if (!SFMModCompat.isMekanismLoaded()) return;
-//        DirectionQualifier directions = statement.labelAccess().directions();
+//        SideQualifier sides = statement.labelAccess().sides();
 //        Stream<Pair<Label, BlockPos>> mekanismBlocks = statement
 //                .labelAccess()
 //                .getLabelledPositions(labelPositionHolder)
 //                .stream()
 //                .filter(pair -> level.isLoaded(pair.getSecond()))
 //                .filter(pair -> SFMModCompat.isMekanismBlock(level, pair.getSecond()));
-//        if (directions.equals(DirectionQualifier.NULL_DIRECTION)) {
+//        if (sides.equals(SideQualifier.NULL)) {
 //            // add warning if interacting with mekanism without specifying a side
 //            // are any of the blocks mekanism?
 //            mekanismBlocks
-//                    .forEach(pair -> warnings.add(PROGRAM_WARNING_MEKANISM_USED_WITHOUT_DIRECTION.get(
+//                    .forEach(pair -> warnings.add(PROGRAM_WARNING_MEKANISM_USED_WITH_NULL_DIRECTION.get(
 //                            pair.getFirst(),
 //                            statement.toStringPretty()
 //                    )));
@@ -224,14 +226,16 @@ public class ProgramLinter {
 //            }
 //            mekanismBlocks.forEach(pair -> {
 //                BlockPos blockPos = pair.getSecond();
-//                if (level.getBlockEntity(blockPos) instanceof ISideConfiguration mekBlockEntity) {
+//                BlockEntity blockEntity = level.getBlockEntity(blockPos);
+//                if (blockEntity instanceof ISideConfiguration mekBlockEntity) {
+//                    BlockState blockState = blockEntity.getBlockState();
 //                    TileComponentConfig config = mekBlockEntity.getConfig();
 //                    for (TransmissionType transmissionType : referencedTransmissionTypes) {
 //                        boolean anySuccess = false;
 //                        ConfigInfo transmissionConfig = config.getConfig(transmissionType);
 //                        if (transmissionConfig != null) {
 //                            Set<Direction> activeSides = transmissionConfig.getSides(dataTypePredicate);
-//                            for (Direction direction : directions) {
+//                            for (Direction direction : sides.resolve(blockState)) {
 //                                if (activeSides.contains(direction)) {
 //                                    anySuccess = true;
 //                                    break;

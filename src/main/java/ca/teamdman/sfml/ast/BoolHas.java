@@ -69,7 +69,7 @@ public record BoolHas(
     ) {
         resourceType.forEachDirectionalCapability(
                 programContext,
-                labelAccess.directions(),
+                labelAccess.sides(),
                 pos,
                 (direction, cap) -> resourceType.getStacksInSlots(cap, labelAccess.slots()).forEach(stack -> {
                     if (this.resourceIdSet.getMatchingFromStack(stack) != null) {
