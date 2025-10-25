@@ -5,8 +5,6 @@ import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.item.DiskItem;
-import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.program.linting.ProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.Stored;
@@ -94,16 +92,7 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
         if (level.getBlockEntity(pos) instanceof ManagerBlockEntity manager
             && player instanceof ServerPlayer serverPlayer) {
             // update warnings on disk as we open the gui
-            var disk = manager.getDisk();
-            if (disk != null) {
-                var program = manager.getProgram();
-                if (program != null) {
-                    DiskItem.setWarnings(
-                            disk,
-                            ProgramLinter.gatherWarnings(program, LabelPositionHolder.from(disk), manager)
-                    );
-                }
-            }
+            DiskItem.rebuildWarnings(manager);
             NetworkHooks.openScreen(serverPlayer, manager, buf -> ManagerContainerMenu.encode(manager, buf));
             return InteractionResult.CONSUME;
         }

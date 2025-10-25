@@ -2,20 +2,13 @@ package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.compat.SFMModCompat;
-import ca.teamdman.sfm.common.program.linting.FlowProgramLinter;
-import ca.teamdman.sfm.common.program.linting.IProgramLinter;
-import ca.teamdman.sfm.common.program.linting.ResourcesProgramLinter;
-import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import net.minecraft.core.Registry;
+import ca.teamdman.sfm.common.program.linting.*;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredRegister;
 
-import java.util.function.Supplier;
-
+@SuppressWarnings("unused")
 public class SFMProgramLinters {
     public static final ResourceKey<Registry<IProgramLinter>> REGISTRY_ID
             = SFMResourceLocation.createSFMRegistryKey("program_linters");
@@ -27,16 +20,46 @@ public class SFMProgramLinters {
                     .createNewRegistry()
                     .build();
 
-    public static final SFMRegistryObject<IProgramLinter, FlowProgramLinter> FLOW
-            = REGISTERER.register(
+    public static final SFMRegistryObject<IProgramLinter, EachInIOWithoutPatternProgramLinter>
+            FLOW = REGISTERER.register(
             "flow",
-            FlowProgramLinter::new
+            EachInIOWithoutPatternProgramLinter::new
     );
 
-    public static final SFMRegistryObject<IProgramLinter, ResourcesProgramLinter> RESOURCE
-            = REGISTERER.register(
+    public static final SFMRegistryObject<IProgramLinter, ResourcesProgramLinter>
+            RESOURCE = REGISTERER.register(
             "resources",
             ResourcesProgramLinter::new
+    );
+
+    public static final SFMRegistryObject<IProgramLinter, LabelUsedInProgramButNotPresentProgramLinter>
+            LABEL_USED_IN_PROGRAM_BUT_NOT_PRESENT_PROGRAM_LINTER = REGISTERER.register(
+            "label_used_in_program_but_not_present",
+            LabelUsedInProgramButNotPresentProgramLinter::new
+    );
+
+    public static final SFMRegistryObject<IProgramLinter, LabelPresentButNotUsedProgramLinter>
+            LABEL_PRESENT_BUT_NOT_USED_IN_PROGRAM_LINTER = REGISTERER.register(
+            "label_present_but_not_used",
+            LabelPresentButNotUsedProgramLinter::new
+    );
+
+    public static final SFMRegistryObject<IProgramLinter, LabelNotConnectedProgramLinter>
+            LABEL_NOT_CONNECTED_PROGRAM_LINTER = REGISTERER.register(
+            "label_not_connected",
+            LabelNotConnectedProgramLinter::new
+    );
+
+    public static final SFMRegistryObject<IProgramLinter, RoundRobinProgramLinter>
+            ROUND_ROBIN_PROGRAM_LINTER = REGISTERER.register(
+            "round_robin",
+            RoundRobinProgramLinter::new
+    );
+
+    public static final SFMRegistryObject<IProgramLinter, IncompleteIOProgramLinter>
+            INCOMPLETE_IO_PROGRAM_LINTER = REGISTERER.register(
+            "incomplete_io",
+            IncompleteIOProgramLinter::new
     );
 
     static {

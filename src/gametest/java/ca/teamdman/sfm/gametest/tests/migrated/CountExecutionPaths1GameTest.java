@@ -5,6 +5,7 @@ import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.program.linting.GatherWarningsProgramBehaviour;
+import ca.teamdman.sfm.common.program.linting.ProblemTracker;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
@@ -75,7 +76,7 @@ public class CountExecutionPaths1GameTest extends SFMGameTestDefinition {
         assertTrue(warnings.isEmpty(), "expected 0 warning, got " + warnings.size());
 
         // count the execution paths
-        GatherWarningsProgramBehaviour simulation = new GatherWarningsProgramBehaviour(warnings::addAll);
+        GatherWarningsProgramBehaviour simulation = new GatherWarningsProgramBehaviour(new ProblemTracker());
         program.tick(ProgramContext.createSimulationContext(
                 program,
                 labelPositionHolder,

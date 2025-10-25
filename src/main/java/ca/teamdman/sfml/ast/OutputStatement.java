@@ -524,10 +524,15 @@ public class OutputStatement implements IOStatement {
 
     @Override
     public String toString() {
-        return "OUTPUT " + resourceLimits.toStringCondensed(Limit.MAX_QUANTITY_MAX_RETENTION) + " TO " +
-                (emptySlotsOnly ? "EMPTY SLOTS IN " : "") +
-                (each ? "EACH " : "") +
-                labelAccess;
+        StringBuilder rtn = new StringBuilder();
+        rtn.append("OUTPUT ");
+        String limits = resourceLimits.toStringCondensed(Limit.MAX_QUANTITY_MAX_RETENTION);
+        if (!limits.isEmpty()) rtn.append(limits).append(" ");
+        rtn.append("TO");
+        if (emptySlotsOnly) rtn.append(" EMPTY SLOTS IN");
+        if (each) rtn.append(" EACH");
+        rtn.append(" ").append(labelAccess);
+        return rtn.toString();
     }
 
     @Override
