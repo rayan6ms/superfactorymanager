@@ -12,9 +12,11 @@ import com.mojang.datafixers.util.Pair;
 import net.minecraft.network.chat.contents.TranslatableContents;
 
 import java.math.BigInteger;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNING_OUTPUT_RESOURCE_TYPE_NOT_FOUND_IN_INPUTS;
@@ -23,13 +25,18 @@ import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNI
 @SuppressWarnings("rawtypes")
 public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgramBehaviour {
     private final List<Pair<ExecutionPath, List<Pair<ExecutionPathElement, TranslatableContents>>>> sharedMultiverseWarningsByPath;
-    private final Consumer<Collection<TranslatableContents>> sharedMultiverseWarningDisplay;
+
+    private final ProblemTracker tracker;
+
     private final List<Pair<ExecutionPathElement, TranslatableContents>> warnings = new ArrayList<>();
+
     private final Multimap<ResourceType, Label> resourceTypesInputted = HashMultimap.create();
+
     private final Set<ResourceType> resourceTypesOutputted = new HashSet<>();
 
-    public GatherWarningsProgramBehaviour(Consumer<Collection<TranslatableContents>> sharedMultiverseWarningDisplay) {
-        this.sharedMultiverseWarningDisplay = sharedMultiverseWarningDisplay;
+    public GatherWarningsProgramBehaviour(ProblemTracker tracker) {
+
+        this.tracker = tracker;
         this.sharedMultiverseWarningsByPath = new ArrayList<>();
     }
 
@@ -37,24 +44,26 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
             List<ExecutionPath> seenPaths,
             ExecutionPath currentPath,
             AtomicReference<BigInteger> triggerPathCount,
-            Consumer<Collection<TranslatableContents>> sharedMultiverseWarningDisplay,
+            ProblemTracker tracker,
             List<Pair<ExecutionPath, List<Pair<ExecutionPathElement, TranslatableContents>>>> sharedMultiverseWarningsByPath,
             List<Pair<ExecutionPathElement, TranslatableContents>> warnings
     ) {
+
         super(seenPaths, currentPath, triggerPathCount);
         this.warnings.addAll(warnings);
-        this.sharedMultiverseWarningDisplay = sharedMultiverseWarningDisplay;
+        this.tracker = tracker;
         this.sharedMultiverseWarningsByPath = sharedMultiverseWarningsByPath;
     }
 
 
     @Override
     public ProgramBehaviour fork() {
+
         return new GatherWarningsProgramBehaviour(
                 this.seenPaths,
                 this.currentPath,
                 this.triggerPathCount,
-                this.sharedMultiverseWarningDisplay,
+                this.tracker,
                 this.sharedMultiverseWarningsByPath,
                 this.warnings
         );
@@ -63,7 +72,9 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
     @Override
     public void onInputStatementExecution(
             ProgramContext context,
-            InputStatement inputStatement) {
+            InputStatement inputStatement
+    ) {
+
         super.onInputStatementExecution(context, inputStatement);
         Set<? extends ResourceType<?, ?, ?>> inputtingResourceTypes = inputStatement
                 .getReferencedIOResourceIds()
@@ -81,6 +92,7 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
             ProgramContext context,
             OutputStatement outputStatement
     ) {
+
         super.onOutputStatementExecution(context, outputStatement);
 
 
@@ -115,6 +127,7 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
             InputStatement old,
             InputStatement next
     ) {
+
         super.onInputStatementForgetTransform(context, old, next);
 
         /*
@@ -154,7 +167,9 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
     @Override
     public void onInputStatementDropped(
             ProgramContext context,
-            InputStatement inputStatement) {
+            InputStatement inputStatement
+    ) {
+
         super.onInputStatementDropped(context, inputStatement);
 
         /*
@@ -177,7 +192,9 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
     @Override
     public void onProgramFinished(
             ProgramContext context,
-            Program program) {
+            Program program
+    ) {
+
         super.onProgramFinished(context, program);
         // we need to calculate what warnings were present in ALL paths
 
@@ -215,13 +232,18 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
                 }
             }
         }
-//        for (var path : sharedMultiverseWarningsByPath) {
-//            ExecutionPathElement seeking
-//            toWarn.removeIf(pair -> path.getFirst().stream().noneMatch(element -> element.equals(pair.getFirst())));
-//        }
 
         // return deduplicated warnings
-        sharedMultiverseWarningDisplay.accept(toWarn.stream().map(Pair::getSecond).collect(Collectors.toSet()));
+        for (
+                TranslatableContents warning : toWarn
+                .stream()
+                .map(Pair::getSecond)
+                .collect(Collectors.toSet())
+        ) {
+            if (tracker.add(warning).isSaturated()) {
+                break;
+            }
+        }
     }
 
     private void warnUnusedInputLabels(
@@ -230,6 +252,7 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
             Set<Label> removedLabels,
             Set<? extends ResourceType<?, ?, ?>> droppingResourceTypes
     ) {
+
         for (Label label : removedLabels) {
             for (ResourceType resourceType : droppingResourceTypes) {
                 // if the label was never used, warn
@@ -254,6 +277,7 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
             }
         }
     }
+
 }
 
 /*

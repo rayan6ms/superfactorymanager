@@ -2,10 +2,11 @@ package ca.teamdman.sfm.common.compat;
 
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.linting.IProgramLinter;
-import ca.teamdman.sfm.common.program.linting.MekanismSideConfigProgramLinter;
+import ca.teamdman.sfm.common.program.linting.compat.mekanism.MekanismSidednessProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMDeferredRegister;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.*;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfml.ast.IOStatement;
 import ca.teamdman.sfml.ast.ResourceIdentifier;
@@ -73,7 +74,9 @@ public class SFMMekanismCompat {
         return UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertInPlaceFrom(FloatingLong.create(amount));
     }
 
+    @MCVersionDependentBehaviour
     public static Set<Direction> getSides(ConfigInfo config, ISideConfiguration facing, Predicate<DataType> condition) {
+
         Set<Direction> rtn = EnumSet.noneOf(Direction.class);
         for (Map.Entry<RelativeSide, DataType> entry : config.getSideConfig()) {
             if (condition.test(entry.getValue())) {
@@ -175,8 +178,8 @@ public class SFMMekanismCompat {
 
     public static void registerProgramLinters(SFMDeferredRegister<IProgramLinter> types) {
         types.register(
-                "mekanism",
-                MekanismSideConfigProgramLinter::new
+                "mekanism_sidedness",
+                MekanismSidednessProgramLinter::new
         );
     }
 

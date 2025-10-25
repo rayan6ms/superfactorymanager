@@ -144,13 +144,14 @@ setOp           : OVERALL
 //
 labelAccess     : label (COMMA label)* roundrobin? sidequalifier? slotqualifier?;
 roundrobin      : ROUND ROBIN BY (LABEL | BLOCK);
-label           : (identifier)   #RawLabel
-                | string                  #StringLabel
+
+label           : (identifier)  #RawLabel
+                | string        #StringLabel
                 ;
 
 emptyslots      : EMPTY (SLOTS | SLOT) IN ;
 
-identifier : (IDENTIFIER | REDSTONE | GLOBAL | SECOND | SECONDS) ;
+identifier : (IDENTIFIER | REDSTONE | GLOBAL | SECOND | SECONDS | TOP | BOTTOM | LEFT | RIGHT | FRONT | BACK) ;
 
 // GENERAL
 string: STRING ;
