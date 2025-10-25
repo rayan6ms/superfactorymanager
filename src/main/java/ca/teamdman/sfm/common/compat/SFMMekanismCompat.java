@@ -2,14 +2,15 @@ package ca.teamdman.sfm.common.compat;
 
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.linting.IProgramLinter;
-import ca.teamdman.sfm.common.program.linting.MekanismSideConfigProgramLinter;
+import ca.teamdman.sfm.common.program.linting.compat.mekanism.MekanismSidednessProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMDeferredRegister;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.*;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
-import ca.teamdman.sfml.ast.DirectionQualifier;
 import ca.teamdman.sfml.ast.IOStatement;
 import ca.teamdman.sfml.ast.ResourceIdentifier;
+import ca.teamdman.sfml.ast.Side;
 import mekanism.api.RelativeSide;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.tile.component.TileComponentConfig;
@@ -72,7 +73,9 @@ public class SFMMekanismCompat {
         return UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertFrom(amount);
     }
 
+    @MCVersionDependentBehaviour
     public static Set<Direction> getSides(ConfigInfo config, ISideConfiguration facing, Predicate<DataType> condition) {
+
         Set<Direction> rtn = EnumSet.noneOf(Direction.class);
         for (Map.Entry<RelativeSide, DataType> entry : config.getSideConfig()) {
             if (condition.test(entry.getValue())) {
@@ -115,7 +118,8 @@ public class SFMMekanismCompat {
                 sb.append("INPUT ").append(resourceTypeKey.location()).append(":: FROM target ");
                 sb.append(outputSides
                                   .stream()
-                                  .map(DirectionQualifier::directionToString)
+                                  .map(Side::fromDirection)
+                                  .map(Side::toString)
                                   .collect(Collectors.joining(", ")));
                 sb.append(" SIDE\n");
             }
@@ -138,7 +142,8 @@ public class SFMMekanismCompat {
                 sb.append("OUTPUT ").append(resourceTypeKey.location()).append(":: TO target ");
                 sb.append(inputSides
                                   .stream()
-                                  .map(DirectionQualifier::directionToString)
+                                  .map(Side::fromDirection)
+                                  .map(Side::toString)
                                   .collect(Collectors.joining(", ")));
                 sb.append(" SIDE\n");
             }
@@ -172,8 +177,8 @@ public class SFMMekanismCompat {
 
     public static void registerProgramLinters(SFMDeferredRegister<IProgramLinter> types) {
         types.register(
-                "mekanism",
-                MekanismSideConfigProgramLinter::new
+                "mekanism_sidedness",
+                MekanismSidednessProgramLinter::new
         );
     }
 

@@ -10,7 +10,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,7 +45,7 @@ public class SFMASTUtils {
                 // update the labels
                 .map(inputStatement -> new InputStatement(new LabelAccess(
                         labelAccess.labels(),
-                        labelAccess.directions(),
+                        labelAccess.sides(),
                         inputStatement.labelAccess()
                                 .slots(),
                         RoundRobin.disabled()
@@ -64,10 +63,7 @@ public class SFMASTUtils {
     ) {
         LabelAccess labelAccess = new LabelAccess(
                 List.of(new Label(label)),
-                new DirectionQualifier(
-                        direction == null
-                        ? EnumSet.noneOf(Direction.class)
-                        : EnumSet.of(direction)),
+                new SideQualifier(List.of(Side.fromDirection(direction))),
                 new NumberRangeSet(
                         new NumberRange[]{new NumberRange(slot, slot)}
                 ),

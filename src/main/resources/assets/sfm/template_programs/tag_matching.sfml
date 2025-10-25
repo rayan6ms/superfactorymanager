@@ -35,5 +35,32 @@ EVERY 20 TICKS DO
     EXCEPT sand, gold_ingot
     FROM chest
 
+    -- you can exclude tags as well
+    INPUT WITH NOT #needs_stone_tool FROM chest
+
+    INPUT
+        -- there is an implicit sfm:item:*:* here
+        WITH
+            NOT #needs_stone_tool
+            AND #ores/*
+    FROM chest -- inputted items will have ores/* and will not have needs_stone_tool
+
+    -- WITHOUT will negate the entire expression
+    INPUT WITHOUT #needs_stone_tool AND #ores/* FROM chest
+    INPUT WITH NOT (#needs_stone_tool AND #ores/*) FROM chest
+    -- this will input stuff that doesn't have both tags
+    -- which is not the same as
+    INPUT WITH NOT #ores/* AND #needs_stone_tool FROM chest
+
+    -- Note that EXCEPT (see "Filtering" example) is statement-wide.
+    -- EXCEPT does not support WITH clauses.
+    -- There is no statement-wide exclusion for WITH clauses.
+    INPUT
+      * WITH #ores NOT #needs_stone_tool,
+      * WITHOUT #piglin_loved,
+    FROM chest
+
+
+
     OUTPUT TO other_chest
 END

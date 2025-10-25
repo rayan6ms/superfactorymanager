@@ -44,7 +44,7 @@ sourceSets {
         java {
             exclude "ca/teamdman/sfm/common/capability/ae2/InterfaceCapabilityProvider.java"
             exclude "ca/teamdman/sfm/common/capability/ae2/EnergyAcceptorBlockCapabilityProvider.java"
-            //exclude "ca/teamdman/sfm/common/program/linting/MekanismSideConfigProgramLinter.java"
+//            exclude "ca/teamdman/sfm/common/program/linting/compat/mekanism"
         }
         java {
             exclude "ca/teamdman/sfm/common/block/BatteryBlock.java"

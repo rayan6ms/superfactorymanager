@@ -73,7 +73,7 @@ public class CodegenTests {
     public void codegen() {
         var aLabel = new LabelAccess(
                 List.of(new Label("a")),
-                DirectionQualifier.NULL_DIRECTION,
+                SideQualifier.NULL,
                 NumberRangeSet.MAX_RANGE,
                 RoundRobin.disabled()
         );
