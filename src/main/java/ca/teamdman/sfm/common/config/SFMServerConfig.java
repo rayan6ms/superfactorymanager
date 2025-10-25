@@ -15,6 +15,7 @@ public class SFMServerConfig {
     public final ForgeConfigSpec.IntValue timerTriggerMinimumIntervalInTicks;
     public final ForgeConfigSpec.IntValue timerTriggerMinimumIntervalInTicksWhenOnlyForgeEnergyIO;
     public final ForgeConfigSpec.IntValue maxIfStatementsInTriggerBeforeSimulationIsntAllowed;
+    public final ForgeConfigSpec.IntValue maxDiskProblems;
     public final ForgeConfigSpec.ConfigValue<List<? extends String>> disallowedResourceTypesForTransfer;
     public final ForgeConfigSpec.EnumValue<LevelsToShards> levelsToShards;
     /**
@@ -48,6 +49,10 @@ public class SFMServerConfig {
                 .comment(
                         "The number of scenarios to check is 2^n where n is the number of if statements in a trigger")
                 .defineInRange("maxIfStatementsInTriggerBeforeSimulationIsntAllowed", 10, 0, Integer.MAX_VALUE);
+
+        maxDiskProblems = builder
+                .comment("The max number of problems annotated on a disk item before truncation")
+                .defineInRange("maxDiskProblems", 10, 0, Integer.MAX_VALUE);
 
         disallowedResourceTypesForTransfer = builder
                 .comment("What resource types should SFM not be allowed to move")

@@ -34,6 +34,7 @@ EVERY 20 TICKS DO
   INPUT FROM machine LEFT SIDE -- relative to the facing property of the block state, null side if not applicable
   OUTPUT TO machine2 RIGHT SIDE
 END
+-- Add a server config for max number of warnings on a disk, fixes #383
 
 
 ---- 4.26.0 ----

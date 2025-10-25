@@ -74,13 +74,13 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
 
         return AST_NODE_CONTEXTS
                 .stream()
-                .filter(pair -> pair.getFirst() == node)
+                .filter(pair -> pair.getFirst().get() == node)
                 .map(Pair::getSecond)
                 .findFirst();
     }
 
     public String getLineColumnForNode(ASTNode node) {
-
+        // todo: return TranslatableContents
         return getContextForNode(node)
                 .map(ctx -> "Line " + ctx.start.getLine() + ", Column " + ctx.start.getCharPositionInLine())
                 .orElse("Unknown location");
