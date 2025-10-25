@@ -31,7 +31,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -77,7 +77,7 @@ public class DiskItem extends Item {
         Program.compile(
                 getProgram(stack),
                 successProgram -> {
-                    ArrayList<TranslatableContents> warnings = ProgramLinter.gatherWarnings(
+                    Collection<TranslatableContents> warnings = ProgramLinter.gatherWarnings(
                             successProgram,
                             LabelPositionHolder.from(stack),
                             manager
@@ -154,9 +154,24 @@ public class DiskItem extends Item {
                         Collectors.toList());
     }
 
+    public static void rebuildWarnings(
+            ManagerBlockEntity manager
+    ) {
+        var disk = manager.getDisk();
+        if (disk != null) {
+            var program = manager.getProgram();
+            if (program != null) {
+                DiskItem.setWarnings(
+                        disk,
+                        ProgramLinter.gatherWarnings(program, LabelPositionHolder.from(disk), manager)
+                );
+            }
+        }
+    }
+
     public static void setWarnings(
             ItemStack stack,
-            List<TranslatableContents> warnings
+            Collection<TranslatableContents> warnings
     ) {
         stack
                 .getOrCreateTag()
