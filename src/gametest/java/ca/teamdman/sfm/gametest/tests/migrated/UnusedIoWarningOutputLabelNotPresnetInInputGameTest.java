@@ -2,14 +2,15 @@ package ca.teamdman.sfm.gametest.tests.migrated;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.item.DiskItem;
-import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
+import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Objects;
@@ -65,12 +66,14 @@ public class UnusedIoWarningOutputLabelNotPresnetInInputGameTest extends SFMGame
         // assert expected warnings
         var warnings = DiskItem.getWarnings(Objects.requireNonNull(manager.getDisk()));
         assertTrue(warnings.size() == 1, "expected 1 warning, got " + warnings.size());
-        assertTrue(warnings
-                           .get(0)
-                           .getKey()
-                           .equals(LocalizationKeys.PROGRAM_WARNING_OUTPUT_RESOURCE_TYPE_NOT_FOUND_IN_INPUTS
-                                           .key()
-                                           .get()), "expected output without matching input warning");
+
+        TranslatableContents firstWarning = warnings.get(0);
+        String expectedKey = LocalizationKeys.PROGRAM_WARNING_OUTPUT_RESOURCE_TYPE_NOT_FOUND_IN_INPUTS.key().get();
+        assertTrue(firstWarning.getKey().equals(expectedKey), "expected output without matching input warning");
+        assertTrue(firstWarning.getArgs().length == 3, "expected 3 arguments in warning");
+        assertTrue(firstWarning.getArgs()[0].equals("OUTPUT TO bruh"), "expected arg 0 to be \"OUTPUT TO bruh\"");
+        assertTrue(firstWarning.getArgs()[1].equals("Line 2, Column 4"), "expected arg 1 to be \"Line 2, Column 4\"");
+        assertTrue(firstWarning.getArgs()[2].equals("sfm:item"), "expected arg 2 to be \"sfm:item\"");
         helper.succeed();
     }
 }

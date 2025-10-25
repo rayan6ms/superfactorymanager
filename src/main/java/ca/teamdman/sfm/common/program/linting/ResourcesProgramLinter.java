@@ -2,10 +2,12 @@ package ca.teamdman.sfm.common.program.linting;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
+import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -16,10 +18,11 @@ import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNI
 public class ResourcesProgramLinter implements IProgramLinter {
 
     @Override
-    public ArrayList<TranslatableContents> gatherWarnings(
+    public void gatherWarnings(
             Program program,
             LabelPositionHolder labelPositionHolder,
-            @Nullable ManagerBlockEntity managerBlockEntity
+            @Nullable ManagerBlockEntity managerBlockEntity,
+            ProblemTracker tracker
     ) {
         ArrayList<TranslatableContents> warnings = new ArrayList<>();
 
@@ -31,23 +34,24 @@ public class ResourcesProgramLinter implements IProgramLinter {
                 continue;
             }
             // resource.getResourceType() can return null if something's not mapped
-            if (resource.getResourceType() == null) {
+            ResourceType<?, ?, ?> resourceType = resource.getResourceType();
+            if (resourceType == null) {
                 continue;
             }
             // If it doesn't exist in the registry, add a warning
-            if (!resource.getResourceType().registryKeyExists((ResourceLocation) loc.get())) {
+            if (!resourceType.registryKeyExists((ResourceLocation) loc.get())) {
                 warnings.add(PROGRAM_WARNING_UNKNOWN_RESOURCE_ID.get(resource));
             }
         }
-
-        return warnings;
     }
 
     @Override
     public void fixWarnings(
-            ManagerBlockEntity managerBlockEntity,
-            ItemStack diskStack,
-            Program program
+            Program program,
+            LabelPositionHolder labels,
+            ManagerBlockEntity manager,
+            Level level,
+            ItemStack disk
     ) {
         // Resource references typically cannot be “auto-fixed,” so do nothing here.
     }

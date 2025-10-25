@@ -2,10 +2,11 @@ package ca.teamdman.sfm.common.compat;
 
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.linting.IProgramLinter;
-import ca.teamdman.sfm.common.program.linting.MekanismSideConfigProgramLinter;
+import ca.teamdman.sfm.common.program.linting.compat.mekanism.MekanismSidednessProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMDeferredRegister;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.*;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfml.ast.IOStatement;
 import ca.teamdman.sfml.ast.ResourceIdentifier;
@@ -26,6 +27,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.EnumSet;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 public class SFMMekanismCompat {
@@ -71,6 +73,16 @@ public class SFMMekanismCompat {
         return UnitDisplayUtils.EnergyUnit.FORGE_ENERGY.convertInPlaceFrom(FloatingLong.create(amount));
     }
 
+    @SuppressWarnings("unused")
+    @MCVersionDependentBehaviour
+    public static Set<Direction> getSides(
+            ConfigInfo config,
+            ISideConfiguration facing,
+            Predicate<DataType> condition
+    ) {
+        return config.getSides(condition);
+    }
+
     public static String gatherInspectionResults(BlockEntity blockEntity) {
         if (!(blockEntity instanceof ISideConfiguration sideConfiguration)) {
             return "";
@@ -95,7 +107,7 @@ public class SFMMekanismCompat {
                 continue;
             }
 
-            Set<Direction> outputSides = info.getSides(DataType::canOutput);
+            Set<Direction> outputSides = getSides(info, sideConfiguration, DataType::canOutput);
             if (!outputSides.isEmpty()) {
                 sb
                         .append("-- ")
@@ -163,8 +175,8 @@ public class SFMMekanismCompat {
 
     public static void registerProgramLinters(SFMDeferredRegister<IProgramLinter> types) {
         types.register(
-                "mekanism",
-                MekanismSideConfigProgramLinter::new
+                "mekanism_sidedness",
+                MekanismSidednessProgramLinter::new
         );
     }
 
