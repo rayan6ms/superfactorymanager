@@ -35,6 +35,8 @@ EVERY 20 TICKS DO
   OUTPUT TO machine2 RIGHT SIDE
 END
 -- Add a server config for max number of warnings on a disk, fixes #383
+-- Implement custom event subscriber logic to reduce entropy in SFM code between MC versions
+---- Not being used by production logic yet
 
 
 ---- 4.26.0 ----
