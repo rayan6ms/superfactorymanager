@@ -4,7 +4,6 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.util.SFMAnnotationUtils;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod.EventBusSubscriber.Bus;
 import net.neoforged.fml.event.IModBusEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,6 +13,8 @@ import java.lang.invoke.MethodHandles;
 import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
+
+import static net.neoforged.fml.common.EventBusSubscriber.Bus;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class SFMEventListenerMethod<T extends Event> {
@@ -87,16 +88,6 @@ public class SFMEventListenerMethod<T extends Event> {
         return new SFMEventListenerMethod<>(methodParent, method, target, annotationData, annotation);
     }
 
-    private @NotNull Bus getEventBusType() {
-        Bus busType;
-        if (IModBusEvent.class.isAssignableFrom(eventClass)) {
-            busType = SFMEventBus.Target.MOD;
-        } else {
-            busType = SFMEventBus.Target.GAME;
-        }
-        return busType;
-    }
-
     public Consumer<T> createConsumer() {
 
         try {
@@ -129,7 +120,11 @@ public class SFMEventListenerMethod<T extends Event> {
                 @Override
                 public String toString() {
 
-                    return "SFMEventListenerMethod.createConsumer(){" + methodParent.getName() + "#" + annotationData.memberName() + "}";
+                    return "SFMEventListenerMethod.createConsumer(){"
+                           + methodParent.getName()
+                           + "#"
+                           + annotationData.memberName()
+                           + "}";
                 }
             };
         } catch (IllegalAccessException e) {
@@ -155,6 +150,17 @@ public class SFMEventListenerMethod<T extends Event> {
 
         // Log success
         SFM.LOGGER.info("Registered bus={} listener={}", busType, consumer);
+    }
+
+    private @NotNull Bus getEventBusType() {
+
+        Bus busType;
+        if (IModBusEvent.class.isAssignableFrom(eventClass)) {
+            busType = SFMEventBus.Target.MOD;
+        } else {
+            busType = SFMEventBus.Target.GAME;
+        }
+        return busType;
     }
 
 }

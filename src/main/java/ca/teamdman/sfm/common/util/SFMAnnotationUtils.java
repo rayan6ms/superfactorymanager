@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.util;
 
 import ca.teamdman.sfm.SFM;
 import net.neoforged.fml.ModList;
-import net.neoforged.fml.loading.moddiscovery.ModAnnotation;
+import net.neoforged.fml.loading.modscan.ModAnnotation;
 import net.neoforged.neoforgespi.language.ModFileScanData;
 import org.jetbrains.annotations.UnknownNullability;
 import org.objectweb.asm.Type;
@@ -101,14 +101,14 @@ public class SFMAnnotationUtils {
 
             var rtn = EnumSet.noneOf(clazz);
             for (ModAnnotation.EnumHolder enumHolder : existing) {
-                rtn.add(Enum.valueOf(clazz, enumHolder.getValue()));
+                rtn.add(Enum.valueOf(clazz, enumHolder.value()));
             }
             return rtn;
         }
 
         public <T extends Enum<T>> @UnknownNullability T getEnum(String key, Class<T> clazz) {
             var existing = (ModAnnotation.EnumHolder) annotationData().get(key);
-            return existing == null ? null : Enum.valueOf(clazz, existing.getValue());
+            return existing == null ? null : Enum.valueOf(clazz, existing.value());
         }
 
     }
