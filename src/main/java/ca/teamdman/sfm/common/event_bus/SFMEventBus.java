@@ -3,27 +3,31 @@ package ca.teamdman.sfm.common.event_bus;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.jetbrains.annotations.UnknownNullability;
 
 /// Used to reduce {@link ca.teamdman.sfm.common.util.MCVersionDependentBehaviour}.
 public class SFMEventBus {
+    public static final IEventBus GAME_BUS = MinecraftForge.EVENT_BUS;
 
-    public static IEventBus getEventBus(Bus target) {
+    public static @UnknownNullability IEventBus MOD_BUS = null;
 
-        if (target == Target.MOD) {
-            return FMLJavaModLoadingContext.get().getModEventBus();
-        } else if (target == Target.GAME) {
-            return MinecraftForge.EVENT_BUS;
+    public static IEventBus getEventBus(Bus busType) {
+
+        if (busType == EventBusType.MOD) {
+            return MOD_BUS;
+        } else if (busType == EventBusType.GAME) {
+            return GAME_BUS;
         } else {
-            throw new IllegalArgumentException("Invalid target: " + target);
+            throw new IllegalArgumentException("Invalid busType: " + busType);
         }
     }
 
-    public static class Target {
+    public static class EventBusType {
 
         public static final Bus MOD = Bus.MOD;
 
         public static final Bus GAME = Bus.FORGE;
 
     }
+
 }
