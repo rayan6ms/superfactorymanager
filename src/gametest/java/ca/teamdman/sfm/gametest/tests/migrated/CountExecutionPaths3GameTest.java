@@ -5,14 +5,13 @@ import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.program.linting.GatherWarningsProgramBehaviour;
+import ca.teamdman.sfm.common.program.linting.ProblemTracker;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.Objects;
@@ -53,7 +52,7 @@ public class CountExecutionPaths3GameTest extends SFMGameTestDefinition {
         helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
         // place manager
-        ManagerBlockEntity manager = helper.getBlockEntity(new BlockPos(1, 2, 0));
+        ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(new BlockPos(1, 2, 0));
         manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
 
         // set the labels
@@ -88,11 +87,7 @@ public class CountExecutionPaths3GameTest extends SFMGameTestDefinition {
         assertTrue(warnings.isEmpty(), "expected 0 warning, got " + warnings.size());
 
         // count the execution paths
-        GatherWarningsProgramBehaviour simulation = new GatherWarningsProgramBehaviour(x -> {
-            for (TranslatableContents problem : x) {
-                warnings.add(MutableComponent.create(problem));
-            }
-        });
+        GatherWarningsProgramBehaviour simulation = new GatherWarningsProgramBehaviour(new ProblemTracker());
         program.tick(ProgramContext.createSimulationContext(
                 program,
                 labelPositionHolder,
@@ -100,10 +95,7 @@ public class CountExecutionPaths3GameTest extends SFMGameTestDefinition {
                 simulation
         ));
         assertTrue(simulation.getSeenPaths().size() == 3, "expected single execution path");
-        assertTrue(
-                simulation.getSeenPaths().getFirst().history().size() == 2,
-                "expected two elements in execution path"
-        );
+        assertTrue(simulation.getSeenPaths().get(0).history().size() == 2, "expected two elements in execution path");
         assertTrue(simulation.getSeenPaths().get(1).history().size() == 4, "expected two elements in execution path");
         assertTrue(simulation.getSeenPaths().get(2).history().size() == 3, "expected two elements in execution path");
         helper.succeed();

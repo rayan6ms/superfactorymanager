@@ -3,7 +3,6 @@ package ca.teamdman.sfm.common.resourcetype;
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
-import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.CapabilityConsumer;
 import ca.teamdman.sfm.common.program.ProgramContext;
@@ -16,7 +15,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiConsumer;
@@ -26,15 +24,18 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     public final SFMBlockCapabilityKind<CAP> CAPABILITY_KIND;
 
     public ResourceType(SFMBlockCapabilityKind<CAP> CAPABILITY_KIND) {
+
         this.CAPABILITY_KIND = CAPABILITY_KIND;
     }
 
     public SFMBlockCapabilityKind<CAP> capabilityKind() {
+
         return CAPABILITY_KIND;
     }
 
     @Override
     public boolean equals(Object o) {
+
         if (this == o) return true;
         if (!(o instanceof ResourceType<?, ?, ?> that)) return false;
         return Objects.equals(CAPABILITY_KIND, that.CAPABILITY_KIND);
@@ -42,6 +43,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
 
     @Override
     public int hashCode() {
+
         return Objects.hashCode(CAPABILITY_KIND);
     }
 
@@ -53,6 +55,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     public abstract CAP createHandlerForBufferBlock(BufferBlockEntityContents contents);
 
     public boolean isHandlerEmpty(CAP cap) {
+
         for (int slot = 0; slot < getSlots(cap); slot++) {
             if (!isEmpty(getStackInSlot(cap, slot))) {
                 return false;
@@ -70,6 +73,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             STACK stack1,
             STACK stack2
     ) {
+
         return getAmount(stack1) - getAmount(stack2);
     }
 
@@ -115,6 +119,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             ResourceIdentifier<STACK, ITEM, CAP> resourceId,
             Object stack
     ) {
+
         if (!matchesStackType(stack)) return false;
         @SuppressWarnings("unchecked") STACK stack_ = (STACK) stack;
         if (isEmpty(stack_)) return false;
@@ -139,16 +144,12 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
                         labelAccess.toString() // @MCVersionDependentBehaviour We must cast to string here // do I want to update the base method to perform the component/boolean/string/other check and call tostring on my own?
                 )));
 
-        DirectionQualifier directions = labelAccess.directions();
-        LabelPositionHolder labelPositionHolder = programContext.getLabelPositionHolder();
-        ArrayList<Pair<Label, BlockPos>> positions = labelAccess.getLabelledPositions(labelPositionHolder);
-
-        for (var pair : positions) {
+        for (Pair<Label, BlockPos> pair : labelAccess.getLabelledPositions(programContext.getLabelPositionHolder())) {
             Label label = pair.getFirst();
             BlockPos pos = pair.getSecond();
             forEachDirectionalCapability(
                     programContext,
-                    directions,
+                    labelAccess.sides(),
                     pos,
                     (dir, cap) -> consumer.accept(label, pos, dir, cap)
             );
@@ -157,11 +158,12 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
 
     public void forEachDirectionalCapability(
             ProgramContext programContext,
-            DirectionQualifier directions,
+            SideQualifier sides,
             @Stored BlockPos pos,
             BiConsumer<Direction, CAP> consumer
     ) {
-        for (Direction dir : directions) {
+
+        for (Direction dir : sides.resolve(programContext.getLevel().getBlockState(pos))) {
             SFMBlockCapabilityResult<CAP> maybeCap = programContext.getNetwork()
                     .getCapability(CAPABILITY_KIND, pos, dir, programContext.getLogger());
             if (maybeCap.isPresent()) {
@@ -193,6 +195,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             CAP cap,
             NumberRangeSet slots
     ) {
+
         var rtn = Stream.<STACK>builder();
         for (int slot = 0; slot < getSlots(cap); slot++) {
             if (!slots.contains(slot)) continue;
@@ -226,15 +229,18 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             STACK stack,
             long count
     ) {
+
         return setCount(copy(stack), count);
     }
 
     public String displayAsCode() {
+
         ResourceLocation thisKey = SFMResourceTypes.registry().getId(this);
         return thisKey != null ? thisKey.toString() : "null";
     }
 
     public String displayAsCapabilityClass() {
+
         return CAPABILITY_KIND.getName();
     }
 
@@ -242,4 +248,5 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             STACK stack,
             long amount
     );
+
 }

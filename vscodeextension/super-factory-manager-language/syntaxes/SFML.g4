@@ -83,8 +83,8 @@ tagMatcher  : identifier COLON identifier (SLASH identifier)*
             ;
 
 
-sidequalifier   : EACH SIDE                 #EachSide
-                | side(COMMA side)* SIDE    #ListedSides
+sidequalifier   : EACH SIDE                  #EachSide
+                | side (COMMA side)* SIDE    #ListedSides
                 ;
 
 side            : TOP
@@ -93,8 +93,14 @@ side            : TOP
                 | EAST
                 | SOUTH
                 | WEST
+                | LEFT
+                | RIGHT
+                | FRONT
+                | BACK
+                | NULL
                 ;
-slotqualifier   : SLOTS rangeset;
+
+slotqualifier   : (SLOTS | SLOT) rangeset;
 rangeset        : range (COMMA range)*;
 range           : number (DASH number)? ;
 
@@ -138,13 +144,14 @@ setOp           : OVERALL
 //
 labelAccess     : label (COMMA label)* roundrobin? sidequalifier? slotqualifier?;
 roundrobin      : ROUND ROBIN BY (LABEL | BLOCK);
-label           : (identifier)   #RawLabel
-                | string                  #StringLabel
+
+label           : (identifier)  #RawLabel
+                | string        #StringLabel
                 ;
 
-emptyslots      : EMPTY SLOTS IN ;
+emptyslots      : EMPTY (SLOTS | SLOT) IN ;
 
-identifier : (IDENTIFIER | REDSTONE | GLOBAL | SECOND | SECONDS) ;
+identifier : (IDENTIFIER | REDSTONE | GLOBAL | SECOND | SECONDS | TOP | BOTTOM | LEFT | RIGHT | FRONT | BACK) ;
 
 // GENERAL
 string: STRING ;
@@ -193,6 +200,7 @@ INPUT   : I N P U T ;
 OUTPUT  : O U T P U T ;
 WHERE   : W H E R E ;
 SLOTS   : S L O T S ;
+SLOT   : S L O T ;
 RETAIN  : R E T A I N ;
 EACH    : E A C H ;
 EXCEPT  : E X C E P T ;
@@ -204,7 +212,7 @@ IN      : I N ;
 WITHOUT : W I T H O U T;
 WITH    : W I T H ;
 TAG     : T A G ;
-HASHTAG : '#';
+HASHTAG : '#' ;
 
 // ROUND ROBIN
 ROUND : R O U N D ;
@@ -221,6 +229,11 @@ EAST    : E A S T ;
 SOUTH   : S O U T H ;
 WEST    : W E S T ;
 SIDE    : S I D E ;
+LEFT    : L E F T ;
+RIGHT   : R I G H T ;
+FRONT   : F R O N T ;
+BACK    : B A C K ;
+NULL    : N U L L ;
 
 
 // TIMER TRIGGERS

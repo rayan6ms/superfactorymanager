@@ -51,7 +51,7 @@ public class UnusedIoWarningInputLabelNotPresentInOutputGameTest extends SFMGame
         helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
         // place manager
-        ManagerBlockEntity manager = helper.getBlockEntity(new BlockPos(1, 2, 0));
+        ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(new BlockPos(1, 2, 0));
         manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
         LabelPositionHolder.empty()
                 .add("left", helper.absolutePos(leftPos))
@@ -66,14 +66,16 @@ public class UnusedIoWarningInputLabelNotPresentInOutputGameTest extends SFMGame
         // assert expected warnings
         var warnings = DiskItem.getWarnings(Objects.requireNonNull(manager.getDisk()));
         assertTrue(warnings.size() == 1, "expected 1 warning, got " + warnings.size());
-        assertTrue((
-                           (TranslatableContents) warnings
-                                   .getFirst()
-                                   .getContents()
-                   ).getKey()
-                           .equals(LocalizationKeys.PROGRAM_WARNING_UNUSED_INPUT_LABEL // should be unused input
-                                           .key()
-                                           .get()), "expected output without matching input warning");
+
+        TranslatableContents firstWarning = (TranslatableContents) warnings.getFirst().getContents();
+        String expectedKey = LocalizationKeys.PROGRAM_WARNING_UNUSED_INPUT_LABEL.key().get();
+        assertTrue(firstWarning.getKey().equals(expectedKey), "expected output without matching input warning");
+        assertTrue(firstWarning.getArgs().length == 5, "expected 5 arguments in warning");
+        assertTrue(firstWarning.getArgs()[0].equals("INPUT FROM left"), "expected arg 0 to be \"INPUT FROM left\"");
+        assertTrue(firstWarning.getArgs()[1].equals("Line 2, Column 4"), "expected arg 1 to be \"Line 2, Column 4\"");
+        assertTrue(firstWarning.getArgs()[2].equals("sfm:item"), "expected arg 2 to be \"sfm:item\"");
+        assertTrue(firstWarning.getArgs()[3].equals("left"), "expected arg 3 to be \"left\"");
+        assertTrue(firstWarning.getArgs()[4].equals("sfm:item"), "expected arg 4 to be \"sfm:item\"");
         helper.succeed();
     }
 }
