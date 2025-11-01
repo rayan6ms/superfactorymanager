@@ -4,7 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.util.SFMAnnotationUtils;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.Mod.EventBusSubscriber.Bus;
 import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -87,8 +87,8 @@ public class SFMEventListenerMethod<T extends Event> {
         return new SFMEventListenerMethod<>(methodParent, method, target, annotationData, annotation);
     }
 
-    private Mod.EventBusSubscriber.@NotNull Bus getEventBusType() {
-        Mod.EventBusSubscriber.Bus busType;
+    private @NotNull Bus getEventBusType() {
+        Bus busType;
         if (IModBusEvent.class.isAssignableFrom(eventClass)) {
             busType = SFMEventBus.Target.MOD;
         } else {
@@ -142,7 +142,7 @@ public class SFMEventListenerMethod<T extends Event> {
         Consumer<T> consumer = createConsumer();
 
         // Determine bus
-        Mod.EventBusSubscriber.Bus busType = getEventBusType();
+        Bus busType = getEventBusType();
         IEventBus eventBus = SFMEventBus.getEventBus(busType);
 
         // Register listener
