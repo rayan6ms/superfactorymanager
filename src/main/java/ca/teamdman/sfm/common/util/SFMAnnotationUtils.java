@@ -61,6 +61,11 @@ public class SFMAnnotationUtils {
         }
     }
 
+    @MCVersionDependentBehaviour
+    public static String getEnumValue(ModAnnotation.EnumHolder holder) {
+        return holder.value();
+    }
+
     public record SFMAnnotationData(
             ModFileScanData.AnnotationData inner
     ) {
@@ -101,14 +106,14 @@ public class SFMAnnotationUtils {
 
             var rtn = EnumSet.noneOf(clazz);
             for (ModAnnotation.EnumHolder enumHolder : existing) {
-                rtn.add(Enum.valueOf(clazz, enumHolder.value()));
+                rtn.add(Enum.valueOf(clazz, getEnumValue(enumHolder)));
             }
             return rtn;
         }
 
         public <T extends Enum<T>> @UnknownNullability T getEnum(String key, Class<T> clazz) {
             var existing = (ModAnnotation.EnumHolder) annotationData().get(key);
-            return existing == null ? null : Enum.valueOf(clazz, existing.value());
+            return existing == null ? null : Enum.valueOf(clazz, getEnumValue(existing));
         }
 
     }

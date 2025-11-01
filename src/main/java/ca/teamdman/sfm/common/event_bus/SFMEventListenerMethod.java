@@ -156,9 +156,9 @@ public class SFMEventListenerMethod<T extends Event> {
 
         Bus busType;
         if (IModBusEvent.class.isAssignableFrom(eventClass)) {
-            busType = SFMEventBus.Target.MOD;
+            busType = SFMEventBus.EventBusType.MOD;
         } else {
-            busType = SFMEventBus.Target.GAME;
+            busType = SFMEventBus.EventBusType.GAME;
         }
         return busType;
     }
