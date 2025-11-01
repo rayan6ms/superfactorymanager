@@ -4,6 +4,7 @@ import ca.teamdman.sfm.client.registry.SFMMenuScreens;
 import ca.teamdman.sfm.client.registry.SFMTextEditorActions;
 import ca.teamdman.sfm.client.registry.SFMTextEditors;
 import ca.teamdman.sfm.common.config.SFMConfig;
+import ca.teamdman.sfm.common.event_bus.SFMAutomaticEventSubscriber;
 import ca.teamdman.sfm.common.registry.*;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.common.Mod;
@@ -38,5 +39,6 @@ public class SFM {
         SFMConfig.register(ModLoadingContext.get());
         bus.addListener((FMLClientSetupEvent e) -> SFMMenuScreens.register());
         bus.addListener((FMLCommonSetupEvent e) -> SFMPackets.register());
+        SFMAutomaticEventSubscriber.attachEventBusSubscribers();
     }
 }
