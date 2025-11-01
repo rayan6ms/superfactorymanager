@@ -4,7 +4,6 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.util.SFMAnnotationUtils;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.IEventListener;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.IModBusEvent;
 import org.jetbrains.annotations.NotNull;
@@ -17,7 +16,7 @@ import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
 @SuppressWarnings("FieldCanBeLocal")
-public class SFMEventListenerMethod<T extends Event> implements IEventListener {
+public class SFMEventListenerMethod<T extends Event> {
     private final Method method;
 
     private final @Nullable Object target;
@@ -96,17 +95,6 @@ public class SFMEventListenerMethod<T extends Event> implements IEventListener {
             busType = SFMEventBus.Target.GAME;
         }
         return busType;
-    }
-
-    @Override
-    public void invoke(Event event) {
-
-    }
-
-    @Override
-    public String listenerName() {
-
-        return IEventListener.super.listenerName();
     }
 
     public Consumer<T> createConsumer() {
