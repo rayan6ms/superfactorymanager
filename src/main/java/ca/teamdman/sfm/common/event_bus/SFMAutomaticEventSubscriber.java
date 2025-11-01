@@ -24,7 +24,7 @@ public class SFMAutomaticEventSubscriber {
                         sides.add(SFMEnvironmentUtils.CLIENT_DIST);
                         sides.add(SFMEnvironmentUtils.SERVER_DIST);
                     }
-                    ;
+
                     Dist currentDist = FMLEnvironment.dist;
                     return sides.contains(currentDist);
                 })
