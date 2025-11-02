@@ -445,12 +445,18 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                     if (lastProgramWithSyntaxHighlighting.isEmpty()) {
                         return false;
                     }
-                    boolean selecting = Screen.hasShiftDown();
-                    this.textField.setSelecting(selecting);
+                    // Focus the editor so the caret blinks and keys go here
+                    this.setFocused(true);
+
+                    boolean shiftDown = Screen.hasShiftDown();
+                    // Move cursor to the click position
                     seekCursorFromPoint(mx, my);
-                    if (!selecting) {
+                    // If not extending with Shift, start a new selection anchor at the click
+                    if (!shiftDown) {
                         this.textField.selectCursor = this.textField.cursor;
                     }
+                    // Enable selection so dragging extends from the anchor
+                    this.textField.setSelecting(true);
                     return true;
                 }
                 return super.mouseClicked(mx, my, button);
@@ -480,13 +486,9 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                     if (lastProgramWithSyntaxHighlighting.isEmpty()) {
                         return false;
                     }
-                    boolean shiftDown = Screen.hasShiftDown();
+                    // Keep selection active while dragging and update cursor
                     this.textField.setSelecting(true);
                     seekCursorFromPoint(mx, my);
-                    this.textField.setSelecting(shiftDown);
-                    if (!shiftDown) {
-                        this.textField.selectCursor = this.textField.cursor;
-                    }
                     return true;
                 }
             } catch (Exception e) {
@@ -500,6 +502,15 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             }
 
             return super.mouseDragged(mx, my, button, dx, dy);
+        }
+
+        @Override
+        public boolean mouseReleased(double mx, double my, int button) {
+            if (button == 0) {
+                // Stop active selection on mouse up
+                this.textField.setSelecting(false);
+            }
+            return super.mouseReleased(mx, my, button);
         }
 
         public int getSelectionCursorPosition() {
