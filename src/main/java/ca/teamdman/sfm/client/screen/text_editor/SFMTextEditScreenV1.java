@@ -85,7 +85,8 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                     }
                     seen.addAndGet(content.length());
                     return Optional.empty();
-                }, Style.EMPTY
+                },
+                Style.EMPTY
         );
         return rtn;
     }
@@ -359,7 +360,10 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         );
         this.addRenderableWidget(
                 new SFMButtonBuilder()
-                        .setPosition(this.width / 2 - 2 - 150, this.height / 2 - 100 + 195)
+                        .setPosition(
+                                this.width / 2 - 2 - 150,
+                                this.height / 2 - 100 + 195
+                        )
                         .setSize(200, 20)
                         .setText(CommonComponents.GUI_DONE)
                         .setOnPress((button) -> this.saveAndClose())
@@ -368,7 +372,10 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         );
         this.addRenderableWidget(
                 new SFMButtonBuilder()
-                        .setPosition(this.width / 2 - 2 + 100, this.height / 2 - 100 + 195)
+                        .setPosition(
+                                this.width / 2 - 2 + 100,
+                                this.height / 2 - 100 + 195
+                        )
                         .setSize(100, 20)
                         .setText(CommonComponents.GUI_CANCEL)
                         .setOnPress((button) -> this.onClose())
@@ -577,7 +584,6 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             );
             List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(intellisenseContext);
             SFMTextEditScreenV1.this.suggestedActions.setItems(suggestions);
-
 
             // Update the intellisense picklist query used to sort the suggestions
             String cursorWord = buildResult.getWordAtCursorPosition(cursorPosition);
