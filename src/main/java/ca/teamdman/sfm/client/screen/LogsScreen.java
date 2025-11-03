@@ -335,6 +335,9 @@ public class LogsScreen extends Screen {
 
         private boolean scrollbarDragActive;
 
+        /// Used to debounce scrolling when click-dragging to select text.
+        private boolean scrollingEnabled = true;
+
         public MyMultiLineEditBox() {
 
             super(
@@ -484,6 +487,13 @@ public class LogsScreen extends Screen {
             return super.mouseReleased(mx, my, button);
         }
 
+        @Override
+        protected void setScrollAmount(double pScrollAmount) {
+
+            if (!scrollingEnabled) return;
+            super.setScrollAmount(pScrollAmount);
+        }
+
         private void rebuildDisplayCache() {
 
             this.lastPlainText = this.textField.value();
@@ -519,10 +529,13 @@ public class LogsScreen extends Screen {
             int lineIndex = Mth.clamp(
                     (int) Math.floor(innerY / Math.max(1, this.font.lineHeight)),
                     0,
-                    Math.max(0, content.size() - 1)
+                    Math.max(0, lineCount - 1)
             );
             int cursorPosition = pointToCursor(innerX, lineIndex);
+
+            this.scrollingEnabled = false;
             this.textField.seekCursor(Whence.ABSOLUTE, cursorPosition);
+            this.scrollingEnabled = true;
         }
 
         private int getLineStartIndex(int lineIndex) {

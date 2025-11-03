@@ -393,6 +393,9 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
 
         private boolean scrollbarDragActive;
 
+        /// Used to debounce scrolling when click-dragging to select text.
+        private boolean scrollingEnabled = true;
+
         public MyMultiLineEditBox() {
 
             super(
@@ -564,9 +567,10 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         }
 
         @Override
-        public void setScrollAmount(double d) {
+        protected void setScrollAmount(double pScrollAmount) {
 
-            super.setScrollAmount(d);
+            if (!scrollingEnabled) return;
+            super.setScrollAmount(pScrollAmount);
         }
 
         private void seekCursorFromPoint(
@@ -583,12 +587,15 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             );
             double innerY = my - (this.y + this.innerPadding()) + this.scrollAmount();
             int lineIndex = Mth.clamp(
-                    (int) Math.floor(innerY / this.font.lineHeight),
+                    (int) Math.floor(innerY / Math.max(1, this.font.lineHeight)),
                     0,
                     Math.max(0, lineCount - 1)
             );
             int cursorPosition = pointToCursor(innerX, lineIndex);
+
+            this.scrollingEnabled = false;
             this.textField.seekCursor(Whence.ABSOLUTE, cursorPosition);
+            this.scrollingEnabled = true;
         }
 
         private int getLineStartIndex(int lineIndex) {
