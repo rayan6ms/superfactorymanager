@@ -447,16 +447,16 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         @MCVersionDependentBehaviour
         @Override
         public boolean mouseClicked(
-                double mx,
-                double my,
-                int button
+                double pMouseX,
+                double pMouseY,
+                int pButton
         ) {
 
             try {
-                if (button == 0) {
+                if (pButton == 0) {
                     this.scrollbarDragActive = false;
                 }
-                if (button == 0 && this.visible && this.withinContentAreaPoint(mx, my)) {
+                if (pButton == 0 && this.visible && this.withinContentAreaPoint(pMouseX, pMouseY)) {
                     if (content.isEmpty()) {
                         return false;
                     }
@@ -465,7 +465,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
 
                     boolean shiftDown = Screen.hasShiftDown();
                     // Move cursor to the click position
-                    seekCursorFromPoint(mx, my);
+                    seekCursorFromPoint(pMouseX, pMouseY);
                     // If not extending with Shift, start a new selection anchor at the click
                     if (!shiftDown) {
                         this.textField.selectCursor = this.textField.cursor;
@@ -475,18 +475,18 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                     return true;
                 }
                 boolean clickedScrollbar =
-                        button == 0
+                        pButton == 0
                         && this.visible
                         && this.scrollbarVisible()
-                        && mx >= SFMWidgetUtils.getX(this) + this.width
-                        && mx <= SFMWidgetUtils.getX(this) + this.width + 8
-                        && my >= SFMWidgetUtils.getY(this)
-                        && my < SFMWidgetUtils.getY(this) + this.height;
+                        && pMouseX >= SFMWidgetUtils.getX(this) + this.width
+                        && pMouseX <= SFMWidgetUtils.getX(this) + this.width + 8
+                        && pMouseY >= SFMWidgetUtils.getY(this)
+                        && pMouseY < SFMWidgetUtils.getY(this) + this.height;
                 if (clickedScrollbar) {
                     this.scrollbarDragActive = true;
                 }
 
-                return super.mouseClicked(mx, my, button);
+                return super.mouseClicked(pMouseX, pMouseY, pButton);
             } catch (Exception e) {
                 SFM.LOGGER.error("Error in SFMTextEditScreenV1.MyMultiLineEditBox.mouseClicked", e);
                 return false;
