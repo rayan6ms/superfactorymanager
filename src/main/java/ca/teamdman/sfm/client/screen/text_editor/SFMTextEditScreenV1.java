@@ -622,6 +622,13 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             String plainLine = content.get(clampedLine).getString();
             int clampedX = (int) Math.max(0, innerX);
             int cursorOffsetInLine = this.font.plainSubstrByWidth(plainLine, clampedX).length();
+            int widthBeforeCursor = this.font.width(plainLine.substring(0, cursorOffsetInLine));
+            if (cursorOffsetInLine < plainLine.length()) {
+                int nextGlyphWidth = this.font.width(plainLine.substring(cursorOffsetInLine, cursorOffsetInLine + 1));
+                if ((double) (clampedX - widthBeforeCursor) >= nextGlyphWidth / 2.0D) {
+                    cursorOffsetInLine = Math.min(plainLine.length(), cursorOffsetInLine + 1);
+                }
+            }
             return Mth.clamp(
                     lineStartIndex + cursorOffsetInLine,
                     0,

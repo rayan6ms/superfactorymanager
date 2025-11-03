@@ -40,8 +40,10 @@ END
 ---- Not being used by production logic yet
 -- Fixed disjoint text selection when using left click to select text in the editor #396
 ---- Thank you @Zexylz for the contribution!
--- Fixed text editor scroll bar state being in drag mode when it should not
+-- Fixed text editor scroll bar inappropriately responding to mouse events
 -- Improved text editor performance on large documents by using virtual scrolling
+-- Click-drag text selection now uses character midpoint for determining if a character is in selection
+
 
 ---- 4.26.0 ----
 -- Add new textures from #343, thanks MHanHanBing
