@@ -5,18 +5,8 @@ import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.AbstractWidget;
 
 public class SFMScreenRenderUtils {
-    @MCVersionDependentBehaviour
-    public static int getX(AbstractWidget widget) {
-        return widget.getX();
-    }
-    @MCVersionDependentBehaviour
-    public static int getY(AbstractWidget widget) {
-        return widget.getY();
-    }
-
 
     @MCVersionDependentBehaviour
     public static void enableKeyRepeating() {
