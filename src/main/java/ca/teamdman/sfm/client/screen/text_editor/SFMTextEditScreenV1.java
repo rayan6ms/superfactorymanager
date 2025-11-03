@@ -3,10 +3,7 @@ package ca.teamdman.sfm.client.screen.text_editor;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
-import ca.teamdman.sfm.client.screen.SFMFontUtils;
-import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
-import ca.teamdman.sfm.client.screen.SFMScreenRenderUtils;
-import ca.teamdman.sfm.client.screen.SFMTextEditorConfigScreen;
+import ca.teamdman.sfm.client.screen.*;
 import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
 import ca.teamdman.sfm.client.widget.PickList;
 import ca.teamdman.sfm.client.widget.PickListItem;
@@ -436,7 +433,6 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             this.textField.seekCursor(Whence.ABSOLUTE, cursor);
         }
 
-
         @Override
         public int getScrollBarHeight() {
             // Fix #307: divide by zero exception in AbstractScrollWidget.mouseDragged
@@ -482,13 +478,14 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                         button == 0
                         && this.visible
                         && this.scrollbarVisible()
-                        && mx >= this.x + this.width
-                        && mx <= this.x + this.width + 8
-                        && my >= this.y
-                        && my < this.y + this.height;
+                        && mx >= SFMWidgetUtils.getX(this) + this.width
+                        && mx <= SFMWidgetUtils.getX(this) + this.width + 8
+                        && my >= SFMWidgetUtils.getY(this)
+                        && my < SFMWidgetUtils.getY(this) + this.height;
                 if (clickedScrollbar) {
                     this.scrollbarDragActive = true;
                 }
+
                 return super.mouseClicked(mx, my, button);
             } catch (Exception e) {
                 SFM.LOGGER.error("Error in SFMTextEditScreenV1.MyMultiLineEditBox.mouseClicked", e);
@@ -771,7 +768,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             final int viewLineIndexEnd = Math.min(lines.size(), viewLineIndexStart + numVisibleLines);
 
             final int lineX =
-                    SFMScreenRenderUtils.getX(this) + this.innerPadding()
+                    SFMWidgetUtils.getX(this) + this.innerPadding()
                     + SFMTextEditorUtils.getLineNumberWidth(this.font, content.size());
 
             boolean isCursorAtEndOfLine = false;
@@ -780,7 +777,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             // IMPORTANT: do not subtract (scroll % lineHeight) here.
             // The parent has already translated by -scrollAmount.
             // Draw at content-space Y positions as if there was no scrolling:
-            final int contentTopY = SFMScreenRenderUtils.getY(this) + this.innerPadding();
+            final int contentTopY = SFMWidgetUtils.getY(this) + this.innerPadding();
             int lineY = contentTopY + viewLineIndexStart * lineHeight;
             int charCountAccum = getLineStartIndex(viewLineIndexStart);
 

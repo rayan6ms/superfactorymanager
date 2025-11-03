@@ -418,13 +418,14 @@ public class LogsScreen extends Screen {
                         button == 0
                         && this.visible
                         && this.scrollbarVisible()
-                        && mx >= this.x + this.width
-                        && mx <= this.x + this.width + 8
-                        && my >= this.y
-                        && my < this.y + this.height;
+                        && mx >= SFMWidgetUtils.getX(this) + this.width
+                        && mx <= SFMWidgetUtils.getX(this) + this.width + 8
+                        && my >= SFMWidgetUtils.getY(this)
+                        && my < SFMWidgetUtils.getY(this) + this.height;
                 if (clickedScrollbar) {
                     this.scrollbarDragActive = true;
                 }
+
                 return super.mouseClicked(mx, my, button);
             } catch (Exception e) {
                 SFM.LOGGER.error("Error in LogsScreen.MyMultiLineEditBox.mouseClicked", e);
@@ -620,7 +621,7 @@ public class LogsScreen extends Screen {
             final int viewLineIndexEnd = Math.min(lines.size(), viewLineIndexStart + numVisibleLines);
 
             final int lineX =
-                    SFMScreenRenderUtils.getX(this) + this.innerPadding()
+                    SFMWidgetUtils.getX(this) + this.innerPadding()
                     + SFMTextEditorUtils.getLineNumberWidth(this.font, content.size());
 
             boolean isCursorAtEndOfLine = false;
@@ -629,7 +630,7 @@ public class LogsScreen extends Screen {
             // IMPORTANT: do not subtract (scroll % lineHeight) here.
             // The parent has already translated by -scrollAmount.
             // Draw at content-space Y positions as if there was no scrolling:
-            final int contentTopY = SFMScreenRenderUtils.getY(this) + this.innerPadding();
+            final int contentTopY = SFMWidgetUtils.getY(this) + this.innerPadding();
             int lineY = contentTopY + viewLineIndexStart * lineHeight;
             int charCountAccum = getLineStartIndex(viewLineIndexStart);
 

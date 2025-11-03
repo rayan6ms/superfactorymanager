@@ -2,6 +2,7 @@ package ca.teamdman.sfm.client.widget;
 
 import ca.teamdman.sfm.client.screen.SFMFontUtils;
 import ca.teamdman.sfm.client.screen.SFMScreenRenderUtils;
+import ca.teamdman.sfm.client.screen.SFMWidgetUtils;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
@@ -219,14 +220,14 @@ public class PickList<T extends PickListItem> extends AbstractScrollWidget {
         // Only render the visible items
         Matrix4f matrix4f = poseStack.last().pose();
         var buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
-        int lineX = SFMScreenRenderUtils.getX(this) + this.innerPadding();
+        int lineX = SFMWidgetUtils.getX(this) + this.innerPadding();
         Rect2i highlight = null;
 
         // Render only the visible subset of items
         for (int i = startIndex; i < endIndex; i++) {
             PickListItem item = items.get(i);
             // Calculate the y position based on the item's position in the full list
-            int lineY = SFMScreenRenderUtils.getY(this) + this.innerPadding() + (i * itemHeight);
+            int lineY = SFMWidgetUtils.getY(this) + this.innerPadding() + (i * itemHeight);
 
             SFMFontUtils.drawInBatch(
                     item.getComponent(),

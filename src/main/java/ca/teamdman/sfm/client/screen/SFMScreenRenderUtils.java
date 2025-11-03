@@ -6,19 +6,9 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.renderer.GameRenderer;
 
 public class SFMScreenRenderUtils {
-    @MCVersionDependentBehaviour
-    public static int getX(AbstractWidget widget) {
-        return widget.x;
-    }
-    @MCVersionDependentBehaviour
-    public static int getY(AbstractWidget widget) {
-        return widget.y;
-    }
-
 
     @MCVersionDependentBehaviour
     public static void enableKeyRepeating() {
