@@ -422,6 +422,8 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
 
         private String cachedBuildProgram = "";
 
+    private boolean scrollbarDragActive;
+
         public MyMultiLineEditBox() {
 
             super(
@@ -441,6 +443,15 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         public void scrollToTop() {
 
             this.setScrollAmount(0);
+        }
+
+        @Override
+        public void setFocused(boolean focused) {
+
+            super.setFocused(focused);
+            if (!focused) {
+                this.scrollbarDragActive = false;
+            }
         }
 
         public int getCursorPosition() {
@@ -482,6 +493,9 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         ) {
 
             try {
+                if (button == 0) {
+                    this.scrollbarDragActive = false;
+                }
                 if (button == 0 && this.visible && this.withinContentAreaPoint(mx, my)) {
                     if (lastProgramWithSyntaxHighlighting.isEmpty()) {
                         return false;
@@ -499,6 +513,17 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                     // Enable selection so dragging extends from the anchor
                     this.textField.setSelecting(true);
                     return true;
+                }
+                boolean clickedScrollbar =
+                        button == 0
+                        && this.visible
+                        && this.scrollbarVisible()
+                        && mx >= this.x + this.width
+                        && mx <= this.x + this.width + 8
+                        && my >= this.y
+                        && my < this.y + this.height;
+                if (clickedScrollbar) {
+                    this.scrollbarDragActive = true;
                 }
                 return super.mouseClicked(mx, my, button);
             } catch (Exception e) {
@@ -522,6 +547,12 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                 double dx,
                 double dy
         ) {
+            // IMPORTANT: give the scrollbar drag priority.
+            // If the drag started on the scrollbar, AbstractScrollWidget will
+            // consume this, and we should not start a text selection.
+            if (this.scrollbarDragActive && super.mouseDragged(mx, my, button, dx, dy)) {
+                return true;
+            }
 
             try {
                 if (button == 0 && this.visible && this.withinContentAreaPoint(mx, my)) {
@@ -537,13 +568,8 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                 SFM.LOGGER.error("Error in SFMTextEditScreenV1.MyMultiLineEditBox.mouseDragged", e);
                 return false;
             }
-            // if mouse in bounds, translate to accommodate line numbers
-            int thisX = SFMScreenRenderUtils.getX(this);
-            if (mx >= thisX + 1 && mx <= thisX + this.width - 1) {
-                mx -= getLineNumberWidth();
-            }
 
-            return super.mouseDragged(mx, my, button, dx, dy);
+            return false;
         }
 
         @Override
@@ -556,6 +582,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             if (button == 0) {
                 // Stop active selection on mouse up
                 this.textField.setSelecting(false);
+                this.scrollbarDragActive = false;
             }
             return super.mouseReleased(mx, my, button);
         }
