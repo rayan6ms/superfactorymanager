@@ -577,12 +577,12 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
 
             int lineCount = content.size();
             double innerX = mx - (
-                    this.x + this.innerPadding() + SFMTextEditorUtils.getLineNumberWidth(
+                    SFMWidgetUtils.getX(this) + this.innerPadding() + SFMTextEditorUtils.getLineNumberWidth(
                             this.font,
                             lineCount
                     )
             );
-            double innerY = my - (this.y + this.innerPadding()) + this.scrollAmount();
+            double innerY = my - (SFMWidgetUtils.getY(this) + this.innerPadding()) + this.scrollAmount();
             int lineIndex = Mth.clamp(
                     (int) Math.floor(innerY / Math.max(1, this.font.lineHeight)),
                     0,
