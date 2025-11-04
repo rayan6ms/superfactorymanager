@@ -20,6 +20,7 @@ import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
 import net.minecraft.client.gui.components.Button;
 import net.minecraft.client.gui.components.MultiLineEditBox;
@@ -225,7 +226,15 @@ public class LogsScreen extends Screen {
 
         super.init();
         assert this.minecraft != null;
-        this.textarea = this.addRenderableWidget(new MyMultiLineEditBox());
+        this.textarea = this.addRenderableWidget(new MyMultiLineEditBox(
+                LogsScreen.this.font,
+                LogsScreen.this.width / 2 - 200,
+                LogsScreen.this.height / 2 - 90,
+                400,
+                180,
+                Component.literal(""),
+                Component.literal("")
+        ));
 
         rebuildText();
 
@@ -344,16 +353,24 @@ public class LogsScreen extends Screen {
         /// Used to debounce scrolling when click-dragging to select text.
         private boolean scrollingEnabled = true;
 
-        public MyMultiLineEditBox() {
+        public MyMultiLineEditBox(
+                Font pFont,
+                int pX,
+                int pY,
+                int pWidth,
+                int pHeight,
+                Component pPlaceholder,
+                Component pMessage
+        ) {
 
             super(
-                    LogsScreen.this.font,
-                    LogsScreen.this.width / 2 - 200,
-                    LogsScreen.this.height / 2 - 90,
-                    400,
-                    180,
-                    Component.literal(""),
-                    Component.literal("")
+                    pFont,
+                    pX,
+                    pY,
+                    pWidth,
+                    pHeight,
+                    pPlaceholder,
+                    pMessage
             );
             rebuildDisplayCache();
         }

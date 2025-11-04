@@ -8,7 +8,6 @@ import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
 import ca.teamdman.sfm.client.widget.PickList;
 import ca.teamdman.sfm.client.widget.PickListItem;
 import ca.teamdman.sfm.client.widget.SFMButtonBuilder;
-import ca.teamdman.sfm.client.widget.SFMExtendedButtonWithTooltip;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
@@ -26,8 +25,8 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiComponent;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.MultiLineEditBox;
 import net.minecraft.client.gui.components.MultilineTextField.StringView;
 import net.minecraft.client.gui.components.Whence;
@@ -283,7 +282,15 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         super.init();
         SFMScreenRenderUtils.enableKeyRepeating();
 
-        this.textarea = this.addRenderableWidget(new MyMultiLineEditBox());
+        this.textarea = this.addRenderableWidget(new MyMultiLineEditBox(
+                SFMTextEditScreenV1.this.font,
+                SFMTextEditScreenV1.this.width / 2 - 200,
+                SFMTextEditScreenV1.this.height / 2 - 110,
+                400,
+                200,
+                Component.literal(""),
+                Component.literal("")
+        ));
 
         this.suggestedActions = this.addRenderableWidget(new PickList<>(
                 this.font,
@@ -365,16 +372,24 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         /// Used to debounce scrolling when click-dragging to select text.
         private boolean scrollingEnabled = true;
 
-        public MyMultiLineEditBox() {
+        public MyMultiLineEditBox(
+                Font pFont,
+                int pX,
+                int pY,
+                int pWidth,
+                int pHeight,
+                Component pPlaceholder,
+                Component pMessage
+        ) {
 
             super(
-                    SFMTextEditScreenV1.this.font,
-                    SFMTextEditScreenV1.this.width / 2 - 200,
-                    SFMTextEditScreenV1.this.height / 2 - 110,
-                    400,
-                    200,
-                    Component.literal(""),
-                    Component.literal("")
+                    pFont,
+                    pX,
+                    pY,
+                    pWidth,
+                    pHeight,
+                    pPlaceholder,
+                    pMessage
             );
             this.textField.setValueListener(this::onValueOrCursorChanged);
             this.textField.setCursorListener(() -> this.onValueOrCursorChanged(this.textField.value()));
