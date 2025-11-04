@@ -370,6 +370,8 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
 
         private String cachedBuildProgram = "";
 
+        private boolean scrollbarDragActive;
+
         /// Used to debounce scrolling when click-dragging to select text.
         private boolean scrollingEnabled = true;
 
@@ -402,6 +404,15 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             this.setScrollAmount(0);
         }
 
+        @Override
+        public void setFocused(boolean focused) {
+
+            super.setFocused(focused);
+            if (!focused) {
+                this.scrollbarDragActive = false;
+            }
+        }
+
         public int getCursorPosition() {
 
             return this.textField.cursor;
@@ -432,6 +443,9 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         ) {
 
             try {
+                if (pButton == 0) {
+                    this.scrollbarDragActive = false;
+                }
                 if (pButton == 0 && this.visible && this.withinContentAreaPoint(pMouseX, pMouseY)) {
                     if (content.isEmpty()) {
                         return false;
@@ -449,6 +463,17 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                     // Enable selection so dragging extends from the anchor
                     this.textField.setSelecting(true);
                     return true;
+                }
+                boolean clickedScrollbar =
+                        pButton == 0
+                        && this.visible
+                        && this.scrollbarVisible()
+                        && pMouseX >= SFMWidgetUtils.getX(this) + this.width
+                        && pMouseX <= SFMWidgetUtils.getX(this) + this.width + 8
+                        && pMouseY >= SFMWidgetUtils.getY(this)
+                        && pMouseY < SFMWidgetUtils.getY(this) + this.height;
+                if (clickedScrollbar) {
+                    this.scrollbarDragActive = true;
                 }
 
                 return super.mouseClicked(pMouseX, pMouseY, pButton);
@@ -476,7 +501,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             // IMPORTANT: give the scrollbar drag priority.
             // If the drag started on the scrollbar, AbstractScrollWidget will
             // consume this, and we should not start a text selection.
-            if (super.mouseDragged(mx, my, button, dx, dy)) {
+            if (this.scrollbarDragActive && super.mouseDragged(mx, my, button, dx, dy)) {
                 return true;
             }
 
@@ -496,6 +521,21 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             }
 
             return false;
+        }
+
+        @Override
+        public boolean mouseReleased(
+                double mx,
+                double my,
+                int button
+        ) {
+
+            if (button == 0) {
+                // Stop active selection on mouse up
+                this.textField.setSelecting(false);
+                this.scrollbarDragActive = false;
+            }
+            return super.mouseReleased(mx, my, button);
         }
 
         public int getSelectionCursorPosition() {
