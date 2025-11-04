@@ -1,10 +1,10 @@
 package ca.teamdman.sfm.client.screen.text_editor;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
 import ca.teamdman.sfm.client.screen.*;
 import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
+import ca.teamdman.sfm.client.text_styling.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.widget.PickList;
 import ca.teamdman.sfm.client.widget.PickListItem;
 import ca.teamdman.sfm.client.widget.SFMButtonBuilder;
@@ -527,10 +527,9 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
 
             int lineCount = content.size();
             double innerX = mx - (
-                    SFMWidgetUtils.getX(this) + this.innerPadding() + SFMTextEditorUtils.getLineNumberWidth(
-                            this.font,
-                            lineCount
-                    )
+                    SFMWidgetUtils.getX(this)
+                    + this.innerPadding()
+                    + SFMTextEditorUtils.getLineNumberWidth(this.font, lineCount)
             );
             double innerY = my - (SFMWidgetUtils.getY(this) + this.innerPadding()) + this.scrollAmount();
             int lineIndex = Mth.clamp(
@@ -664,10 +663,15 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         private void rebuild(boolean showContextActionHints) {
 
             lastProgram = this.textField.value();
-            content =
-                    ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(
-                            lastProgram, showContextActionHints);
+            content = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(
+                    lastProgram,
+                    showContextActionHints
+            );
 
+            rebuildDisplayCache();
+        }
+
+        private void rebuildDisplayCache() {
             // Rebuild displayed line-start offsets to match the raw text and
             // rendered lines
             displayedLineStartOffsets.clear();
@@ -700,6 +704,10 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             }
 
             final List<MutableComponent> lines = content;
+            if (lines.isEmpty()) {
+                return;
+            }
+
             final boolean isCursorVisible = this.isFocused() && this.frame / 6 % 2 == 0;
             final int cursorIndex = textField.cursor();
 
