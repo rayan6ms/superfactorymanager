@@ -360,6 +360,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         this.setInitialFocus(textarea);
     }
 
+    // TODO: enable scrolling without focus; respond to wheel events
     protected class MyMultiLineEditBox extends MultiLineEditBox {
         // Precomputed line start offsets for fast mapping; kept in sync in rebuild()
         private final List<Integer> displayedLineStartOffsets = new ArrayList<>();
