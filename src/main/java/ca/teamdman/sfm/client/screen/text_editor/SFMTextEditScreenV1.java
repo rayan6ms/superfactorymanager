@@ -266,41 +266,15 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             float partialTicks
     ) {
 
+        // render background
         this.renderBackground(poseStack);
+
+        // render widgets
         super.render(poseStack, mx, my, partialTicks);
-        this.renderTooltip(poseStack, mx, my);
-    }
 
-    protected void renderTooltip(
-            PoseStack pose,
-            int mx,
-            int my
-    ) {
-
-        if (Minecraft.getInstance().screen != this) {
-            // this should fix the annoying Ctrl+E popup when editing
-            this.renderables
-                    .stream()
-                    .filter(AbstractWidget.class::isInstance)
-                    .map(AbstractWidget.class::cast)
-                    .forEach(w -> w.setFocused(false));
-            return;
-        }
-        drawChildTooltips(pose, mx, my);
-    }
-
-    @MCVersionDependentBehaviour
-    private void drawChildTooltips(
-            PoseStack pose,
-            int mx,
-            int my
-    ) {
-        // 1.19.2: manually render button tooltips
-        this.renderables
-                .stream()
-                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
-                .map(SFMExtendedButtonWithTooltip.class::cast)
-                .forEach(x -> x.renderToolTip(pose, mx, my));
+        // render tooltips
+        SFMWidgetUtils.hideTooltipsWhenNotFocused(this, this.renderables);
+        SFMWidgetUtils.renderChildTooltips(poseStack, mx, my, this.renderables);
     }
 
     @Override

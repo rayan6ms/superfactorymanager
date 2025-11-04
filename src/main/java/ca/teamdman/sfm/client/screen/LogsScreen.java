@@ -121,8 +121,16 @@ public class LogsScreen extends Screen {
             float partialTicks
     ) {
 
+        // render background
         this.renderBackground(poseStack);
+
+        // render widgets
         super.render(poseStack, mx, my, partialTicks);
+
+        // render tooltips
+        SFMWidgetUtils.hideTooltipsWhenNotFocused(this, this.renderables);
+        SFMWidgetUtils.renderChildTooltips(poseStack, mx, my, this.renderables);
+
         if (!MENU.logLevel.equals(lastKnownLogLevel)) {
             onLogLevelChange();
         }
