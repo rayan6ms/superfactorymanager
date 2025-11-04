@@ -9,7 +9,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class SFMComponentUtils {
     public static MutableComponent substring(
-            MutableComponent component,
+            Component component,
             int start,
             int end
     ) {
@@ -30,6 +30,17 @@ public class SFMComponentUtils {
                 Style.EMPTY
         );
         return rtn;
+    }
+
+    public static int length(
+            Component component
+    ) {
+        AtomicInteger seen = new AtomicInteger(0);
+        component.visit(content -> {
+            seen.addAndGet(content.length());
+            return Optional.empty();
+        });
+        return seen.get();
     }
 
 }
