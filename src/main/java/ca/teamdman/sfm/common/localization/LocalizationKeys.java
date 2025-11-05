@@ -814,7 +814,7 @@ public final class LocalizationKeys {
     );
     public static final LocalizationEntry LOGS_GUI_NO_CONTENT = new LocalizationEntry(
             "gui.sfm.logs.no_content",
-            "Ahoy, world!\nChange the log level using the buttons at the top of this screen.\nLoud log levels will be reset after a single program execution.\nLogging can make statements take longer to execute.\nThe scrolling is wacky, I'm working on it.\nOnly a few hundred lines are drawn to reduce lag.\nUse the copy button to view in a better editor for now lol."
+            "Ahoy, world!\nChange the log level using the buttons at the top of this screen.\nTrace, debug, and info log levels will be turned off after a single program execution.\nLogging can make statements take longer to execute.\nUse the copy button to help view in a different editor."
     );
     public static final LocalizationEntry LOGS_MISSING_ADJACENT_CABLE = new LocalizationEntry(
             "gui.sfm.logs.missing_adjacent_cable",

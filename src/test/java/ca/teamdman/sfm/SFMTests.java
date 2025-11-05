@@ -1,7 +1,7 @@
 package ca.teamdman.sfm;
 
-import ca.teamdman.sfm.client.screen.text_editor.SFMTextEditScreenV1;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
+import ca.teamdman.sfm.common.util.SFMComponentUtils;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfml.ast.*;
 import com.mojang.datafixers.util.Pair;
@@ -34,7 +34,7 @@ public class SFMTests {
         var content = sb.toString();
         for (int start = 0; start < content.length(); start++) {
             for (int end = start; end < content.length(); end++) {
-                MutableComponent substring = SFMTextEditScreenV1.substring(component, start, end);
+                MutableComponent substring = SFMComponentUtils.substring(component, start, end);
                 assertEquals(content.substring(start, end), substring.getString());
             }
         }
