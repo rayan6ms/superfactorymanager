@@ -64,14 +64,14 @@ class LogsScreenMultiLineEditBox extends MultiLineEditBox {
         this.logsScreen = logsScreen;
     }
 
-    @Override
-    public void setFocused(boolean focused) {
-
-        super.setFocused(focused);
-        if (!focused) {
-            this.scrollbarDragActive = false;
-        }
-    }
+//    @Override
+//    public void setFocused(boolean focused) {
+//
+//        super.setFocused(focused);
+//        if (!focused) {
+//            this.scrollbarDragActive = false;
+//        }
+//    }
 
     public void scrollToBottom() {
 
