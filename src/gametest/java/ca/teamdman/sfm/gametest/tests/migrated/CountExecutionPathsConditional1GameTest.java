@@ -5,14 +5,13 @@ import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.program.linting.GatherWarningsProgramBehaviour;
+import ca.teamdman.sfm.common.program.linting.ProblemTracker;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 
 import java.util.ArrayList;
@@ -80,11 +79,7 @@ public class CountExecutionPathsConditional1GameTest extends SFMGameTestDefiniti
         assertTrue(warnings.isEmpty(), "expected 0 warning, got " + warnings.size());
 
         // count the execution paths
-        GatherWarningsProgramBehaviour simulation = new GatherWarningsProgramBehaviour(x -> {
-            for (TranslatableContents problem : x) {
-                warnings.add(MutableComponent.create(problem));
-            }
-        });
+        GatherWarningsProgramBehaviour simulation = new GatherWarningsProgramBehaviour(new ProblemTracker());
         program.tick(ProgramContext.createSimulationContext(
                 program,
                 labelPositionHolder,

@@ -1,6 +1,7 @@
-package ca.teamdman.sfm.client;
+package ca.teamdman.sfm.client.text_styling;
 
 import ca.teamdman.langs.SFMLLexer;
+import ca.teamdman.sfm.client.ProgramTokenContextActions;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
@@ -81,6 +82,10 @@ public class ProgramSyntaxHighlightingHelper {
             case SFMLLexer.EAST:
             case SFMLLexer.WEST:
             case SFMLLexer.EACH:
+            case SFMLLexer.LEFT:
+            case SFMLLexer.RIGHT:
+            case SFMLLexer.FRONT:
+            case SFMLLexer.BACK:
                 return ChatFormatting.DARK_PURPLE;
             case SFMLLexer.LINE_COMMENT:
                 return ChatFormatting.GRAY;

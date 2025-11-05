@@ -3,23 +3,32 @@ package ca.teamdman.sfm.common.program.linting;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfml.ast.Program;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-
 public interface IProgramLinter {
-    ArrayList<TranslatableContents> gatherWarnings(
+    void gatherWarnings(
             Program program,
             LabelPositionHolder labelPositionHolder,
-            @Nullable
-            ManagerBlockEntity managerBlockEntity
+            @Nullable ManagerBlockEntity managerBlockEntity,
+            ProblemTracker tracker
     );
 
+    /// This method can update the disk program but should not modify the warnings since we will
+    /// recompute the warnings after fixing.
     void fixWarnings(
-            ManagerBlockEntity managerBlockEntity,
-            ItemStack diskStack,
-            Program program
+            Program program,
+            LabelPositionHolder labels,
+            ManagerBlockEntity manager,
+            Level level,
+            ItemStack disk
     );
+    /*
+    todo:
+
+        // update warnings on the disk itself
+        var updatedWarnings = gatherWarnings(program, labels, manager, tracker);
+        DiskItem.setWarnings(disk, updatedWarnings);
+     */
 }

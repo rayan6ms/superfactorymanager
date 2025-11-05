@@ -1,9 +1,12 @@
-package ca.teamdman.sfm.common.program.linting;
+package ca.teamdman.sfm.common.program.linting.compat.mekanism;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
 import ca.teamdman.sfm.common.compat.SFMModCompat;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
+import ca.teamdman.sfm.common.program.linting.IProgramLinter;
+import ca.teamdman.sfm.common.program.linting.ProblemTracker;
+import ca.teamdman.sfm.common.util.SFMStreamUtils;
 import ca.teamdman.sfml.ast.*;
 import com.mojang.datafixers.util.Pair;
 import mekanism.api.RelativeSide;
@@ -14,87 +17,75 @@ import mekanism.common.tile.component.config.DataType;
 import mekanism.common.tile.interfaces.ISideConfiguration;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNING_MEKANISM_BAD_SIDE_CONFIG;
-import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNING_MEKANISM_USED_WITHOUT_DIRECTION;
+import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNING_MEKANISM_USED_WITH_NULL_DIRECTION;
 
-public class MekanismSideConfigProgramLinter implements IProgramLinter {
+public class MekanismSidednessProgramLinter implements IProgramLinter {
 
     @Override
-    public ArrayList<TranslatableContents> gatherWarnings(
+    public void gatherWarnings(
             Program program,
-            LabelPositionHolder labelPositionHolder,
-            @Nullable ManagerBlockEntity managerBlockEntity
+            LabelPositionHolder labels,
+            @Nullable ManagerBlockEntity manager,
+            ProblemTracker tracker
     ) {
-        ArrayList<TranslatableContents> warnings = new ArrayList<>();
 
-        if (!SFMModCompat.isMekanismLoaded()) {
-            return warnings;
-        }
-        if (managerBlockEntity == null) {
-            return warnings;
-        }
-
-        Level level = managerBlockEntity.getLevel();
-        if (level == null) {
-            return warnings;
-        }
+        if (manager == null) return;
+        Level level = manager.getLevel();
+        if (level == null) return;
 
         // We only care about IO statements in the program
-        program.getDescendantStatements()
+        Stream<IOStatement> ioStatements = program.getDescendantStatements()
                 .filter(IOStatement.class::isInstance)
-                .map(IOStatement.class::cast)
-                .forEach(statement ->
-                                 addWarningsForMekanismAccess(statement, labelPositionHolder, statement, level, warnings)
-                );
-
-        return warnings;
+                .map(IOStatement.class::cast);
+        for (IOStatement statement : SFMStreamUtils.iterate(ioStatements)) {
+            if (gatherWarningsForIOStatement(statement, labels, statement, level, tracker).isSaturated()) {
+                break;
+            }
+        }
     }
 
     @Override
     public void fixWarnings(
-            ManagerBlockEntity managerBlockEntity,
-            ItemStack diskStack,
-            Program program
+            Program program,
+            LabelPositionHolder labels,
+            ManagerBlockEntity manager,
+            Level level,
+            ItemStack disk
     ) {
-        if (!SFMModCompat.isMekanismLoaded()) return;
-        if (managerBlockEntity == null || managerBlockEntity.getLevel() == null) {
-            return;
-        }
-        Level level = managerBlockEntity.getLevel();
-
         program.getDescendantStatements()
                 .filter(IOStatement.class::isInstance)
                 .map(IOStatement.class::cast)
                 .forEach(statement ->
-                                 fixWarningsByModifyingMekanismAccess(statement, LabelPositionHolder.from(diskStack), level)
+                                 fixWarningsByModifyingMekanismAccess(
+                                         statement,
+                                         LabelPositionHolder.from(disk),
+                                         level
+                                 )
                 );
     }
 
-    // ------------------------------------------
-    // PRIVATE METHODS
-    // ------------------------------------------
-
-    private static void addWarningsForMekanismAccess(
+    private static ProblemTracker.AddProblemResult gatherWarningsForIOStatement(
             IOStatement ioStatement,
             LabelPositionHolder labelPositionHolder,
             IOStatement statement,
             Level level,
-            ArrayList<TranslatableContents> warnings
+            ProblemTracker warnings
     ) {
-        if (!SFMModCompat.isMekanismLoaded()) return;
 
-        DirectionQualifier directions = statement.labelAccess().directions();
+        SideQualifier sides = statement.labelAccess().sides();
         Stream<Pair<ca.teamdman.sfml.ast.Label, BlockPos>> mekanismBlocks = statement
                 .labelAccess()
                 .getLabelledPositions(labelPositionHolder)
@@ -102,14 +93,16 @@ public class MekanismSideConfigProgramLinter implements IProgramLinter {
                 .filter(pair -> level.isLoaded(pair.getSecond()))
                 .filter(pair -> SFMModCompat.isMekanismBlock(level, pair.getSecond()));
 
-        if (directions.equals(DirectionQualifier.NULL_DIRECTION)) {
-            // No side specified
-            mekanismBlocks.forEach(pair ->
-                                           warnings.add(PROGRAM_WARNING_MEKANISM_USED_WITHOUT_DIRECTION.get(
-                                                   pair.getFirst(),
-                                                   statement.toStringPretty()
-                                           ))
-            );
+        if (sides.sides().contains(Side.NULL)) {
+            for (Pair<Label, BlockPos> pair : SFMStreamUtils.iterate(mekanismBlocks)) {
+                Label label = pair.getFirst();
+                if (warnings.add(PROGRAM_WARNING_MEKANISM_USED_WITH_NULL_DIRECTION.get(
+                        label,
+                        statement.toStringPretty()
+                )).isSaturated()) {
+                    return ProblemTracker.AddProblemResult.TOO_MANY_PROBLEMS;
+                }
+            }
         } else {
             // Check side config
             EnumSet<TransmissionType> referencedTransmissionTypes = SFMMekanismCompat
@@ -130,14 +123,16 @@ public class MekanismSideConfigProgramLinter implements IProgramLinter {
 
             mekanismBlocks.forEach(pair -> {
                 BlockPos blockPos = pair.getSecond();
-                if (level.getBlockEntity(blockPos) instanceof ISideConfiguration mekBlockEntity) {
+                BlockEntity blockEntity = level.getBlockEntity(blockPos);
+                if (blockEntity instanceof ISideConfiguration mekBlockEntity) {
                     TileComponentConfig config = mekBlockEntity.getConfig();
+                    BlockState blockState = blockEntity.getBlockState();
                     for (TransmissionType transmissionType : referencedTransmissionTypes) {
                         boolean anySuccess = false;
                         ConfigInfo transmissionConfig = config.getConfig(transmissionType);
                         if (transmissionConfig != null) {
                             Set<Direction> activeSides = SFMMekanismCompat.getSides(transmissionConfig, mekBlockEntity, dataTypePredicate);
-                            for (Direction direction : directions) {
+                            for (Direction direction : sides.resolve(blockState)) {
                                 if (activeSides.contains(direction)) {
                                     anySuccess = true;
                                     break;
@@ -155,6 +150,7 @@ public class MekanismSideConfigProgramLinter implements IProgramLinter {
                 }
             });
         }
+        return ProblemTracker.AddProblemResult.SUCCESS;
     }
 
     private static void fixWarningsByModifyingMekanismAccess(
@@ -162,13 +158,16 @@ public class MekanismSideConfigProgramLinter implements IProgramLinter {
             LabelPositionHolder labelPositionHolder,
             Level level
     ) {
-        DirectionQualifier directions = statement.labelAccess().directions();
-        Stream<Pair<ca.teamdman.sfml.ast.Label, BlockPos>> mekanismBlocks =
-                statement.labelAccess()
-                        .getLabelledPositions(labelPositionHolder)
-                        .stream()
-                        .filter(pair -> SFMModCompat.isMekanismBlock(level, pair.getSecond()));
 
+        SideQualifier sides = statement.labelAccess().sides();
+        Stream<Pair<Label, BlockPos>> mekanismBlocks = statement
+                .labelAccess()
+                .getLabelledPositions(labelPositionHolder)
+                .stream()
+                .filter(pair -> level.isLoaded(pair.getSecond()))
+                .filter(pair -> SFMModCompat.isMekanismBlock(level, pair.getSecond()));
+
+        // add warning if interacting with mekanism but the mekanism side config is not ALLOW
         EnumSet<TransmissionType> referencedTransmissionTypes = SFMMekanismCompat
                 .getReferencedTransmissionTypes(statement);
 
@@ -177,33 +176,36 @@ public class MekanismSideConfigProgramLinter implements IProgramLinter {
         DataType fixed;
         if (statement instanceof InputStatement) {
             dataTypePredicate = DataType::canOutput;
-            fixed = DataType.OUTPUT;
+            fixed = DataType.OUTPUT; // to input from it, it must be set to output
         } else if (statement instanceof OutputStatement) {
             dataTypePredicate = dataType -> dataType == DataType.INPUT
                                             || dataType == DataType.INPUT_OUTPUT
                                             || dataType == DataType.INPUT_1
                                             || dataType == DataType.INPUT_2;
-            fixed = DataType.INPUT;
+            fixed = DataType.INPUT; // to output from it, it must be set to input
         } else {
             throw new IllegalStateException("Unexpected value: " + statement);
         }
 
         mekanismBlocks.forEach(pair -> {
             BlockPos blockPos = pair.getSecond();
-            if (level.getBlockEntity(blockPos) instanceof ISideConfiguration mekBlockEntity) {
+            BlockEntity blockEntity = level.getBlockEntity(blockPos);
+            if (blockEntity instanceof ISideConfiguration mekBlockEntity) {
                 TileComponentConfig mekBlockEntityConfig = mekBlockEntity.getConfig();
+                BlockState blockState = blockEntity.getBlockState();
+                Set<@Nullable Direction> directions = new HashSet<>(sides.resolve(blockState));
                 for (TransmissionType transmissionType : referencedTransmissionTypes) {
                     ConfigInfo transmissionConfig = mekBlockEntityConfig.getConfig(transmissionType);
                     if (transmissionConfig != null) {
                         Set<Direction> activeSides = SFMMekanismCompat.getSides(transmissionConfig, mekBlockEntity, dataTypePredicate);
                         boolean anySuccess = directions.stream().anyMatch(activeSides::contains);
                         if (!anySuccess) {
-                            // pick the first direction from the statement
-                            Direction statementSide = directions.iterator().next();
-                            if (statementSide != null) {
+                            // we want to enable a side for the transmission type
+                            @Nullable Direction directionToEnable = sides.getNonNullDirection(blockState);
+                            if (directionToEnable != null) {
                                 RelativeSide relativeSide = RelativeSide.fromDirections(
                                         mekBlockEntity.getDirection(),
-                                        statementSide
+                                        directionToEnable
                                 );
                                 transmissionConfig.setDataType(fixed, relativeSide);
                                 mekBlockEntityConfig.sideChanged(transmissionType, relativeSide);
@@ -214,4 +216,5 @@ public class MekanismSideConfigProgramLinter implements IProgramLinter {
             }
         });
     }
+
 }

@@ -9,7 +9,7 @@ import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
-import ca.teamdman.sfml.ast.DirectionQualifier;
+import ca.teamdman.sfml.ast.Side;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -21,29 +21,35 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 public record ServerboundNetworkToolUsePacket(
         BlockPos blockPosition,
+
         Direction blockFace
 ) implements SFMPacket {
     public static class Daddy implements SFMPacketDaddy<ServerboundNetworkToolUsePacket> {
         @Override
         public PacketDirection getPacketDirection() {
+
             return PacketDirection.SERVERBOUND;
         }
+
         @Override
         public void encode(
                 ServerboundNetworkToolUsePacket msg,
                 RegistryFriendlyByteBuf friendlyByteBuf
         ) {
+
             friendlyByteBuf.writeBlockPos(msg.blockPosition);
             friendlyByteBuf.writeEnum(msg.blockFace);
         }
 
         @Override
         public ServerboundNetworkToolUsePacket decode(RegistryFriendlyByteBuf friendlyByteBuf) {
+
             return new ServerboundNetworkToolUsePacket(
                     friendlyByteBuf.readBlockPos(),
                     friendlyByteBuf.readEnum(Direction.class)
@@ -55,6 +61,7 @@ public record ServerboundNetworkToolUsePacket(
                 ServerboundNetworkToolUsePacket msg,
                 SFMPacketHandlingContext context
         ) {
+
             {
                 // we don't know if the player has the program edit screen open from a manager or a disk in hand
                 ServerPlayer player = context.sender();
@@ -92,13 +99,14 @@ public record ServerboundNetworkToolUsePacket(
                         payload.append(entity).append("\n");
                     }
                 }
-                payload.append("---- capabilityKind directions ----\n");
+                payload.append("---- capabilityKind sides ----\n");
                 for (var cap : (Iterable<SFMBlockCapabilityKind<?>>) SFMWellKnownCapabilities.streamCapabilities()::iterator) {
-                    String directions = DirectionQualifier.EVERY_DIRECTION
-                            .stream()
+                    String directions = Arrays.stream(SFMDirections.DIRECTIONS_WITH_NULL)
                             .filter(dir -> SFMBlockCapabilityDiscovery
-                                    .discoverCapabilityFromLevel(level, cap, pos, dir).isPresent())
-                            .map(dir -> dir == null ? "NULL DIRECTION" : DirectionQualifier.directionToString(dir))
+                                    .discoverCapabilityFromLevel(level, cap, pos, dir)
+                                    .isPresent())
+                            .map(Side::fromDirection)
+                            .map(Side::toString)
                             .collect(Collectors.joining(", ", "[", "]"));
                     if (!directions.equals("[]")) {
                         payload
@@ -156,17 +164,22 @@ public record ServerboundNetworkToolUsePacket(
                 }
 
 
-                SFMPackets.sendToPlayer(() -> player, new ClientboundInputInspectionResultsPacket(
-                        SFMPacketDaddy.truncate(
-                                payload.toString(),
-                                ClientboundInputInspectionResultsPacket.MAX_RESULTS_LENGTH
-                        )));
+                SFMPackets.sendToPlayer(
+                        () -> player, new ClientboundInputInspectionResultsPacket(
+                                SFMPacketDaddy.truncate(
+                                        payload.toString(),
+                                        ClientboundInputInspectionResultsPacket.MAX_RESULTS_LENGTH
+                                ))
+                );
             }
         }
 
         @Override
         public Class<ServerboundNetworkToolUsePacket> getPacketClass() {
+
             return ServerboundNetworkToolUsePacket.class;
         }
+
     }
+
 }

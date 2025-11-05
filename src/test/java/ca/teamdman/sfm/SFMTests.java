@@ -1,20 +1,18 @@
 package ca.teamdman.sfm;
 
-import ca.teamdman.sfm.client.screen.text_editor.SFMTextEditScreenV1;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
+import ca.teamdman.sfm.common.util.SFMComponentUtils;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfml.ast.*;
 import com.mojang.datafixers.util.Pair;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.resources.ResourceLocation;
 import org.junit.jupiter.api.Test;
 
-import java.util.EnumSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -36,7 +34,7 @@ public class SFMTests {
         var content = sb.toString();
         for (int start = 0; start < content.length(); start++) {
             for (int end = start; end < content.length(); end++) {
-                MutableComponent substring = SFMTextEditScreenV1.substring(component, start, end);
+                MutableComponent substring = SFMComponentUtils.substring(component, start, end);
                 assertEquals(content.substring(start, end), substring.getString());
             }
         }
@@ -46,7 +44,7 @@ public class SFMTests {
     public void roundRobinByBlockDistinct() {
         LabelAccess labelAccess = new LabelAccess(
                 Stream.of("a", "b", "c").map(Label::new).toList(),
-                new DirectionQualifier(EnumSet.of(Direction.DOWN)),
+                new SideQualifier(List.of(Side.BOTTOM)),
                 NumberRangeSet.MAX_RANGE,
                 new RoundRobin(RoundRobin.Behaviour.BY_BLOCK)
         );

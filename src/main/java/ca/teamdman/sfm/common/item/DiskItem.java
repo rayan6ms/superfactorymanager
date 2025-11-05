@@ -1,9 +1,9 @@
 package ca.teamdman.sfm.common.item;
 
-import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenDiskOpenContext;
+import ca.teamdman.sfm.client.text_styling.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
@@ -29,7 +29,7 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
@@ -77,7 +77,7 @@ public class DiskItem extends Item {
         Program.compile(
                 getProgram(stack),
                 successProgram -> {
-                    ArrayList<TranslatableContents> warnings = ProgramLinter.gatherWarnings(
+                    Collection<TranslatableContents> warnings = ProgramLinter.gatherWarnings(
                             successProgram,
                             LabelPositionHolder.from(stack),
                             manager
@@ -136,9 +136,24 @@ public class DiskItem extends Item {
         return stack.getOrDefault(SFMDataComponents.PROGRAM_WARNINGS, Collections.emptyList());
     }
 
+    public static void rebuildWarnings(
+            ManagerBlockEntity manager
+    ) {
+        var disk = manager.getDisk();
+        if (disk != null) {
+            var program = manager.getProgram();
+            if (program != null) {
+                DiskItem.setWarnings(
+                        disk,
+                        ProgramLinter.gatherWarnings(program, LabelPositionHolder.from(disk), manager)
+                );
+            }
+        }
+    }
+
     public static void setWarnings(
             ItemStack stack,
-            List<TranslatableContents> warnings
+            Collection<TranslatableContents> warnings
     ) {
         stack.set(SFMDataComponents.PROGRAM_WARNINGS, warnings
                 .stream()

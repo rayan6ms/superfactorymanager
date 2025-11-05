@@ -3,19 +3,9 @@ package ca.teamdman.sfm.client.screen;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.renderer.RenderType;
 
 public class SFMScreenRenderUtils {
-    @MCVersionDependentBehaviour
-    public static int getX(AbstractWidget widget) {
-        return widget.getX();
-    }
-    @MCVersionDependentBehaviour
-    public static int getY(AbstractWidget widget) {
-        return widget.getY();
-    }
-
 
     @MCVersionDependentBehaviour
     public static void enableKeyRepeating() {

@@ -44,13 +44,13 @@ sourceSets {
         java {
             exclude "ca/teamdman/sfm/common/capability/ae2/InterfaceCapabilityProvider.java"
             exclude "ca/teamdman/sfm/common/capability/ae2/EnergyAcceptorBlockCapabilityProvider.java"
-            exclude "ca/teamdman/sfm/common/program/linting/MekanismSideConfigProgramLinter.java"
+            exclude "ca/teamdman/sfm/common/program/linting/compat/mekanism"
         }
         java {
             exclude "ca/teamdman/sfm/common/block/BatteryBlock.java"
             exclude "ca/teamdman/sfm/common/blockentity/BatteryBlockEntity.java"
         }
-        // @MCVersionDependentBehaviour
+        //// @MCVersionDependentBehaviour
         java {
             exclude "ca/teamdman/sfm/common/compat/SFMMekanismCompat.java"
         }
@@ -293,6 +293,8 @@ dependencies {
 //
 //    implementation "curse.maven:spark-361579:5759671" // spark-1.10.109-neoforge.jar
 //
+//    implementation "curse.maven:extreme-reactors-250277:6772850" // ExtremeReactors2-1.21.1-2.4.24.jar
+//    implementation "curse.maven:zerocore-247921:6648746" // ZeroCore2-1.21.1-2.4.18.jar
 //
 //
 //    implementation 'org.appliedenergistics:appliedenergistics2:19.2.15'
