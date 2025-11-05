@@ -1,19 +1,17 @@
 package ca.teamdman.sfm.client.screen.text_editor;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.client.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
-import ca.teamdman.sfm.client.screen.SFMFontUtils;
-import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
-import ca.teamdman.sfm.client.screen.SFMScreenRenderUtils;
-import ca.teamdman.sfm.client.screen.SFMTextEditorConfigScreen;
+import ca.teamdman.sfm.client.screen.*;
 import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
+import ca.teamdman.sfm.client.text_styling.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.widget.PickList;
 import ca.teamdman.sfm.client.widget.PickListItem;
 import ca.teamdman.sfm.client.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfm.common.util.SFMComponentUtils;
 import ca.teamdman.sfm.common.util.SFMDisplayUtils;
 import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
@@ -23,28 +21,25 @@ import ca.teamdman.sfml.manipulation.ManipulationResult;
 import ca.teamdman.sfml.manipulation.ProgramStringManipulationUtils;
 import ca.teamdman.sfml.program_builder.ProgramBuildResult;
 import ca.teamdman.sfml.program_builder.ProgramBuilder;
-import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
-import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.components.MultiLineEditBox;
-import net.minecraft.client.gui.components.MultilineTextField;
+import net.minecraft.client.gui.components.MultilineTextField.StringView;
 import net.minecraft.client.gui.components.Whence;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
-import net.minecraft.network.chat.Style;
+import net.minecraft.util.Mth;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.lwjgl.glfw.GLFW;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_SCREEN_CONFIG_BUTTON_TOOLTIP;
@@ -53,47 +48,33 @@ import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_EDIT_
 @SuppressWarnings("NotNullFieldNotInitialized")
 public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
     private final ISFMTextEditScreenOpenContext openContext;
+
     protected MyMultiLineEditBox textarea;
+
     protected String lastProgram = "";
-    protected List<MutableComponent> lastProgramWithSyntaxHighlighting = new ArrayList<>();
+
+    protected List<MutableComponent> content = new ArrayList<>();
+
     protected PickList<IntellisenseAction> suggestedActions;
+
     private boolean scrolledOnFirstInit = false;
 
     public SFMTextEditScreenV1(
             ISFMTextEditScreenOpenContext openContext
     ) {
+
         super(LocalizationKeys.TEXT_EDIT_SCREEN_TITLE.getComponent());
         this.openContext = openContext;
     }
 
-    public static MutableComponent substring(
-            MutableComponent component,
-            int start,
-            int end
-    ) {
-        var rtn = Component.empty();
-        AtomicInteger seen = new AtomicInteger(0);
-        component.visit(
-                (style, content) -> {
-                    int contentStart = Math.max(start - seen.get(), 0);
-                    int contentEnd = Math.min(end - seen.get(), content.length());
-
-                    if (contentStart < contentEnd) {
-                        rtn.append(Component.literal(content.substring(contentStart, contentEnd)).withStyle(style));
-                    }
-                    seen.addAndGet(content.length());
-                    return Optional.empty();
-                }, Style.EMPTY
-        );
-        return rtn;
-    }
-
     public void scrollToTop() {
+
         this.textarea.scrollToTop();
     }
 
     @Override
     public boolean isPauseScreen() {
+
         return false;
     }
 
@@ -101,6 +82,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
      * The user has indicated to save by hitting Shift+Enter or by pressing the Done button
      */
     public void saveAndClose() {
+
         openContext.onSaveAndClose(textarea.getValue());
     }
 
@@ -109,16 +91,19 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
      */
     @Override
     public void onClose() {
+
         openContext.onTryClose(textarea.getValue(), SFMScreenChangeHelpers::popScreen);
     }
 
     @Override
     public ISFMTextEditScreenOpenContext openContext() {
+
         return openContext;
     }
 
     @Override
     public void onPreferenceChanged() {
+
         textarea.rebuildIntellisense();
     }
 
@@ -128,6 +113,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             int pScanCode,
             int pModifiers
     ) {
+
         if (pKeyCode == GLFW.GLFW_KEY_LEFT_CONTROL || pKeyCode == GLFW.GLFW_KEY_RIGHT_CONTROL) {
             // if control released => update syntax highlighting
             textarea.rebuild(Screen.hasControlDown());
@@ -141,6 +127,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             char pCodePoint,
             int pModifiers
     ) {
+
         if (Screen.hasControlDown() && pCodePoint == ' ') {
             return true;
         }
@@ -262,6 +249,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             int x,
             int y
     ) {
+
         var prev = this.textarea.getValue();
         init(mc, x, y);
         super.resize(mc, x, y);
@@ -269,53 +257,34 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
     }
 
     @Override
-    @MCVersionDependentBehaviour
     public void render(GuiGraphics graphics, int mx, int my, float partialTicks) {
+
+        // render background
         this.renderTransparentBackground(graphics);
+
+        // render widgets
         super.render(graphics, mx, my, partialTicks);
-    }
 
-    private static boolean shouldShowLineNumbers() {
-        return SFMConfig.getOrDefault(SFMConfig.CLIENT_TEXT_EDITOR_CONFIG.showLineNumbers);
-    }
-
-    protected void renderTooltip(
-            PoseStack pose,
-            int mx,
-            int my
-    ) {
-        if (Minecraft.getInstance().screen != this) {
-            // this should fix the annoying Ctrl+E popup when editing
-            this.renderables
-                    .stream()
-                    .filter(AbstractWidget.class::isInstance)
-                    .map(AbstractWidget.class::cast)
-                    .forEach(w -> w.setFocused(false));
-            return;
-        }
-        drawChildTooltips(pose, mx, my);
-    }
-
-    @MCVersionDependentBehaviour
-    private void drawChildTooltips(
-            PoseStack pose,
-            int mx,
-            int my
-    ) {
-        // 1.19.2: manually render button tooltips
-//        this.renderables
-//                .stream()
-//                .filter(SFMExtendedButtonWithTooltip.class::isInstance)
-//                .map(SFMExtendedButtonWithTooltip.class::cast)
-//                .forEach(x -> x.renderToolTip(pose, mx, my));
+        // render tooltips
+        SFMWidgetUtils.hideTooltipsWhenNotFocused(this, this.renderables);
+        SFMWidgetUtils.renderChildTooltips(graphics.pose(), mx, my, this.renderables);
     }
 
     @Override
     protected void init() {
+
         super.init();
         SFMScreenRenderUtils.enableKeyRepeating();
 
-        this.textarea = this.addRenderableWidget(new MyMultiLineEditBox());
+        this.textarea = this.addRenderableWidget(new MyMultiLineEditBox(
+                SFMTextEditScreenV1.this.font,
+                SFMTextEditScreenV1.this.width / 2 - 200,
+                SFMTextEditScreenV1.this.height / 2 - 110,
+                400,
+                200,
+                Component.literal(""),
+                Component.literal("")
+        ));
 
         this.suggestedActions = this.addRenderableWidget(new PickList<>(
                 this.font,
@@ -352,7 +321,10 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         );
         this.addRenderableWidget(
                 new SFMButtonBuilder()
-                        .setPosition(this.width / 2 - 2 - 150, this.height / 2 - 100 + 195)
+                        .setPosition(
+                                this.width / 2 - 2 - 150,
+                                this.height / 2 - 100 + 195
+                        )
                         .setSize(200, 20)
                         .setText(CommonComponents.GUI_DONE)
                         .setOnPress((button) -> this.saveAndClose())
@@ -361,7 +333,10 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         );
         this.addRenderableWidget(
                 new SFMButtonBuilder()
-                        .setPosition(this.width / 2 - 2 + 100, this.height / 2 - 100 + 195)
+                        .setPosition(
+                                this.width / 2 - 2 + 100,
+                                this.height / 2 - 100 + 195
+                        )
                         .setSize(100, 20)
                         .setText(CommonComponents.GUI_CANCEL)
                         .setOnPress((button) -> this.onClose())
@@ -379,17 +354,42 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         this.setInitialFocus(textarea);
     }
 
+    // TODO: enable scrolling without focus; respond to wheel events
     protected class MyMultiLineEditBox extends MultiLineEditBox {
+
         private int frame = 0;
-        public MyMultiLineEditBox() {
+
+        // Precomputed line start offsets for fast mapping; kept in sync in rebuild()
+        private final List<Integer> displayedLineStartOffsets = new ArrayList<>();
+
+        // Cache to avoid reparsing on cursor-only moves
+        private @Nullable ProgramBuildResult cachedBuildResult;
+
+        private String cachedBuildProgram = "";
+
+        private boolean scrollbarDragActive;
+
+        /// Used to debounce scrolling when click-dragging to select text.
+        private boolean scrollingEnabled = true;
+
+        public MyMultiLineEditBox(
+                Font pFont,
+                int pX,
+                int pY,
+                int pWidth,
+                int pHeight,
+                Component pPlaceholder,
+                Component pMessage
+        ) {
+
             super(
-                    SFMTextEditScreenV1.this.font,
-                    SFMTextEditScreenV1.this.width / 2 - 200,
-                    SFMTextEditScreenV1.this.height / 2 - 110,
-                    400,
-                    200,
-                    Component.literal(""),
-                    Component.literal("")
+                    pFont,
+                    pX,
+                    pY,
+                    pWidth,
+                    pHeight,
+                    pPlaceholder,
+                    pMessage
             );
             this.textField.setValueListener(this::onValueOrCursorChanged);
             this.textField.setCursorListener(() -> this.onValueOrCursorChanged(this.textField.value()));
@@ -397,23 +397,27 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         }
 
         public void scrollToTop() {
+
             this.setScrollAmount(0);
         }
 
+        @Override
+        public void setFocused(boolean focused) {
+
+            super.setFocused(focused);
+            if (!focused) {
+                this.scrollbarDragActive = false;
+            }
+        }
+
         public int getCursorPosition() {
+
             return this.textField.cursor;
         }
 
         public void setCursorPosition(int cursor) {
-            this.textField.seekCursor(Whence.ABSOLUTE, cursor);
-        }
 
-        public int getLineNumberWidth() {
-            if (shouldShowLineNumbers()) {
-                return this.font.width("000");
-            } else {
-                return 0;
-            }
+            this.textField.seekCursor(Whence.ABSOLUTE, cursor);
         }
 
         @Override
@@ -434,12 +438,42 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                 double pMouseY,
                 int pButton
         ) {
+
             try {
-                // Accommodate line numbers
-                if (pMouseX >= this.getX() + 1 && pMouseX <= this.getX() + this.width - 1) {
-                    pMouseX -= getLineNumberWidth();
+                if (pButton == 0) {
+                    this.scrollbarDragActive = false;
+                }
+                if (pButton == 0 && this.visible && this.withinContentAreaPoint(pMouseX, pMouseY)) {
+                    if (content.isEmpty()) {
+                        return false;
+                    }
+                    // Focus the editor so the caret blinks and keys go here
+                    this.setFocused(true);
+
+                    boolean shiftDown = Screen.hasShiftDown();
+                    // Move cursor to the click position
+                    seekCursorFromPoint(pMouseX, pMouseY);
+                    // If not extending with Shift, start a new selection anchor at the click
+                    if (!shiftDown) {
+                        this.textField.selectCursor = this.textField.cursor;
+                    }
+                    // Enable selection so dragging extends from the anchor
+                    this.textField.setSelecting(true);
+                    return true;
+                }
+                boolean clickedScrollbar =
+                        pButton == 0
+                        && this.visible
+                        && this.scrollbarVisible()
+                        && pMouseX >= SFMWidgetUtils.getX(this) + this.width
+                        && pMouseX <= SFMWidgetUtils.getX(this) + this.width + 8
+                        && pMouseY >= SFMWidgetUtils.getY(this)
+                        && pMouseY < SFMWidgetUtils.getY(this) + this.height;
+                if (clickedScrollbar) {
+                    this.scrollbarDragActive = true;
                 }
 
+//                return super.mouseClicked(pMouseX, pMouseY, pButton);
                 // we need to override the default behaviour because Mojang broke it
                 // if it's not scrolling, it should return false for cursor click movement
                 boolean rtn;
@@ -485,7 +519,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         public int getInnerHeight() {
             // parent method uses this.textField.getLineCount() which is split for text wrapping
             // we don't use the wrapped text, so we need to calculate the height ourselves to avoid overshooting
-            return this.font.lineHeight * (lastProgramWithSyntaxHighlighting.size() + 2);
+            return this.font.lineHeight * (content.size() + 2);
         }
 
         @Override
@@ -496,42 +530,150 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                 double dx,
                 double dy
         ) {
-            // if mouse in bounds, translate to accommodate line numbers
-            int thisX = SFMScreenRenderUtils.getX(this);
-            if (mx >= thisX + 1 && mx <= thisX + this.width - 1) {
-                mx -= getLineNumberWidth();
+            // IMPORTANT: give the scrollbar drag priority.
+            // If the drag started on the scrollbar, AbstractScrollWidget will
+            // consume this, and we should not start a text selection.
+            if (this.scrollbarDragActive && super.mouseDragged(mx, my, button, dx, dy)) {
+                return true;
             }
 
-            return super.mouseDragged(mx, my, button, dx, dy);
+            try {
+                if (button == 0 && this.visible && this.withinContentAreaPoint(mx, my)) {
+                    if (content.isEmpty()) {
+                        return false;
+                    }
+                    // Keep selection active while dragging and update cursor
+                    this.textField.setSelecting(true);
+                    seekCursorFromPoint(mx, my);
+                    return true;
+                }
+            } catch (Exception e) {
+                SFM.LOGGER.error("Error in SFMTextEditScreenV1.MyMultiLineEditBox.mouseDragged", e);
+                return false;
+            }
+
+            return false;
+        }
+
+        @Override
+        public boolean mouseReleased(
+                double mx,
+                double my,
+                int button
+        ) {
+
+            if (button == 0) {
+                // Stop active selection on mouse up
+                this.textField.setSelecting(false);
+                this.scrollbarDragActive = false;
+            }
+            return super.mouseReleased(mx, my, button);
         }
 
         public int getSelectionCursorPosition() {
+
             return this.textField.selectCursor;
         }
 
         public void setSelectionCursorPosition(int cursor) {
+
             this.textField.selectCursor = cursor;
         }
 
         public double getScrollAmount() {
+
             return this.scrollAmount();
         }
 
         @Override
-        public void setScrollAmount(double d) {
-            super.setScrollAmount(d);
+        protected void setScrollAmount(double pScrollAmount) {
+
+            if (!scrollingEnabled) return;
+            super.setScrollAmount(pScrollAmount);
+        }
+
+        private void seekCursorFromPoint(
+                double mx,
+                double my
+        ) {
+
+            int lineCount = content.size();
+            double innerX = mx - (
+                    SFMWidgetUtils.getX(this)
+                    + this.innerPadding()
+                    + SFMTextEditorUtils.getLineNumberWidth(this.font, lineCount)
+            );
+            double innerY = my - (SFMWidgetUtils.getY(this) + this.innerPadding()) + this.scrollAmount();
+            int lineIndex = Mth.clamp(
+                    (int) Math.floor(innerY / Math.max(1, this.font.lineHeight)),
+                    0,
+                    Math.max(0, lineCount - 1)
+            );
+            int cursorPosition = pointToCursor(innerX, lineIndex);
+
+            this.scrollingEnabled = false;
+            this.textField.seekCursor(Whence.ABSOLUTE, cursorPosition);
+            this.scrollingEnabled = true;
+        }
+
+        private int getLineStartIndex(int lineIndex) {
+
+            if (displayedLineStartOffsets.isEmpty()) return 0;
+            int clamped = Mth.clamp(
+                    lineIndex,
+                    0,
+                    Math.max(0, displayedLineStartOffsets.size() - 1)
+            );
+            return displayedLineStartOffsets.get(clamped);
+        }
+
+        private int pointToCursor(
+                double innerX,
+                int lineIndex
+        ) {
+
+            int lineStartIndex = getLineStartIndex(lineIndex);
+            if (content.isEmpty()) {
+                return lineStartIndex;
+            }
+            int clampedLine = Mth.clamp(lineIndex, 0, Math.max(0, content.size() - 1));
+            String plainLine = content.get(clampedLine).getString();
+            int clampedX = (int) Math.max(0, innerX);
+            int cursorOffsetInLine = this.font.plainSubstrByWidth(plainLine, clampedX).length();
+            int widthBeforeCursor = this.font.width(plainLine.substring(0, cursorOffsetInLine));
+            if (cursorOffsetInLine < plainLine.length()) {
+                int nextGlyphWidth = this.font.width(plainLine.substring(cursorOffsetInLine, cursorOffsetInLine + 1));
+                if ((double) (clampedX - widthBeforeCursor) >= nextGlyphWidth / 2.0D) {
+                    cursorOffsetInLine = Math.min(plainLine.length(), cursorOffsetInLine + 1);
+                }
+            }
+            return Mth.clamp(
+                    lineStartIndex + cursorOffsetInLine,
+                    0,
+                    this.textField.value().length()
+            );
         }
 
         @Override
         protected int getMaxScrollAmount() {
+
             return Math.max(1, super.getMaxScrollAmount()); // Fix #307: divide by zero exception
         }
 
         private void onValueOrCursorChanged(String programString) {
+
             int cursorPosition = getCursorPosition();
 
-            // Build the program
-            ProgramBuildResult buildResult = ProgramBuilder.build(programString);
+            // Build the program only when text changed; reuse parse on cursor-only
+            // moves
+            ProgramBuildResult buildResult;
+            if (programString.equals(cachedBuildProgram) && cachedBuildResult != null) {
+                buildResult = cachedBuildResult;
+            } else {
+                buildResult = ProgramBuilder.build(programString);
+                cachedBuildProgram = programString;
+                cachedBuildResult = buildResult;
+            }
 
             // Update the intellisense picklist
             IntellisenseContext intellisenseContext = new IntellisenseContext(
@@ -543,7 +685,6 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             );
             List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(intellisenseContext);
             SFMTextEditScreenV1.this.suggestedActions.setItems(suggestions);
-
 
             // Update the intellisense picklist query used to sort the suggestions
             String cursorWord = buildResult.getWordAtCursorPosition(cursorPosition);
@@ -580,53 +721,116 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         }
 
         private void rebuildIntellisense() {
+
             onValueOrCursorChanged(getValue());
         }
 
         /**
-         * Rebuilds the syntax-highlighted program text.
-         * This runs more frequently than when the value is changed.
+         * Rebuilds the syntax-highlighted program text. This runs more frequently than
+         * when the value is changed.
          *
-         * @param showContextActionHints Should underline words that have context actions
+         * @param showContextActionHints Should underline words that have context
+         *                               actions
          */
         private void rebuild(boolean showContextActionHints) {
+
             lastProgram = this.textField.value();
-            lastProgramWithSyntaxHighlighting = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(
+            content = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(
                     lastProgram,
                     showContextActionHints
             );
+
+            rebuildDisplayCache();
+        }
+
+        private void rebuildDisplayCache() {
+            // Rebuild displayed line-start offsets to match the raw text and
+            // rendered lines
+            displayedLineStartOffsets.clear();
+            displayedLineStartOffsets.add(0);
+            for (int i = 0; i < lastProgram.length(); i++) {
+                if (lastProgram.charAt(i) == '\n') {
+                    displayedLineStartOffsets.add(i + 1);
+                }
+            }
+            // Ensure the list size matches the number of rendered lines
+            int lines = content.size();
+            while (displayedLineStartOffsets.size() > lines) {
+                displayedLineStartOffsets.remove(displayedLineStartOffsets.size() - 1);
+            }
+            while (displayedLineStartOffsets.size() < lines) {
+                displayedLineStartOffsets.add(lastProgram.length());
+            }
         }
 
         @Override
         protected void renderContents(GuiGraphics graphics, int mx, int my, float partialTicks) {
             Matrix4f matrix4f = graphics.pose().last().pose();
+
+            // rebuild the program if necessary
             if (!lastProgram.equals(this.textField.value())) {
                 rebuild(Screen.hasControlDown());
             }
-            List<MutableComponent> lines = lastProgramWithSyntaxHighlighting;
-            boolean isCursorVisible = this.isFocused() && this.frame++ / 60 % 2 == 0;
+
+            final List<MutableComponent> lines = content;
+            if (lines.isEmpty()) {
+                return;
+            }
+
+            final boolean isCursorVisible = this.isFocused() && this.frame++ / 6 % 2 == 0;
+            final int cursorIndex = textField.cursor();
+
+            final int lineHeight = Math.max(1, this.font.lineHeight);
+            final int availableHeight = this.height - this.innerPadding() * 2;
+            final double scroll = this.scrollAmount();
+
+            // Determine which logical line is at the top
+            final int viewLineIndexStart = Mth.clamp(
+                    (int) Math.floor(scroll / lineHeight),
+                    0,
+                    Math.max(0, lines.size() - 1)
+            );
+            // Render a small overscan
+            final int numVisibleLines = Math.max(1, availableHeight / lineHeight + 2);
+            final int viewLineIndexEnd = Math.min(lines.size(), viewLineIndexStart + numVisibleLines);
+
+            final int lineX =
+                    SFMWidgetUtils.getX(this) + this.innerPadding()
+                    + SFMTextEditorUtils.getLineNumberWidth(this.font, content.size());
+
             boolean isCursorAtEndOfLine = false;
-            int cursorIndex = textField.cursor();
-            int lineX = SFMScreenRenderUtils.getX(this) + this.innerPadding() + getLineNumberWidth();
-            int lineY = SFMScreenRenderUtils.getY(this) + this.innerPadding();
-            int charCount = 0;
+            boolean drewCursorGlyph = false;
+
+            // IMPORTANT: do not subtract (scroll % lineHeight) here.
+            // The parent has already translated by -scrollAmount.
+            // Draw at content-space Y positions as if there was no scrolling:
+            final int contentTopY = SFMWidgetUtils.getY(this) + this.innerPadding();
+            int lineY = contentTopY + viewLineIndexStart * lineHeight;
+            int charCountAccum = getLineStartIndex(viewLineIndexStart);
+
             int cursorX = 0;
             int cursorY = 0;
-            MultilineTextField.StringView selectedRange = this.textField.getSelected();
-            int selectionStart = selectedRange.beginIndex();
-            int selectionEnd = selectedRange.endIndex();
 
-            for (int line = 0; line < lines.size(); ++line) {
+            final StringView selectedRange = this.textField.getSelected();
+            final int selectionStart = selectedRange.beginIndex();
+            final int selectionEnd = selectedRange.endIndex();
+
+            // One buffer for the entire text pass
+            MultiBufferSource.BufferSource buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+
+            // Collect selection highlights rects and draw them after the text
+            List<int[]> highlightRects = new ArrayList<>();
+
+            for (int line = viewLineIndexStart; line < viewLineIndexEnd; ++line) {
                 var componentColoured = lines.get(line);
-                int lineLength = componentColoured.getString().length();
-                int lineHeight = this.font.lineHeight;
-                boolean cursorOnThisLine = isCursorVisible
-                                           && cursorIndex >= charCount
-                                           && cursorIndex <= charCount + lineLength;
-                var buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+                String plainLine = componentColoured.getString();
+                int lineLength = plainLine.length();
 
+                boolean cursorOnThisLine =
+                        isCursorVisible && cursorIndex >= charCountAccum
+                        && cursorIndex <= charCountAccum + lineLength;
 
-                if (shouldShowLineNumbers()) {
+                if (SFMTextEditorUtils.shouldShowLineNumbers()) {
                     // Draw line number
                     String lineNumber = String.valueOf(line + 1);
                     SFMFontUtils.drawInBatch(
@@ -642,11 +846,14 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                 }
 
                 if (cursorOnThisLine) {
-                    isCursorAtEndOfLine = cursorIndex == charCount + lineLength;
+                    isCursorAtEndOfLine = cursorIndex == charCountAccum + lineLength;
                     cursorY = lineY;
+                    int relativeCursorIndex = cursorIndex - charCountAccum;
+                    int drawnWidthBeforeCursor = this.font.width(plainLine.substring(0, relativeCursorIndex));
+                    cursorX = lineX + drawnWidthBeforeCursor;
                     // draw text before cursor
-                    cursorX = SFMFontUtils.drawInBatch(
-                            substring(componentColoured, 0, cursorIndex - charCount),
+                    SFMFontUtils.drawInBatch(
+                            SFMComponentUtils.substring(componentColoured, 0, relativeCursorIndex),
                             font,
                             lineX,
                             lineY,
@@ -654,11 +861,11 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                             false,
                             matrix4f,
                             buffer
-                    ) - 1;
+                    );
                     SFMTextEditScreenV1.this.suggestedActions.setXY(cursorX + 10, cursorY);
                     // draw text after cursor
                     SFMFontUtils.drawInBatch(
-                            substring(componentColoured, cursorIndex - charCount, lineLength),
+                            SFMComponentUtils.substring(componentColoured, relativeCursorIndex, lineLength),
                             font,
                             cursorX,
                             lineY,
@@ -667,6 +874,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                             matrix4f,
                             buffer
                     );
+                    drewCursorGlyph = true;
                 } else {
                     SFMFontUtils.drawInBatch(
                             componentColoured,
@@ -679,34 +887,59 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                             buffer
                     );
                 }
-                buffer.endBatch();
 
                 // Check if the selection is within the current line
-                if (selectionStart <= charCount + lineLength && selectionEnd > charCount) {
-                    int lineSelectionStart = Math.max(selectionStart - charCount, 0);
-                    int lineSelectionEnd = Math.min(selectionEnd - charCount, lineLength);
+                if (selectionStart <= charCountAccum + lineLength && selectionEnd > charCountAccum) {
+                    int lineSelectionStart = Math.max(selectionStart - charCountAccum, 0);
+                    int lineSelectionEnd = Math.min(selectionEnd - charCountAccum, lineLength);
 
-                    int highlightStartX = this.font.width(substring(componentColoured, 0, lineSelectionStart));
-                    int highlightEndX = this.font.width(substring(componentColoured, 0, lineSelectionEnd));
+                    int highlightStartX = this.font.width(plainLine.substring(0, lineSelectionStart));
+                    int highlightEndX = this.font.width(plainLine.substring(0, lineSelectionEnd));
 
-                    SFMScreenRenderUtils.renderHighlight(
-                            graphics,
+                    highlightRects.add(new int[]{
                             lineX + highlightStartX,
                             lineY,
                             lineX + highlightEndX,
                             lineY + lineHeight
-                    );
+                    });
                 }
 
                 lineY += lineHeight;
-                charCount += lineLength + 1;
+                charCountAccum += lineLength + 1;
             }
 
-            if (isCursorAtEndOfLine) {
-                SFMFontUtils.draw(graphics, this.font, "_", cursorX, cursorY, -1, true);
-            } else {
-                graphics.fill(cursorX, cursorY - 1, cursorX + 1, cursorY + 1 + 9, -1);
+            // Flush the text batch once
+            buffer.endBatch();
+
+            // Draw selection highlights after text
+            for (int[] r : highlightRects) {
+                SFMScreenRenderUtils.renderHighlight(
+                        graphics,
+                        r[0],
+                        r[1],
+                        r[2],
+                        r[3]
+                );
+            }
+
+            if (drewCursorGlyph) {
+                if (isCursorAtEndOfLine) {
+                    SFMFontUtils.draw(
+                            graphics,
+                            this.font,
+                            "_",
+                            cursorX,
+                            cursorY,
+                            -1,
+                            true
+                    );
+                } else {
+                    graphics.fill(
+                            cursorX, cursorY - 1, cursorX + 1, cursorY + 1 + 9, -1);
+                }
             }
         }
+
     }
+
 }
