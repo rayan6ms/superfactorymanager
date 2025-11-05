@@ -81,6 +81,7 @@ public class SFMMultiLineTextRenderWidget implements Widget {
         this.styledTextContentLines = styledTextContentLines;
     }
 
+    // TODO: we want to store the last known cursor position then revamp the V1 editor to use this
     @Override
     public void render(
             PoseStack pPoseStack,
