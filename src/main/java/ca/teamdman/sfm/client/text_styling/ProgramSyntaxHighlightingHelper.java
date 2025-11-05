@@ -1,6 +1,7 @@
-package ca.teamdman.sfm.client;
+package ca.teamdman.sfm.client.text_styling;
 
 import ca.teamdman.langs.SFMLLexer;
+import ca.teamdman.sfm.client.ProgramTokenContextActions;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
