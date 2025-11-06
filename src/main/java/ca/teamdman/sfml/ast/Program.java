@@ -16,6 +16,8 @@ import org.antlr.v4.runtime.Recognizer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -111,7 +113,7 @@ public record Program(
             }
 
             // Start stopwatch
-            long start = System.nanoTime();
+            Instant start = Instant.now();
 
             // Perform tick
             if (context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
@@ -140,11 +142,11 @@ public record Program(
             }
 
             // End stopwatch
-            long nanoTimePassed = System.nanoTime() - start;
+            Duration elapsed = Duration.between(start, Instant.now());
 
             // Log trigger time
             context.getLogger().info(x -> x.accept(LocalizationKeys.PROGRAM_TICK_TRIGGER_TIME_MS.get(
-                    nanoTimePassed / 1_000_000.0,
+                    elapsed.toMillis(),
                     trigger.toString()
             )));
         }

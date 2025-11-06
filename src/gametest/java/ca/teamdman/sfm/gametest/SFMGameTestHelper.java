@@ -12,7 +12,6 @@ import ca.teamdman.sfml.ast.Trigger;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.gametest.framework.GameTestInfo;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
@@ -30,14 +29,14 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
 
 public class SFMGameTestHelper extends GameTestHelper {
-    public SFMGameTestHelper(GameTestInfo pTestInfo) {
+    public final SFMDelegatedTestFunction sfmTestDefinition;
 
-        super(pTestInfo);
-    }
-
-    public SFMGameTestHelper(GameTestHelper helper) {
-
+    public SFMGameTestHelper(
+            SFMDelegatedTestFunction sfmDelegatedTestFunction,
+            GameTestHelper helper
+    ) {
         super(helper.testInfo);
+        this.sfmTestDefinition = sfmDelegatedTestFunction;
     }
 
     public <CAP> CAP discoverCapability(
@@ -131,7 +130,6 @@ public class SFMGameTestHelper extends GameTestHelper {
         var endTime = new AtomicLong();
         List<Trigger> triggers = Objects.requireNonNull(manager.getProgram()).triggers();
         var oldFirstTrigger = triggers.get(0);
-        long timeoutTicks = 200;
 
         Trigger startTimerTrigger = new Trigger() {
             @Override
@@ -183,7 +181,7 @@ public class SFMGameTestHelper extends GameTestHelper {
         triggers.add(0, startTimerTrigger);
         triggers.add(endTimerTrigger);
 
-        long bound = timeoutTicks - getTick();
+        long bound = (long) sfmTestDefinition.getMaxTicks() - getTick();
         for (long i = getTick() + 1; i < bound; i++) {
             /// We cannot reuse the {@link Runnable} object because it is used as the key in a dict.
             runAfterDelay(

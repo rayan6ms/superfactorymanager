@@ -14,6 +14,7 @@ import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.net.ClientboundManagerGuiUpdatePacket;
 import ca.teamdman.sfm.common.net.ClientboundManagerLogLevelUpdatedPacket;
 import ca.teamdman.sfm.common.net.ClientboundManagerLogsPacket;
+import ca.teamdman.sfm.common.program.IProgramHooks;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMContainerUtil;
@@ -37,20 +38,32 @@ import net.minecraft.world.level.block.state.BlockState;
 import org.apache.logging.log4j.core.time.MutableInstant;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 public class ManagerBlockEntity extends BaseContainerBlockEntity {
     public static final int TICK_TIME_HISTORY_SIZE = 20;
     public final TranslatableLogger logger;
     private final NonNullList<ItemStack> ITEMS = NonNullList.withSize(1, ItemStack.EMPTY);
-    private final long[] tickTimeNanos = new long[TICK_TIME_HISTORY_SIZE];
+    private final Duration[] tickTimes = new Duration[TICK_TIME_HISTORY_SIZE];
     private @Nullable Program program = null;
     private int configRevision = -1;
     private int tick = 0;
     private int unprocessedRedstonePulses = 0; // used by redstone trigger
     private boolean shouldRebuildProgram = false;
+
+
+    /**
+     * Used to prevent tests which modify configs from interfering with other tests.
+     * <p>
+     * When the manager detects a config change and rebuilds, it clobbers the monkey patching used by the tests.
+     */
     private boolean shouldRebuildProgramLock = false;
+
     private int tickIndex = 0;
 
     public ManagerBlockEntity(
@@ -80,6 +93,8 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     public String toString() {
         return "ManagerBlockEntity{" +
                "hasDisk=" + (getDisk() != null) +
+               ", pos=" + getBlockPos() +
+               ", level=" + getLevel() +
                '}';
     }
 
@@ -99,29 +114,44 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
             ManagerBlockEntity manager
     ) {
         try {
-            long start = System.nanoTime();
+            // Get timestamp for elapsed time calculations
+            Instant start = Instant.now();
+
+            // Increment tick counter
             manager.tick++;
+
+            // If config changed, mark dirty
             if (manager.configRevision != SFMConfig.SERVER_CONFIG.getRevision()) {
                 manager.shouldRebuildProgram = true;
             }
+
+            // Rebuild if dirty and not locked
             if (manager.shouldRebuildProgram && !manager.shouldRebuildProgramLock) {
                 manager.rebuildProgramAndUpdateDisk();
                 manager.shouldRebuildProgram = false;
             }
+
+            // If a program is present, execute it
             if (manager.program != null) {
+                // Check if any triggers executed
                 boolean didSomething = manager.program.tick(manager);
                 if (didSomething) {
-                    long nanoTimePassed = Long.min(System.nanoTime() - start, Integer.MAX_VALUE);
-                    manager.tickTimeNanos[manager.tickIndex] = (int) nanoTimePassed;
-                    manager.tickIndex = (manager.tickIndex + 1) % manager.tickTimeNanos.length;
-                    manager.logger.trace(x -> x.accept(LocalizationKeys.PROGRAM_TICK_TIME_MS.get(nanoTimePassed
-                                                                                                 / 1_000_000f)));
+
+                    // Get and track the elapsed time
+                    Duration elapsed = Duration.between(start, Instant.now());
+                    manager.tickTimes[manager.tickIndex] = elapsed;
+                    manager.tickIndex = (manager.tickIndex + 1) % manager.tickTimes.length;
+                    manager.logger.trace(x -> x.accept(
+                            LocalizationKeys.PROGRAM_TICK_TIME_MS.get(elapsed.toMillis())));
+
+                    // Distribute time information to playters
                     manager.sendUpdatePacket();
                     manager.logger.pruneSoWeDontEatAllTheRam();
 
                     if (manager.logger.getLogLevel() == org.apache.logging.log4j.Level.TRACE
                         || manager.logger.getLogLevel() == org.apache.logging.log4j.Level.DEBUG
-                        || manager.logger.getLogLevel() == org.apache.logging.log4j.Level.INFO) {
+                        || manager.logger.getLogLevel() == org.apache.logging.log4j.Level.INFO
+                    ) {
                         org.apache.logging.log4j.Level newLevel = org.apache.logging.log4j.Level.OFF;
                         manager.logger.info(x -> x.accept(LocalizationKeys.LOG_LEVEL_UPDATED.get(newLevel)));
                         var oldLevel = manager.logger.getLogLevel();
@@ -345,11 +375,11 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         }
     }
 
-    public long[] getTickTimeNanos() {
+    public Duration[] getTickTimes() {
         // tickTimeNanos is used as a cyclical buffer, transform it to have the first index be the most recent tick
-        long[] result = new long[tickTimeNanos.length];
-        System.arraycopy(tickTimeNanos, tickIndex, result, 0, tickTimeNanos.length - tickIndex);
-        System.arraycopy(tickTimeNanos, 0, result, tickTimeNanos.length - tickIndex, tickIndex);
+        Duration[] result = new Duration[tickTimes.length];
+        System.arraycopy(tickTimes, tickIndex, result, 0, tickTimes.length - tickIndex);
+        System.arraycopy(tickTimes, 0, result, tickTimes.length - tickIndex, tickIndex);
         return result;
     }
 
@@ -359,7 +389,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
                 -1,
                 getProgramStringOrEmptyIfNull(),
                 getState(),
-                getTickTimeNanos()
+                getTickTimes()
         );
 
         OpenContainerTracker.getOpenManagerMenus(getBlockPos())
