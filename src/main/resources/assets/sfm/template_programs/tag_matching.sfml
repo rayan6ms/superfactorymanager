@@ -56,7 +56,7 @@ EVERY 20 TICKS DO
     -- EXCEPT does not support WITH clauses.
     -- There is no statement-wide exclusion for WITH clauses.
     INPUT
-      * WITH #ores NOT #needs_stone_tool,
+      * WITH #ores AND NOT #needs_stone_tool,
       * WITHOUT #piglin_loved,
     FROM chest
 
