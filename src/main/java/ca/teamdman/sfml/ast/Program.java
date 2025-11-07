@@ -4,6 +4,7 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.*;
+import ca.teamdman.sfm.common.timing.SFMInstant;
 import ca.teamdman.sfml.program_builder.ProgramBuilder;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerPlayer;
@@ -16,6 +17,7 @@ import org.antlr.v4.runtime.Recognizer;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
+import java.time.Duration;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.List;
@@ -111,7 +113,7 @@ public record Program(
             }
 
             // Start stopwatch
-            long start = System.nanoTime();
+            SFMInstant start = SFMInstant.now();
 
             // Perform tick
             if (context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
@@ -140,11 +142,11 @@ public record Program(
             }
 
             // End stopwatch
-            long nanoTimePassed = System.nanoTime() - start;
+            Duration elapsed = start.elapsed();
 
             // Log trigger time
             context.getLogger().info(x -> x.accept(LocalizationKeys.PROGRAM_TICK_TRIGGER_TIME_MS.get(
-                    nanoTimePassed / 1_000_000.0,
+                    elapsed.toMillis(),
                     trigger.toString()
             )));
         }
