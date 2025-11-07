@@ -624,7 +624,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
             tesselator.end();
         } else {
             // Draw the tick time text for peak value
-            var peakTickTimeMilliseconds = peakTickTime.toMillis();
+            var peakTickTimeMilliseconds = peakTickTime.toNanos() / 1_000_000f; // we want decimal precision
             String formattedMillis = format.format(peakTickTimeMilliseconds);
             ChatFormatting lagColor = getMillisecondColour(peakTickTimeMilliseconds);
             Component milliseconds = Component.literal(formattedMillis).withStyle(lagColor);

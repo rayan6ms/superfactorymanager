@@ -3,9 +3,9 @@ package ca.teamdman.sfm.common.containermenu;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.logging.TranslatableLogEvent;
-import ca.teamdman.sfm.common.net.SFMDurationNetworkUtils;
 import ca.teamdman.sfm.common.net.ServerboundManagerSetLogLevelPacket;
 import ca.teamdman.sfm.common.registry.SFMMenus;
+import ca.teamdman.sfm.common.timing.SFMDurationNetworkUtils;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -20,7 +20,7 @@ import net.minecraft.world.item.ItemStack;
 import java.time.Duration;
 import java.util.ArrayDeque;
 
-import static ca.teamdman.sfm.common.net.SFMDurationNetworkUtils.readDurationArray;
+import static ca.teamdman.sfm.common.timing.SFMDurationNetworkUtils.readDurationArray;
 
 public class ManagerContainerMenu extends AbstractContainerMenu {
     public final Container CONTAINER;

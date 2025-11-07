@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.common.net;
+package ca.teamdman.sfm.common.timing;
 
 import net.minecraft.network.FriendlyByteBuf;
 
@@ -12,7 +12,12 @@ public class SFMDurationNetworkUtils {
 
         long[] tickTimeNanos = new long[durations.length];
         for (int i = 0; i < tickTimeNanos.length; i++) {
-            tickTimeNanos[i] = durations[i].toNanos();
+            Duration duration = durations[i];
+            if (duration == null) {
+                tickTimeNanos[i] = 0;
+            } else {
+                tickTimeNanos[i] = duration.toNanos();
+            }
         }
         friendlyByteBuf.writeLongArray(tickTimeNanos);
     }

@@ -1,11 +1,11 @@
 package ca.teamdman.sfm;
 
 import ca.teamdman.sfm.common.program.RegexCache;
+import ca.teamdman.sfm.common.timing.SFMInstant;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.function.Predicate;
 import java.util.regex.Pattern;
 
@@ -75,9 +75,9 @@ public class RegexCacheTests {
 
     private Duration measureTime(Runnable runnable) {
 
-        Instant start = Instant.now();
+        SFMInstant start = SFMInstant.now();
         runnable.run();
-        return Duration.between(start, Instant.now());
+        return start.elapsed();
     }
 
     private void performPerformanceTest(

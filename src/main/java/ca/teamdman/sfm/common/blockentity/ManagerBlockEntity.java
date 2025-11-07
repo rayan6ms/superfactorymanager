@@ -17,6 +17,8 @@ import ca.teamdman.sfm.common.net.ClientboundManagerLogsPacket;
 import ca.teamdman.sfm.common.program.IProgramHooks;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.timing.SFMEpochInstant;
+import ca.teamdman.sfm.common.timing.SFMInstant;
 import ca.teamdman.sfm.common.util.SFMContainerUtil;
 import ca.teamdman.sfml.ast.Program;
 import com.google.common.base.Joiner;
@@ -35,11 +37,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import org.apache.logging.log4j.core.time.MutableInstant;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -55,16 +55,10 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     private int tick = 0;
     private int unprocessedRedstonePulses = 0; // used by redstone trigger
     private boolean shouldRebuildProgram = false;
-
-
-    /**
-     * Used to prevent tests which modify configs from interfering with other tests.
-     * <p>
-     * When the manager detects a config change and rebuilds, it clobbers the monkey patching used by the tests.
-     */
-    private boolean shouldRebuildProgramLock = false;
-
     private int tickIndex = 0;
+
+    /// Callbacks for testing, used to assert postconditions
+    private @Nullable List<IProgramHooks> programHooks = null;
 
     public ManagerBlockEntity(
             BlockPos blockPos,
@@ -98,13 +92,11 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
                '}';
     }
 
-    /**
-     * Used to prevent tests which modify configs from interfering with other tests.
-     * <p>
-     * When the manager detects a config change and rebuilds, it clobbers the monkey patching used by the tests.
-     */
-    public void enableRebuildProgramLock() {
-        shouldRebuildProgramLock = true;
+    public void addProgramHooks(IProgramHooks hooks) {
+        if (this.programHooks == null) {
+            this.programHooks = new ArrayList<>();
+        }
+        this.programHooks.add(hooks);
     }
 
     public static void serverTick(
@@ -115,7 +107,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     ) {
         try {
             // Get timestamp for elapsed time calculations
-            Instant start = Instant.now();
+            SFMInstant start = SFMInstant.now();
 
             // Increment tick counter
             manager.tick++;
@@ -125,49 +117,60 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
                 manager.shouldRebuildProgram = true;
             }
 
-            // Rebuild if dirty and not locked
-            if (manager.shouldRebuildProgram && !manager.shouldRebuildProgramLock) {
+            // Rebuild if dirty
+            if (manager.shouldRebuildProgram) {
                 manager.rebuildProgramAndUpdateDisk();
                 manager.shouldRebuildProgram = false;
             }
 
-            // If a program is present, execute it
-            if (manager.program != null) {
-                // Check if any triggers executed
-                boolean didSomething = manager.program.tick(manager);
-                if (didSomething) {
+            // Make sure manager has a program
+            if (manager.program == null) {
+                return;
+            }
 
-                    // Get and track the elapsed time
-                    Duration elapsed = Duration.between(start, Instant.now());
-                    manager.tickTimes[manager.tickIndex] = elapsed;
-                    manager.tickIndex = (manager.tickIndex + 1) % manager.tickTimes.length;
-                    manager.logger.trace(x -> x.accept(
-                            LocalizationKeys.PROGRAM_TICK_TIME_MS.get(elapsed.toMillis())));
+            // Tick the program and see if anything happened
+            boolean didSomething = manager.program.tick(manager);
+            if (!didSomething) {
+                return;
+            }
 
-                    // Distribute time information to playters
-                    manager.sendUpdatePacket();
-                    manager.logger.pruneSoWeDontEatAllTheRam();
+            // Calculate and track the elapsed time
+            Duration elapsed = start.elapsed();
+            manager.tickTimes[manager.tickIndex] = elapsed;
+            manager.tickIndex = (manager.tickIndex + 1) % manager.tickTimes.length;
+            manager.logger.trace(x -> x.accept(
+                    LocalizationKeys.PROGRAM_TICK_TIME_MS.get(elapsed.toNanos() / 1_000_000f)));
 
-                    if (manager.logger.getLogLevel() == org.apache.logging.log4j.Level.TRACE
-                        || manager.logger.getLogLevel() == org.apache.logging.log4j.Level.DEBUG
-                        || manager.logger.getLogLevel() == org.apache.logging.log4j.Level.INFO
-                    ) {
-                        org.apache.logging.log4j.Level newLevel = org.apache.logging.log4j.Level.OFF;
-                        manager.logger.info(x -> x.accept(LocalizationKeys.LOG_LEVEL_UPDATED.get(newLevel)));
-                        var oldLevel = manager.logger.getLogLevel();
-                        manager.setLogLevel(newLevel);
-                        SFM.LOGGER.debug(
-                                "SFM updated manager {} {} log level to {} after a single execution at {} level",
-                                manager.getBlockPos(),
-                                manager.getLevel(),
-                                newLevel,
-                                oldLevel
-                        );
-                    }
+            // Run hooks if present
+            if (manager.programHooks != null) {
+                for (IProgramHooks hook : manager.programHooks) {
+                    hook.onProgramDidSomething(elapsed);
                 }
             }
+
+            // Distribute timing information to players
+            manager.sendUpdatePacket();
+            manager.logger.pruneSoWeDontEatAllTheRam();
+
+            // Turn off logging after one execution
+            if (manager.logger.getLogLevel() == org.apache.logging.log4j.Level.TRACE
+                || manager.logger.getLogLevel() == org.apache.logging.log4j.Level.DEBUG
+                || manager.logger.getLogLevel() == org.apache.logging.log4j.Level.INFO
+            ) {
+                org.apache.logging.log4j.Level newLogLevel = org.apache.logging.log4j.Level.OFF;
+                manager.logger.info(x -> x.accept(LocalizationKeys.LOG_LEVEL_UPDATED.get(newLogLevel)));
+                var oldLogLevel = manager.logger.getLogLevel();
+                manager.setLogLevel(newLogLevel);
+                SFM.LOGGER.debug(
+                        "SFM updated manager {} {} log level to {} after a single execution at {} level",
+                        manager.getBlockPos(),
+                        manager.getLevel(),
+                        newLogLevel,
+                        oldLogLevel
+                );
+            }
         } catch (Throwable t) {
-            // tell the user that they can disable the manager in the config
+            // Inform the user that they can disable the manager in the config
             String configPath;
             var found = SFMConfigTracker.getPathForConfig(SFMConfig.SERVER_CONFIG_SPEC);
             if (found != null) {
@@ -411,10 +414,10 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
                         menu.logLevel = logger.getLogLevel().name();
                     }
 
-                    // Send new logs
-                    MutableInstant hasSince = new MutableInstant();
+                    // Send new logs by determining what logs the player already has
+                    SFMEpochInstant hasSince = SFMEpochInstant.zero();
                     if (!menu.logs.isEmpty()) {
-                        hasSince.initFrom(menu.logs.getLast().instant());
+                        hasSince = menu.logs.getLast().instant();
                     }
                     var logsToSend = logger.getLogsAfter(hasSince);
                     if (!logsToSend.isEmpty()) {

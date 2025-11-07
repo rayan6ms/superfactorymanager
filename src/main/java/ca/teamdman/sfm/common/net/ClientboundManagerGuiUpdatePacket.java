@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
+import ca.teamdman.sfm.common.timing.SFMDurationNetworkUtils;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
