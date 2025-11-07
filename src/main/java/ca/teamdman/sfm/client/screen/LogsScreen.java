@@ -9,6 +9,7 @@ import ca.teamdman.sfm.common.net.ServerboundManagerClearLogsPacket;
 import ca.teamdman.sfm.common.net.ServerboundManagerLogDesireUpdatePacket;
 import ca.teamdman.sfm.common.net.ServerboundManagerSetLogLevelPacket;
 import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.timing.SFMEpochInstant;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -19,7 +20,6 @@ import net.minecraft.network.chat.CommonComponents;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import org.apache.logging.log4j.Level;
-import org.apache.logging.log4j.core.time.MutableInstant;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -132,11 +132,9 @@ public class LogsScreen extends Screen {
 
         // If no logs present, add reminder text as a log message
         if (MENU.logs.isEmpty() && MENU.logLevel.equals(Level.OFF.name())) {
-            MutableInstant instant = new MutableInstant();
-            instant.initFromEpochMilli(System.currentTimeMillis(), 0);
             MENU.logs.add(new TranslatableLogEvent(
                     Level.INFO,
-                    instant,
+                    SFMEpochInstant.now(),
                     LocalizationKeys.LOGS_GUI_NO_CONTENT.get()
             ));
         }
@@ -258,27 +256,27 @@ public class LogsScreen extends Screen {
 
     private void onCopyLogsClicked(Button button) {
 
-        StringBuilder clip = new StringBuilder();
-        clip.append(SFMDiagnostics.getDiagnosticsSummary(
+        StringBuilder clipboardBuilder = new StringBuilder();
+        clipboardBuilder.append(SFMDiagnostics.getDiagnosticsSummary(
                 MENU.getDisk()
         ));
-        clip.append("\n-- LOGS --\n");
+        clipboardBuilder.append("\n-- LOGS --\n");
         if (hasShiftDown()) {
             for (TranslatableLogEvent log : MENU.logs) {
-                clip.append(log.level().name()).append(" ");
-                clip.append(log.instant().toString()).append(" ");
-                clip.append(log.contents().getKey());
+                clipboardBuilder.append(log.level().name()).append(" ");
+                clipboardBuilder.append(log.instant().toString()).append(" ");
+                clipboardBuilder.append(log.contents().getKey());
                 for (Object arg : log.contents().getArgs()) {
-                    clip.append(" ").append(arg);
+                    clipboardBuilder.append(" ").append(arg);
                 }
-                clip.append("\n");
+                clipboardBuilder.append("\n");
             }
         } else {
             for (MutableComponent line : textarea.styledTextContentLines) {
-                clip.append(line.getString()).append("\n");
+                clipboardBuilder.append(line.getString()).append("\n");
             }
         }
-        Minecraft.getInstance().keyboardHandler.setClipboard(clip.toString());
+        Minecraft.getInstance().keyboardHandler.setClipboard(clipboardBuilder.toString());
     }
 
 }

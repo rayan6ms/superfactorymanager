@@ -19,14 +19,16 @@ public class SFMDelegatedTestFunction extends TestFunction {
                 definition.required(),
                 1,
                 1,
-                (GameTestHelper helper) -> definition.run(new SFMGameTestHelper(helper))
+                (GameTestHelper helper) -> {
+                    throw new UnsupportedOperationException("We expect tests to call the run fn");
+                }
         );
         this.definition = definition;
     }
 
     @Override
     public void run(GameTestHelper pGameTestHelper) {
-        definition.run(new SFMGameTestHelper(pGameTestHelper));
+        definition.run(new SFMGameTestHelper(this, pGameTestHelper));
     }
 
     @Override

@@ -5,6 +5,7 @@ import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.logging.TranslatableLogEvent;
 import ca.teamdman.sfm.common.net.ServerboundManagerSetLogLevelPacket;
 import ca.teamdman.sfm.common.registry.SFMMenus;
+import ca.teamdman.sfm.common.timing.SFMDurationNetworkUtils;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
@@ -16,7 +17,10 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
 
+import java.time.Duration;
 import java.util.ArrayDeque;
+
+import static ca.teamdman.sfm.common.timing.SFMDurationNetworkUtils.readDurationArray;
 
 public class ManagerContainerMenu extends AbstractContainerMenu {
     public final Container CONTAINER;
@@ -27,7 +31,7 @@ public class ManagerContainerMenu extends AbstractContainerMenu {
     public boolean isLogScreenOpen = false;
     public String program;
     public ManagerBlockEntity.State state;
-    public long[] tickTimeNanos;
+    public Duration[] tickTimes;
 
 
     public ManagerContainerMenu(
@@ -38,7 +42,7 @@ public class ManagerContainerMenu extends AbstractContainerMenu {
             String program,
             String logLevel,
             ManagerBlockEntity.State state,
-            long[] tickTimeNanos,
+            Duration[] tickTimes,
             ArrayDeque<TranslatableLogEvent> logs
     ) {
         super(SFMMenus.MANAGER_MENU.get(), windowId);
@@ -50,7 +54,7 @@ public class ManagerContainerMenu extends AbstractContainerMenu {
         this.logs = logs;
         this.program = program;
         this.state = state;
-        this.tickTimeNanos = tickTimeNanos;
+        this.tickTimes = tickTimes;
 
         this.addSlot(new Slot(container, 0, 15, 47) {
             @Override
@@ -88,7 +92,7 @@ public class ManagerContainerMenu extends AbstractContainerMenu {
                 buf.readUtf(Program.MAX_PROGRAM_LENGTH),
                 buf.readUtf(ServerboundManagerSetLogLevelPacket.MAX_LOG_LEVEL_NAME_LENGTH),
                 buf.readEnum(ManagerBlockEntity.State.class),
-                buf.readLongArray(null, ManagerBlockEntity.TICK_TIME_HISTORY_SIZE),
+                readDurationArray(buf.readLongArray(null, ManagerBlockEntity.TICK_TIME_HISTORY_SIZE)),
                 new ArrayDeque<>()
         );
     }
@@ -106,7 +110,7 @@ public class ManagerContainerMenu extends AbstractContainerMenu {
                 manager.getProgramStringOrEmptyIfNull(),
                 manager.logger.getLogLevel().name(),
                 manager.getState(),
-                manager.getTickTimeNanos(),
+                manager.getTickTimes(),
                 new ArrayDeque<>()
         );
     }
@@ -122,7 +126,7 @@ public class ManagerContainerMenu extends AbstractContainerMenu {
                 ServerboundManagerSetLogLevelPacket.MAX_LOG_LEVEL_NAME_LENGTH
         );
         buf.writeEnum(manager.getState());
-        buf.writeLongArray(manager.getTickTimeNanos());
+        SFMDurationNetworkUtils.writeDurationArray(manager.getTickTimes(), buf);
     }
 
     public ItemStack getDisk() {
