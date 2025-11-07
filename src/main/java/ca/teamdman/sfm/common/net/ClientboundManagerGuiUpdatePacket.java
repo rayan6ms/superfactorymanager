@@ -2,16 +2,19 @@ package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
+import ca.teamdman.sfm.common.timing.SFMDurationNetworkUtils;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 
+import java.time.Duration;
+
 public record ClientboundManagerGuiUpdatePacket(
         int windowId,
         String program,
         ManagerBlockEntity.State state,
-        long[] tickTimes
+        Duration[] tickTimes
 ) implements SFMPacket {
     public ClientboundManagerGuiUpdatePacket cloneWithWindowId(int windowId) {
         return new ClientboundManagerGuiUpdatePacket(windowId, program(), state(), tickTimes());
@@ -35,7 +38,7 @@ public record ClientboundManagerGuiUpdatePacket(
             friendlyByteBuf.writeVarInt(msg.windowId());
             friendlyByteBuf.writeUtf(msg.program(), Program.MAX_PROGRAM_LENGTH);
             friendlyByteBuf.writeEnum(msg.state());
-            friendlyByteBuf.writeLongArray(msg.tickTimes());
+            SFMDurationNetworkUtils.writeDurationArray(msg.tickTimes, friendlyByteBuf);
         }
 
         @Override
@@ -44,7 +47,7 @@ public record ClientboundManagerGuiUpdatePacket(
                     friendlyByteBuf.readVarInt(),
                     friendlyByteBuf.readUtf(Program.MAX_PROGRAM_LENGTH),
                     friendlyByteBuf.readEnum(ManagerBlockEntity.State.class),
-                    friendlyByteBuf.readLongArray()
+                    SFMDurationNetworkUtils.readDurationArray(friendlyByteBuf.readLongArray())
             );
         }
 
@@ -61,7 +64,7 @@ public record ClientboundManagerGuiUpdatePacket(
 //                SFM.LOGGER.error("Invalid manager gui packet received, ignoring.");
                 return;
             }
-            menu.tickTimeNanos = msg.tickTimes();
+            menu.tickTimes = msg.tickTimes();
             menu.state = msg.state();
             menu.program = msg.program();
         }

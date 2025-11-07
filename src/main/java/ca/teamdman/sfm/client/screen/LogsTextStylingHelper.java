@@ -15,10 +15,10 @@ public class LogsTextStylingHelper {
     public static List<MutableComponent> getStyledLogs(Iterable<TranslatableLogEvent> logs) {
         List<MutableComponent> processedLogs = new ArrayList<>();
         for (TranslatableLogEvent log : logs) {
-            int seconds = (int) (System.currentTimeMillis() - log.instant().getEpochMillisecond()) / 1000;
-            int minutes = seconds / 60;
-            seconds = seconds % 60;
-            var ago = Component.literal(minutes + "m" + seconds + "s ago").withStyle(ChatFormatting.GRAY);
+            int secondsAgo = Math.toIntExact(log.instant().elapsed().toSeconds());
+            int minutes = secondsAgo / 60;
+            secondsAgo = secondsAgo % 60;
+            var ago = Component.literal(minutes + "m" + secondsAgo + "s ago").withStyle(ChatFormatting.GRAY);
 
             var level = Component.literal(" [" + log.level() + "] ");
             if (log.level() == Level.ERROR) {
