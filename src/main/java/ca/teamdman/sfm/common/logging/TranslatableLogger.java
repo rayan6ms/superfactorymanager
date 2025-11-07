@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.logging;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.timing.SFMEpochInstant;
 import io.netty.buffer.Unpooled;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -11,7 +12,6 @@ import org.apache.logging.log4j.Logger;
 import org.apache.logging.log4j.core.LoggerContext;
 import org.apache.logging.log4j.core.config.Configuration;
 import org.apache.logging.log4j.core.config.LoggerConfig;
-import org.apache.logging.log4j.core.time.Instant;
 
 import java.util.*;
 import java.util.function.Consumer;
@@ -128,17 +128,6 @@ public class TranslatableLogger {
         getContents().clear();
     }
 
-    public static boolean comesAfter(
-            Instant a,
-            Instant b
-    ) {
-        return a.getEpochSecond() > b.getEpochSecond()
-               || (
-                       a.getEpochSecond() == b.getEpochSecond()
-                       && a.getNanoOfSecond() > b.getNanoOfSecond()
-               );
-    }
-
     public static ArrayDeque<TranslatableLogEvent> decode(FriendlyByteBuf buf) {
         int size = buf.readVarInt();
         ArrayDeque<TranslatableLogEvent> contents = new ArrayDeque<>(size);
@@ -178,14 +167,14 @@ public class TranslatableLogger {
         buf.writeBytes(chunk);
     }
 
-    public ArrayDeque<TranslatableLogEvent> getLogsAfter(Instant instant) {
+    public ArrayDeque<TranslatableLogEvent> getLogsAfter(SFMEpochInstant instant) {
         List<TranslatableLogEvent> contents = getContents();
         ArrayDeque<TranslatableLogEvent> toSend = new ArrayDeque<>();
         // Add from tail until we reach the last sent marker
         var iter = contents.listIterator(contents.size());
         while (iter.hasPrevious()) {
             var entry = iter.previous();
-            if (comesAfter(entry.instant(), instant)) {
+            if (entry.instant().compareTo(instant) > 0) {
                 toSend.addFirst(entry);
             } else {
                 break;
