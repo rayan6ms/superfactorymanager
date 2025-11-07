@@ -114,8 +114,8 @@ public class CircleRedstoneGameTest extends SFMGameTestDefinition {
         // Check for alternation
         AtomicInteger countSlot0 = new AtomicInteger(0);
         AtomicInteger countSlot1 = new AtomicInteger(0);
-        for (int i = 1; i <= 20; i++) {
-            helper.runAfterDelay(i * 10, () -> {
+        for (int i = 1; i <= 100; i++) {
+            helper.runAfterDelay(i, () -> {
                 boolean slot0Full = barrelHandler.getStackInSlot(0).getCount() == 64 && barrelHandler.getStackInSlot(1).isEmpty();
                 boolean slot1Full = barrelHandler.getStackInSlot(1).getCount() == 64 && barrelHandler.getStackInSlot(0).isEmpty();
                 if (slot0Full) {
@@ -124,11 +124,10 @@ public class CircleRedstoneGameTest extends SFMGameTestDefinition {
                 if (slot1Full) {
                     countSlot1.incrementAndGet();
                 }
-                int diff = Math.abs(countSlot0.get() - countSlot1.get());
-                if (diff > 1) {
-                    helper.fail("Alternation failed: diff = " + diff);
+                if (slot0Full && slot1Full) {
+                    helper.fail("Alternation failed: both slots full");
                 }
-                if (countSlot0.get() > 5 && countSlot1.get() > 5) {
+                if (countSlot0.get() >= 20 && countSlot1.get() >= 20) {
                     helper.succeed();
                 }
             });

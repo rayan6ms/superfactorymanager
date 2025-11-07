@@ -6,21 +6,27 @@ import java.time.Duration;
 import java.util.List;
 
 public final class SequentialAssertionHooks implements IProgramHooks {
+
     private final List<Runnable> assertions;
+
+    private final SFMGameTestHelper helper;
 
     private int index = 0;
 
     public SequentialAssertionHooks(
+            SFMGameTestHelper helper,
             List<Runnable> assertions
     ) {
 
+        this.helper = helper;
         this.assertions = assertions;
     }
 
     @Override
     public void onProgramDidSomething(Duration elapsed) {
         if (index < assertions.size()) {
-            assertions.get(index).run();
+            // enqueue to run inside the game test harness
+            helper.runAfterDelay(0, assertions.get(index));
             index++;
         }
     }

@@ -68,33 +68,36 @@ public class CapabilityCacheRemoveDestinationGameTest extends SFMGameTestDefinit
                 .save(Objects.requireNonNull(manager.getDisk()));
 
 
-        manager.addProgramHooks(new SequentialAssertionHooks(List.of(
-                () -> {
-                    // validate one item has moved
-                    assertTrue(count(leftChest, null) == 63, "One should have departed");
-                    assertTrue(count(rightChest.get(), null) == 1, "One should have arrived");
+        manager.addProgramHooks(new SequentialAssertionHooks(
+                helper,
+                List.of(
+                        () -> {
+                            // validate one item has moved
+                            assertTrue(count(leftChest, null) == 63, "One should have departed");
+                            assertTrue(count(rightChest.get(), null) == 1, "One should have arrived");
 
-                    // break the destination block
-                    helper.setBlock(rightPos, Blocks.AIR);
-                },
-                () -> {
-                    // validate things aren't moving
-                    assertTrue(count(leftChest, null) == 63, "None should depart after destination is broken");
+                            // break the destination block
+                            helper.setBlock(rightPos, Blocks.AIR);
+                        },
+                        () -> {
+                            // validate things aren't moving
+                            assertTrue(count(leftChest, null) == 63, "None should depart after destination is broken");
 
-                    // restore destination block
-                    helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
-                    rightChest.set(helper.getItemHandler(rightPos));
-                    rightChest.get().insertItem(0, new ItemStack(Blocks.DIRT, 1), false);
-                },
-                () -> {
-                    // validate that items have resumed moving
-                    assertTrue(count(leftChest, null) == 62, "Another departs after dest restored");
-                    assertTrue(count(rightChest.get(), null) == 2, "Another arrives after dest restored");
+                            // restore destination block
+                            helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+                            rightChest.set(helper.getItemHandler(rightPos));
+                            rightChest.get().insertItem(0, new ItemStack(Blocks.DIRT, 1), false);
+                        },
+                        () -> {
+                            // validate that items have resumed moving
+                            assertTrue(count(leftChest, null) == 62, "Another departs after dest restored");
+                            assertTrue(count(rightChest.get(), null) == 2, "Another arrives after dest restored");
 
-                    // enqueue success
-                    helper.runAfterDelay(0, helper::succeed);
-                }
-        )));
+                            // enqueue success
+                            helper.succeed();
+                        }
+                )
+        ));
     }
 
 }

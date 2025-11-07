@@ -120,14 +120,17 @@ public class SFMGameTestHelper extends GameTestHelper {
         manager.addProgramHooks(new IProgramHooks() {
             @Override
             public void onProgramDidSomething(Duration elapsed) {
-                assertion.run();
-                SFMGameTestMethodHelpers.assertTrue(
-                        elapsed.toMillis() < 80,
-                        "Program took too long to run: took " + NumberFormat
-                                .getInstance(Locale.getDefault())
-                                .format(elapsed.toNanos()) + "ns"
-                );
-                ((Runnable) SFMGameTestHelper.this::succeed).run();
+                // enqueue to run inside the game test harness
+                SFMGameTestHelper.this.runAfterDelay(0, () -> {
+                    assertion.run();
+                    SFMGameTestMethodHelpers.assertTrue(
+                            elapsed.toMillis() < 80,
+                            "Program took too long to run: took " + NumberFormat
+                                    .getInstance(Locale.getDefault())
+                                    .format(elapsed.toNanos()) + "ns"
+                    );
+                    SFMGameTestHelper.this.succeed();
+                });
             }
         });
     }
