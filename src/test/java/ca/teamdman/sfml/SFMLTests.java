@@ -688,6 +688,18 @@ public class SFMLTests {
     }
 
     @Test
+    public void relativeDirectionLabels() {
+        assertNoCompileErrors(
+                """
+                        every 20 ticks do
+                            input from left right, null side
+                            output to right left, top side
+                        end
+                        """
+        );
+    }
+
+    @Test
     public void basicResourceIdentifier() {
         var identifier = ResourceIdentifier.fromString("wool");
         assertEquals("sfm:item:.*:wool", identifier.toString());
