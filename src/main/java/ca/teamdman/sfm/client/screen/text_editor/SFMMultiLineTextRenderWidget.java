@@ -4,7 +4,6 @@ import ca.teamdman.sfm.client.screen.SFMFontUtils;
 import ca.teamdman.sfm.client.screen.SFMScreenRenderUtils;
 import ca.teamdman.sfm.common.util.SFMComponentUtils;
 import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.Tesselator;
 import it.unimi.dsi.fastutil.ints.Int2IntArrayMap;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -130,7 +129,7 @@ public class SFMMultiLineTextRenderWidget implements Renderable {
         final int selectionEnd = selected.endIndex();
 
         // One buffer for the entire text pass
-        MultiBufferSource.BufferSource buffer = MultiBufferSource.immediate(Tesselator.getInstance().getBuilder());
+        MultiBufferSource.BufferSource buffer = pGuiGraphics.bufferSource();
 
         // Collect selection highlights rects and draw them after the text
         List<int[]> highlightRects = new ArrayList<>();
