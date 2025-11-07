@@ -87,7 +87,7 @@ public abstract class SFMTestBuilder {
         }
         assert manager != null;
         labelHolder.save(Objects.requireNonNull(manager.getDisk()));
-        helper.assertManagerDidThingWithoutLagging(
+        helper.succeedIfManagerDidThingWithoutLagging(
                 manager,
                 () -> {
                     // first, assertions as normal
@@ -211,8 +211,7 @@ public abstract class SFMTestBuilder {
                         );
 
                     }
-                },
-                helper::succeed
+                }
         );
     }
 
