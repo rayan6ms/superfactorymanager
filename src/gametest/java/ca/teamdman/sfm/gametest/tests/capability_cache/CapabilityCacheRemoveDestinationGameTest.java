@@ -91,8 +91,8 @@ public class CapabilityCacheRemoveDestinationGameTest extends SFMGameTestDefinit
                     assertTrue(count(leftChest, null) == 62, "Another departs after dest restored");
                     assertTrue(count(rightChest.get(), null) == 2, "Another arrives after dest restored");
 
-                    // succeed
-                    helper.succeed();
+                    // enqueue success
+                    helper.runAfterDelay(0, helper::succeed);
                 }
         )));
     }
