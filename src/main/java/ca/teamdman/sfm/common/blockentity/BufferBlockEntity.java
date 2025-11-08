@@ -64,7 +64,7 @@ public class BufferBlockEntity extends BlockEntity {
         );
         if (found.isPresent()) {
             // create a copy so that we can invalidate it without affecting the original
-            LazyOptional<T> rtn = found.capability().lazyMap(x->x);
+            LazyOptional<T> rtn = found.inner().lazyMap(x->x);
             toInvalidate.add(rtn);
             return rtn;
         } else {
