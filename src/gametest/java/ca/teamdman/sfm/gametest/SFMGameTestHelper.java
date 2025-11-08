@@ -151,6 +151,8 @@ public class SFMGameTestHelper extends GameTestHelper {
         });
     }
 
+    /// Asserts an expression using labels from the disk inside a manager.
+    /// Note that this should not be used in tests responsible for validating the correctness of the capability cache.
     public void assertExpr(
             ManagerBlockEntity manager,
             String exprString
