@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.capability.BufferBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.CauldronBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
+import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
@@ -97,6 +98,12 @@ public class SFMBlockCapabilities {
                 Blocks.CAULDRON,
                 Blocks.LAVA_CAULDRON,
                 Blocks.WATER_CAULDRON
+        );
+
+        event.registerBlockEntity(
+                SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind(),
+                SFMBlockEntities.MANAGER_BLOCK_ENTITY.get(),
+                (manager, direction) -> new InvWrapper(manager)
         );
 
         SFMResourceTypes.registry().values().forEach(resourceType -> {
