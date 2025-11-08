@@ -74,7 +74,7 @@ public class ConditionalOutputInspectionGameTest extends SFMGameTestDefinition {
         manager.setProgram(code);
         assertManagerRunning(manager);
 
-        // compile new program for inspection
+        // compile a new program for inspection
         Program program = compile(code);
 
 

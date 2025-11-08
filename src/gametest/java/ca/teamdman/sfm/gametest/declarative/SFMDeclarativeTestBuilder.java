@@ -10,15 +10,12 @@ import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.BoolExpr;
-import ca.teamdman.sfml.ast.IfStatement;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
-import org.apache.commons.lang3.mutable.Mutable;
-import org.apache.commons.lang3.mutable.MutableObject;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -114,7 +111,7 @@ public class SFMDeclarativeTestBuilder {
             List<String> conditions
     ) {
         if (conditions.isEmpty()) return;
-        List<BoolExpr> expressions = conditions.stream().map(this::getCondition).toList();
+        List<BoolExpr> expressions = conditions.stream().map(BoolExpr::from).toList();
         ProgramContext programContext = new ProgramContext(
                 new Program(new ASTBuilder(), "temp lol", List.of(), Set.of(), Set.of()),
                 manager,
@@ -127,35 +124,6 @@ public class SFMDeclarativeTestBuilder {
             }
             conditionIndex++;
         }
-    }
-
-    private BoolExpr getCondition(String line) {
-        // This is where you’d parse lines like:
-        //   “a BOTTOM SIDE HAS EQ 1000 fe::”
-        // Or something like: “b BOTTOM SIDE HAS EQ 0 fe::”
-        Mutable<BoolExpr> rtn = new MutableObject<>();
-        String program = "EVERY 20 TICKS DO IF " + line + " THEN END END";
-        Program.compile(
-                program,
-                success -> {
-                    BoolExpr condition = (
-                            (IfStatement) success
-                                    .triggers()
-                                    .get(0)
-                                    .getBlock()
-                                    .getStatements()
-                                    .get(0)
-                    ).condition();
-                    rtn.setValue(condition);
-                },
-                failure -> {
-                    StringBuilder msg = new StringBuilder("Failed to compile program: ").append(program);
-                    msg.append('\n');
-                    failure.forEach(e -> msg.append(e.toString()).append('\n'));
-                    throw new IllegalStateException(msg.toString());
-                }
-        );
-        return rtn.getValue();
     }
 
     private void labelBlocks(

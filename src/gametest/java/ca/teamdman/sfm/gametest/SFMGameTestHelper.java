@@ -5,15 +5,24 @@ import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
+import ca.teamdman.sfm.common.program.ExecuteProgramBehaviour;
 import ca.teamdman.sfm.common.program.IProgramHooks;
+import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.util.NotStored;
+import ca.teamdman.sfml.ast.ASTBuilder;
+import ca.teamdman.sfml.ast.BoolExpr;
+import ca.teamdman.sfml.ast.Program;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.gametest.framework.GameTestAssertPosException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.level.block.Mirror;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
@@ -21,7 +30,10 @@ import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 public class SFMGameTestHelper extends GameTestHelper {
     public final SFMDelegatedTestFunction sfmTestDefinition;
@@ -30,6 +42,7 @@ public class SFMGameTestHelper extends GameTestHelper {
             SFMDelegatedTestFunction sfmDelegatedTestFunction,
             GameTestHelper helper
     ) {
+
         super(helper.testInfo);
         this.sfmTestDefinition = sfmDelegatedTestFunction;
     }
@@ -125,18 +138,58 @@ public class SFMGameTestHelper extends GameTestHelper {
             @Override
             public void onProgramDidSomething(Duration elapsed) {
                 // enqueue to run inside the game test harness
-                SFMGameTestHelper.this.runAfterDelay(0, () -> {
-                    assertion.run();
-                    SFMGameTestMethodHelpers.assertTrue(
-                            elapsed.toMillis() < 80,
-                            "Program took too long to run: took " + NumberFormat
-                                    .getInstance(Locale.getDefault())
-                                    .format(elapsed.toNanos()) + "ns"
-                    );
-                    SFMGameTestHelper.this.succeed();
-                });
+                SFMGameTestHelper.this.runAfterDelay(
+                        0,
+                        () -> {
+                            assertion.run();
+                            SFMGameTestMethodHelpers.assertTrue(
+                                    elapsed.toMillis() < 80,
+                                    "Program took too long to run: took " + NumberFormat
+                                            .getInstance(Locale.getDefault())
+                                            .format(elapsed.toNanos()) + "ns"
+                            );
+                            SFMGameTestHelper.this.succeed();
+                        }
+                );
             }
         });
+    }
+
+    /// Asserts an expression using labels from the disk inside a manager.
+    /// Note that this should not be used in tests responsible for validating the correctness of the capability cache.
+    public void assertExpr(
+            ManagerBlockEntity manager,
+            String exprString
+    ) {
+
+        BoolExpr expr = BoolExpr.from(exprString);
+        ProgramContext programContext = new ProgramContext(
+                new Program(new ASTBuilder(), "temp lol", List.of(), Set.of(), Set.of()),
+                manager,
+                ExecuteProgramBehaviour::new
+        );
+        boolean passed = expr.test(programContext);
+        if (!passed) {
+            List<BlockPos> positions = new ArrayList<>();
+            expr.collectPositions(programContext, positions::add);
+            positions.add(manager.getBlockPos());
+            BlockPos failurePos = positions.get(0);
+            throw new GameTestAssertPosException(
+                    "Condition failed: " + exprString,
+                    failurePos,
+                    relativePos(failurePos),
+                    this.getTick()
+            );
+        }
+    }
+
+    @Override
+    public BlockPos relativePos(BlockPos pPos) {
+
+        BlockPos blockpos = this.testInfo.getStructureBlockPos();
+        Rotation rotation = this.testInfo.getRotation(); //.getRotated(Rotation.CLOCKWISE_180); // causes problems idk
+        BlockPos blockpos1 = StructureTemplate.transform(pPos, Mirror.NONE, rotation, blockpos);
+        return blockpos1.subtract(blockpos);
     }
 
 }

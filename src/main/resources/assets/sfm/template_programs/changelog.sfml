@@ -43,6 +43,15 @@ END
 -- Fixed text editor scroll bar inappropriately responding to mouse events
 -- Improved text editor performance on large documents by using virtual scrolling
 -- Click-drag text selection now uses character midpoint for determining if a character is in selection
+-- Allow managers to interact with themselves
+EVERY 20 TICKS DO
+  INPUT FROM manager
+  OUTPUT TO chest slot 0
+FORGET
+  INPUT disk FROM chest slot 1
+  OUTPUT TO manager
+END
+-- Add try-catch to capability discovery, thanks @Sverd for the report! #418
 
 
 ---- 4.26.0 ----
