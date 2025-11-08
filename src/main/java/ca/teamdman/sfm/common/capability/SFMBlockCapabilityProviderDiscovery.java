@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.capability;
 
+import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.SFMBlockCapabilityCacheForLevel;
@@ -31,17 +32,45 @@ public class SFMBlockCapabilityProviderDiscovery {
             BlockEntity blockEntity,
             @Nullable Direction direction
     ) {
-        for (var capabilityProviderMapper : getCapabilityProvidersForKindFast(capKind)) {
-            var capability = capabilityProviderMapper.getCapability(
-                    capKind, level,
+
+        try {
+            for (var capabilityProviderMapper : getCapabilityProvidersForKindFast(capKind)) {
+                var capability = capabilityProviderMapper.getCapability(
+                        capKind,
+                        level,
+                        pos,
+                        blockState,
+                        blockEntity,
+                        direction
+                );
+                if (capability.isPresent()) {
+                    return capability;
+                }
+            }
+        } catch (Throwable t) {
+            SFM.LOGGER.error(
+                    """
+                            SFM encountered an exception while querying capabilities. Please report this!
+                            {}
+                            capKind={}
+                            level={}
+                            pos={}
+                            blockState={}
+                            block={}
+                            blockClass={}
+                            blockEntity={}
+                            direction={}
+                            """.stripTrailing().stripIndent(),
+                    SFM.ISSUE_TRACKER_URL,
+                    capKind,
+                    level,
                     pos,
                     blockState,
+                    blockState.getBlock(),
+                    blockState.getBlock().getClass(),
                     blockEntity,
                     direction
             );
-            if (capability.isPresent()) {
-                return capability;
-            }
         }
         return SFMBlockCapabilityResult.empty();
     }
@@ -50,6 +79,7 @@ public class SFMBlockCapabilityProviderDiscovery {
     public static <CAP> ArrayList<SFMBlockCapabilityProvider<CAP>> getCapabilityProvidersForKindFast(
             SFMBlockCapabilityKind<CAP> capabilityKind
     ) {
+
         return (ArrayList<SFMBlockCapabilityProvider<CAP>>) (ArrayList) BLOCK_CAPABILITY_PROVIDERS_BY_KIND.computeIfAbsent(
                 capabilityKind,
                 __ -> (ArrayList<SFMBlockCapabilityProvider<?>>) (ArrayList)
@@ -60,6 +90,7 @@ public class SFMBlockCapabilityProviderDiscovery {
     private static <CAP> ArrayList<SFMBlockCapabilityProvider<CAP>> getCapabilityProvidersForKind(
             SFMBlockCapabilityKind<CAP> capabilityKind
     ) {
+
         ArrayList<SFMBlockCapabilityProvider<CAP>> rtn = new ArrayList<>();
         for (SFMBlockCapabilityProvider<?> mapper : SFMGlobalBlockCapabilityProviders.getAllProviders()) {
             if (mapper.matchesCapabilityKind(capabilityKind)) {

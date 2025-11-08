@@ -179,9 +179,10 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         if (pKeyCode == GLFW.GLFW_KEY_BACKSLASH && !suggestedActions.isEmpty()) {
             IntellisenseAction action = suggestedActions.getSelected();
             assert action != null;
+
             ManipulationResult result = action.perform(
                     new IntellisenseContext(
-                            ProgramBuilder.build(textarea.getValue()),
+                            new ProgramBuilder(textarea.getValue()).build(),
                             textarea.getCursorPosition(),
                             textarea.getSelectionCursorPosition(),
                             openContext.labelPositionHolder(),
@@ -667,7 +668,8 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             if (programString.equals(cachedBuildProgram) && cachedBuildResult != null) {
                 buildResult = cachedBuildResult;
             } else {
-                buildResult = ProgramBuilder.build(programString);
+
+                buildResult = new ProgramBuilder(programString).build();
                 cachedBuildProgram = programString;
                 cachedBuildResult = buildResult;
             }

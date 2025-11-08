@@ -142,6 +142,9 @@ public class CableNetwork {
      * @return {@code true} if adjacent to cable in network
      */
     public boolean isAdjacentToCable(@NotStored BlockPos pos) {
+        if (containsCablePosition(pos)) {
+            return true; // allow managers to interact with themselves
+        }
         BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
         for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
             target.set(pos).move(direction);
