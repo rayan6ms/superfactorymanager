@@ -257,7 +257,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
             return null;
         }
 
-        var program = DiskItem.getProgram(disk);
+        var program = DiskItem.getProgramString(disk);
         return program.isBlank() ? null : program;
     }
 
