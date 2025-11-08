@@ -15,6 +15,7 @@ import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.common.util.SFMTranslationUtils;
 import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.program_builder.ProgramBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -83,9 +84,10 @@ public class DiskItem extends Item {
             manager.logger.info(x -> x.accept(LocalizationKeys.PROGRAM_COMPILE_FROM_DISK_BEGIN.get()));
         }
         AtomicReference<Program> rtn = new AtomicReference<>(null);
-        Program.compile(
-                getProgramString(stack),
-                successProgram -> {
+        String programString = getProgramString(stack);
+        ProgramBuilder
+                .build(programString)
+                .caseSuccess((successProgram, metadata) -> {
                     if (updateWarnings) {
                         Collection<TranslatableContents> warnings = ProgramLinter.gatherWarnings(
                                 successProgram,
@@ -110,9 +112,10 @@ public class DiskItem extends Item {
 
                     // Track result
                     rtn.set(successProgram);
-                },
-                errors -> {
+                })
+                .caseFailure(result -> {
                     List<TranslatableContents> warnings = Collections.emptyList();
+                    List<TranslatableContents> errors = result.metadata().errors();
 
                     // Log to disk
                     if (manager != null) {
@@ -124,8 +127,7 @@ public class DiskItem extends Item {
                     // Update disk properties
                     setWarnings(stack, warnings);
                     setErrors(stack, errors);
-                }
-        );
+                });
         return rtn.get();
     }
 

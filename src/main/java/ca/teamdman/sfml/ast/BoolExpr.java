@@ -1,6 +1,7 @@
 package ca.teamdman.sfml.ast;
 
 import ca.teamdman.sfm.common.program.ProgramContext;
+import ca.teamdman.sfml.program_builder.ProgramBuilder;
 import net.minecraft.core.BlockPos;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -21,12 +22,12 @@ public interface BoolExpr extends Predicate<ProgramContext>, ASTNode, ToStringPr
         //   “a BOTTOM SIDE HAS EQ 1000 fe::”
         // Or something like: “b BOTTOM SIDE HAS EQ 0 fe::”
         Mutable<BoolExpr> rtn = new MutableObject<>();
-        String program = "EVERY 20 TICKS DO IF " + line + " THEN END END";
-        Program.compile(
-                program,
-                success -> {
+        String programString = "EVERY 20 TICKS DO IF " + line + " THEN END END";
+        ProgramBuilder
+                .build(programString)
+                .caseSuccess((program, metadata) -> {
                     BoolExpr condition = (
-                            (IfStatement) success
+                            (IfStatement) program
                                     .triggers()
                                     .get(0)
                                     .getBlock()
@@ -34,14 +35,13 @@ public interface BoolExpr extends Predicate<ProgramContext>, ASTNode, ToStringPr
                                     .get(0)
                     ).condition();
                     rtn.setValue(condition);
-                },
-                failure -> {
-                    StringBuilder msg = new StringBuilder("Failed to compile program: ").append(program);
+                })
+                .caseFailure(result -> {
+                    StringBuilder msg = new StringBuilder("Failed to compile program: ").append(programString);
                     msg.append('\n');
-                    failure.forEach(e -> msg.append(e.toString()).append('\n'));
+                    result.metadata().errors().forEach(e -> msg.append(e.toString()).append('\n'));
                     throw new IllegalStateException(msg.toString());
-                }
-        );
+                });
         return rtn.getValue();
     }
 
