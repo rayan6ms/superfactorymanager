@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.gametest.tests.migrated;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
-import ca.teamdman.sfm.common.net.ServerboundOutputInspectionRequestPacket;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
+import ca.teamdman.sfm.common.net.ServerboundOutputInspectionRequestPacket;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
@@ -74,7 +74,7 @@ public class ConditionalOutputInspectionGameTest extends SFMGameTestDefinition {
         manager.setProgram(code);
         assertManagerRunning(manager);
 
-        // compile new program for inspection
+        // compile a new program for inspection
         Program program = compile(code);
 
 

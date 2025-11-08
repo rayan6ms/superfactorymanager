@@ -67,7 +67,7 @@ public class CapabilityCacheRemoveDestinationGameTest extends SFMGameTestDefinit
                 .add("b", helper.absolutePos(rightPos))
                 .save(Objects.requireNonNull(manager.getDisk()));
 
-
+        // add outcome hooks
         manager.addProgramHooks(new SequentialAssertionHooks(
                 helper,
                 List.of(
