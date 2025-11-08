@@ -76,16 +76,6 @@ public class ProgramBuilder {
             }
         }
 
-        // Assert just in case, this should never happen
-        //noinspection ConstantValue
-        if (program == null && errors.isEmpty()) {
-            errors.add(LocalizationKeys.PROGRAM_ERROR_COMPILE_FAILED.get());
-            SFM.LOGGER.error(
-                    "Program was somehow null after a successful compile. I have no idea how this could happen, but it definitely shouldn't.\n```\n{}\n```",
-                    programString
-            );
-        }
-
         ProgramMetadata metadata = new ProgramMetadata(
                 programString,
                 lexer,
