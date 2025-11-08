@@ -22,13 +22,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.WeakHashMap;
 
 public class ProgramBuilder {
+    private static final WeakHashMap<String, ProgramBuildResult> cache = new WeakHashMap<>();
     public static ProgramBuildResult build(
             @Nullable String programString
     ) {
         if (programString == null) {
             programString = "";
+        }
+        @Nullable ProgramBuildResult cached = cache.get(programString);
+        if (cached != null) {
+            return cached;
         }
         SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(programString));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -84,7 +90,9 @@ public class ProgramBuilder {
                 builder,
                 errors
         );
-        return new ProgramBuildResult(program, metadata);
+        ProgramBuildResult programBuildResult = new ProgramBuildResult(program, metadata);
+        cache.put(programString, programBuildResult);
+        return programBuildResult;
     }
 
 
