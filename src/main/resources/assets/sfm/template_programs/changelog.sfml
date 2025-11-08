@@ -52,6 +52,7 @@ FORGET
   OUTPUT TO manager
 END
 -- Add try-catch to capability discovery, thanks @Sverd for the report! #418
+-- Add missing item capability for manager block on MC 1.20.3+
 
 
 ---- 4.26.0 ----
