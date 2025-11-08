@@ -51,7 +51,7 @@ public class SFMBlockCapabilityDiscovery {
             @Nullable Direction direction,
             TranslatableLogger logger
     ) {
-
+        // If there is a cache entry, it has already been validated to be adjacent to a cable
         SFMBlockCapabilityCacheForLevel levelCapabilityCache = cableNetwork.getLevelCapabilityCache();
 
         // It is a precondition to enter the cache that the capability is adjacent to a cable
