@@ -16,7 +16,8 @@ import net.minecraft.world.level.block.ButtonBlock;
 import net.minecraft.world.level.block.RepeaterBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.AttachFace;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandler;
+
 
 import java.util.List;
 import java.util.Objects;

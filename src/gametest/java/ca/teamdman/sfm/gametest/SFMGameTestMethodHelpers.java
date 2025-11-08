@@ -7,6 +7,7 @@ import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.program_builder.ProgramBuilder;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
@@ -39,6 +40,7 @@ public class SFMGameTestMethodHelpers {
             Enchantment enchantment,
             int level
     ) {
+
         EnchantmentHelper.setEnchantments(Map.of(enchantment, level), stack);
         return stack;
     }
@@ -47,6 +49,7 @@ public class SFMGameTestMethodHelpers {
             boolean condition,
             String message
     ) {
+
         if (!condition) {
             @SuppressWarnings("UnnecessaryLocalVariable")
             var toThrow = new GameTestAssertException(message);
@@ -58,21 +61,24 @@ public class SFMGameTestMethodHelpers {
     }
 
     public static Program compile(String code) {
+
         AtomicReference<Program> rtn = new AtomicReference<>();
-        Program.compile(
-                code,
-                rtn::set,
-                errors -> {
-                    throw new GameTestAssertException("Failed to compile program: " + errors
+
+        new ProgramBuilder(code)
+                .useCache(false)
+                .build()
+                .caseSuccess((program, metadata) -> rtn.set(program))
+                .caseFailure(result -> {
+                    throw new GameTestAssertException("Failed to compile program: " + result.metadata().errors()
                             .stream()
                             .map(Object::toString)
                             .reduce("", (a, b) -> a + "\n" + b));
-                }
-        );
+                });
         return rtn.get();
     }
 
     public static void assertManagerRunning(ManagerBlockEntity manager) {
+
         SFMGameTestMethodHelpers.assertTrue(manager.getDisk() != null, "No disk in manager");
         SFMGameTestMethodHelpers.assertTrue(
                 manager.getState() == ManagerBlockEntity.State.RUNNING,
@@ -84,6 +90,7 @@ public class SFMGameTestMethodHelpers {
             Container chest,
             @Nullable Item item
     ) {
+
         return IntStream.range(0, chest.getContainerSize())
                 .mapToObj(chest::getItem)
                 .filter(stack -> item == null || stack.getItem() == item)
@@ -95,6 +102,7 @@ public class SFMGameTestMethodHelpers {
             IItemHandler chest,
             @Nullable Item item
     ) {
+
         return IntStream.range(0, chest.getSlots())
                 .mapToObj(chest::getStackInSlot)
                 .filter(stack -> item == null || stack.getItem() == item)
@@ -125,15 +133,18 @@ public class SFMGameTestMethodHelpers {
             ItemStack enchBook,
             Iterator<Pair<SFMServerConfig.LevelsToShards, Integer>> iter
     ) {
+
         if (!iter.hasNext()) {
             // restore config to value before the test
             SFMConfig.SERVER_CONFIG.levelsToShards.set(configToRestore);
             helper.succeed();
             return;
         }
-        var c = iter.next();
+        var testCase = iter.next();
+        SFMServerConfig.LevelsToShards levelsToShards = testCase.first();
+        Integer expectedCount = testCase.second();
 
-        SFMConfig.SERVER_CONFIG.levelsToShards.set(c.first());
+        SFMConfig.SERVER_CONFIG.levelsToShards.set(levelsToShards);
         // kill old item entities
         helper
                 .getLevel()
@@ -154,25 +165,29 @@ public class SFMGameTestMethodHelpers {
         helper.setBlock(new BlockPos(1, 3, 1), Blocks.AIR);
         helper.setBlock(new BlockPos(1, 4, 1), Blocks.ANVIL);
 
-        helper.runAfterDelay(20, () -> {
-            List<ItemEntity> found = helper
-                    .getLevel()
-                    .getEntitiesOfClass(
-                            ItemEntity.class,
-                            new AABB(helper.absolutePos(new BlockPos(1, 4, 1))).inflate(3)
+        helper.runAfterDelay(
+                20,
+                () -> {
+                    List<ItemEntity> found = helper
+                            .getLevel()
+                            .getEntitiesOfClass(
+                                    ItemEntity.class,
+                                    new AABB(helper.absolutePos(new BlockPos(1, 4, 1))).inflate(3)
+                            );
+                    assertTrue(
+                            found.stream().allMatch(e -> e.getItem().is(SFMItems.EXPERIENCE_SHARD_ITEM.get())),
+                            "should only be xp shards"
                     );
-            assertTrue(
-                    found.stream().allMatch(e -> e.getItem().is(SFMItems.EXPERIENCE_SHARD_ITEM.get())),
-                    "should only be xp shards"
-            );
 
-            var cnt = found.stream().mapToInt(e -> e.getItem().getCount()).sum();
-            assertTrue(
-                    cnt == c.second(),
-                    "bad count for " + c.first().name() + ": expected " + c.second() + " but got " + cnt
-            );
+                    var count = found.stream().mapToInt(itemEntity -> itemEntity.getItem().getCount()).sum();
+                    assertTrue(
+                            count == expectedCount,
+                            "bad count for " + levelsToShards.name() + ": expected " + expectedCount + " but got " + count
+                    );
 
-            falling_anvil_xp_shard_inner(helper, numBooks, configToRestore, pos, enchBook, iter);
-        });
+                    falling_anvil_xp_shard_inner(helper, numBooks, configToRestore, pos, enchBook, iter);
+                }
+        );
     }
+
 }
