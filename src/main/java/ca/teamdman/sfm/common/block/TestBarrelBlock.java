@@ -26,8 +26,12 @@ public class TestBarrelBlock extends BarrelBlock {
             boolean pIsMoving
     ) {
         if (!pState.is(pNewState.getBlock())) {
-            // remove the block entity manually to prevent the items from dropping on the ground
+            // Remove the block entity manually to prevent the items from dropping on the ground from super logic.
+            // Note that this doesn't drain the inventory like the normal drop behaviour does.
+            // This means that if SFM has a use-after-free bug, the tests will be more likely to properly fail.
+            // For example, if a source barrel is broken without SFM discarding the reference, it will continue to successfully pull items from it.
             pLevel.removeBlockEntity(pPos);
+
             super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         }
     }
