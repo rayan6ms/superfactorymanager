@@ -59,8 +59,9 @@ public class SFMGameTestMethodHelpers {
     public static Program compile(String code) {
 
         AtomicReference<Program> rtn = new AtomicReference<>();
-        ProgramBuilder
-                .build(code)
+
+        new ProgramBuilder(code)
+                .build()
                 .caseSuccess((program, metadata) -> rtn.set(program))
                 .caseFailure(result -> {
                     throw new GameTestAssertException("Failed to compile program: " + result.metadata().errors()

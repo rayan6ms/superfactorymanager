@@ -97,7 +97,8 @@ public class ExamplesScreen extends Screen {
                     programString = programString.replace("$REPLACE_RESOURCE_TYPES_HERE$", replacement);
                 }
                 String finalProgram = programString;
-                ProgramBuilder.build(programString)
+
+                new ProgramBuilder(programString).build()
                         .caseSuccess((program, metadata) -> templatePrograms.put(
                                 program.name().isBlank() ? entry.getKey().toString() : program.name(),
                                 finalProgram
@@ -106,8 +107,8 @@ public class ExamplesScreen extends Screen {
                                 String.format("(compile failed) %s", entry.getKey().toString()),
                                 finalProgram
                         ));
-                ProgramBuilder
-                        .build(programString)
+
+                new ProgramBuilder(programString).build()
                         .caseSuccess((successProgram, metadata) -> templatePrograms.put(
                                 successProgram.name().isBlank() ? entry.getKey().toString() : successProgram.name(),
                                 finalProgram

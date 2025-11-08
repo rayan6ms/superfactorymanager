@@ -26,15 +26,31 @@ import java.util.WeakHashMap;
 
 public class ProgramBuilder {
     private static final WeakHashMap<String, ProgramBuildResult> cache = new WeakHashMap<>();
-    public static ProgramBuildResult build(
-            @Nullable String programString
-    ) {
+
+    private boolean useCache = true;
+
+    private final String programString;
+
+    public ProgramBuilder(@Nullable String programString) {
+
         if (programString == null) {
             programString = "";
         }
-        @Nullable ProgramBuildResult cached = cache.get(programString);
-        if (cached != null) {
-            return cached;
+        this.programString = programString;
+    }
+
+    public void setUseCache(boolean useCache) {
+
+        this.useCache = useCache;
+    }
+
+    public ProgramBuildResult build(
+    ) {
+        if (useCache) {
+            @Nullable ProgramBuildResult cached = cache.get(programString);
+            if (cached != null) {
+                return cached;
+            }
         }
         SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(programString));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -100,6 +116,7 @@ public class ProgramBuilder {
             Program program,
             List<TranslatableContents> errors
     ) {
+
         if (!SFMEnvironmentUtils.isGameLoaded()) {
             return;
         }
@@ -125,4 +142,5 @@ public class ProgramBuilder {
             }
         }
     }
+
 }

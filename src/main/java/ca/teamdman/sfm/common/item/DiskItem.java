@@ -85,8 +85,8 @@ public class DiskItem extends Item {
         }
         AtomicReference<Program> rtn = new AtomicReference<>(null);
         String programString = getProgramString(stack);
-        ProgramBuilder
-                .build(programString)
+
+        new ProgramBuilder(programString).build()
                 .caseSuccess((successProgram, metadata) -> {
                     if (updateWarnings) {
                         Collection<TranslatableContents> warnings = ProgramLinter.gatherWarnings(

@@ -80,7 +80,8 @@ public class SFMLIntellisenseTests {
                 """.stripTrailing().stripIndent();
         for (int cursorPosition = 0; cursorPosition < countTokens(programString); cursorPosition++) {
             StringBuilder display = new StringBuilder();
-            ProgramBuildResult buildResult = ProgramBuilder.build(programString);
+
+            ProgramBuildResult buildResult = new ProgramBuilder(programString).build();
             List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(new IntellisenseContext(
                     buildResult,
                     cursorPosition,
@@ -107,8 +108,8 @@ public class SFMLIntellisenseTests {
 
         // Build the program
         AtomicReference<Program> program = new AtomicReference<>();
-        ProgramBuilder
-                .build(programString)
+
+        new ProgramBuilder(programString).build()
                 .caseSuccess((successProgram, metadata) -> program.set(successProgram))
                 .caseFailure(result -> {
                     result.metadata().errors().forEach(error -> System.out.println(error.toString()));
@@ -136,7 +137,8 @@ public class SFMLIntellisenseTests {
     public void combinedTest() {
 
         String programString = SIMPLE_PROGRAM_STRING;
-        ProgramBuildResult buildResult = ProgramBuilder.build(programString).caseFailure(failure -> {
+
+        ProgramBuildResult buildResult = new ProgramBuilder(programString).build().caseFailure(failure -> {
             failure.metadata().errors().forEach(error -> System.out.println(error.toString()));
             throw new RuntimeException("Failed to compile program");
         });
@@ -275,7 +277,8 @@ public class SFMLIntellisenseTests {
 //        for (int chop = 0; chop < outerProgramString.length(); chop++) {
         for (int chop = outerProgramString.length() - 1; chop < outerProgramString.length(); chop++) {
             String programString = outerProgramString.substring(0, chop);
-            ProgramBuildResult buildResult = ProgramBuilder.build(programString);
+
+            ProgramBuildResult buildResult = new ProgramBuilder(programString).build();
             SFMLParser parser = buildResult.metadata().parser();
             var contexts = new ParserRuleContext[]{
                     parser.program(),
@@ -362,7 +365,8 @@ public class SFMLIntellisenseTests {
                   INPUT stone FROM chest
                 END
                 """.stripTrailing().stripIndent();
-        ProgramBuildResult buildResult = ProgramBuilder.build(programString);
+
+        ProgramBuildResult buildResult = new ProgramBuilder(programString).build();
         SFMLParser parser = buildResult.metadata().parser();
         CodeCompletionCore core = new CodeCompletionCore(
                 parser,
@@ -420,7 +424,8 @@ public class SFMLIntellisenseTests {
                   INPUT stone FROM chest
                 END
                 """.stripTrailing().stripIndent();
-        ProgramBuildResult buildResult = ProgramBuilder.build(programString);
+
+        ProgramBuildResult buildResult = new ProgramBuilder(programString).build();
         SFMLParser parser = buildResult.metadata().parser();
         CodeCompletionCore core = new CodeCompletionCore(
                 parser,
@@ -478,7 +483,8 @@ public class SFMLIntellisenseTests {
     @Test
     public void testCursorInsideResourceId() {
         // 1) Build the snippet into a ProgramBuildResult
-        ProgramBuildResult buildResult = ProgramBuilder.build(PROGRAM_SNIPPET);
+
+        ProgramBuildResult buildResult = new ProgramBuilder(PROGRAM_SNIPPET).build();
         assertTrue(buildResult.isBuildSuccessful(), "Snippet must parse successfully");
 
         // 2) Find a cursor position somewhere in IRON_INGOT
@@ -520,7 +526,8 @@ public class SFMLIntellisenseTests {
     @Test
     public void testCursorInsideLabel() {
         // Use the same snippet, but put the cursor in the label area
-        ProgramBuildResult buildResult = ProgramBuilder.build(PROGRAM_SNIPPET);
+
+        ProgramBuildResult buildResult = new ProgramBuilder(PROGRAM_SNIPPET).build();
         assertTrue(buildResult.isBuildSuccessful(), "Snippet must parse successfully");
 
         // Cursor in "Minecart"

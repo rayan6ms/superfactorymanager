@@ -23,8 +23,8 @@ public interface BoolExpr extends Predicate<ProgramContext>, ASTNode, ToStringPr
         // Or something like: “b BOTTOM SIDE HAS EQ 0 fe::”
         Mutable<BoolExpr> rtn = new MutableObject<>();
         String programString = "EVERY 20 TICKS DO IF " + line + " THEN END END";
-        ProgramBuilder
-                .build(programString)
+
+        new ProgramBuilder(programString).build()
                 .caseSuccess((program, metadata) -> {
                     BoolExpr condition = (
                             (IfStatement) program

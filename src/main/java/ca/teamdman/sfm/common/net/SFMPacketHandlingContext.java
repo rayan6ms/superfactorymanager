@@ -143,8 +143,8 @@ public class SFMPacketHandlingContext {
             return;
         }
         //todo: localize
-        ProgramBuilder
-                .build(programString)
+
+        new ProgramBuilder(programString).build()
                 .caseSuccess((program, metadata) -> callback.accept(
                         program,
                         player,
