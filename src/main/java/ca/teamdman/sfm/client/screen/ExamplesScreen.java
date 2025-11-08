@@ -4,7 +4,6 @@ import ca.teamdman.sfm.client.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
-import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.program_builder.ProgramBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -27,6 +26,7 @@ public class ExamplesScreen extends Screen {
     private final BiConsumer<String, Map<String, String>> CALLBACK;
 
     public ExamplesScreen(BiConsumer<String, Map<String, String>> callback) {
+
         super(LocalizationKeys.EXAMPLES_GUI_TITLE.getComponent());
         CALLBACK = callback;
     }
@@ -38,6 +38,7 @@ public class ExamplesScreen extends Screen {
             int pMouseY,
             float pPartialTick
     ) {
+
         this.renderBackground(pPoseStack);
         this.renderBackground(pPoseStack);
         this.renderBackground(pPoseStack);
@@ -67,6 +68,7 @@ public class ExamplesScreen extends Screen {
 
     @Override
     protected void init() {
+
         super.init();
 
         //discover template programs
@@ -95,7 +97,8 @@ public class ExamplesScreen extends Screen {
                     programString = programString.replace("$REPLACE_RESOURCE_TYPES_HERE$", replacement);
                 }
                 String finalProgram = programString;
-                ProgramBuilder.build(programString)
+
+                new ProgramBuilder(programString).build()
                         .caseSuccess((program, metadata) -> templatePrograms.put(
                                 program.name().isBlank() ? entry.getKey().toString() : program.name(),
                                 finalProgram
@@ -104,17 +107,16 @@ public class ExamplesScreen extends Screen {
                                 String.format("(compile failed) %s", entry.getKey().toString()),
                                 finalProgram
                         ));
-                Program.compile(
-                        programString,
-                        successProgram -> templatePrograms.put(
+
+                new ProgramBuilder(programString).build()
+                        .caseSuccess((successProgram, metadata) -> templatePrograms.put(
                                 successProgram.name().isBlank() ? entry.getKey().toString() : successProgram.name(),
                                 finalProgram
-                        ),
-                        failure -> templatePrograms.put(
+                        ))
+                        .caseFailure(result -> templatePrograms.put(
                                 String.format("(compile failed) %s", entry.getKey().toString()),
                                 finalProgram
-                        )
-                );
+                        ));
             } catch (IOException ignored) {
             }
         }
@@ -157,4 +159,5 @@ public class ExamplesScreen extends Screen {
             }
         }
     }
+
 }
