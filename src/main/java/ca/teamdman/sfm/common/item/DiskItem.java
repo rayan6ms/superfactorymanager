@@ -70,13 +70,6 @@ public class DiskItem extends Item {
 
     public static @Nullable Program compileAndUpdateErrorsAndWarnings(
             ItemStack stack,
-            @Nullable ManagerBlockEntity manager
-    ) {
-        return compileAndUpdateErrorsAndWarnings(stack, manager, true);
-    }
-
-    public static @Nullable Program compileAndUpdateErrorsAndWarnings(
-            ItemStack stack,
             @Nullable ManagerBlockEntity manager,
             boolean updateWarnings
     ) {

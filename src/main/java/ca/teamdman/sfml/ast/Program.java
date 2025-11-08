@@ -183,6 +183,10 @@ public record Program(
             OutputStatement newStatement
     ) {
 
+        if (!ProgramBuilder.isMutationAllowed(this)) {
+            throw new IllegalArgumentException(
+                    "Mutation is not allowed on this Program object because it is cached! Program = " + this);
+        }
         Deque<Statement> toPatch = new ArrayDeque<>();
         toPatch.add(this);
         while (!toPatch.isEmpty()) {

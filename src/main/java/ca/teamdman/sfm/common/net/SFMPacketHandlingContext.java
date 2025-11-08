@@ -122,6 +122,7 @@ public class SFMPacketHandlingContext {
 
     public void compileAndThen(
             String programString,
+            boolean willMutateProgram,
             ProgramConsumer callback
     ) {
 
@@ -144,7 +145,9 @@ public class SFMPacketHandlingContext {
         }
         //todo: localize
 
-        new ProgramBuilder(programString).build()
+        new ProgramBuilder(programString)
+                .useCache(!willMutateProgram)
+                .build()
                 .caseSuccess((program, metadata) -> callback.accept(
                         program,
                         player,
