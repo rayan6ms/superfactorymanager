@@ -45,7 +45,7 @@ public class DiskNameGameTest extends SFMGameTestDefinition {
                     END
                     """;
             DiskItem.setProgram(disk, programString);
-            DiskItem.compileAndUpdateErrorsAndWarnings(disk, null);
+            DiskItem.compileAndUpdateErrorsAndWarnings(disk, null, true);
             chest.insertItem(0, disk, false);
             assertTrue(DiskItem.getProgramName(disk).equals("bruh"), "program name should be bruh for disk 1");
             assertTrue(DiskItem.getWarnings(disk).isEmpty(), "there should be no warnings on disk 1");
@@ -59,7 +59,7 @@ public class DiskNameGameTest extends SFMGameTestDefinition {
                     END
                     """;
             DiskItem.setProgram(disk, programString);
-            DiskItem.compileAndUpdateErrorsAndWarnings(disk, null);
+            DiskItem.compileAndUpdateErrorsAndWarnings(disk, null, true);
             chest.insertItem(1, disk, false);
             assertTrue(DiskItem.getProgramName(disk).isEmpty(), "program name should be empty for disk 2");
             assertTrue(DiskItem.getWarnings(disk).isEmpty(), "there should be no warnings on disk 2");
