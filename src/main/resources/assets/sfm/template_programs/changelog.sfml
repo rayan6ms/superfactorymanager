@@ -51,6 +51,7 @@ FORGET
   INPUT disk FROM chest slot 1
   OUTPUT TO manager
 END
+-- Add try-catch to capability discovery, thanks @Sverd for the report! #418
 
 
 ---- 4.26.0 ----
