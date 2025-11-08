@@ -27,10 +27,11 @@ import java.util.stream.Stream;
 public class CableNetwork {
     protected final Level level;
     protected final LongSet cablePositions = new LongOpenHashSet();
-    protected final SFMBlockCapabilityCacheForLevel levelCapabilityCache = new SFMBlockCapabilityCacheForLevel();
+    protected final SFMBlockCapabilityCacheForLevel levelCapabilityCache;
 
     public CableNetwork(Level level) {
         this.level = level;
+        this.levelCapabilityCache = new SFMBlockCapabilityCacheForLevel(level);
     }
 
     public SFMBlockCapabilityCacheForLevel getLevelCapabilityCache() {

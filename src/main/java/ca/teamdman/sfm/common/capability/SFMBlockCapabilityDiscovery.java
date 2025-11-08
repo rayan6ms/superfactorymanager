@@ -51,6 +51,11 @@ public class SFMBlockCapabilityDiscovery {
             @Nullable Direction direction,
             TranslatableLogger logger
     ) {
+
+        /* #####################
+                CHECK CACHE
+           ##################### */
+
         // If there is a cache entry, it has already been validated to be adjacent to a cable
         SFMBlockCapabilityCacheForLevel levelCapabilityCache = cableNetwork.getLevelCapabilityCache();
 
@@ -64,10 +69,12 @@ public class SFMBlockCapabilityDiscovery {
         );
         if (cached.isPresent()) return cached;
 
-        // NEED TO DISCOVER
+        /* #####################
+            DISCOVER FROM LEVEL
+           ##################### */
 
-        // any BlockPos can have labels assigned
-        // we must only proceed here if there is an adjacent cable from this network
+        // Any BlockPos can have labels assigned to it.
+        // We must only proceed here if there is an adjacent cable from this network.
         if (!cableNetwork.isAdjacentToCable(pos)) {
             logger.warn(x -> x.accept(LocalizationKeys.LOGS_MISSING_ADJACENT_CABLE.get(pos)));
             return SFMBlockCapabilityResult.empty();
@@ -83,9 +90,8 @@ public class SFMBlockCapabilityDiscovery {
                 direction
         );
         if (cap.isPresent()) {
-            // Track in cache and add hook for invalidation
+            // Track in cache
             levelCapabilityCache.putCapability(pos, capKind, direction, cap);
-            cap.addListener(x -> levelCapabilityCache.remove(pos, capKind, direction));
         } else {
             logger.warn(x -> x.accept(LocalizationKeys.LOGS_EMPTY_CAPABILITY.get(
                     pos,

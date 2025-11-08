@@ -15,29 +15,37 @@ import org.jetbrains.annotations.NotNull;
 ///
 /// This class helps keep {@link MCVersionDependentBehaviour} out of other classes.
 @MCVersionDependentBehaviour
-public record SFMBlockCapabilityResult<CAP>(LazyOptional<CAP> capability) {
+public record SFMBlockCapabilityResult<CAP>(LazyOptional<CAP> inner) {
 
     public static <CAP> SFMBlockCapabilityResult<CAP> of(LazyOptional<CAP> capability) {
+
         return new SFMBlockCapabilityResult<>(capability);
     }
 
     public static <CAP> SFMBlockCapabilityResult<CAP> of(CAP capability) {
+
         return new SFMBlockCapabilityResult<>(LazyOptional.of(() -> capability));
     }
 
     public static <CAP> SFMBlockCapabilityResult<CAP> empty() {
+
         return SFMBlockCapabilityResult.of(LazyOptional.empty());
     }
 
     public @NotNull CAP unwrap() {
-        return capability.orElseThrow(IllegalStateException::new);
+
+        return inner.orElseThrow(IllegalStateException::new);
     }
 
     public boolean isPresent() {
-        return capability.isPresent();
+
+        return inner.isPresent();
     }
 
-    public void addListener(NonNullConsumer<LazyOptional<CAP>> listener) {
-        capability.addListener(listener);
+    /// If this is not present, the listener is called immediately.
+    public void addInvalidationListener(NonNullConsumer<SFMBlockCapabilityResult<CAP>> listener) {
+
+        inner.addListener(inner -> listener.accept(SFMBlockCapabilityResult.this));
     }
+
 }
