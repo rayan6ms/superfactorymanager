@@ -11,7 +11,7 @@ import ca.teamdman.sfm.gametest.SequentialAssertionHooks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraftforge.items.IItemHandler;
+import net.neoforged.neoforge.items.IItemHandler;
 
 import java.util.List;
 import java.util.Objects;
