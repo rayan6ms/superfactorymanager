@@ -17,12 +17,14 @@ public interface BoolExpr extends Predicate<ProgramContext>, ASTNode, ToStringPr
 
     }
 
-    static BoolExpr from(String line) {
+    static BoolExpr from(String expr) {
         // This is where you’d parse lines like:
         //   “a BOTTOM SIDE HAS EQ 1000 fe::”
         // Or something like: “b BOTTOM SIDE HAS EQ 0 fe::”
         Mutable<BoolExpr> rtn = new MutableObject<>();
-        String programString = "EVERY 20 TICKS DO IF " + line + " THEN END END";
+
+        // trailing newline allows comments in expr
+        String programString = "EVERY 20 TICKS DO IF\n" + expr + "\nTHEN END END";
 
         new ProgramBuilder(programString).build()
                 .caseSuccess((program, metadata) -> {
