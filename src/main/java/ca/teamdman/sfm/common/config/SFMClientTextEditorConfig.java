@@ -17,7 +17,8 @@ public class SFMClientTextEditorConfig {
     public final ModConfigSpec.ConfigValue<String> preferredEditor;
 
     SFMClientTextEditorConfig(ModConfigSpec.Builder builder) {
-        showLineNumbers = builder.define("showLineNumbers", true);
+
+        showLineNumbers = builder.define("showLineNumbers", false);
         intellisenseLevel = builder.defineEnum("intellisenseLevel", SFMTextEditorIntellisenseLevel.OFF);
         preferredEditor = builder.define("preferredEditor", "sfm:v1");
     }
