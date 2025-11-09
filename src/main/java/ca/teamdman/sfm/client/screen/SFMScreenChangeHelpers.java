@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.client.screen;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.examples.SFMExampleProgram;
 import ca.teamdman.sfm.client.screen.text_editor.ISFMTextEditScreen;
 import ca.teamdman.sfm.client.screen.text_editor.SFMTextEditScreenV1;
 import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
@@ -19,18 +20,16 @@ import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraft.server.packs.resources.Resource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Map;
+import java.util.List;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class SFMScreenChangeHelpers {
     public static void setOrPushScreen(Screen screen) {
+
         if (Minecraft.getInstance().screen == null) {
             Minecraft
                     .getInstance()
@@ -43,6 +42,7 @@ public class SFMScreenChangeHelpers {
     }
 
     public static void popScreen() {
+
         Minecraft.getInstance().popGuiLayer();
     }
 
@@ -50,6 +50,7 @@ public class SFMScreenChangeHelpers {
             ItemStack stack,
             InteractionHand hand
     ) {
+
         setOrPushScreen(new LabelGunScreen(stack, hand));
     }
 
@@ -64,12 +65,14 @@ public class SFMScreenChangeHelpers {
     public static void showProgramEditScreen(
             ISFMTextEditScreenOpenContext context
     ) {
+
         showTextEditScreen(createProgramEditScreen(context));
     }
 
     public static void showTextEditScreen(
             ISFMTextEditScreen screen
     ) {
+
         switch (screen.openBehaviour()) {
             case Push -> setOrPushScreen(screen.asScreen());
             case Replace -> setScreen(screen.asScreen());
@@ -79,12 +82,14 @@ public class SFMScreenChangeHelpers {
     public static void showTomlEditScreen(
             TomlEditScreenOpenContext context
     ) {
+
         SFMTextEditScreenV1 screen = new TomlEditScreen(context);
         setOrPushScreen(screen);
         screen.scrollToTop();
     }
 
     public static void showProgramEditScreen(String initialContent) {
+
         ISFMTextEditScreenOpenContext openContext = new SFMTextEditScreenDiskOpenContext(
                 initialContent,
                 LabelPositionHolder.empty(),
@@ -99,6 +104,7 @@ public class SFMScreenChangeHelpers {
             LabelPositionHolder labelPositionHolder,
             Consumer<String> saveCallback
     ) {
+
         setOrPushScreen(new ExamplesScreen((chosenExample, templates) -> {
             SFMTextEditScreenV1 screen = new SFMTextEditScreenV1(new SFMTextEditScreenExampleProgramOpenContext(
                     chosenExample,
@@ -113,6 +119,7 @@ public class SFMScreenChangeHelpers {
     }
 
     public static void showLogsScreen(ManagerContainerMenu menu) {
+
         LogsScreen screen = new LogsScreen(menu);
         setOrPushScreen(screen);
         screen.scrollToBottom();
@@ -126,6 +133,7 @@ public class SFMScreenChangeHelpers {
     // TODO: copy item id, not just NBT
     // TODO: replace with showing a screen with the data
     public static void showItemInspectorScreen(ItemStack stack) {
+
 //        CompoundTag tag = stack.getTag();
         CompoundTag tag = new CompoundTag();
         ClientLevel level = Minecraft.getInstance().level;
@@ -148,30 +156,12 @@ public class SFMScreenChangeHelpers {
     }
 
     public static void showChangelog() {
-        String changelog = null;
-        var irm = Minecraft.getInstance().getResourceManager();
-        Map<ResourceLocation, Resource> found = irm.listResources(
-                "template_programs",
-                (path) -> path.getPath().endsWith(".sfml") || path.getPath().endsWith(".sfm")
-        );
-        for (var entry : found.entrySet()) {
-            if (entry.getKey().getPath().equals("template_programs/changelog.sfml")) {
-                try (var reader = entry.getValue().openAsReader()) {
-                    changelog = reader.lines().collect(Collectors.joining("\n"));
-                    break;
-                } catch (Exception e) {
-                    SFM.LOGGER.error("Failed to read changelog", e);
-                }
-            }
-        }
-        if (changelog == null) {
-            SFM.LOGGER.error("Failed to find changelog");
-            return;
-        }
+
+        SFMExampleProgram changelogExampleProgram = SFMExampleProgram.getChangelog();
         SFMTextEditScreenV1 screen = new SFMTextEditScreenV1(new SFMTextEditScreenExampleProgramOpenContext(
-                changelog,
-                changelog,
-                Map.of("changelog.sfml", changelog),
+                changelogExampleProgram.programString(),
+                changelogExampleProgram.programString(),
+                List.of(changelogExampleProgram),
                 LabelPositionHolder.empty(),
                 newContent -> {
                 }
@@ -181,10 +171,13 @@ public class SFMScreenChangeHelpers {
     }
 
     public static @Nullable Screen getCurrentScreen() {
+
         return Minecraft.getInstance().screen;
     }
 
     public static void setScreen(@Nullable Screen screen) {
+
         Minecraft.getInstance().setScreen(screen);
     }
+
 }
