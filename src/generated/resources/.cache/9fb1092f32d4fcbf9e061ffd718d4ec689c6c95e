@@ -1,14 +1,20 @@
-// 1.20.2	2025-02-17T18:17:27.8673702	Recipes
+// 1.20.2	2025-11-09T14:20:19.6009309	Recipes
+5f51e453e4550ab631cd280346798215a019db36 data/minecraft/advancements/recipes/misc/tunnelled_manager_horizontal.json
+ed506e4780ab46b4b399356aa192be07728bf2be data/minecraft/advancements/recipes/misc/tunnelled_manager_vertical.json
+89c3b2bcd1fa82ad94447189e42890ec797250b6 data/minecraft/advancements/recipes/misc/uncraft_tunnelled_manager.json
 21ddf44d8958739f46e499c9445d01a6b7965013 data/minecraft/recipes/disk_reset.json
 3e32bf9955f0a270baf5f2615e887356ea966207 data/minecraft/recipes/label_gun_reset.json
+b6f2bd057aafefd51d4b39a6ec5761c22fc6a90b data/minecraft/recipes/tunnelled_manager_horizontal.json
+c44f01dad2afaf2f270b124a2499b2cb8524a973 data/minecraft/recipes/tunnelled_manager_vertical.json
+b894e1ed9c71bbb9583fbbcac859dfafd168ea1e data/minecraft/recipes/uncraft_tunnelled_manager.json
 4a8fe19050edf9a36eb1b6521d9c2a82f0f48710 data/sfm/advancements/recipes/misc/cable.json
 c8627afba2dd3610f08f7801769bed56eccb0623 data/sfm/advancements/recipes/misc/disk.json
 8015175d51489cd0169c06904bd489b41c0b9ca1 data/sfm/advancements/recipes/misc/fancy_cable.json
 9e2e309f302d5960074e7e2d29b79a43e4220e17 data/sfm/advancements/recipes/misc/fancy_to_cable.json
-0828896f18209b1db6bd4244fd0cee331a36d8b2 data/sfm/advancements/recipes/misc/labelgun.json
 12a9f9269ee710aa02eb5c94ce24a149160599d2 data/sfm/advancements/recipes/misc/manager.json
 7e7b3f111d82074cb3f8bbcaddee45903809fbd6 data/sfm/advancements/recipes/misc/network_tool.json
 ffce2d96d5dacc48d63b5c69e08ac88d272179e0 data/sfm/advancements/recipes/misc/printing_press.json
+d8b95d7f5eba581497738b448b164855215987d7 data/sfm/advancements/recipes/misc/tunnelled_manager.json
 f53743bc7ce71cc4fa931008d17cf97e2bd3d87b data/sfm/advancements/recipes/misc/water_tank.json
 9da2b27d6464b27b8cbaf2ba4296c0fa4197c3de data/sfm/advancements/recipes/misc/xp_goop.json
 807a872a4f019c590a34aa05926538fb097ca6f3 data/sfm/recipes/cable.json
@@ -16,12 +22,12 @@ f53743bc7ce71cc4fa931008d17cf97e2bd3d87b data/sfm/advancements/recipes/misc/wate
 86b45396d6e685d9f816a6da3434eb5d7f49f178 data/sfm/recipes/enchanted_book_copy.json
 03e05fda9c561e878f8dc5f6d917fb94bc571be1 data/sfm/recipes/fancy_cable.json
 9c8879382df5c99b529c44f2114eb9014ef2c112 data/sfm/recipes/fancy_to_cable.json
-c44f01dad2afaf2f270b124a2499b2cb8524a973 data/sfm/recipes/labelgun.json
 d6edefb276c274877ae41992435ff66f3e87a7c4 data/sfm/recipes/manager.json
 4432751f9842cae951f8b9dc8e405317ea4dc08f data/sfm/recipes/map_copy.json
 5132d605087fa910d832a64cee491cb206553a3f data/sfm/recipes/network_tool.json
 1de9b03f775c36402c0677e033ea0e5afe5e5b9f data/sfm/recipes/printing_press.json
 ba7da1ba1466172a0c01a861667f7aa599593002 data/sfm/recipes/program_copy.json
+476735c8b83d423eed0d2373d93879edb6ee16a5 data/sfm/recipes/tunnelled_manager.json
 2d596d9bad2f027d6f565414182f79b7d0664ce9 data/sfm/recipes/water_tank.json
 4a9fab7ad8327b3a1cfd6122f86016738542e32c data/sfm/recipes/written_book_copy.json
 0e2393c48006d18a8c006e2c45f83f56fbd8f559 data/sfm/recipes/xp_goop.json
