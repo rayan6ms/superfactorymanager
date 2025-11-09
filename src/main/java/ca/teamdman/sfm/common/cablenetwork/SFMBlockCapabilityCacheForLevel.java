@@ -67,20 +67,28 @@ public class SFMBlockCapabilityCacheForLevel {
             SFMBlockCapabilityKind<CAP> capKind,
             @Nullable Direction direction
     ) {
-
-        var capMap = CACHE.get(pos.asLong());
-        if (capMap != null) {
-            var dirMap = capMap.get(capKind);
-            if (dirMap != null) {
-                var found = dirMap.get(direction);
-                if (found != null) {
-                    //noinspection unchecked
-                    return (SFMBlockCapabilityResult<CAP>) found;
-                }
-
-            }
+        // Get the (pos, ...) entry
+        var posEntry = CACHE.get(pos.asLong());
+        if (posEntry == null) {
+            return null;
         }
-        return null;
+
+        // Get the (pos, capKind, ...direction) entry
+        var capKindEntry = posEntry.get(capKind);
+        if (capKindEntry == null) {
+            return null;
+        }
+
+        // Get the (pos, capKind, direction) entry
+        var found = capKindEntry.get(direction);
+        if (found == null) {
+            return null;
+        }
+
+        // Return the cached capability result
+        //noinspection unchecked
+        return (SFMBlockCapabilityResult<CAP>) found;
+
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
