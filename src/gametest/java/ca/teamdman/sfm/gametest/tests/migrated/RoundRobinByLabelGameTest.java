@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.Blocks;
 import java.util.Objects;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 /**
  * Migrated from SFMCorrectnessGameTests.round_robin_by_label
@@ -88,7 +87,7 @@ public class RoundRobinByLabelGameTest extends SFMGameTestDefinition {
                 .save(Objects.requireNonNull(manager.getDisk()));
 
         helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
-            assertTrue(count(sourceInv, Items.DIRT) == 64 * (27 - 4), "source count bad");
+            assertCount(sourceInv, Items.DIRT, 64 * (27 - 4), "source count bad");
             // we make no guarantees about which one ticks first
             // we guarantee only one of a or b receives on the first tick
             boolean condition1 = count(a1, Items.DIRT) == 128 && count(a2, Items.DIRT) == 128
