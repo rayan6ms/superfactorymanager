@@ -91,7 +91,7 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
             ItemStack held = player.getMainHandItem();
 
             // Fail if the result is not a perfect clone of the disk
-            if (!held.is(SFMItems.DISK_ITEM.get()) || !DiskItem.getProgram(held).equals(DiskItem.getProgram(disk))) {
+            if (!held.is(SFMItems.DISK_ITEM.get()) || !DiskItem.getProgramString(held).equals(DiskItem.getProgramString(disk))) {
                 helper.fail("Disk was not cloned");
             }
 

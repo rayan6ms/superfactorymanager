@@ -27,6 +27,7 @@ import java.util.function.Predicate;
 
 public record ServerboundOutputInspectionRequestPacket(
         String programString,
+
         int outputNodeIndex
 ) implements SFMPacket {
     private static final int MAX_RESULTS_LENGTH = 20480;
@@ -36,191 +37,201 @@ public record ServerboundOutputInspectionRequestPacket(
             Program successProgram,
             OutputStatement outputStatement
     ) {
+
         StringBuilder payload = new StringBuilder();
         payload.append(outputStatement.toStringPretty()).append("\n");
         payload.append("-- predictions may differ from actual execution results\n");
 
         AtomicInteger branchCount = new AtomicInteger(0);
-        successProgram.replaceOutputStatement(outputStatement, new OutputStatement(
-                outputStatement.labelAccess(),
-                outputStatement.resourceLimits(),
-                outputStatement.each(),
-                outputStatement.emptySlotsOnly()
-        ) {
-            @Override
-            public void tick(ProgramContext context) {
-                if (!(context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour behaviour)) {
-                    throw new IllegalStateException("Expected behaviour to be SimulateExploreAllPathsProgramBehaviour");
-                }
-                StringBuilder branchPayload = new StringBuilder();
+        successProgram.replaceOutputStatement(
+                outputStatement,
+                new OutputStatement(
+                        outputStatement.labelAccess(),
+                        outputStatement.resourceLimits(),
+                        outputStatement.each(),
+                        outputStatement.emptySlotsOnly()
+                ) {
+                    @Override
+                    public void tick(ProgramContext context) {
 
-                payload
-                        .append("-- POSSIBILITY ")
-                        .append(branchCount.getAndIncrement())
-                        .append(" --");
-                if (behaviour.getCurrentPath().streamBranches().allMatch(Branch::wasTrue)) {
-                    payload.append(" all true\n");
-                } else if (behaviour
-                        .getCurrentPath()
-                        .streamBranches()
-                        .allMatch(Predicate.not(Branch::wasTrue))) {
-                    payload.append(" all false\n");
-                } else {
-                    payload.append('\n');
-                }
-                behaviour.getCurrentPath()
-                        .streamBranches()
-                        .forEach(branch -> {
-                            if (branch.wasTrue()) {
-                                payload
-                                        .append(branch.ifStatement().condition().toStringPretty())
-                                        .append(" -- true");
-                            } else {
-                                payload
-                                        .append(branch.ifStatement().condition().toStringPretty())
-                                        .append(" -- false");
-                            }
-                            payload.append("\n");
-                        });
-                payload.append("\n");
-
-
-                branchPayload.append("-- predicted inputs:\n");
-                List<Pair<LimitedInputSlot<?, ?, ?>, LabelAccess>> inputSlots = new ArrayList<>();
-                context
-                        .getInputs()
-                        .forEach(inputStatement -> inputStatement.gatherSlots(
-                                context,
-                                slot -> inputSlots.add(new Pair<>(
-                                        slot,
-                                        inputStatement.labelAccess()
-                                ))
-                        ));
-                List<InputStatement> inputStatements = inputSlots.stream()
-                        .map(slot -> SFMASTUtils.getInputStatementForSlot(slot.a, slot.b))
-                        .filter(Optional::isPresent)
-                        .map(Optional::get)
-                        .toList();
-                if (inputStatements.isEmpty()) {
-                    branchPayload.append("none\n-- predicted outputs:\nnone");
-                } else {
-                    inputStatements.stream()
-                            .map(InputStatement::toStringPretty)
-                            .map(x -> x + "\n")
-                            .forEach(branchPayload::append);
-
-                    branchPayload.append(
-                            "-- predicted outputs:\n");
-                    ResourceLimits condensedResourceLimits;
-                    {
-                        ResourceLimits resourceLimits = new ResourceLimits(
-                                inputSlots
-                                        .stream()
-                                        .map(slot -> slot.a)
-                                        .map(ServerboundOutputInspectionRequestPacket::getSlotResource)
-                                        .toList(),
-                                ResourceIdSet.EMPTY
-                        );
-                        List<ResourceLimit> condensedResourceLimitList = new ArrayList<>();
-                        for (ResourceLimit resourceLimit : resourceLimits.resourceLimitList()) {
-                            // check if an existing resource limit has the same resource identifier
-                            condensedResourceLimitList
-                                    .stream()
-                                    .filter(x -> x
-                                            .resourceIds()
-                                            .equals(resourceLimit.resourceIds()))
-                                    .findFirst()
-                                    .ifPresentOrElse(found -> {
-                                        int i = condensedResourceLimitList.indexOf(found);
-                                        ResourceLimit newLimit = found.withLimit(new Limit(
-                                                found
-                                                        .limit()
-                                                        .quantity()
-                                                        .add(resourceLimit.limit().quantity()),
-                                                ResourceQuantity.MAX_QUANTITY
-                                        ));
-                                        condensedResourceLimitList.set(i, newLimit);
-                                    }, () -> condensedResourceLimitList.add(resourceLimit));
+                        if (!(context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour behaviour)) {
+                            throw new IllegalStateException(
+                                    "Expected behaviour to be SimulateExploreAllPathsProgramBehaviour");
                         }
-                        {
-                            // prune items not covered by the output resource limits
-                            ListIterator<ResourceLimit> iter = condensedResourceLimitList.listIterator();
-                            while (iter.hasNext()) {
-                                ResourceLimit resourceLimit = iter.next();
-                                if (resourceLimit.resourceIds().size() != 1) {
-                                    throw new IllegalStateException(
-                                            "Expected resource limit to have exactly one resource id");
-                                }
-                                ResourceIdentifier<?, ?, ?> resourceId = resourceLimit
-                                        .resourceIds()
-                                        .stream()
-                                        .iterator()
-                                        .next();
+                        StringBuilder branchPayload = new StringBuilder();
 
-                                // because these resource limits were generated from resource stacks
-                                // they should always be valid resource locations (not patterns)
-                                ResourceLocation resourceLimitLocation = SFMResourceLocation.fromNamespaceAndPath(
-                                        resourceId.resourceNamespace,
-                                        resourceId.resourceName
+                        payload
+                                .append("-- POSSIBILITY ")
+                                .append(branchCount.getAndIncrement())
+                                .append(" --");
+                        if (behaviour.getCurrentPath().streamBranches().allMatch(Branch::wasTrue)) {
+                            payload.append(" all true\n");
+                        } else if (behaviour
+                                .getCurrentPath()
+                                .streamBranches()
+                                .allMatch(Predicate.not(Branch::wasTrue))) {
+                            payload.append(" all false\n");
+                        } else {
+                            payload.append('\n');
+                        }
+                        behaviour.getCurrentPath()
+                                .streamBranches()
+                                .forEach(branch -> {
+                                    if (branch.wasTrue()) {
+                                        payload
+                                                .append(branch.ifStatement().condition().toStringPretty())
+                                                .append(" -- true");
+                                    } else {
+                                        payload
+                                                .append(branch.ifStatement().condition().toStringPretty())
+                                                .append(" -- false");
+                                    }
+                                    payload.append("\n");
+                                });
+                        payload.append("\n");
+
+
+                        branchPayload.append("-- predicted inputs:\n");
+                        List<Pair<LimitedInputSlot<?, ?, ?>, LabelAccess>> inputSlots = new ArrayList<>();
+                        context
+                                .getInputs()
+                                .forEach(inputStatement -> inputStatement.gatherSlots(
+                                        context,
+                                        slot -> inputSlots.add(new Pair<>(
+                                                slot,
+                                                inputStatement.labelAccess()
+                                        ))
+                                ));
+                        List<InputStatement> inputStatements = inputSlots.stream()
+                                .map(slot -> SFMASTUtils.getInputStatementForSlot(slot.a, slot.b))
+                                .filter(Optional::isPresent)
+                                .map(Optional::get)
+                                .toList();
+                        if (inputStatements.isEmpty()) {
+                            branchPayload.append("none\n-- predicted outputs:\nnone");
+                        } else {
+                            inputStatements.stream()
+                                    .map(InputStatement::toStringPretty)
+                                    .map(x -> x + "\n")
+                                    .forEach(branchPayload::append);
+
+                            branchPayload.append(
+                                    "-- predicted outputs:\n");
+                            ResourceLimits condensedResourceLimits;
+                            {
+                                ResourceLimits resourceLimits = new ResourceLimits(
+                                        inputSlots
+                                                .stream()
+                                                .map(slot -> slot.a)
+                                                .map(ServerboundOutputInspectionRequestPacket::getSlotResource)
+                                                .toList(),
+                                        ResourceIdSet.EMPTY
                                 );
-                                long accept = outputStatement
-                                        .resourceLimits()
-                                        .resourceLimitList()
-                                        .stream()
-                                        .filter(outputResourceLimit -> outputResourceLimit
-                                                                               .resourceIds()
-                                                                               .anyMatchResourceLocation(
-                                                                                       resourceLimitLocation)
-                                                                       && outputStatement
-                                                                               .resourceLimits()
-                                                                               .exclusions()
-                                                                               .stream()
-                                                                               .noneMatch(
-                                                                                       exclusion -> exclusion.matchesResourceLocation(
-                                                                                               resourceLimitLocation)))
-                                        .mapToLong(rl -> rl.limit().quantity().number().value())
-                                        .max()
-                                        .orElse(0);
-                                if (accept == 0) {
-                                    iter.remove();
-                                } else {
-                                    iter.set(resourceLimit.withLimit(new Limit(
-                                            new ResourceQuantity(new Number(Long.min(
-                                                    accept,
-                                                    resourceLimit
-                                                            .limit()
-                                                            .quantity()
-                                                            .number()
-                                                            .value()
-                                            )), resourceLimit.limit().quantity()
-                                                                         .idExpansionBehaviour()),
-                                            ResourceQuantity.MAX_QUANTITY
-                                    )));
+                                List<ResourceLimit> condensedResourceLimitList = new ArrayList<>();
+                                for (ResourceLimit resourceLimit : resourceLimits.resourceLimitList()) {
+                                    // check if an existing resource limit has the same resource identifier
+                                    condensedResourceLimitList
+                                            .stream()
+                                            .filter(x -> x
+                                                    .resourceIds()
+                                                    .equals(resourceLimit.resourceIds()))
+                                            .findFirst()
+                                            .ifPresentOrElse(
+                                                    found -> {
+                                                        int i = condensedResourceLimitList.indexOf(found);
+                                                        ResourceLimit newLimit = found.withLimit(new Limit(
+                                                                found
+                                                                        .limit()
+                                                                        .quantity()
+                                                                        .add(resourceLimit.limit().quantity()),
+                                                                ResourceQuantity.MAX_QUANTITY
+                                                        ));
+                                                        condensedResourceLimitList.set(i, newLimit);
+                                                    }, () -> condensedResourceLimitList.add(resourceLimit)
+                                            );
                                 }
-                            }
-                        }
-                        condensedResourceLimits = new ResourceLimits(
-                                condensedResourceLimitList,
-                                ResourceIdSet.EMPTY
-                        );
-                    }
-                    if (condensedResourceLimits.resourceLimitList().isEmpty()) {
-                        branchPayload.append("none\n");
-                    } else {
-                        branchPayload
-                                .append(new OutputStatement(
-                                        outputStatement.labelAccess(),
-                                        condensedResourceLimits,
-                                        outputStatement.each(),
-                                        outputStatement.emptySlotsOnly()
-                                ).toStringPretty());
-                    }
+                                {
+                                    // prune items not covered by the output resource limits
+                                    ListIterator<ResourceLimit> iter = condensedResourceLimitList.listIterator();
+                                    while (iter.hasNext()) {
+                                        ResourceLimit resourceLimit = iter.next();
+                                        if (resourceLimit.resourceIds().size() != 1) {
+                                            throw new IllegalStateException(
+                                                    "Expected resource limit to have exactly one resource id");
+                                        }
+                                        ResourceIdentifier<?, ?, ?> resourceId = resourceLimit
+                                                .resourceIds()
+                                                .stream()
+                                                .iterator()
+                                                .next();
 
+                                        // because these resource limits were generated from resource stacks
+                                        // they should always be valid resource locations (not patterns)
+                                        ResourceLocation resourceLimitLocation = SFMResourceLocation.fromNamespaceAndPath(
+                                                resourceId.resourceNamespace,
+                                                resourceId.resourceName
+                                        );
+                                        long accept = outputStatement
+                                                .resourceLimits()
+                                                .resourceLimitList()
+                                                .stream()
+                                                .filter(outputResourceLimit -> outputResourceLimit
+                                                                                       .resourceIds()
+                                                                                       .anyMatchResourceLocation(
+                                                                                               resourceLimitLocation)
+                                                                               && outputStatement
+                                                                                       .resourceLimits()
+                                                                                       .exclusions()
+                                                                                       .stream()
+                                                                                       .noneMatch(
+                                                                                               exclusion -> exclusion.matchesResourceLocation(
+                                                                                                       resourceLimitLocation)))
+                                                .mapToLong(rl -> rl.limit().quantity().number().value())
+                                                .max()
+                                                .orElse(0);
+                                        if (accept == 0) {
+                                            iter.remove();
+                                        } else {
+                                            iter.set(resourceLimit.withLimit(new Limit(
+                                                    new ResourceQuantity(
+                                                            new Number(Long.min(
+                                                                    accept,
+                                                                    resourceLimit
+                                                                            .limit()
+                                                                            .quantity()
+                                                                            .number()
+                                                                            .value()
+                                                            )), resourceLimit.limit().quantity()
+                                                                    .idExpansionBehaviour()
+                                                    ),
+                                                    ResourceQuantity.MAX_QUANTITY
+                                            )));
+                                        }
+                                    }
+                                }
+                                condensedResourceLimits = new ResourceLimits(
+                                        condensedResourceLimitList,
+                                        ResourceIdSet.EMPTY
+                                );
+                            }
+                            if (condensedResourceLimits.resourceLimitList().isEmpty()) {
+                                branchPayload.append("none\n");
+                            } else {
+                                branchPayload
+                                        .append(new OutputStatement(
+                                                outputStatement.labelAccess(),
+                                                condensedResourceLimits,
+                                                outputStatement.each(),
+                                                outputStatement.emptySlotsOnly()
+                                        ).toStringPretty());
+                            }
+
+                        }
+                        branchPayload.append("\n");
+                        payload.append(branchPayload.toString().indent(4));
+                    }
                 }
-                branchPayload.append("\n");
-                payload.append(branchPayload.toString().indent(4));
-            }
-        });
+        );
 
         successProgram.tick(new ProgramContext(
                 successProgram,
@@ -234,6 +245,7 @@ public record ServerboundOutputInspectionRequestPacket(
     private static <STACK, ITEM, CAP> ResourceLimit getSlotResource(
             LimitedInputSlot<STACK, ITEM, CAP> limitedInputSlot
     ) {
+
         ResourceType<STACK, ITEM, CAP> resourceType = limitedInputSlot.type;
         //noinspection OptionalGetWithoutIsPresent
         ResourceKey<ResourceType<STACK, ITEM, CAP>> resourceTypeResourceKey = SFMResourceTypes
@@ -268,13 +280,16 @@ public record ServerboundOutputInspectionRequestPacket(
     public static class Daddy implements SFMPacketDaddy<ServerboundOutputInspectionRequestPacket> {
         @Override
         public PacketDirection getPacketDirection() {
+
             return PacketDirection.SERVERBOUND;
         }
+
         @Override
         public void encode(
                 ServerboundOutputInspectionRequestPacket msg,
                 RegistryFriendlyByteBuf friendlyByteBuf
         ) {
+
             friendlyByteBuf.writeUtf(msg.programString, Program.MAX_PROGRAM_LENGTH);
             friendlyByteBuf.writeInt(msg.outputNodeIndex());
         }
@@ -292,8 +307,10 @@ public record ServerboundOutputInspectionRequestPacket(
                 ServerboundOutputInspectionRequestPacket msg,
                 SFMPacketHandlingContext context
         ) {
+
             context.compileAndThen(
                     msg.programString,
+                    true,
                     (program, player, managerBlockEntity) -> program.astBuilder()
                             .getNodeAtIndex(msg.outputNodeIndex)
                             .filter(OutputStatement.class::isInstance)
@@ -322,7 +339,10 @@ public record ServerboundOutputInspectionRequestPacket(
 
         @Override
         public Class<ServerboundOutputInspectionRequestPacket> getPacketClass() {
+
             return ServerboundOutputInspectionRequestPacket.class;
         }
+
     }
+
 }
