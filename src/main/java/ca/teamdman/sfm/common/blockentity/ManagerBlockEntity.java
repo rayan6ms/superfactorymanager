@@ -38,6 +38,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
@@ -54,6 +56,8 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     private final NonNullList<ItemStack> ITEMS = NonNullList.withSize(1, ItemStack.EMPTY);
 
     private final Duration[] tickTimes = new Duration[TICK_TIME_HISTORY_SIZE];
+
+    public IItemHandler invWrapper = new InvWrapper(this);
 
     private @Nullable Program program = null;
 

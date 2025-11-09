@@ -103,7 +103,7 @@ public class SFMBlockCapabilities {
         event.registerBlockEntity(
                 SFMWellKnownCapabilities.ITEM_HANDLER.capabilityKind(),
                 SFMBlockEntities.MANAGER_BLOCK_ENTITY.get(),
-                (manager, direction) -> new InvWrapper(manager)
+                (manager, direction) -> manager.invWrapper
         );
 
         SFMResourceTypes.registry().values().forEach(resourceType -> {
