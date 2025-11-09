@@ -18,7 +18,7 @@ import net.minecraft.world.item.Items;
 
 import java.util.ArrayList;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
+import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.count;
 
 
 /**

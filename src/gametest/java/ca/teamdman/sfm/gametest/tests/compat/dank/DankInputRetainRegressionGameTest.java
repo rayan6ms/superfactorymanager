@@ -3,9 +3,9 @@ package ca.teamdman.sfm.gametest.tests.compat.dank;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.gametest.SFMGameTest;
+import ca.teamdman.sfm.gametest.SFMGameTestCountHelpers;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
-import ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
@@ -18,8 +18,8 @@ import tfar.dankstorage.init.ModItems;
 import static ca.teamdman.sfm.common.registry.SFMBlocks.MANAGER_BLOCK;
 import static ca.teamdman.sfm.common.registry.SFMBlocks.TEST_BARREL_BLOCK;
 import static ca.teamdman.sfm.common.registry.SFMItems.DISK_ITEM;
+import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.count;
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 /// [Moving fluid with retain from Fluid Drawer to Industrial Foregoing Latex Processing Unit](https://discord.com/channels/967118679370264627/1372589927090487458)
 /// <br/>
@@ -92,7 +92,7 @@ public class DankInputRetainRegressionGameTest extends SFMGameTestDefinition {
 
         // Success check
         helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
-            var chestCount = SFMGameTestMethodHelpers.count(chest, Items.DIRT);
+            var chestCount = SFMGameTestCountHelpers.count(chest, Items.DIRT);
             assertTrue(
                     chestCount == expectedChest,
                     "Expected chest contain %d dirt, got %d".formatted(expectedChest, chestCount)
