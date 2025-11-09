@@ -17,8 +17,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
+import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.assertCount;
 
 @SuppressWarnings({"DataFlowIssue"})
 @SFMGameTest
@@ -73,15 +72,15 @@ public class CapabilityCacheRemoveDestinationGameTest extends SFMGameTestDefinit
                 List.of(
                         () -> {
                             // validate one item has moved
-                            assertTrue(count(leftChest, null) == 63, "One should have departed");
-                            assertTrue(count(rightChest.get(), null) == 1, "One should have arrived");
+                            assertCount(leftChest, 63, "One should have departed");
+                            assertCount(rightChest, 1, "One should have arrived");
 
                             // break the destination block
                             helper.setBlock(rightPos, Blocks.AIR);
                         },
                         () -> {
                             // validate things aren't moving
-                            assertTrue(count(leftChest, null) == 63, "None should depart after destination is broken");
+                            assertCount(leftChest, 63, "None should depart after destination is broken");
 
                             // restore destination block
                             helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
@@ -90,8 +89,8 @@ public class CapabilityCacheRemoveDestinationGameTest extends SFMGameTestDefinit
                         },
                         () -> {
                             // validate that items have resumed moving
-                            assertTrue(count(leftChest, null) == 62, "Another departs after dest restored");
-                            assertTrue(count(rightChest.get(), null) == 2, "Another arrives after dest restored");
+                            assertCount(leftChest, 62, "Another departs after dest restored");
+                            assertCount(rightChest, 2, "Another arrives after dest restored");
 
                             // enqueue success
                             helper.succeed();

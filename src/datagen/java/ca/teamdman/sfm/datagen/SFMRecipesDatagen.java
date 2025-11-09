@@ -22,11 +22,13 @@ import java.util.function.Consumer;
 
 public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
     public SFMRecipesDatagen(GatherDataEvent event) {
+
         super(event, SFM.MOD_ID);
     }
 
     @Override
     protected void populate(Consumer<FinishedRecipe> writer) {
+
         beginShaped(SFMBlocks.CABLE_BLOCK.get(), 16)
                 .define('D', Tags.Items.DYES_BLACK)
                 .define('G', Items.LIGHT_WEIGHTED_PRESSURE_PLATE)
@@ -62,15 +64,28 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
                 .pattern("ABA")
                 .save(writer);
 
-//        beginShaped(SFMBlocks.TUNNELLED_MANAGER_BLOCK.get(), 1)
-//                .define('M', SFMBlocks.MANAGER_BLOCK.get())
-//                .define('H', Items.HOPPER)
-//                .unlockedBy("has_iron_ingot", RecipeProvider.has(Items.IRON_INGOT))
-//                .unlockedBy("has_chest", RecipeProvider.has(Tags.Items.CHESTS))
-//                .pattern("M  ")
-//                .pattern("H  ")
-//                .pattern("   ")
-//                .save(writer);
+        beginShaped(SFMBlocks.TUNNELLED_MANAGER_BLOCK.get(), 1)
+                .define('A', Tags.Items.FENCES)
+                .define('B', SFMBlocks.MANAGER_BLOCK.get())
+                .unlockedBy("has_manager", RecipeProvider.has(SFMItems.MANAGER_ITEM.get()))
+                .pattern("A A")
+                .pattern("ABA")
+                .pattern("A A")
+                .save(writer);
+
+        beginShaped(SFMBlocks.TUNNELLED_MANAGER_BLOCK.get(), 1)
+                .define('A', Tags.Items.FENCES)
+                .define('B', SFMBlocks.MANAGER_BLOCK.get())
+                .unlockedBy("has_manager", RecipeProvider.has(SFMItems.MANAGER_ITEM.get()))
+                .pattern("AAA")
+                .pattern(" B ")
+                .pattern("AAA")
+                .save(writer, "tunnelled_manager_horizontal");
+
+        beginShapeless(SFMBlocks.MANAGER_BLOCK.get(), 1)
+                .requires(SFMItems.TUNNELLED_MANAGER_ITEM.get())
+                .unlockedBy("has_manager", RecipeProvider.has(SFMItems.TUNNELLED_MANAGER_ITEM.get()))
+                .save(writer, "uncraft_tunnelled_manager");
 
         beginShaped(SFMItems.LABEL_GUN_ITEM.get(), 1)
                 .define('S', Tags.Items.RODS_WOODEN)
@@ -81,7 +96,7 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
                 .pattern(" LC")
                 .pattern(" SB")
                 .pattern("S  ")
-                .save(writer);
+                .save(writer, "tunnelled_manager_vertical");
 
 
         beginShaped(SFMItems.NETWORK_TOOL_ITEM.get(), 1)
@@ -189,6 +204,8 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
             Ingredient ink,
             Ingredient paper
     ) {
+
         consumer.accept(new PrintingPressFinishedRecipe(id, form, ink, paper));
     }
+
 }

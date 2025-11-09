@@ -14,8 +14,9 @@ import net.minecraft.world.level.block.Blocks;
 
 import java.util.Objects;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.assertCount;
+import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.count;
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 /**
  * Migrated from SFMCorrectnessGameTests.round_robin_by_block_2
@@ -88,7 +89,7 @@ public class RoundRobinByBlock2GameTest extends SFMGameTestDefinition {
                 .save(Objects.requireNonNull(manager.getDisk()));
 
         helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
-            assertTrue(count(sourceInv, Items.DIRT) == 64 * (27 - 2), "source count bad");
+            assertCount(sourceInv, Items.DIRT, 64 * (27 - 2), "source count bad");
             int a1Count = count(a1, Items.DIRT);
             int a2Count = count(a2, Items.DIRT);
             int b1Count = count(b1, Items.DIRT);
