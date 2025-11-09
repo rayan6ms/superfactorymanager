@@ -1,17 +1,18 @@
 package ca.teamdman.sfm.client.text_editor;
 
+import ca.teamdman.sfm.client.examples.SFMExampleProgram;
 import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import net.minecraft.client.gui.screens.ConfirmScreen;
 
-import java.util.Map;
+import java.util.List;
 import java.util.function.Consumer;
 
 public record SFMTextEditScreenExampleProgramOpenContext(
         String initialExampleContent,
         String initialDiskContent,
-        Map<String, String> examples,
+        List<SFMExampleProgram> examples,
         LabelPositionHolder labelPositionHolder,
         Consumer<String> saveWriter
 ) implements ISFMTextEditScreenOpenContext {
@@ -45,8 +46,8 @@ public record SFMTextEditScreenExampleProgramOpenContext(
 
     public boolean equalsAnyTemplate(String content) {
         return examples()
-                .values()
                 .stream()
+                .map(SFMExampleProgram::programString)
                 .map(String::trim)
                 .anyMatch(content.trim()::equals);
     }

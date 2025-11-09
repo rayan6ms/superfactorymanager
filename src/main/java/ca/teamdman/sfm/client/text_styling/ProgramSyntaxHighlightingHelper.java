@@ -116,6 +116,7 @@ public class ProgramSyntaxHighlightingHelper {
             case SFMLLexer.SECONDS:
             case SFMLLexer.SECOND:
             case SFMLLexer.SLOTS:
+            case SFMLLexer.SLOT:
             case SFMLLexer.EXCEPT:
             case SFMLLexer.RETAIN:
             case SFMLLexer.LONE:
