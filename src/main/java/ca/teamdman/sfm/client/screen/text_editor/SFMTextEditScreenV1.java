@@ -354,11 +354,14 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         this.setInitialFocus(textarea);
     }
 
+    @Override
+    public void tick() {
+
+        this.textarea.tick();
+    }
+
     // TODO: enable scrolling without focus; respond to wheel events
     protected class MyMultiLineEditBox extends MultiLineEditBox {
-
-        private int frame = 0;
-
         // Precomputed line start offsets for fast mapping; kept in sync in rebuild()
         private final List<Integer> displayedLineStartOffsets = new ArrayList<>();
 
@@ -371,6 +374,8 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
 
         /// Used to debounce scrolling when click-dragging to select text.
         private boolean scrollingEnabled = true;
+
+        private int cursorBlinkTick = 0;
 
         public MyMultiLineEditBox(
                 Font pFont,
@@ -764,6 +769,11 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             }
         }
 
+        public void tick() {
+
+            this.cursorBlinkTick++;
+        }
+
         @Override
         protected void renderContents(GuiGraphics graphics, int mx, int my, float partialTicks) {
             Matrix4f matrix4f = graphics.pose().last().pose();
@@ -778,7 +788,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                 return;
             }
 
-            final boolean isCursorVisible = this.isFocused() && this.frame++ / 6 % 2 == 0;
+            final boolean isCursorVisible = this.isFocused() && this.cursorBlinkTick % 20 >= 10;
             final int cursorIndex = textField.cursor();
 
             final int lineHeight = Math.max(1, this.font.lineHeight);
