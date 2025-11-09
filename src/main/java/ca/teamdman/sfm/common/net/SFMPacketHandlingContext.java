@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.Stored;
 import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.program_builder.ProgramBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -19,6 +20,7 @@ public class SFMPacketHandlingContext {
     private final PlayPayloadContext inner;
 
     public SFMPacketHandlingContext(PlayPayloadContext inner) {
+
         this.inner = inner;
     }
 
@@ -31,10 +33,12 @@ public class SFMPacketHandlingContext {
     }
 
     public void finish() {
+
 //        inner.setPacketHandled(true);
     }
 
     public void enqueueAndFinish(Runnable runnable) {
+
         inner.workHandler().submitAsync(runnable);
         finish();
     }
@@ -46,6 +50,7 @@ public class SFMPacketHandlingContext {
             int containerId,
             BiConsumer<MENU, BE> callback
     ) {
+
         handleServerboundContainerPacket(
                 this,
                 menuClass,
@@ -64,6 +69,7 @@ public class SFMPacketHandlingContext {
             int containerId,
             BiConsumer<MENU, BE> callback
     ) {
+
         var sender = ctx.sender();
         if (sender == null) {
             SFM.LOGGER.warn("Invalid packet received: no sender");
@@ -118,8 +124,10 @@ public class SFMPacketHandlingContext {
 
     public void compileAndThen(
             String programString,
+            boolean willMutateProgram,
             ProgramConsumer callback
     ) {
+
         ServerPlayer player = this.sender();
         if (player == null) return;
         ManagerBlockEntity manager;
@@ -131,21 +139,29 @@ public class SFMPacketHandlingContext {
             }
         } else {
             //todo: localize
-            SFMPackets.sendToPlayer(() -> player, new ClientboundInputInspectionResultsPacket(
-                    "This inspection is only available when editing inside a manager."));
+            SFMPackets.sendToPlayer(
+                    () -> player, new ClientboundInputInspectionResultsPacket(
+                            "This inspection is only available when editing inside a manager.")
+            );
             return;
         }
-        Program.compile(
-                programString,
-                successProgram -> callback.accept(successProgram, player, manager),
-                failure -> {
+        //todo: localize
+
+        new ProgramBuilder(programString)
+                .useCache(!willMutateProgram)
+                .build()
+                .caseSuccess((program, metadata) -> callback.accept(
+                        program,
+                        player,
+                        manager
+                ))
+                .caseFailure(result -> {
                     //todo: localize
                     SFMPackets.sendToPlayer(
                             () -> player,
                             new ClientboundOutputInspectionResultsPacket("failed to compile program")
                     );
-                }
-        );
+                });
     }
 
     @FunctionalInterface
@@ -155,5 +171,7 @@ public class SFMPacketHandlingContext {
                 ServerPlayer player,
                 ManagerBlockEntity managerBlockEntity
         );
+
     }
+
 }
