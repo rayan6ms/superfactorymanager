@@ -13,9 +13,6 @@ import net.minecraft.world.item.Items;
 
 import java.util.Objects;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
-
 /**
  * Migrated from SFMCorrectnessGameTests.each_dest_quantity_each_retain
  */
@@ -66,10 +63,10 @@ public class EachDestQuantityEachRetainGameTest extends SFMGameTestDefinition {
         helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             // two of the four ingots should have moved
             // for now we assume that gold will move since it is in the higher slot
-            assertTrue(count(leftChest, Items.IRON_INGOT) == 6, "Iron depart fail");
-            assertTrue(count(leftChest, Items.GOLD_INGOT) == 6, "Gold depart fail");
-            assertTrue(count(rightChest, Items.IRON_INGOT) == 2, "Iron arrive fail");
-            assertTrue(count(rightChest, Items.GOLD_INGOT) == 2, "Gold arrive fail");
+            assertCount(leftChest, Items.IRON_INGOT, 6, "Iron depart fail");
+            assertCount(leftChest, Items.GOLD_INGOT, 6, "Gold depart fail");
+            assertCount(rightChest, Items.IRON_INGOT, 2, "Iron arrive fail");
+            assertCount(rightChest, Items.GOLD_INGOT, 2, "Gold arrive fail");
 
         });
     }

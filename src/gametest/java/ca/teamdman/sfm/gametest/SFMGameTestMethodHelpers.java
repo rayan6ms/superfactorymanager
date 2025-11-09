@@ -24,10 +24,8 @@ import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.world.Container;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentHelper;
@@ -36,12 +34,10 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.items.IItemHandler;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.stream.IntStream;
 
 public class SFMGameTestMethodHelpers {
     public static ItemStack enchant(
@@ -96,30 +92,6 @@ public class SFMGameTestMethodHelpers {
                 manager.getState() == ManagerBlockEntity.State.RUNNING,
                 "Program did not start running " + DiskItem.getErrors(manager.getDisk())
         );
-    }
-
-    public static int count(
-            Container chest,
-            @Nullable Item item
-    ) {
-
-        return IntStream.range(0, chest.getContainerSize())
-                .mapToObj(chest::getItem)
-                .filter(stack -> item == null || stack.getItem() == item)
-                .mapToInt(ItemStack::getCount)
-                .sum();
-    }
-
-    public static int count(
-            IItemHandler chest,
-            @Nullable Item item
-    ) {
-
-        return IntStream.range(0, chest.getSlots())
-                .mapToObj(chest::getStackInSlot)
-                .filter(stack -> item == null || stack.getItem() == item)
-                .mapToInt(ItemStack::getCount)
-                .sum();
     }
 
     public static IItemHandler getItemHandler(
