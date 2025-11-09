@@ -10,8 +10,6 @@ NAME "Changelog"
 -- Add tunnelled manager block from #189, thanks @Qther
 ---- When capabilities are queried, will pass through to the opposite side
 ---- Hopper -> Manager -> Chest
--- Add resource buffer block
----- Holds one stack worth of any of the resource types supported by SFM
 -- Fix capabilities not being invalidated properly on 1.20.3+
 -- Add support for "SLOT" for when "SLOTS" isn't appropriate
 every 20 ticks do
