@@ -29,6 +29,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.core.NonNullList;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.util.Mth;
 import net.minecraft.world.ContainerHelper;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -38,6 +39,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.items.IItemHandler;
+import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.Nullable;
 
 import java.time.Duration;
@@ -48,15 +51,30 @@ import java.util.Set;
 
 public class ManagerBlockEntity extends BaseContainerBlockEntity {
     public static final int TICK_TIME_HISTORY_SIZE = 20;
+
     public final TranslatableLogger logger;
+
     private final NonNullList<ItemStack> ITEMS = NonNullList.withSize(1, ItemStack.EMPTY);
+
     private final Duration[] tickTimes = new Duration[TICK_TIME_HISTORY_SIZE];
+
+    public IItemHandler invWrapper = new InvWrapper(this);
+
     private @Nullable Program program = null;
+
     private int configRevision = -1;
+
     private int tick = 0;
+
     private int unprocessedRedstonePulses = 0; // used by redstone trigger
+
     private boolean shouldRebuildProgram = false;
+
     private int tickIndex = 0;
+
+    /// When using a manager to frequently swap between two disks, we don't care about warnings as much.
+    /// Warnings are still rebuilt when opening manager regardless of this value.
+    private int automationAvoidRebuildingWarningsCooldown = 0;
 
     /// Callbacks for testing, used to assert postconditions
     private @Nullable List<IProgramHooks> programHooks = null;
@@ -65,6 +83,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
             BlockPos blockPos,
             BlockState blockState
     ) {
+
         this(SFMBlockEntities.MANAGER_BLOCK_ENTITY.get(), blockPos, blockState);
     }
 
@@ -73,6 +92,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
             BlockPos blockPos,
             BlockState blockState
     ) {
+
         super(pType, blockPos, blockState);
         // Logger name should be unique to (isClient,managerpos)
         // We can't check isClient here, so instead to guarantee uniqueness we can just use hash
@@ -86,6 +106,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
 
     @Override
     public String toString() {
+
         return "ManagerBlockEntity{" +
                "hasDisk=" + (getDisk() != null) +
                ", pos=" + getBlockPos() +
@@ -94,6 +115,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     }
 
     public void addProgramHooks(IProgramHooks hooks) {
+
         if (this.programHooks == null) {
             this.programHooks = new ArrayList<>();
         }
@@ -106,12 +128,14 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
             @SuppressWarnings("unused") BlockState state,
             ManagerBlockEntity manager
     ) {
+
         try {
             // Get timestamp for elapsed time calculations
             SFMInstant start = SFMInstant.now();
 
-            // Increment tick counter
+            // Update tick counters
             manager.tick++;
+            manager.decrementRebuildWarningsCooldown();
 
             // If config changed, mark dirty
             if (manager.configRevision != SFMConfig.SERVER_CONFIG.getRevision()) {
@@ -191,6 +215,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
 
     @Override
     public void fillCrashReportCategory(CrashReportCategory pReportCategory) {
+
         super.fillCrashReportCategory(pReportCategory);
         {
             String configPath;
@@ -201,7 +226,14 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
                 configPath = "sfm-server.toml";
             }
             String configValuePath = Joiner.on(".").join(SFMConfig.SERVER_CONFIG.disableProgramExecution.getPath());
-            pReportCategory.setDetail("SFM Reminder", "You can set `" + configValuePath + " = true` in " + configPath + " to help recover your world.");
+            pReportCategory.setDetail(
+                    "SFM Reminder",
+                    "You can set `"
+                    + configValuePath
+                    + " = true` in "
+                    + configPath
+                    + " to help recover your world."
+            );
         }
         {
             ItemStack disk = getDisk();
@@ -212,21 +244,29 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     }
 
     public void setLogLevel(org.apache.logging.log4j.Level logLevelObj) {
+
         logger.setLogLevel(logLevelObj);
         sendUpdatePacket();
     }
 
     public int getTick() {
+
         return tick;
     }
 
     public @Nullable Program getProgram() {
+
         return program;
     }
 
     public void setProgram(String program) {
+
         var disk = getDisk();
         if (disk != null) {
+
+            // always rebuild warnings when modifying program string
+            this.ensureRebuildWarnings();
+
             DiskItem.setProgram(disk, program.stripTrailing().stripIndent());
             rebuildProgramAndUpdateDisk();
             setChanged();
@@ -234,18 +274,22 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     }
 
     public void trackRedstonePulseUnprocessed() {
+
         unprocessedRedstonePulses++;
     }
 
     public void clearRedstonePulseQueue() {
+
         unprocessedRedstonePulses = 0;
     }
 
     public int getUnprocessedRedstonePulseCount() {
+
         return unprocessedRedstonePulses;
     }
 
     public State getState() {
+
         if (getDisk() == null) return State.NO_DISK;
         if (getProgramString() == null) return State.NO_PROGRAM;
         if (program == null) return State.INVALID_PROGRAM;
@@ -253,21 +297,24 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     }
 
     public @Nullable String getProgramString() {
+
         var disk = getDisk();
         if (disk == null) {
             return null;
         }
 
-        var program = DiskItem.getProgram(disk);
+        var program = DiskItem.getProgramString(disk);
         return program.isBlank() ? null : program;
     }
 
     public String getProgramStringOrEmptyIfNull() {
+
         var programString = this.getProgramString();
         return programString == null ? "" : programString;
     }
 
     public Set<String> getReferencedLabels() {
+
         if (program == null) return Collections.emptySet();
         return program.referencedLabels();
     }
@@ -278,13 +325,46 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         return null;
     }
 
+    public boolean shouldRebuildWarnings() {
+
+        return this.automationAvoidRebuildingWarningsCooldown < 300; // arbitrary threshold
+    }
+
+    public void ensureRebuildWarnings() {
+
+        this.automationAvoidRebuildingWarningsCooldown = 0;
+    }
+
+    public void incrementRebuildWarningsCooldown() {
+
+        this.automationAvoidRebuildingWarningsCooldown = Mth.clamp(
+                this.automationAvoidRebuildingWarningsCooldown + 100,
+                0,
+                500
+        );
+    }
+
+    public void decrementRebuildWarningsCooldown() {
+
+        this.automationAvoidRebuildingWarningsCooldown = Math.max(
+                0,
+                this.automationAvoidRebuildingWarningsCooldown - 1
+        );
+    }
+
     public void rebuildProgramAndUpdateDisk() {
+
         if (level != null && level.isClientSide()) return;
         var disk = getDisk();
         if (disk == null) {
             this.program = null;
         } else {
-            this.program = DiskItem.compileAndUpdateErrorsAndWarnings(disk, this);
+            this.incrementRebuildWarningsCooldown();
+            this.program = DiskItem.compileAndUpdateErrorsAndWarnings(
+                    disk,
+                    this,
+                    this.shouldRebuildWarnings()
+            );
         }
         this.configRevision = SFMConfig.SERVER_CONFIG.getRevision();
         sendUpdatePacket();
@@ -292,16 +372,19 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
 
     @Override
     public int getContainerSize() {
+
         return ITEMS.size();
     }
 
     @Override
     public boolean isEmpty() {
+
         return ITEMS.isEmpty();
     }
 
     @Override
     public ItemStack getItem(int slot) {
+
         if (slot < 0 || slot >= ITEMS.size()) return ItemStack.EMPTY;
         return ITEMS.get(slot);
     }
@@ -312,6 +395,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
             int slot,
             int amount
     ) {
+
         var result = ContainerHelper.removeItem(ITEMS, slot, amount);
         if (slot == 0) rebuildProgramAndUpdateDisk();
         setChanged();
@@ -320,6 +404,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
 
     @Override
     public ItemStack removeItemNoUpdate(int slot) {
+
         var result = ContainerHelper.takeItem(ITEMS, slot);
         if (slot == 0) rebuildProgramAndUpdateDisk();
         setChanged();
@@ -331,6 +416,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
             int slot,
             ItemStack stack
     ) {
+
         if (slot < 0 || slot >= ITEMS.size()) return;
         ITEMS.set(slot, stack);
         if (slot == 0) rebuildProgramAndUpdateDisk();
@@ -338,18 +424,8 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     }
 
     @Override
-    protected NonNullList<ItemStack> getItems() {
-        return ITEMS;
-    }
-
-    @Override
-    protected void setItems(NonNullList<ItemStack> pItems) {
-        ITEMS.clear();
-        ITEMS.addAll(pItems);
-    }
-
-    @Override
     public int getMaxStackSize() {
+
         return 1;
     }
 
@@ -358,45 +434,24 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
             int slot,
             ItemStack stack
     ) {
+
         return stack.getItem() instanceof DiskItem;
     }
 
     @Override
     public boolean stillValid(Player player) {
+
         return SFMContainerUtil.stillValid(this, player);
     }
 
-
-    @Override
-    protected void saveAdditional(
-            CompoundTag pTag,
-            HolderLookup.Provider pRegistries
-    ) {
-        super.saveAdditional(pTag, pRegistries);
-        ContainerHelper.saveAllItems(pTag, ITEMS, pRegistries);
-    }
-
-    @Override
-    protected void loadAdditional(
-            CompoundTag pTag,
-            HolderLookup.Provider pRegistries
-    ) {
-        super.loadAdditional(pTag, pRegistries);
-        ContainerHelper.loadAllItems(pTag, ITEMS, pRegistries);
-        this.shouldRebuildProgram = true;
-        if (level != null) {
-            this.tick = level.random.nextInt();
-        }
-    }
-
-
-
     @Override
     public void clearContent() {
+
         ITEMS.clear();
     }
 
     public void reset() {
+
         var disk = getDisk();
         if (disk != null) {
             LabelPositionHolder.clear(disk);
@@ -435,10 +490,12 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
 
                     // Send log level changes
                     if (!menu.logLevel.equals(logger.getLogLevel().name())) {
-                        SFMPackets.sendToPlayer(entry::getKey, new ClientboundManagerLogLevelUpdatedPacket(
-                                menu.containerId,
-                                logger.getLogLevel().name()
-                        ));
+                        SFMPackets.sendToPlayer(
+                                entry::getKey, new ClientboundManagerLogLevelUpdatedPacket(
+                                        menu.containerId,
+                                        logger.getLogLevel().name()
+                                )
+                        );
                         menu.logLevel = logger.getLogLevel().name();
                     }
 
@@ -456,10 +513,12 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
                         // Send the logs
                         while (!logsToSend.isEmpty()) {
                             int remaining = logsToSend.size();
-                            SFMPackets.sendToPlayer(entry::getKey, ClientboundManagerLogsPacket.drainToCreate(
-                                    menu.containerId,
-                                    logsToSend
-                            ));
+                            SFMPackets.sendToPlayer(
+                                    entry::getKey, ClientboundManagerLogsPacket.drainToCreate(
+                                            menu.containerId,
+                                            logsToSend
+                                    )
+                            );
                             if (logsToSend.size() >= remaining) {
                                 throw new IllegalStateException("Failed to send logs, infinite loop detected");
                             }
@@ -469,7 +528,45 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     }
 
     @Override
+    protected NonNullList<ItemStack> getItems() {
+
+        return ITEMS;
+    }
+
+    @Override
+    protected void setItems(NonNullList<ItemStack> pItems) {
+
+        ITEMS.clear();
+        ITEMS.addAll(pItems);
+    }
+
+    @Override
+    protected void saveAdditional(
+            CompoundTag pTag,
+            HolderLookup.Provider pRegistries
+    ) {
+
+        super.saveAdditional(pTag, pRegistries);
+        ContainerHelper.saveAllItems(pTag, ITEMS, pRegistries);
+    }
+
+    @Override
+    protected void loadAdditional(
+            CompoundTag pTag,
+            HolderLookup.Provider pRegistries
+    ) {
+
+        super.loadAdditional(pTag, pRegistries);
+        ContainerHelper.loadAllItems(pTag, ITEMS, pRegistries);
+        this.shouldRebuildProgram = true;
+        if (level != null) {
+            this.tick = level.random.nextInt();
+        }
+    }
+
+    @Override
     protected Component getDefaultName() {
+
         return LocalizationKeys.MANAGER_CONTAINER.getComponent();
     }
 
@@ -479,6 +576,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
             int windowId,
             Inventory inv
     ) {
+
         return new ManagerContainerMenu(windowId, inv, this);
     }
 
@@ -496,12 +594,14 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         );
 
         public final ChatFormatting COLOR;
+
         public final LocalizationEntry LOC;
 
         State(
                 ChatFormatting color,
                 LocalizationEntry loc
         ) {
+
             COLOR = color;
             LOC = loc;
         }

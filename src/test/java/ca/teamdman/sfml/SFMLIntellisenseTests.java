@@ -35,6 +35,7 @@ public class SFMLIntellisenseTests {
               OUTPUT TO b
             END
             """.stripTrailing().stripIndent();
+
     /**
      * A small snippet of code where we have "INPUT 64 IRON_INGOT FROM Minecart"
      * The 'IRON_INGOT' portion is recognized by the grammar as resourceId,
@@ -48,6 +49,7 @@ public class SFMLIntellisenseTests {
 
     @Test
     public void displayTokens() {
+
         SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(SIMPLE_PROGRAM_STRING));
         lexer.removeErrorListeners();
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -71,13 +73,15 @@ public class SFMLIntellisenseTests {
 
     @Test
     public void itWorksTest() {
+
         String programString = """
                 NAME "hi"
                 EVERY 20
                 """.stripTrailing().stripIndent();
         for (int cursorPosition = 0; cursorPosition < countTokens(programString); cursorPosition++) {
             StringBuilder display = new StringBuilder();
-            ProgramBuildResult buildResult = ProgramBuilder.build(programString);
+
+            ProgramBuildResult buildResult = new ProgramBuilder(programString).build();
             List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(new IntellisenseContext(
                     buildResult,
                     cursorPosition,
@@ -99,18 +103,18 @@ public class SFMLIntellisenseTests {
 
     @Test
     public void getNodesUnderCursor() {
+
         String programString = SIMPLE_PROGRAM_STRING;
 
         // Build the program
         AtomicReference<Program> program = new AtomicReference<>();
-        Program.compile(
-                programString,
-                program::set,
-                failure -> {
-                    failure.forEach(error -> System.out.println(error.toString()));
+
+        new ProgramBuilder(programString).build()
+                .caseSuccess((successProgram, metadata) -> program.set(successProgram))
+                .caseFailure(result -> {
+                    result.metadata().errors().forEach(error -> System.out.println(error.toString()));
                     throw new RuntimeException("Failed to compile program");
-                }
-        );
+                });
         assertNotNull(program.get());
 
         // Put each cursor position as a new line in the stdout
@@ -131,8 +135,10 @@ public class SFMLIntellisenseTests {
 
     @Test
     public void combinedTest() {
+
         String programString = SIMPLE_PROGRAM_STRING;
-        ProgramBuildResult buildResult = ProgramBuilder.build(programString).caseFailure(failure -> {
+
+        ProgramBuildResult buildResult = new ProgramBuilder(programString).build().caseFailure(failure -> {
             failure.metadata().errors().forEach(error -> System.out.println(error.toString()));
             throw new RuntimeException("Failed to compile program");
         });
@@ -176,6 +182,7 @@ public class SFMLIntellisenseTests {
 
     @Test
     public void lavaSearch() {
+
         String typed = "lava";
         List<String> suggestions = Arrays.asList(
                 "TO",
@@ -210,7 +217,7 @@ public class SFMLIntellisenseTests {
                 StringDistances.overlapCoefficient(),
                 StringDistances.qGramsDistance(),
                 StringDistances.simonWhite(),
-        };
+                };
         String[] distanceNames = new String[]{
                 "blockDistance",
                 "cosineSimilarity",
@@ -229,7 +236,7 @@ public class SFMLIntellisenseTests {
                 "overlapCoefficient",
                 "qGramsDistance",
                 "simonWhite",
-        };
+                };
         List<String> sorted = new ArrayList<>(suggestions);
         for (int i = 0; i < distances.length; i++) {
             try {
@@ -242,7 +249,12 @@ public class SFMLIntellisenseTests {
                 long endTime = System.nanoTime();
                 System.out.println("Typed: " + typed + " => Sorted suggestions: " + sorted);
                 for (String s : sorted) {
-                    System.out.printf("Distance: %.2f %.2f, suggestion: %s\n", distance.distance(s, typed), distance.distance(typed, s), s);
+                    System.out.printf(
+                            "Distance: %.2f %.2f, suggestion: %s\n",
+                            distance.distance(s, typed),
+                            distance.distance(typed, s),
+                            s
+                    );
                 }
                 System.out.printf("Time taken: %d ns\n", (endTime - startTime));
                 System.out.println();
@@ -265,7 +277,8 @@ public class SFMLIntellisenseTests {
 //        for (int chop = 0; chop < outerProgramString.length(); chop++) {
         for (int chop = outerProgramString.length() - 1; chop < outerProgramString.length(); chop++) {
             String programString = outerProgramString.substring(0, chop);
-            ProgramBuildResult buildResult = ProgramBuilder.build(programString);
+
+            ProgramBuildResult buildResult = new ProgramBuilder(programString).build();
             SFMLParser parser = buildResult.metadata().parser();
             var contexts = new ParserRuleContext[]{
                     parser.program(),
@@ -346,12 +359,14 @@ public class SFMLIntellisenseTests {
 
     @Test
     public void getRulesTest2() {
+
         String programString = """
                 EVERY 20 TICKS DO
                   INPUT stone FROM chest
                 END
                 """.stripTrailing().stripIndent();
-        ProgramBuildResult buildResult = ProgramBuilder.build(programString);
+
+        ProgramBuildResult buildResult = new ProgramBuilder(programString).build();
         SFMLParser parser = buildResult.metadata().parser();
         CodeCompletionCore core = new CodeCompletionCore(
                 parser,
@@ -403,12 +418,14 @@ public class SFMLIntellisenseTests {
 
     @Test
     public void getRulesTest3() {
+
         String programString = """
                 EVERY 20 TICKS DO
                   INPUT stone FROM chest
                 END
                 """.stripTrailing().stripIndent();
-        ProgramBuildResult buildResult = ProgramBuilder.build(programString);
+
+        ProgramBuildResult buildResult = new ProgramBuilder(programString).build();
         SFMLParser parser = buildResult.metadata().parser();
         CodeCompletionCore core = new CodeCompletionCore(
                 parser,
@@ -466,7 +483,8 @@ public class SFMLIntellisenseTests {
     @Test
     public void testCursorInsideResourceId() {
         // 1) Build the snippet into a ProgramBuildResult
-        ProgramBuildResult buildResult = ProgramBuilder.build(PROGRAM_SNIPPET);
+
+        ProgramBuildResult buildResult = new ProgramBuilder(PROGRAM_SNIPPET).build();
         assertTrue(buildResult.isBuildSuccessful(), "Snippet must parse successfully");
 
         // 2) Find a cursor position somewhere in IRON_INGOT
@@ -508,7 +526,8 @@ public class SFMLIntellisenseTests {
     @Test
     public void testCursorInsideLabel() {
         // Use the same snippet, but put the cursor in the label area
-        ProgramBuildResult buildResult = ProgramBuilder.build(PROGRAM_SNIPPET);
+
+        ProgramBuildResult buildResult = new ProgramBuilder(PROGRAM_SNIPPET).build();
         assertTrue(buildResult.isBuildSuccessful(), "Snippet must parse successfully");
 
         // Cursor in "Minecart"
@@ -540,6 +559,7 @@ public class SFMLIntellisenseTests {
     }
 
     private static int countTokens(String program) {
+
         SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(program));
         lexer.removeErrorListeners();
         CommonTokenStream tokens = new CommonTokenStream(lexer);
@@ -547,4 +567,5 @@ public class SFMLIntellisenseTests {
 
         return tokens.size();
     }
+
 }

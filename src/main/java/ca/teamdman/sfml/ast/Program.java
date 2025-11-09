@@ -26,11 +26,16 @@ import java.util.function.Consumer;
 import static ca.teamdman.sfm.common.blockentity.ManagerBlockEntity.TICK_TIME_HISTORY_SIZE;
 import static ca.teamdman.sfm.common.net.ServerboundManagerSetLogLevelPacket.MAX_LOG_LEVEL_NAME_LENGTH;
 
+/// Use {@link ProgramBuilder} to get a {@link Program} from a {@link String}
 public record Program(
         ASTBuilder astBuilder,
+
         String name,
+
         List<Trigger> triggers,
+
         Set<String> referencedLabels,
+
         Set<ResourceIdentifier<?, ?, ?>> referencedResources
 ) implements Statement {
     /**
@@ -43,18 +48,8 @@ public record Program(
                                                  - MAX_LOG_LEVEL_NAME_LENGTH
                                                  - 1 // manager state enum
                                                  - 8; // block pos
-    public static final int MAX_LABEL_LENGTH = 256;
 
-    public static void compile(
-            String programString,
-            Consumer<Program> onSuccess,
-            Consumer<List<TranslatableContents>> onFailure
-    ) {
-        ProgramBuilder
-                .build(programString)
-                .caseSuccess((program, metadata) -> onSuccess.accept(program))
-                .caseFailure(result -> onFailure.accept(result.metadata().errors()));
-    }
+    public static final int MAX_LABEL_LENGTH = 256;
 
     /**
      * Create a context and tick the program.
@@ -62,6 +57,7 @@ public record Program(
      * @return {@code true} if a trigger entered its body
      */
     public boolean tick(ManagerBlockEntity manager) {
+
         var context = new ProgramContext(this, manager, new ExecuteProgramBehaviour());
 
         // log if there are unprocessed redstone pulses
@@ -87,6 +83,7 @@ public record Program(
 
     @Override
     public void tick(ProgramContext context) {
+
         LimitedInputSlotObjectPool.checkInvariant();
         LimitedOutputSlotObjectPool.checkInvariant();
 
@@ -159,6 +156,7 @@ public record Program(
     }
 
     public int getConditionIndex(IfStatement ifStatement) {
+
         for (Trigger trigger : triggers) {
             int conditionIndex = trigger.getConditionIndex(ifStatement);
             if (conditionIndex != -1) {
@@ -170,6 +168,7 @@ public record Program(
 
     @Override
     public String toString() {
+
         var rtn = new StringBuilder();
         rtn.append("NAME \"").append(name).append("\"\n");
         for (Trigger trigger : triggers) {
@@ -182,6 +181,11 @@ public record Program(
             OutputStatement oldStatement,
             OutputStatement newStatement
     ) {
+
+        if (!ProgramBuilder.isMutationAllowed(this)) {
+            throw new IllegalArgumentException(
+                    "Mutation is not allowed on this Program object because it is cached! Program = " + this);
+        }
         Deque<Statement> toPatch = new ArrayDeque<>();
         toPatch.add(this);
         while (!toPatch.isEmpty()) {
@@ -199,6 +203,7 @@ public record Program(
     }
 
     private static @NotNull Consumer<Consumer<TranslatableContents>> getTraceLogWriter(ProgramContext context) {
+
         return trace -> {
             trace.accept(LocalizationKeys.LOG_CABLE_NETWORK_DETAILS_HEADER_1.get());
             trace.accept(LocalizationKeys.LOG_CABLE_NETWORK_DETAILS_HEADER_2.get());
@@ -257,6 +262,7 @@ public record Program(
         private final List<String> errors;
 
         public ListErrorListener(List<String> errors) {
+
             this.errors = errors;
         }
 
@@ -269,7 +275,10 @@ public record Program(
                 String msg,
                 RecognitionException e
         ) {
+
             errors.add("line " + line + ":" + charPositionInLine + " " + msg);
         }
+
     }
+
 }
