@@ -54,6 +54,7 @@ END
 -- Add try-catch to capability discovery, thanks @Sverd for the report! #418
 -- Add missing item capability for manager block on MC 1.20.3+
 -- Add Russian translation, thanks @BazZziliuS, #415
+-- Turned off line numbers by default in the text editor, I see you @joaobmt lol
 
 ---- 4.26.0 ----
 -- Add new textures from #343, thanks MHanHanBing
