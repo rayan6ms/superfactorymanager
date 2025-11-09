@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.Blocks;
 import java.util.Objects;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 /**
  * Migrated from SFMCorrectnessGameTests.move_using_or
@@ -76,9 +75,9 @@ public class MoveUsingOrGameTest extends SFMGameTestDefinition {
             int rightStoneDirt = count(rightChest, Items.STONE) + count(rightChest, Items.DIRT);
             assertTrue(rightStoneDirt == 5, "stone and dirt should arrive");
             // left cobblestone count = 0
-            assertTrue(count(leftChest, Items.COBBLESTONE) == 0, "no cobblestone should remain");
+            assertCount(leftChest, Items.COBBLESTONE, 0, "no cobblestone should remain");
             // right cobblestone count = 64*2
-            assertTrue(count(rightChest, Items.COBBLESTONE) == 64 * 2, "cobblestone should arrive");
+            assertCount(rightChest, Items.COBBLESTONE, 64 * 2, "cobblestone should arrive");
         });
     }
 }
