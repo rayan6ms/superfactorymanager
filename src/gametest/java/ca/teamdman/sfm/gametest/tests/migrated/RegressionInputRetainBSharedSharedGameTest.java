@@ -14,7 +14,6 @@ import net.minecraft.world.item.Items;
 import java.util.Objects;
 
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 /**
  * Migrated from SFMCorrectnessGameTests.regression_input_retain_b_shared_shared
@@ -83,7 +82,7 @@ public class RegressionInputRetainBSharedSharedGameTest extends SFMGameTestDefin
         helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
             // There should be exactly 5 dirt across all b
             // The rest should be in a
-            assertTrue(count(a, Items.DIRT) == 64 * 3 * 5 - 5, "dirt should arrive in a");
+            assertCount(a, Items.DIRT, 64 * 3 * 5 - 5, "dirt should arrive in a");
             int bDirt = count(b1, Items.DIRT) + count(b2, Items.DIRT) + count(b3, Items.DIRT);
             assertTrue(bDirt == 5, "dirt should depart from b");
         });
