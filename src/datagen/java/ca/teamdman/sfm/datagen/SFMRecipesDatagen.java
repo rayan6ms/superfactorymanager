@@ -22,11 +22,13 @@ import java.util.function.Consumer;
 
 public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
     public SFMRecipesDatagen(GatherDataEvent event) {
+
         super(event, SFM.MOD_ID);
     }
 
     @Override
     protected void populate(Consumer<FinishedRecipe> writer) {
+
         beginShaped(SFMBlocks.CABLE_BLOCK.get(), 16)
                 .define('D', Tags.Items.DYES_BLACK)
                 .define('G', Items.LIGHT_WEIGHTED_PRESSURE_PLATE)
@@ -78,7 +80,7 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern("AAA")
-                .save(writer);
+                .save(writer, "tunnelled_manager_horizontal");
 
         beginShaped(SFMItems.LABEL_GUN_ITEM.get(), 1)
                 .define('S', Tags.Items.RODS_WOODEN)
@@ -89,7 +91,7 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
                 .pattern(" LC")
                 .pattern(" SB")
                 .pattern("S  ")
-                .save(writer);
+                .save(writer, "tunnelled_manager_vertical");
 
 
         beginShaped(SFMItems.NETWORK_TOOL_ITEM.get(), 1)
@@ -197,6 +199,8 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
             Ingredient ink,
             Ingredient paper
     ) {
+
         consumer.accept(new PrintingPressFinishedRecipe(id, form, ink, paper));
     }
+
 }

@@ -1,11 +1,13 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_ink": {
+    "has_manager": {
       "conditions": {
         "items": [
           {
-            "tag": "forge:dyes/black"
+            "items": [
+              "sfm:manager"
+            ]
           }
         ]
       },
@@ -13,20 +15,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "sfm:labelgun"
+        "recipe": "minecraft:tunnelled_manager_horizontal"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_ink",
+      "has_manager",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "sfm:labelgun"
+      "minecraft:tunnelled_manager_horizontal"
     ]
   }
 }
