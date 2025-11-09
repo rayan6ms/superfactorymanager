@@ -7,12 +7,10 @@ NAME "Changelog"
 -- https://github.com/TeamDman/SuperFactoryManager/issues/new
 
 ---- 4.27.0 (pre) ----
+-- Fix capabilities not being invalidated properly on 1.20.3+
 -- Add tunnelled manager block from #189, thanks @Qther
 ---- When capabilities are queried, will pass through to the opposite side
 ---- Hopper -> Manager -> Chest
--- Add resource buffer block
----- Holds one stack worth of any of the resource types supported by SFM
--- Fix capabilities not being invalidated properly on 1.20.3+
 -- Add support for "SLOT" for when "SLOTS" isn't appropriate
 every 20 ticks do
     input from chest slot 5
@@ -30,14 +28,11 @@ FORGET b -- you can specify labels, though I doubt anyone uses it lol
 END
 -- Update tag_matching.sfml and filtering.sfml examples, thanks @Final and @MikMouk for the motivation
 -- Add relative directions, #380
--- TODO: tests for INPUT FROM "left" LEFT SIDE
 EVERY 20 TICKS DO
   INPUT FROM machine LEFT SIDE -- relative to the facing property of the block state, null side if not applicable
-  OUTPUT TO machine2 RIGHT SIDE
+  OUTPUT TO machine2 RIGHT, FRONT, BACK SIDE
 END
 -- Add a server config for max number of warnings on a disk, fixes #383
--- Implement custom event subscriber logic to reduce entropy in SFM code between MC versions
----- Not being used by production logic yet
 -- Fixed disjoint text selection when using left click to select text in the editor #396
 ---- Thank you @Zexylz for the contribution!
 -- Fixed text editor scroll bar inappropriately responding to mouse events
@@ -54,6 +49,9 @@ END
 -- Add try-catch to capability discovery, thanks @Sverd for the report! #418
 -- Add missing item capability for manager block on MC 1.20.3+
 -- Add Russian translation, thanks @BazZziliuS, #415
+-- Turned off line numbers by default in the text editor, I see you @joaobmt lol
+-- Implement custom event subscriber logic to reduce entropy in SFM code between MC versions
+---- Not being used by production logic yet
 
 ---- 4.26.0 ----
 -- Add new textures from #343, thanks MHanHanBing
