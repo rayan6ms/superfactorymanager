@@ -1,10 +1,12 @@
-// 1.19.2	2025-11-09T12:52:54.9020187	Recipes
+// 1.19.2	2025-11-09T12:56:10.8084432	Recipes
 7ded111f9e17f19c22e228ed71a142b4cb9ec527 data/minecraft/advancements/recipes/sfm/tunnelled_manager_horizontal.json
 da2d621c83e62b6385405f9d13afb961b33c50a9 data/minecraft/advancements/recipes/sfm/tunnelled_manager_vertical.json
+220658ab093bcf17e9432b2a8baf08809a7c6434 data/minecraft/advancements/recipes/sfm/uncraft_tunnelled_manager.json
 1b709571a4d702e0d4da0cfbec3d5a7e51c68c2f data/minecraft/recipes/disk_reset.json
 3fe94198dd838649cc4b34bf9413bbaf95e5823e data/minecraft/recipes/label_gun_reset.json
 36f5cfef5558aea52df34ed8ce550d024aea7a37 data/minecraft/recipes/tunnelled_manager_horizontal.json
 32925307f65ae8813cb0426a93f322c1cb6315bc data/minecraft/recipes/tunnelled_manager_vertical.json
+4ca916a2abd965824d7083b072a0b9f6f6235f1f data/minecraft/recipes/uncraft_tunnelled_manager.json
 347a9db1dc51c336dab23358554282348afd7a8f data/sfm/advancements/recipes/sfm/cable.json
 3812a02ebe30dcd7536c329803d6a65d05a14800 data/sfm/advancements/recipes/sfm/disk.json
 b725fc4de1a90aaf2d01b0f35a1ce27f224c28d7 data/sfm/advancements/recipes/sfm/fancy_cable.json

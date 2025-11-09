@@ -82,6 +82,11 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
                 .pattern("AAA")
                 .save(writer, "tunnelled_manager_horizontal");
 
+        beginShapeless(SFMBlocks.MANAGER_BLOCK.get(), 1)
+                .requires(SFMItems.TUNNELLED_MANAGER_ITEM.get())
+                .unlockedBy("has_manager", RecipeProvider.has(SFMItems.TUNNELLED_MANAGER_ITEM.get()))
+                .save(writer, "uncraft_tunnelled_manager");
+
         beginShaped(SFMItems.LABEL_GUN_ITEM.get(), 1)
                 .define('S', Tags.Items.RODS_WOODEN)
                 .define('B', Tags.Items.DYES_BLACK)
