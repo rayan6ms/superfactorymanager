@@ -19,7 +19,7 @@ import net.minecraft.world.level.block.StandingSignBlock;
 
 import java.util.stream.Stream;
 
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
+import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.count;
 
 /**
  * Migrated from SFMAppliedEnergisticsCompatGameTests.ae2_inscribers
