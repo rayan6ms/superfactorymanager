@@ -10,18 +10,22 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ServerboundInputInspectionRequestPacket(
         String programString,
+
         int inputNodeIndex
 ) implements SFMPacket {
     public static class Daddy implements SFMPacketDaddy<ServerboundInputInspectionRequestPacket> {
         @Override
         public PacketDirection getPacketDirection() {
+
             return PacketDirection.SERVERBOUND;
         }
+
         @Override
         public void encode(
                 ServerboundInputInspectionRequestPacket msg,
                 RegistryFriendlyByteBuf friendlyByteBuf
         ) {
+
             friendlyByteBuf.writeUtf(msg.programString, Program.MAX_PROGRAM_LENGTH);
             friendlyByteBuf.writeInt(msg.inputNodeIndex());
         }
@@ -39,8 +43,10 @@ public record ServerboundInputInspectionRequestPacket(
                 ServerboundInputInspectionRequestPacket msg,
                 SFMPacketHandlingContext context
         ) {
+
             context.compileAndThen(
                     msg.programString,
+                    false,
                     (program, player, managerBlockEntity) ->
                             program.astBuilder()
                                     .getNodeAtIndex(msg.inputNodeIndex)
@@ -87,7 +93,10 @@ public record ServerboundInputInspectionRequestPacket(
 
         @Override
         public Class<ServerboundInputInspectionRequestPacket> getPacketClass() {
+
             return ServerboundInputInspectionRequestPacket.class;
         }
+
     }
+
 }

@@ -22,7 +22,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.count;
 
 @SuppressWarnings({"DataFlowIssue"})
 @SFMGameTest
-public class CapabilityCacheRemoveDestinationGameTest extends SFMGameTestDefinition {
+public class CapabilityCacheRemoveSourceGameTest extends SFMGameTestDefinition {
     @Override
     public String template() {
 
@@ -43,11 +43,11 @@ public class CapabilityCacheRemoveDestinationGameTest extends SFMGameTestDefinit
         helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
 
         // get handlers
-        AtomicReference<IItemHandler> rightChest = new AtomicReference<>(helper.getItemHandler(rightPos));
-        var leftChest = helper.getItemHandler(leftPos);
+        var rightChest = helper.getItemHandler(rightPos);
+        AtomicReference<IItemHandler> leftChest = new AtomicReference<>(helper.getItemHandler(leftPos));
 
         // prepare resources
-        leftChest.insertItem(0, new ItemStack(Blocks.DIRT, 64), false);
+        leftChest.get().insertItem(0, new ItemStack(Blocks.DIRT, 64), false);
 
         // prepare manager
         ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
@@ -73,25 +73,25 @@ public class CapabilityCacheRemoveDestinationGameTest extends SFMGameTestDefinit
                 List.of(
                         () -> {
                             // validate one item has moved
-                            assertTrue(count(leftChest, null) == 63, "One should have departed");
-                            assertTrue(count(rightChest.get(), null) == 1, "One should have arrived");
+                            assertTrue(count(leftChest.get(), null) == 63, "One should have departed");
+                            assertTrue(count(rightChest, null) == 1, "One should have arrived");
 
-                            // break the destination block
-                            helper.setBlock(rightPos, Blocks.AIR);
+                            // break the source block
+                            helper.setBlock(leftPos, Blocks.AIR);
                         },
                         () -> {
                             // validate things aren't moving
-                            assertTrue(count(leftChest, null) == 63, "None should depart after destination is broken");
+                            assertTrue(count(leftChest.get(), null) == 63, "None should depart after source is broken");
 
-                            // restore destination block
-                            helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
-                            rightChest.set(helper.getItemHandler(rightPos));
-                            rightChest.get().insertItem(0, new ItemStack(Blocks.DIRT, 1), false);
+                            // restore source block
+                            helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+                            leftChest.set(helper.getItemHandler(leftPos));
+                            leftChest.get().insertItem(0, new ItemStack(Blocks.DIRT, 64), false);
                         },
                         () -> {
                             // validate that items have resumed moving
-                            assertTrue(count(leftChest, null) == 62, "Another departs after dest restored");
-                            assertTrue(count(rightChest.get(), null) == 2, "Another arrives after dest restored");
+                            assertTrue(count(leftChest.get(), null) == 63, "Another departs after source restored");
+                            assertTrue(count(rightChest, null) == 2, "Another arrives after source restored");
 
                             // enqueue success
                             helper.succeed();

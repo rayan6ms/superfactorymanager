@@ -9,18 +9,22 @@ import net.minecraft.network.RegistryFriendlyByteBuf;
 
 public record ServerboundIfStatementInspectionRequestPacket(
         String programString,
+
         int inputNodeIndex
 ) implements SFMPacket {
     public static class Daddy implements SFMPacketDaddy<ServerboundIfStatementInspectionRequestPacket> {
         @Override
         public PacketDirection getPacketDirection() {
+
             return PacketDirection.SERVERBOUND;
         }
+
         @Override
         public void encode(
                 ServerboundIfStatementInspectionRequestPacket msg,
                 RegistryFriendlyByteBuf friendlyByteBuf
         ) {
+
             friendlyByteBuf.writeUtf(msg.programString, Program.MAX_PROGRAM_LENGTH);
             friendlyByteBuf.writeInt(msg.inputNodeIndex());
         }
@@ -38,8 +42,10 @@ public record ServerboundIfStatementInspectionRequestPacket(
                 ServerboundIfStatementInspectionRequestPacket msg,
                 SFMPacketHandlingContext context
         ) {
+
             context.compileAndThen(
                     msg.programString,
+                    false,
                     (program, player, managerBlockEntity) -> program.astBuilder()
                             .getNodeAtIndex(msg.inputNodeIndex)
                             .filter(IfStatement.class::isInstance)
@@ -57,18 +63,23 @@ public record ServerboundIfStatementInspectionRequestPacket(
                                 boolean result = ifStatement.condition().test(programContext);
                                 payload.append(result ? "TRUE" : "FALSE");
 
-                                SFMPackets.sendToPlayer(() -> player, new ClientboundIfStatementInspectionResultsPacket(
-                                        SFMPacketDaddy.truncate(
-                                                payload.toString(),
-                                                ClientboundIfStatementInspectionResultsPacket.MAX_RESULTS_LENGTH
-                                        )));
+                                SFMPackets.sendToPlayer(
+                                        () -> player, new ClientboundIfStatementInspectionResultsPacket(
+                                                SFMPacketDaddy.truncate(
+                                                        payload.toString(),
+                                                        ClientboundIfStatementInspectionResultsPacket.MAX_RESULTS_LENGTH
+                                                ))
+                                );
                             })
             );
         }
 
         @Override
         public Class<ServerboundIfStatementInspectionRequestPacket> getPacketClass() {
+
             return ServerboundIfStatementInspectionRequestPacket.class;
         }
+
     }
+
 }
