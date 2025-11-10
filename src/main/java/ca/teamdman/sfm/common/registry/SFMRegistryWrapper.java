@@ -2,6 +2,9 @@ package ca.teamdman.sfm.common.registry;
 
 
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
@@ -78,9 +81,34 @@ public final class SFMRegistryWrapper<T> implements Iterable<T> {
     /// If this is for a registry not enabled during creation via {@link SFMDeferredRegisterBuilder}
     /// then this method will probably throw.
     public @MCVersionDependentBehaviour Registry<T> getInnerRegistry() {
-        if (maybeInner == null) {
-            maybeInner = (Registry<T>) BuiltInRegistries.REGISTRY.get((ResourceKey) registryKey);
+
+        // Use cached value if present
+        if (maybeInner != null) {
+            return maybeInner;
         }
+
+        // Look up the registry in the registry registry
+        //noinspection unchecked
+        maybeInner = (Registry<T>) BuiltInRegistries.REGISTRY.get((ResourceKey) registryKey);
+        if (maybeInner != null) {
+            return maybeInner;
+        }
+
+        // Couldn't find it, we can only proceed if we are on the client
+        if (!SFMEnvironmentUtils.isClient()) {
+            throw new IllegalStateException("Failed to acquire registry " + registryKey + " - not present in the registry registry, and we aren't on the client");
+        }
+
+        // Grab the level from the client
+        ClientLevel level = Minecraft.getInstance().level;
+        if (level == null) {
+            throw new IllegalStateException("Failed to acquire registry " + registryKey + " - client level is null?");
+        }
+
+        // Grab the registry from the client registry access and cache it
+        maybeInner = level.registryAccess().registryOrThrow(registryKey);
+
+        // Return it
         return maybeInner;
     }
 
