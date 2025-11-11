@@ -15,8 +15,6 @@ import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
@@ -31,15 +29,6 @@ import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SFMGameTestMethodHelpers {
-    public static ItemStack enchant(
-            ItemStack stack,
-            Enchantment enchantment,
-            int level
-    ) {
-
-        EnchantmentHelper.setEnchantments(Map.of(enchantment, level), stack);
-        return stack;
-    }
 
     public static void assertTrue(
             boolean condition,
