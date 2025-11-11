@@ -19,6 +19,7 @@ public class FormItem extends Item {
     public static ItemStack createFormFromReference(ItemStack stack) {
         var formStack = new ItemStack(SFMItems.FORM_ITEM.get());
         formStack.set(SFMDataComponents.FORM_REFERENCE, new ItemStackBox(stack));
+        formStack.setCount(stack.getCount());
         return formStack;
     }
 
