@@ -1,8 +1,6 @@
 package ca.teamdman.sfm.gametest.tests.falling_anvil;
 
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
-import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
-import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.gametest.SFMGameTest;
@@ -41,7 +39,7 @@ public class FallingAnvilEnchantmentFormGameTest extends SFMGameTestDefinition {
         helper.setBlock(new BlockPos(1, 2, 1), Blocks.IRON_BLOCK);
         var pos = helper.absoluteVec(new Vec3(1.5, 3.5, 1.5));
         SFMEnchantmentCollection enchantments = new SFMEnchantmentCollection();
-        enchantments.add(new SFMEnchantmentEntry(new SFMEnchantmentKey(helper.getLevel().registryAccess(), Enchantments.SHARPNESS), 3));
+        enchantments.add(helper.createEnchantmentEntry(Enchantments.SHARPNESS, 3));
         ItemStack enchantedBookStack = enchantments.createEnchantedBook();
 
         helper

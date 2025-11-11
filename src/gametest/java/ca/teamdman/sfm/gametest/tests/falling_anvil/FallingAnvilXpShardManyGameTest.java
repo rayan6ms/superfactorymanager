@@ -2,6 +2,7 @@ package ca.teamdman.sfm.gametest.tests.falling_anvil;
 
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.config.SFMServerConfig.LevelsToShards;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentAliases;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
@@ -41,7 +42,7 @@ public class FallingAnvilXpShardManyGameTest extends SFMGameTestDefinition {
         var pos = helper.absoluteVec(new Vec3(1.5, 3.5, 1.5));
 
         SFMEnchantmentCollection enchantments = new SFMEnchantmentCollection();
-        enchantments.add(helper.createEnchantmentEntry(Enchantments.EFFICIENCY, 2));
+        enchantments.add(helper.createEnchantmentEntry(SFMEnchantmentAliases.EFFICIENCY, 2));
         enchantments.add(helper.createEnchantmentEntry(Enchantments.SHARPNESS, 4));
         ItemStack enchantedBookStack = enchantments.createEnchantedBook();
 

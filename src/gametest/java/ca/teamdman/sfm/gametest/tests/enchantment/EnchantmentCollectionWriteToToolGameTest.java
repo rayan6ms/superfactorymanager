@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.gametest.tests.enchantment;
 
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentAliases;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollectionKind;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
@@ -35,7 +36,7 @@ public class EnchantmentCollectionWriteToToolGameTest extends SFMGameTestDefinit
         // Create two unique enchantment collections
         SFMEnchantmentCollection enchantments1 = new SFMEnchantmentCollection();
         enchantments1.add(helper.createEnchantmentEntry(Enchantments.SHARPNESS, 3));
-        enchantments1.add(helper.createEnchantmentEntry(Enchantments.EFFICIENCY, 2));
+        enchantments1.add(helper.createEnchantmentEntry(SFMEnchantmentAliases.EFFICIENCY, 2));
 
         SFMEnchantmentCollection enchantments2 = new SFMEnchantmentCollection();
         enchantments2.add(helper.createEnchantmentEntry(Enchantments.SHARPNESS, 3));

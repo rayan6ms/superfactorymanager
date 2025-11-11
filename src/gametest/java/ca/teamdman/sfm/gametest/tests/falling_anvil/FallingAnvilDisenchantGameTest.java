@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.gametest.tests.falling_anvil;
 
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentAliases;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollectionKind;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
@@ -69,7 +70,7 @@ public class FallingAnvilDisenchantGameTest extends SFMGameTestDefinition {
         var axe = new ItemStack(Items.GOLDEN_AXE);
 
         SFMEnchantmentCollection enchantments = new SFMEnchantmentCollection();
-        enchantments.add(helper.createEnchantmentEntry(Enchantments.EFFICIENCY, 3));
+        enchantments.add(helper.createEnchantmentEntry(SFMEnchantmentAliases.EFFICIENCY, 3));
         enchantments.add(helper.createEnchantmentEntry(Enchantments.SHARPNESS, 2));
         enchantments.write(axe, SFMEnchantmentCollectionKind.EnchantedLikeATool);
 
@@ -141,7 +142,7 @@ public class FallingAnvilDisenchantGameTest extends SFMGameTestDefinition {
             } else if (SFMItemUtils.isSameItemSameTags(
                     stack,
                     helper.createEnchantmentEntry(
-                            Enchantments.EFFICIENCY,
+                            SFMEnchantmentAliases.EFFICIENCY,
                             3
                     ).createEnchantedBook()
             )) {

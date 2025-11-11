@@ -10,6 +10,7 @@ import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.common.program.ExecuteProgramBehaviour;
 import ca.teamdman.sfm.common.program.IProgramHooks;
 import ca.teamdman.sfm.common.program.ProgramContext;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.BoolExpr;
@@ -48,6 +49,7 @@ public class SFMGameTestHelper extends GameTestHelper {
         super(helper.testInfo);
     }
 
+    @MCVersionDependentBehaviour
     public SFMEnchantmentEntry createEnchantmentEntry(
             ResourceKey<Enchantment> id,
             int enchantmentLevel

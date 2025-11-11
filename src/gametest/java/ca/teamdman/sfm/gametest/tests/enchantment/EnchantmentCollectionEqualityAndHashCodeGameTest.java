@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.gametest.tests.enchantment;
 
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentAliases;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
@@ -28,11 +29,11 @@ public class EnchantmentCollectionEqualityAndHashCodeGameTest extends SFMGameTes
 
         SFMEnchantmentCollection enchantments1 = new SFMEnchantmentCollection();
         enchantments1.add(helper.createEnchantmentEntry(Enchantments.SHARPNESS, 3));
-        enchantments1.add(helper.createEnchantmentEntry(Enchantments.EFFICIENCY, 2));
+        enchantments1.add(helper.createEnchantmentEntry(SFMEnchantmentAliases.EFFICIENCY, 2));
 
         SFMEnchantmentCollection enchantments2 = new SFMEnchantmentCollection();
         enchantments2.add(helper.createEnchantmentEntry(Enchantments.SHARPNESS, 3));
-        enchantments2.add(helper.createEnchantmentEntry(Enchantments.EFFICIENCY, 2));
+        enchantments2.add(helper.createEnchantmentEntry(SFMEnchantmentAliases.EFFICIENCY, 2));
         if (!enchantments1.equals(enchantments2)) {
             helper.fail("enchantments1 and enchantments2 must be equal");
         }
@@ -41,11 +42,11 @@ public class EnchantmentCollectionEqualityAndHashCodeGameTest extends SFMGameTes
         }
 
         SFMEnchantmentCollection enchantments3 = new SFMEnchantmentCollection();
-        enchantments3.add(helper.createEnchantmentEntry(Enchantments.EFFICIENCY, 5));
+        enchantments3.add(helper.createEnchantmentEntry(SFMEnchantmentAliases.EFFICIENCY, 5));
         enchantments3.add(helper.createEnchantmentEntry(Enchantments.SHARPNESS, 3));
-        enchantments3.add(helper.createEnchantmentEntry(Enchantments.EFFICIENCY, 2));
-        enchantments3.add(helper.createEnchantmentEntry(Enchantments.EFFICIENCY, 3));
-        enchantments3.add(helper.createEnchantmentEntry(Enchantments.EFFICIENCY, 2));
+        enchantments3.add(helper.createEnchantmentEntry(SFMEnchantmentAliases.EFFICIENCY, 2));
+        enchantments3.add(helper.createEnchantmentEntry(SFMEnchantmentAliases.EFFICIENCY, 3));
+        enchantments3.add(helper.createEnchantmentEntry(SFMEnchantmentAliases.EFFICIENCY, 2));
         if (enchantments1.equals(enchantments3)) {
             helper.fail("enchantments1 and enchantments3 must not be equal");
         }
