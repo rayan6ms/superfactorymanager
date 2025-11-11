@@ -35,15 +35,12 @@ import java.util.Locale;
 import java.util.Set;
 
 public class SFMGameTestHelper extends GameTestHelper {
-    public final SFMDelegatedTestFunction sfmTestDefinition;
 
     public SFMGameTestHelper(
-            SFMDelegatedTestFunction sfmDelegatedTestFunction,
             GameTestHelper helper
     ) {
 
         super(helper.testInfo);
-        this.sfmTestDefinition = sfmDelegatedTestFunction;
     }
 
     public <CAP> CAP discoverCapability(
