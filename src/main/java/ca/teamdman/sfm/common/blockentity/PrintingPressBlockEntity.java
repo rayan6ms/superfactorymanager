@@ -27,7 +27,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public class PrintingPressBlockEntity extends BlockEntity implements NotContainer {
 
-
     private final ItemStackHandler FORM = new ItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -58,11 +57,8 @@ public class PrintingPressBlockEntity extends BlockEntity implements NotContaine
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (getLevel() == null) return false;
-            return getLevel()
-                    .getRecipeManager()
-                    .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get())
-                    .stream()
-                    .anyMatch(r -> r.value().INK.test(stack));
+            return getLevel().getRecipeManager()
+                    .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get()).stream().anyMatch(r -> r.value().ink().test(stack));
         }
     };
 
@@ -82,11 +78,8 @@ public class PrintingPressBlockEntity extends BlockEntity implements NotContaine
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (getLevel() == null) return false;
-            return getLevel()
-                    .getRecipeManager()
-                    .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get())
-                    .stream()
-                    .anyMatch(r -> r.value().PAPER.test(stack));
+            return getLevel().getRecipeManager()
+                    .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get()).stream().anyMatch(r -> r.value().paper().test(stack));
         }
     };
     public final CombinedInvWrapper INVENTORY = new CombinedInvWrapper(FORM, INK, PAPER);
@@ -97,7 +90,6 @@ public class PrintingPressBlockEntity extends BlockEntity implements NotContaine
     ) {
         super(SFMBlockEntities.PRINTING_PRESS_BLOCK_ENTITY.get(), pPos, pBlockState);
     }
-
 
     @Override
     public void load(CompoundTag tag) {

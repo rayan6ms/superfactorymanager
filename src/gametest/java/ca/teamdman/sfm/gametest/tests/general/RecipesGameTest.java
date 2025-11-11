@@ -11,6 +11,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.crafting.CraftingRecipe;
+import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.item.crafting.RecipeType;
 
 import java.util.HashMap;
@@ -30,7 +31,7 @@ public class RecipesGameTest extends SFMGameTestDefinition {
     public void run(SFMGameTestHelper helper) {
 
         // Identify all crafting recipes
-        List<CraftingRecipe> craftingRecipes = helper
+        List<RecipeHolder<CraftingRecipe>> craftingRecipes = helper
                 .getLevel()
                 .getRecipeManager()
                 .getAllRecipesFor(RecipeType.CRAFTING);
@@ -40,9 +41,10 @@ public class RecipesGameTest extends SFMGameTestDefinition {
 
         // Populate the tracker
         // For each recipe
-        for (CraftingRecipe recipe : craftingRecipes) {
+        for (RecipeHolder<CraftingRecipe> recipeHolder : craftingRecipes) {
+            CraftingRecipe recipe = recipeHolder.value();
             // If the resulting item is from SFM
-            ResourceLocation resultItemId = SFMWellKnownRegistries.ITEMS.getId(recipe.getResultItem().getItem());
+            ResourceLocation resultItemId = SFMWellKnownRegistries.ITEMS.getId(recipe.getResultItem(helper.getLevel().registryAccess()).getItem());
             if (resultItemId.getNamespace().equals(SFM.MOD_ID)) {
                 // Track it as seen
                 seenSFMItemIds.put(resultItemId, recipe);

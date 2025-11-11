@@ -4,6 +4,7 @@ import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.registry.SFMRecipeSerializers;
 import ca.teamdman.sfm.common.registry.SFMRecipeTypes;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.RegistryAccess;
@@ -20,28 +21,26 @@ import java.util.Objects;
 /**
  * Printing press copies a form using ink and paper.
  */
-public class PrintingPressRecipe implements Recipe<PrintingPressBlockEntity> {
-    public final Ingredient FORM;
-    public final Ingredient INK;
-    public final Ingredient PAPER;
+public record PrintingPressRecipe(
+        Ingredient form,
 
-    public PrintingPressRecipe(
-            Ingredient form,
-            Ingredient ink,
-            Ingredient paper
-    ) {
-        this.FORM = form;
-        this.INK = ink;
-        this.PAPER = paper;
-    }
+        Ingredient ink,
+
+        Ingredient paper
+) implements Recipe<PrintingPressBlockEntity> {
 
     @Override
-    public boolean matches(PrintingPressBlockEntity pContainer, Level pLevel) {
-        return PAPER.test(pContainer.getPaper())
-               && INK.test(pContainer.getInk())
-               && FORM.test(FormItem.getBorrowedReferenceFromForm(pContainer.getForm()));
+    public boolean matches(
+            PrintingPressBlockEntity pContainer,
+            Level pLevel
+    ) {
+
+        return paper.test(pContainer.getPaper())
+               && ink.test(pContainer.getInk())
+               && form.test(FormItem.getBorrowedReferenceFromForm(pContainer.getForm()));
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public ItemStack assemble(PrintingPressBlockEntity pContainer, RegistryAccess p_267165_) {
         ItemStack rtn = FormItem.getCopiedReferenceFromForm(pContainer.getForm());
@@ -50,10 +49,15 @@ public class PrintingPressRecipe implements Recipe<PrintingPressBlockEntity> {
     }
 
     @Override
-    public boolean canCraftInDimensions(int pWidth, int pHeight) {
+    public boolean canCraftInDimensions(
+            int pWidth,
+            int pHeight
+    ) {
+
         return true;
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public ItemStack getResultItem(RegistryAccess p_267052_) {
         return ItemStack.EMPTY;
@@ -62,43 +66,50 @@ public class PrintingPressRecipe implements Recipe<PrintingPressBlockEntity> {
 
     @Override
     public RecipeSerializer<?> getSerializer() {
+
         return SFMRecipeSerializers.PRINTING_PRESS.get();
     }
 
     @Override
     public RecipeType<?> getType() {
+
         return SFMRecipeTypes.PRINTING_PRESS.get();
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public boolean equals(Object obj) {
+
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (PrintingPressRecipe) obj;
-        return
-                Objects.equals(this.FORM, that.FORM) &&
-                Objects.equals(this.INK, that.INK) &&
-                Objects.equals(this.PAPER, that.PAPER);
+        return Objects.equals(this.form, that.form) &&
+               Objects.equals(this.ink, that.ink) &&
+               Objects.equals(this.paper, that.paper);
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public int hashCode() {
-        return Objects.hash(FORM, INK, PAPER);
+
+        return Objects.hash(form, ink, paper);
     }
 
     @Override
     public String toString() {
+
         return "PrintingPressRecipe[" +
-               "form=" + FORM + ", " +
-               "ink=" + INK + ", " +
-               "paper=" + PAPER + ']';
+               "form=" + form + ", " +
+               "ink=" + ink + ", " +
+               "paper=" + paper + ']';
     }
 
+    @MCVersionDependentBehaviour
     public static class Serializer implements RecipeSerializer<PrintingPressRecipe> {
         private final Codec<PrintingPressRecipe> CODEC = RecordCodecBuilder.create(instance -> instance.group(
-                Ingredient.CODEC.fieldOf("form").forGetter(recipe -> recipe.FORM),
-                Ingredient.CODEC.fieldOf("ink").forGetter(recipe -> recipe.INK),
-                Ingredient.CODEC.fieldOf("paper").forGetter(recipe -> recipe.PAPER)
+                Ingredient.CODEC.fieldOf("form").forGetter(PrintingPressRecipe::form),
+                Ingredient.CODEC.fieldOf("ink").forGetter(PrintingPressRecipe::ink),
+                Ingredient.CODEC.fieldOf("paper").forGetter(PrintingPressRecipe::paper)
         ).apply(instance, PrintingPressRecipe::new));
 
         @Override
@@ -115,11 +126,16 @@ public class PrintingPressRecipe implements Recipe<PrintingPressBlockEntity> {
         }
 
         @Override
-        public void toNetwork(FriendlyByteBuf pBuffer, PrintingPressRecipe pRecipe) {
-            pRecipe.FORM.toNetwork(pBuffer);
-            pRecipe.INK.toNetwork(pBuffer);
-            pRecipe.PAPER.toNetwork(pBuffer);
+        public void toNetwork(
+                FriendlyByteBuf pBuffer,
+                PrintingPressRecipe pRecipe
+        ) {
+
+            pRecipe.form.toNetwork(pBuffer);
+            pRecipe.ink.toNetwork(pBuffer);
+            pRecipe.paper.toNetwork(pBuffer);
         }
+
     }
 
 }
