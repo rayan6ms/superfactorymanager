@@ -1,9 +1,8 @@
 package ca.teamdman.sfm.gametest.tests.falling_anvil;
 
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentAliases;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollectionKind;
-import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
-import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
@@ -12,10 +11,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.entity.item.ItemEntity;
-import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
@@ -74,8 +71,8 @@ public class FallingAnvilDisenchantGameTest extends SFMGameTestDefinition {
         var axe = new ItemStack(Items.GOLDEN_AXE);
 
         SFMEnchantmentCollection enchantments = new SFMEnchantmentCollection();
-        enchantments.add(new SFMEnchantmentEntry(new SFMEnchantmentKey(Enchantments.BLOCK_EFFICIENCY), 3));
-        enchantments.add(new SFMEnchantmentEntry(new SFMEnchantmentKey(Enchantments.SHARPNESS), 2));
+        enchantments.add(helper.createEnchantmentEntry(SFMEnchantmentAliases.EFFICIENCY, 3));
+        enchantments.add(helper.createEnchantmentEntry(Enchantments.SHARPNESS, 2));
         enchantments.write(axe, SFMEnchantmentCollectionKind.EnchantedLikeATool);
 
         helper.getLevel().addFreshEntity(new ItemEntity(
@@ -144,18 +141,18 @@ public class FallingAnvilDisenchantGameTest extends SFMGameTestDefinition {
                 foundDisenchantedAxe = true;
             } else if (SFMItemUtils.isSameItemSameTags(
                     stack,
-                    EnchantedBookItem.createForEnchantment(new EnchantmentInstance(
-                            Enchantments.BLOCK_EFFICIENCY,
+                    helper.createEnchantmentEntry(
+                            SFMEnchantmentAliases.EFFICIENCY,
                             3
-                    ))
+                    ).createEnchantedBook()
             )) {
                 foundEfficiencyBook = true;
             } else if (SFMItemUtils.isSameItemSameTags(
                     stack,
-                    EnchantedBookItem.createForEnchantment(new EnchantmentInstance(
+                    helper.createEnchantmentEntry(
                             Enchantments.SHARPNESS,
                             2
-                    ))
+                    ).createEnchantedBook()
             )) {
                 foundSharpnessBook = true;
             } else if (stack.is(Items.BOOK)) {

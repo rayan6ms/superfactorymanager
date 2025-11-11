@@ -28,7 +28,7 @@ public class SFMDelegatedTestFunction extends TestFunction {
 
     @Override
     public void run(GameTestHelper pGameTestHelper) {
-        definition.run(new SFMGameTestHelper(this, pGameTestHelper));
+        definition.run(new SFMGameTestHelper(pGameTestHelper));
     }
 
     @Override
