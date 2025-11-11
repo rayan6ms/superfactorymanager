@@ -137,7 +137,7 @@ public class SFMGameTestMethodHelpers {
                             );
                     assertTrue(
                             found.stream().allMatch(e -> e.getItem().is(SFMItems.EXPERIENCE_SHARD_ITEM.get())),
-                            "should only be xp shards"
+                            "should only find xp shard item entities"
                     );
 
                     var count = found.stream().mapToInt(itemEntity -> itemEntity.getItem().getCount()).sum();
