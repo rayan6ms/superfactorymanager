@@ -5,9 +5,12 @@ import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.common.program.ExecuteProgramBehaviour;
 import ca.teamdman.sfm.common.program.IProgramHooks;
 import ca.teamdman.sfm.common.program.ProgramContext;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.BoolExpr;
@@ -17,6 +20,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestAssertPosException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -41,6 +45,18 @@ public class SFMGameTestHelper extends GameTestHelper {
     ) {
 
         super(helper.testInfo);
+    }
+
+    @MCVersionDependentBehaviour
+    public SFMEnchantmentEntry createEnchantmentEntry(
+            Enchantment enchantment,
+            int enchantmentLevel
+    ) {
+
+        return new SFMEnchantmentEntry(
+                new SFMEnchantmentKey(enchantment),
+                enchantmentLevel
+        );
     }
 
     public <CAP> CAP discoverCapability(
