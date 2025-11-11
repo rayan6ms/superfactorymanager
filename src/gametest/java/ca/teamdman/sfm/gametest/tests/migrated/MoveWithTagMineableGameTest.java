@@ -2,8 +2,6 @@ package ca.teamdman.sfm.gametest.tests.migrated;
 
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollectionKind;
-import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
-import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.gametest.LeftRightManagerTest;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
@@ -38,7 +36,7 @@ public class MoveWithTagMineableGameTest extends SFMGameTestDefinition {
 
         ItemStack enchantedDirt = new ItemStack(Items.DIRT, 64);
         SFMEnchantmentCollection enchantments = new SFMEnchantmentCollection();
-        enchantments.add(new SFMEnchantmentEntry(new SFMEnchantmentKey(Enchantments.SHARPNESS), 100));
+        enchantments.add(helper.createEnchantmentEntry(Enchantments.SHARPNESS, 100));
         enchantments.write(enchantedDirt, SFMEnchantmentCollectionKind.EnchantedLikeATool);
 
         new LeftRightManagerTest(helper)
