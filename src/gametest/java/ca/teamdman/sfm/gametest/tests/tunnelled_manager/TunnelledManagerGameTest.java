@@ -15,6 +15,8 @@ import net.minecraft.world.level.block.Blocks;
 import java.util.List;
 import java.util.Objects;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.assertCount;
+
 @SuppressWarnings({"DataFlowIssue"})
 @SFMGameTest
 public class TunnelledManagerGameTest extends SFMGameTestDefinition {
