@@ -1,15 +1,14 @@
-package ca.teamdman.sfm.gametest.tests.migrated;
+package ca.teamdman.sfm.gametest.tests.falling_anvil;
 
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.config.SFMServerConfig.LevelsToShards;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import it.unimi.dsi.fastutil.Pair;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.Vec3;
@@ -40,19 +39,11 @@ public class FallingAnvilXpShardGameTest extends SFMGameTestDefinition {
     public void run(SFMGameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 2, 1), Blocks.OBSIDIAN);
         var pos = helper.absoluteVec(new Vec3(1.5, 3.5, 1.5));
-        ItemStack enchBook = new ItemStack(Items.ENCHANTED_BOOK);
-        enchBook.enchant(helper
-                                 .getLevel()
-                                 .registryAccess()
-                                 .registry(Registries.ENCHANTMENT)
-                                 .get()
-                                 .getHolder(Enchantments.SHARPNESS).get(), 4);
-        enchBook.enchant(helper
-                                 .getLevel()
-                                 .registryAccess()
-                                 .registry(Registries.ENCHANTMENT)
-                                 .get()
-                                 .getHolder(Enchantments.EFFICIENCY).get(), 2);
+
+        SFMEnchantmentCollection enchantments = new SFMEnchantmentCollection();
+        enchantments.add(helper.createEnchantmentEntry(Enchantments.EFFICIENCY, 2));
+        enchantments.add(helper.createEnchantmentEntry(Enchantments.SHARPNESS, 4));
+        ItemStack enchantedBookStack = enchantments.createEnchantedBook();
 
         var cases = List.of(
                 Pair.of(LevelsToShards.JustOne, 1),
@@ -62,6 +53,13 @@ public class FallingAnvilXpShardGameTest extends SFMGameTestDefinition {
         );
 
         var currentConfig = SFMConfig.SERVER_CONFIG.levelsToShards.get();
-        falling_anvil_xp_shard_inner(helper, 1, currentConfig, pos, enchBook, cases.iterator());
+        falling_anvil_xp_shard_inner(
+                helper,
+                1,
+                currentConfig,
+                pos,
+                enchantedBookStack,
+                cases.iterator()
+        );
     }
 }

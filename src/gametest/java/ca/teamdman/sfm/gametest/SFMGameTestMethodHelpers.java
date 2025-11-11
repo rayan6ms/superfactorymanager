@@ -19,16 +19,11 @@ import mekanism.common.tile.component.config.DataType;
 import mekanism.common.tile.prefab.TileEntityConfigurableMachine;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.Registry;
-import net.minecraft.core.registries.Registries;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentHelper;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -40,18 +35,6 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SFMGameTestMethodHelpers {
-    public static ItemStack enchant(
-            GameTestHelper helper,
-            ItemStack stack,
-            ResourceKey<Enchantment> enchantment,
-            int level
-    ) {
-        Registry<Enchantment> enchantmentRegistry = helper.getLevel().registryAccess().registry(Registries.ENCHANTMENT).get();
-        EnchantmentHelper.updateEnchantments(stack, xs -> {
-            xs.set(enchantmentRegistry.getHolderOrThrow(enchantment), level);
-        });
-        return stack;
-    }
 
     public static void assertTrue(
             boolean condition,

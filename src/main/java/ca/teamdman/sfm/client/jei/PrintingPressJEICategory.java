@@ -58,10 +58,10 @@ public class PrintingPressJEICategory implements IRecipeCategory<PrintingPressRe
     public void setRecipe(IRecipeLayoutBuilder builder, PrintingPressRecipe recipe, IFocusGroup focuses) {
         builder
                 .addSlot(RecipeIngredientRole.INPUT, 0, 0)
-                .addItemStacks(Arrays.stream(recipe.FORM.getItems()).map(FormItem::createFormFromReference).toList())
+                .addItemStacks(Arrays.stream(recipe.form().getItems()).map(FormItem::createFormFromReference).toList())
                 .setBackground(slot, -1, -1);
-        builder.addSlot(RecipeIngredientRole.INPUT, 0, 18).addIngredients(recipe.INK).setBackground(slot, -1, -1);
-        builder.addSlot(RecipeIngredientRole.INPUT, 0, 36).addIngredients(recipe.PAPER).setBackground(slot, -1, -1);
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 25, 18).addIngredients(recipe.FORM);
+        builder.addSlot(RecipeIngredientRole.INPUT, 0, 18).addIngredients(recipe.ink()).setBackground(slot, -1, -1);
+        builder.addSlot(RecipeIngredientRole.INPUT, 0, 36).addIngredients(recipe.paper()).setBackground(slot, -1, -1);
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 25, 18).addIngredients(recipe.form());
     }
 }

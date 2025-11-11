@@ -15,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.count;
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 public abstract class SFMTestBuilder {

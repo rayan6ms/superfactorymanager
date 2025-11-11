@@ -5,6 +5,7 @@ import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.world.level.block.Rotation;
 
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicReference;
 
 public abstract class SFMGameTestDefinition {
     public abstract String template();
@@ -35,6 +36,7 @@ public abstract class SFMGameTestDefinition {
     }
 
     public TestFunction intoTestFunction() {
+        AtomicReference<TestFunction> funcRef = new AtomicReference<>();
         return new TestFunction(
                 this.batchName(),
                 "new_" + this.testName(), // TODO: remove prefix

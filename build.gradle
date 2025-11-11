@@ -37,7 +37,7 @@ sourceSets {
         }
 
         java {
-            exclude "ca/teamdman/sfm/client/jei/**"
+//            exclude "ca/teamdman/sfm/client/jei/**"
             exclude "ca/teamdman/sfm/common/resourcetype/exclude/**"
 //            exclude "ca/teamdman/sfm/common/compat/SFMMekanismCompat.java"
         }
@@ -208,8 +208,8 @@ repositories {
     // }
 
     maven {
-        name 'jei'
-        url 'https://dvs1.progwml6.com/files/maven'
+        name 'jared' // used by jei
+        url 'https://maven.blamejared.com/'
     }
 
     maven {
@@ -284,6 +284,8 @@ dependencies {
     testAnnotationProcessor 'org.openjdk.jmh:jmh-generator-annprocess:1.37'
 
 //    runtimeOnly "curse.maven:easy-villagers-400514:5153632" // Easy Villagers 1.20.4-1.1.4
+
+    implementation "mezz.jei:jei-1.21-neoforge:19.8.2.99"
 
 
     implementation "curse.maven:mekanism-268560:5552293" //Mekanism-1.21-10.6.6.53.jar

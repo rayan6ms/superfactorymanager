@@ -5,6 +5,8 @@ import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.common.program.ExecuteProgramBehaviour;
 import ca.teamdman.sfm.common.program.IProgramHooks;
 import ca.teamdman.sfm.common.program.ProgramContext;
@@ -17,6 +19,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestAssertPosException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -36,15 +40,23 @@ import java.util.Locale;
 import java.util.Set;
 
 public class SFMGameTestHelper extends GameTestHelper {
-    public final SFMDelegatedTestFunction sfmTestDefinition;
 
     public SFMGameTestHelper(
-            SFMDelegatedTestFunction sfmDelegatedTestFunction,
             GameTestHelper helper
     ) {
 
         super(helper.testInfo);
-        this.sfmTestDefinition = sfmDelegatedTestFunction;
+    }
+
+    public SFMEnchantmentEntry createEnchantmentEntry(
+            ResourceKey<Enchantment> id,
+            int enchantmentLevel
+    ) {
+
+        return new SFMEnchantmentEntry(
+                new SFMEnchantmentKey(getLevel().registryAccess(), id),
+                enchantmentLevel
+        );
     }
 
     public <CAP> CAP discoverCapability(
@@ -103,7 +115,7 @@ public class SFMGameTestHelper extends GameTestHelper {
         }
         var newText = new SignText();
         for (int i = 0; i < text.length; i++) {
-            newText.setMessage(i , text[i]);
+            newText.setMessage(i, text[i]);
         }
         signBlockEntity.setText(newText, false);
         signBlockEntity.setText(newText, true);
