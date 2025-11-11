@@ -1,5 +1,9 @@
 package ca.teamdman.sfm.gametest.tests.migrated;
 
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollectionKind;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.gametest.LeftRightManagerTest;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
@@ -9,8 +13,6 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.item.enchantment.Enchantments;
 
 import java.util.Arrays;
-
-import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.enchant;
 
 /**
  * Migrated from SFMWithGameTests.move_without_tag_mineable
@@ -32,6 +34,11 @@ public class MoveWithoutTagMineableGameTest extends SFMGameTestDefinition {
 
     @Override
     public void run(SFMGameTestHelper helper) {
+        ItemStack enchantedDirt = new ItemStack(Items.DIRT, 64);
+        SFMEnchantmentCollection enchantments = new SFMEnchantmentCollection();
+        enchantments.add(new SFMEnchantmentEntry(new SFMEnchantmentKey(Enchantments.SHARPNESS), 100));
+        enchantments.write(enchantedDirt, SFMEnchantmentCollectionKind.EnchantedLikeATool);
+
         new LeftRightManagerTest(helper)
                 .setProgram("""
                                     EVERY 20 TICKS DO
@@ -40,7 +47,7 @@ public class MoveWithoutTagMineableGameTest extends SFMGameTestDefinition {
                                     END
                                     """)
                 .preContents("left", Arrays.asList(
-                        enchant(new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100),
+                        enchantedDirt.copy(),
                         new ItemStack(Items.DIRT, 64),
                         new ItemStack(Items.STONE, 64)
                 ))
@@ -50,7 +57,7 @@ public class MoveWithoutTagMineableGameTest extends SFMGameTestDefinition {
                         new ItemStack(Items.STONE, 64)
                 ))
                 .postContents("right", Arrays.asList(
-                        enchant(new ItemStack(Items.DIRT, 64), Enchantments.SHARPNESS, 100),
+                        enchantedDirt,
                         new ItemStack(Items.DIRT, 64)
                 ))
                 .run();
