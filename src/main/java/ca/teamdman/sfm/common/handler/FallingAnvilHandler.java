@@ -31,82 +31,81 @@ import java.util.List;
 @Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class FallingAnvilHandler {
 
+    @SuppressWarnings("ConstantValue")
     @SubscribeEvent
     public static void onLeave(EntityLeaveLevelEvent event) {
-
-        // Only proceed if the entity was a falling block
-        if (!(event.getEntity() instanceof FallingBlockEntity fbe)) {
-            return;
-        }
-
-        // Only proceed if the falling block was an anvil
-        if (!(fbe.getBlockState().getBlock() instanceof AnvilBlock)) {
-            return;
-        }
-
-        // Determine where the anvil landed
-        var landingPosition = fbe.blockPosition();
 
         // Get the level
         Level level = event.getLevel();
 
+        // Only proceed on the server
+        if (level.isClientSide()) return;
+
+        // Only proceed if the entity was a falling block
+        if (!(event.getEntity() instanceof FallingBlockEntity fbe)) return;
+
+        // Only proceed if the falling block was an anvil
+        if (!(fbe.getBlockState().getBlock() instanceof AnvilBlock)) return;
+
+        // Determine where the anvil landed
+        var anvilPos = fbe.blockPosition();
+
         // Do not proceed if the server is shutting down
         // https://github.com/TeamDman/SuperFactoryManager/issues/114
-        if (!level.isLoaded(landingPosition.below())) {
-            return;
-        }
+        if (!level.isLoaded(anvilPos)) return;
 
         // Get the block that was landed on
-        Block block = level.getBlockState(landingPosition.below()).getBlock();
+        Block blockLandedUpon = level.getBlockState(anvilPos.below()).getBlock();
+
 
         // Check if the landed-on block can be turned into a printing press form
-        boolean tryFormCreation = SFMBlockTags.blockHasTag(block, SFMBlockTags.ANVIL_PRINTING_PRESS_FORMING);
-        if (tryFormCreation) {
-            handlePrintingPressFormCreation(level, landingPosition);
-            return;
-        }
+        boolean tryFormCreation = SFMBlockTags.blockHasTag(blockLandedUpon, SFMBlockTags.ANVIL_PRINTING_PRESS_FORMING);
 
         // Check if the landed-on block can be used for anvil-disenchanting
-        boolean tryCrushing = SFMBlockTags.blockHasTag(block, SFMBlockTags.ANVIL_DISENCHANTING);
-        if (tryCrushing) {
-            handleCrushing(level, landingPosition);
-        }
-    }
+        boolean tryCrushing = SFMBlockTags.blockHasTag(blockLandedUpon, SFMBlockTags.ANVIL_DISENCHANTING);
 
-    private static void handleCrushing(
-            Level level,
-            BlockPos landPosition
-    ) {
+        // Only proceed if the landed-upon block matches our recipes
+        if (!tryCrushing && !tryFormCreation) return;
 
         // Gather the item entities in the landing area
-        List<ItemEntity> items = new ArrayList<>();
-        for (ItemEntity itemEntity : level.getEntitiesOfClass(ItemEntity.class, new AABB(landPosition))) {
-            if (itemEntity.isAlive() && !itemEntity.getItem().isEmpty()) {
-                items.add(itemEntity);
-            }
+        List<ItemEntity> itemEntities = level.getEntitiesOfClass(ItemEntity.class, new AABB(anvilPos));
+
+        // Remove any empty or dead entities
+        itemEntities.removeIf(itemEntity -> !itemEntity.isAlive() || itemEntity.getItem().isEmpty());
+
+        // Do work
+        if (tryFormCreation) {
+
+            // Turn items into forms
+            handlePrintingPressFormCreation(level, anvilPos, itemEntities);
+
+        } else if (tryCrushing) {
+
+            // Crush enchanted books
+            crushEnchantedBooksIntoXpShards(level, anvilPos, itemEntities);
+
+            // Remove any empty or dead entities
+            itemEntities.removeIf(itemEntity -> !itemEntity.isAlive() || itemEntity.getItem().isEmpty());
+
+            // Disenchant items
+            removeEnchantmentsFromItems(level, anvilPos, itemEntities);
         }
-
-        // Crush enchanted books
-        crushEnchantedBooksIntoXpShards(items);
-
-        // Disenchant items
-        removeEnchantmentsFromItems(level, landPosition, items);
     }
 
     private static void removeEnchantmentsFromItems(
             Level level,
-            BlockPos landPosition,
+            BlockPos anvilPos,
             List<ItemEntity> items
     ) {
 
         // Identify book entities
         List<ItemEntity> bookItemEntities = new ArrayList<>();
         List<ItemEntity> nonBookItemEntities = new ArrayList<>();
-        for (ItemEntity item : items) {
-            if (item.getItem().is(Items.BOOK)) {
-                bookItemEntities.add(item);
+        for (ItemEntity itemEntity : items) {
+            if (itemEntity.getItem().is(Items.BOOK)) {
+                bookItemEntities.add(itemEntity);
             } else {
-                nonBookItemEntities.add(item);
+                nonBookItemEntities.add(itemEntity);
             }
         }
 
@@ -153,9 +152,9 @@ public class FallingAnvilHandler {
                 // Spawn the book in the world
                 level.addFreshEntity(new ItemEntity(
                         level,
-                        landPosition.getX(),
-                        landPosition.getY(),
-                        landPosition.getZ(),
+                        anvilPos.getX(),
+                        anvilPos.getY(),
+                        anvilPos.getZ(),
                         enchantedBookToSpawn
                 ));
 
@@ -180,27 +179,31 @@ public class FallingAnvilHandler {
             int toSpawn = Math.min(booksAvailable, 64);
             level.addFreshEntity(new ItemEntity(
                     level,
-                    landPosition.getX(),
-                    landPosition.getY(),
-                    landPosition.getZ(),
+                    anvilPos.getX(),
+                    anvilPos.getY(),
+                    anvilPos.getZ(),
                     new ItemStack(Items.BOOK, toSpawn)
             ));
             booksAvailable -= toSpawn;
         }
     }
 
-    private static void crushEnchantedBooksIntoXpShards(List<ItemEntity> items) {
+    private static void crushEnchantedBooksIntoXpShards(
+            Level level,
+            BlockPos anvilPos,
+            List<ItemEntity> items
+    ) {
 
         // For each item
         for (ItemEntity itemEntity : items) {
 
+            // Get the item stack
+            ItemStack stack = itemEntity.getItem();
+
             // Only proceed if the item is an enchanted book
-            if (!itemEntity.getItem().is(Items.ENCHANTED_BOOK)) {
+            if (!stack.is(Items.ENCHANTED_BOOK)) {
                 continue;
             }
-
-            // Get the book stack
-            ItemStack stack = itemEntity.getItem();
 
             // Get the enchantments stored in the book
             SFMEnchantmentCollection enchantments = SFMEnchantmentCollection.fromItemStack(
@@ -227,44 +230,75 @@ public class FallingAnvilHandler {
                 ItemStack shardStack = new ItemStack(SFMItems.EXPERIENCE_SHARD_ITEM.get(), shardStackSize);
 
                 // Spawn the stack
-                itemEntity.spawnAtLocation(shardStack);
+                ItemEntity shardItemEntity = new ItemEntity(
+                        level,
+                        anvilPos.getX(),
+                        anvilPos.getY(),
+                        anvilPos.getZ(),
+                        shardStack
+                );
+                level.addFreshEntity(shardItemEntity);
 
                 // Decrement count
-                shardsToSpawn -= 64;
+                shardsToSpawn -= shardStackSize;
             }
         }
     }
 
     private static void handlePrintingPressFormCreation(
             Level level,
-            BlockPos landPosition
+            BlockPos anvilPos,
+            List<ItemEntity> itemEntities
     ) {
 
+        // Gather the printing press recipes
         List<RecipeHolder<PrintingPressRecipe>> recipes = level
                 .getRecipeManager()
                 .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get());
-        List<ItemEntity> items = new ArrayList<>();
-        for (ItemEntity e : level.getEntitiesOfClass(ItemEntity.class, new AABB(landPosition))) {
-            if (e.isAlive() && !e.getItem().isEmpty()) {
-                items.add(e);
-            }
-        }
-        boolean didForm = false;
 
-        for (ItemEntity item : items) {
+        // Mark the block for consumption only if work is done
+        boolean consumeBlock = false;
+
+        // For each item entity
+        for (ItemEntity itemEntity : itemEntities) {
+
+            // For each recipe
             for (RecipeHolder<PrintingPressRecipe> recipeHolder : recipes) {
                 PrintingPressRecipe recipe = recipeHolder.value();
-                // check if the item can be turned into a form
-                if (recipe.form().test(item.getItem())) {
-                    didForm = true;
-                    item.setItem(FormItem.createFormFromReference(item.getItem()));
-                    break;
+
+                // Only continue if the item matches the recipe
+                if (!recipe.form().test(itemEntity.getItem())) {
+                    continue;
                 }
+
+                // Create the form stack
+                ItemStack formStack = FormItem.createFormFromReference(itemEntity.getItem());
+
+                // Consume the item
+                itemEntity.kill();
+
+                // Spawn the new item
+                level.addFreshEntity(new ItemEntity(
+                        level,
+                        anvilPos.getX(),
+                        anvilPos.getY(),
+                        anvilPos.getZ(),
+                        formStack
+                ));
+
+                // Mark the block for consumption
+                consumeBlock = true;
+
+                // Move to the next item entity
+                break;
             }
         }
-        if (didForm) {
-            level.setBlockAndUpdate(landPosition.below(), Blocks.AIR.defaultBlockState());
+
+        if (consumeBlock) {
+            // Consume the block below
+            level.setBlockAndUpdate(anvilPos.below(), Blocks.AIR.defaultBlockState());
         }
+
     }
 
     private static long getShardCountForEnchantments(SFMEnchantmentCollection enchantments) {
