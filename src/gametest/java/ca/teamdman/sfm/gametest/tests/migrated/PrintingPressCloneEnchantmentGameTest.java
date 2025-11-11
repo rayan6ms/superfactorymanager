@@ -1,8 +1,6 @@
 package ca.teamdman.sfm.gametest.tests.migrated;
 
 import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
-import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
-import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
@@ -94,7 +92,7 @@ public class PrintingPressCloneEnchantmentGameTest extends SFMGameTestDefinition
                 )
         );
 
-        ItemStack reference = new SFMEnchantmentEntry(new SFMEnchantmentKey(Enchantments.SHARPNESS), 3)
+        ItemStack reference = helper.createEnchantmentEntry(Enchantments.SHARPNESS, 3)
                 .createEnchantedBook();
 
         player.setItemInHand(InteractionHand.MAIN_HAND, FormItem.createFormFromReference(reference));

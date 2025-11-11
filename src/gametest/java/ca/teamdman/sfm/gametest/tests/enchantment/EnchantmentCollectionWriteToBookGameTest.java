@@ -1,9 +1,8 @@
 package ca.teamdman.sfm.gametest.tests.enchantment;
 
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentAliases;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollectionKind;
-import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
-import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -34,12 +33,12 @@ public class EnchantmentCollectionWriteToBookGameTest extends SFMGameTestDefinit
 
         // Create two unique enchantment collections
         SFMEnchantmentCollection enchantments1 = new SFMEnchantmentCollection();
-        enchantments1.add(new SFMEnchantmentEntry(new SFMEnchantmentKey(Enchantments.SHARPNESS), 3));
-        enchantments1.add(new SFMEnchantmentEntry(new SFMEnchantmentKey(Enchantments.BLOCK_EFFICIENCY), 2));
+        enchantments1.add(helper.createEnchantmentEntry(Enchantments.SHARPNESS, 3));
+        enchantments1.add(helper.createEnchantmentEntry(SFMEnchantmentAliases.EFFICIENCY, 2));
 
         SFMEnchantmentCollection enchantments2 = new SFMEnchantmentCollection();
-        enchantments2.add(new SFMEnchantmentEntry(new SFMEnchantmentKey(Enchantments.SHARPNESS), 3));
-        enchantments2.add(new SFMEnchantmentEntry(new SFMEnchantmentKey(Enchantments.UNBREAKING), 2));
+        enchantments2.add(helper.createEnchantmentEntry(Enchantments.SHARPNESS, 3));
+        enchantments2.add(helper.createEnchantmentEntry(Enchantments.UNBREAKING, 2));
 
         assertTrue(!enchantments1.equals(enchantments2), "Enchantment collections must not be equal");
 
