@@ -1,6 +1,8 @@
 package ca.teamdman.sfm.gametest.tests.migrated;
 
 import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
@@ -11,10 +13,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.DirectionalBlock;
@@ -35,18 +35,21 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
         "DataFlowIssue",
         "OptionalGetWithoutIsPresent",
         "DuplicatedCode",
-        "ArraysAsListWithZeroOrOneArgument"
+        "ArraysAsListWithZeroOrOneArgument",
+        "deprecation"
 })
 @SFMGameTest
 public class PrintingPressCloneEnchantmentGameTest extends SFMGameTestDefinition {
 
     @Override
     public String template() {
+
         return "3x4x3";
     }
 
     @Override
     public void run(SFMGameTestHelper helper) {
+
         var printingPos = new BlockPos(1, 2, 1);
         var pistonPos = new BlockPos(1, 4, 1);
         var woodPos = new BlockPos(0, 4, 1);
@@ -90,10 +93,10 @@ public class PrintingPressCloneEnchantmentGameTest extends SFMGameTestDefinition
                         false
                 )
         );
-        ItemStack reference = EnchantedBookItem.createForEnchantment(new EnchantmentInstance(
-                Enchantments.SHARPNESS,
-                3
-        ));
+
+        ItemStack reference = new SFMEnchantmentEntry(new SFMEnchantmentKey(Enchantments.SHARPNESS), 3)
+                .createEnchantedBook();
+
         player.setItemInHand(InteractionHand.MAIN_HAND, FormItem.createFormFromReference(reference));
         pressState.getBlock().use(
                 pressState,
@@ -124,48 +127,51 @@ public class PrintingPressCloneEnchantmentGameTest extends SFMGameTestDefinition
                 )
         );
 
-        helper.runAfterDelay(5, () -> {
-            pressState.getBlock().use(
-                    pressState,
-                    helper.getLevel(),
-                    helper.absolutePos(printingPos),
-                    player,
-                    InteractionHand.MAIN_HAND,
-                    new BlockHitResult(
-                            new Vec3(0.5, 0.5, 0.5),
-                            Direction.UP,
+        helper.runAfterDelay(
+                5, () -> {
+                    pressState.getBlock().use(
+                            pressState,
+                            helper.getLevel(),
                             helper.absolutePos(printingPos),
-                            false
-                    )
-            );
-            ItemStack held = player.getMainHandItem();
+                            player,
+                            InteractionHand.MAIN_HAND,
+                            new BlockHitResult(
+                                    new Vec3(0.5, 0.5, 0.5),
+                                    Direction.UP,
+                                    helper.absolutePos(printingPos),
+                                    false
+                            )
+                    );
+                    ItemStack held = player.getMainHandItem();
 
-            // Fail if result is not a clone of the enchantment
-            if (!ItemStack.isSameItemSameTags(held, reference)) {
-                helper.fail("cloned item wasn't same");
-            }
+                    // Fail if the result is not a clone of the enchantment
+                    if (!ItemStack.isSameItemSameTags(held, reference)) {
+                        helper.fail("cloned item wasn't same");
+                    }
 
-            // Fail if result is the same instance of ItemStack stored in the form
-            ItemStack referenceStack = FormItem.getBorrowedReferenceFromForm(printingPress.getForm());
-            if (Objects.equals(
-                    System.identityHashCode(referenceStack),
-                    System.identityHashCode(held)
-            )) {
-                helper.fail("cloned item shares the same ItemStack instance as form reference");
-            }
+                    // Fail if the result is the same instance of ItemStack stored in the form
+                    ItemStack referenceStack = FormItem.getBorrowedReferenceFromForm(printingPress.getForm());
+                    if (Objects.equals(
+                            System.identityHashCode(referenceStack),
+                            System.identityHashCode(held)
+                    )) {
+                        helper.fail("cloned item shares the same ItemStack instance as form reference");
+                    }
 
 
-            // Place result in chest
-            var chest = helper.getItemHandler(chestPos);
-            chest.insertItem(0, held, false);
+                    // Place result in chest
+                    var chest = helper.getItemHandler(chestPos);
+                    chest.insertItem(0, held, false);
 
-            // Assert ingredient transformations
-            assertTrue(printingPress.getInk().getCount() == 9, "Ink was not consumed properly");
-            assertTrue(printingPress.getPaper().isEmpty(), "Paper was not consumed");
-            assertTrue(!printingPress.getForm().isEmpty(), "Form should not be consumed");
+                    // Assert ingredient transformations
+                    assertTrue(printingPress.getInk().getCount() == 9, "Ink was not consumed properly");
+                    assertTrue(printingPress.getPaper().isEmpty(), "Paper was not consumed");
+                    assertTrue(!printingPress.getForm().isEmpty(), "Form should not be consumed");
 
-            // Succeed test
-            helper.succeed();
-        });
+                    // Succeed test
+                    helper.succeed();
+                }
+        );
     }
+
 }

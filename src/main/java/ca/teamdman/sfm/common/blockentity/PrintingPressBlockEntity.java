@@ -64,7 +64,7 @@ public class PrintingPressBlockEntity extends BlockEntity implements NotContaine
         public boolean isItemValid(int slot, ItemStack stack) {
             if (getLevel() == null) return false;
             return getLevel().getRecipeManager()
-                    .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get()).stream().anyMatch(r -> r.INK.test(stack));
+                    .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get()).stream().anyMatch(r -> r.ink().test(stack));
         }
     };
 
@@ -85,7 +85,7 @@ public class PrintingPressBlockEntity extends BlockEntity implements NotContaine
         public boolean isItemValid(int slot, ItemStack stack) {
             if (getLevel() == null) return false;
             return getLevel().getRecipeManager()
-                    .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get()).stream().anyMatch(r -> r.PAPER.test(stack));
+                    .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get()).stream().anyMatch(r -> r.paper().test(stack));
         }
     };
     private final LazyOptional<IItemHandler> ITEMS_CAPABILITY = LazyOptional.of(() -> new CombinedInvWrapper(
