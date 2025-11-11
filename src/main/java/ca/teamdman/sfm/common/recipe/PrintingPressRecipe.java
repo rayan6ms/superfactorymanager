@@ -4,6 +4,7 @@ import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.registry.SFMRecipeSerializers;
 import ca.teamdman.sfm.common.registry.SFMRecipeTypes;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.google.gson.JsonObject;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
@@ -20,94 +21,110 @@ import java.util.Objects;
 /**
  * Printing press copies a form using ink and paper.
  */
-public class PrintingPressRecipe implements Recipe<PrintingPressBlockEntity> {
-    public final ResourceLocation ID;
-    public final Ingredient FORM;
-    public final Ingredient INK;
-    public final Ingredient PAPER;
+public record PrintingPressRecipe(
+        @MCVersionDependentBehaviour
+        ResourceLocation id,
 
-    /**
-     *
-     */
-    public PrintingPressRecipe(
-            ResourceLocation id,
-            Ingredient form,
-            Ingredient ink,
-            Ingredient paper
-    ) {
-        this.ID = id;
-        this.FORM = form;
-        this.INK = ink;
-        this.PAPER = paper;
-    }
+        Ingredient form,
+
+        Ingredient ink,
+
+        Ingredient paper
+) implements Recipe<PrintingPressBlockEntity> {
 
     @Override
-    public boolean matches(PrintingPressBlockEntity pContainer, Level pLevel) {
-        return PAPER.test(pContainer.getPaper())
-               && INK.test(pContainer.getInk())
-               && FORM.test(FormItem.getBorrowedReferenceFromForm(pContainer.getForm()));
+    public boolean matches(
+            PrintingPressBlockEntity pContainer,
+            Level pLevel
+    ) {
+
+        return paper.test(pContainer.getPaper())
+               && ink.test(pContainer.getInk())
+               && form.test(FormItem.getBorrowedReferenceFromForm(pContainer.getForm()));
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public ItemStack assemble(PrintingPressBlockEntity pContainer) {
+
         ItemStack rtn = FormItem.getCopiedReferenceFromForm(pContainer.getForm());
         rtn.setCount(pContainer.getPaper().getCount());
         return rtn;
     }
 
     @Override
-    public boolean canCraftInDimensions(int pWidth, int pHeight) {
+    public boolean canCraftInDimensions(
+            int pWidth,
+            int pHeight
+    ) {
+
         return true;
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public ItemStack getResultItem() {
+
         return ItemStack.EMPTY;
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public ResourceLocation getId() {
-        return ID;
+
+        return id;
     }
 
     @Override
     public RecipeSerializer<?> getSerializer() {
+
         return SFMRecipeSerializers.PRINTING_PRESS.get();
     }
 
     @Override
     public RecipeType<?> getType() {
+
         return SFMRecipeTypes.PRINTING_PRESS.get();
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public boolean equals(Object obj) {
+
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (PrintingPressRecipe) obj;
-        return Objects.equals(this.ID, that.ID) &&
-               Objects.equals(this.FORM, that.FORM) &&
-               Objects.equals(this.INK, that.INK) &&
-               Objects.equals(this.PAPER, that.PAPER);
+        return Objects.equals(this.id, that.id) &&
+               Objects.equals(this.form, that.form) &&
+               Objects.equals(this.ink, that.ink) &&
+               Objects.equals(this.paper, that.paper);
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public int hashCode() {
-        return Objects.hash(ID, FORM, INK, PAPER);
+
+        return Objects.hash(id, form, ink, paper);
     }
 
     @Override
     public String toString() {
+
         return "PrintingPressRecipe[" +
-               "id=" + ID + ", " +
-               "form=" + FORM + ", " +
-               "ink=" + INK + ", " +
-               "paper=" + PAPER + ']';
+               "id=" + id + ", " +
+               "form=" + form + ", " +
+               "ink=" + ink + ", " +
+               "paper=" + paper + ']';
     }
 
+    @MCVersionDependentBehaviour
     public static class Serializer implements RecipeSerializer<PrintingPressRecipe> {
         @Override
-        public PrintingPressRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
+        public PrintingPressRecipe fromJson(
+                ResourceLocation pRecipeId,
+                JsonObject pSerializedRecipe
+        ) {
+
             Ingredient form = Ingredient.fromJson(pSerializedRecipe.get("form"));
             Ingredient ink = Ingredient.fromJson(pSerializedRecipe.get("ink"));
             Ingredient paper = Ingredient.fromJson(pSerializedRecipe.get("paper"));
@@ -115,7 +132,11 @@ public class PrintingPressRecipe implements Recipe<PrintingPressBlockEntity> {
         }
 
         @Override
-        public @Nullable PrintingPressRecipe fromNetwork(ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
+        public @Nullable PrintingPressRecipe fromNetwork(
+                ResourceLocation pRecipeId,
+                FriendlyByteBuf pBuffer
+        ) {
+
             Ingredient form = Ingredient.fromNetwork(pBuffer);
             Ingredient ink = Ingredient.fromNetwork(pBuffer);
             Ingredient paper = Ingredient.fromNetwork(pBuffer);
@@ -123,11 +144,16 @@ public class PrintingPressRecipe implements Recipe<PrintingPressBlockEntity> {
         }
 
         @Override
-        public void toNetwork(FriendlyByteBuf pBuffer, PrintingPressRecipe pRecipe) {
-            pRecipe.FORM.toNetwork(pBuffer);
-            pRecipe.INK.toNetwork(pBuffer);
-            pRecipe.PAPER.toNetwork(pBuffer);
+        public void toNetwork(
+                FriendlyByteBuf pBuffer,
+                PrintingPressRecipe pRecipe
+        ) {
+
+            pRecipe.form.toNetwork(pBuffer);
+            pRecipe.ink.toNetwork(pBuffer);
+            pRecipe.paper.toNetwork(pBuffer);
         }
+
     }
 
 }
