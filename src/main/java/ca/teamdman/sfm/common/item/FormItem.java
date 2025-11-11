@@ -23,6 +23,7 @@ public class FormItem extends Item {
     public static ItemStack createFormFromReference(ItemStack stack) {
         var formStack = new ItemStack(SFMItems.FORM_ITEM.get());
         formStack.getOrCreateTag().put("reference", stack.save(new CompoundTag()));
+        formStack.setCount(stack.getCount());
         return formStack;
     }
 
