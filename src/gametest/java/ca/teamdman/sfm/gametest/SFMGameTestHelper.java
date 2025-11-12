@@ -31,6 +31,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
@@ -59,6 +60,11 @@ public class SFMGameTestHelper extends GameTestHelper {
                 new SFMEnchantmentKey(getLevel().registryAccess(), id),
                 enchantmentLevel
         );
+    }
+
+    @MCVersionDependentBehaviour
+    public @NotNull SFMEnchantmentKey createEnchantmentKey(ResourceKey<Enchantment> enchantment) {
+        return new SFMEnchantmentKey(getLevel().registryAccess(), enchantment);
     }
 
     public <CAP> CAP discoverCapability(

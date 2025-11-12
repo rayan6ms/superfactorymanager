@@ -8,4 +8,5 @@ import net.minecraft.world.item.enchantment.Enchantments;
 @MCVersionDependentBehaviour
 public class SFMEnchantmentAliases {
     public static final ResourceKey<Enchantment> EFFICIENCY = Enchantments.EFFICIENCY;
+    public static final ResourceKey<Enchantment> FORTUNE = Enchantments.FORTUNE;
 }
