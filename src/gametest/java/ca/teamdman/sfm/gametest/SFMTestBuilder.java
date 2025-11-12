@@ -10,6 +10,7 @@ import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
@@ -107,7 +108,7 @@ public abstract class SFMTestBuilder {
                         Map.Entry<String, IItemHandler> source = null;
                         for (int i = 0; i < chests.size(); i++) {
                             IItemHandler chest = chests.get(i).getValue();
-                            if (count(chest, null) > 0) {
+                            if (count(chest, (ItemLike) null) > 0) {
                                 source = chests.remove(i);
                                 break;
                             }
