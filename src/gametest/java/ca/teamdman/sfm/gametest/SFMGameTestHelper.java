@@ -30,6 +30,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.items.IItemHandler;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
@@ -58,6 +59,11 @@ public class SFMGameTestHelper extends GameTestHelper {
                 new SFMEnchantmentKey(enchantment),
                 enchantmentLevel
         );
+    }
+
+    @MCVersionDependentBehaviour
+    public @NotNull SFMEnchantmentKey createEnchantmentKey(Enchantment enchantment) {
+        return new SFMEnchantmentKey(enchantment);
     }
 
     public <CAP> CAP discoverCapability(
