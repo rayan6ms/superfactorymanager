@@ -205,7 +205,7 @@ public class FallingAnvilHandler {
 
         // Despawn the books
         for (ItemEntity bookEntity : bookItemEntities) {
-            bookEntity.kill();
+            bookEntity.discard();
         }
 
         // Respawn any remaining books
@@ -255,7 +255,7 @@ public class FallingAnvilHandler {
             long shardsToSpawn = (long) stack.getCount() * shardsForEnchantments;
 
             // Kill the book item
-            itemEntity.kill();
+            itemEntity.discard();
 
             // Spawn the shards
             while (shardsToSpawn > 0) {
@@ -312,7 +312,7 @@ public class FallingAnvilHandler {
                 ItemStack formStack = FormItem.createFormFromReference(itemEntity.getItem());
 
                 // Consume the item
-                itemEntity.kill();
+                itemEntity.discard();
 
                 // Spawn the new item
                 level.addFreshEntity(new ItemEntity(
