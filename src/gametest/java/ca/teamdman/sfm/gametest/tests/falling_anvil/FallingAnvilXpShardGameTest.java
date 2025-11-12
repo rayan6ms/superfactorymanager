@@ -5,6 +5,7 @@ import ca.teamdman.sfm.common.config.SFMServerConfig.LevelsToShards;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentAliases;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.common.handler.FallingAnvilHandler;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
@@ -114,15 +115,23 @@ public class FallingAnvilXpShardGameTest extends SFMGameTestDefinition {
         });
     }
 
-    private static SFMEnchantmentCollection pickRandomEnchantments(
+    public static SFMEnchantmentCollection pickRandomEnchantments(
             SFMGameTestHelper helper,
             RandomSource random
     ) {
 
-        List<Enchantment> pool = new ArrayList<>(ENCHANTMENT_POOL);
+        List<SFMEnchantmentKey> ENCHANTMENT_POOL = List.of(
+                helper.createEnchantmentKey(SFMEnchantmentAliases.EFFICIENCY),
+                helper.createEnchantmentKey(Enchantments.SHARPNESS),
+                helper.createEnchantmentKey(SFMEnchantmentAliases.FORTUNE),
+                helper.createEnchantmentKey(Enchantments.UNBREAKING),
+                helper.createEnchantmentKey(Enchantments.MENDING)
+        );
+
+        List<SFMEnchantmentKey> pool = new ArrayList<>(ENCHANTMENT_POOL);
         for (int i = pool.size() - 1; i > 0; i--) {
             int swapIndex = random.nextInt(i + 1);
-            Enchantment tmp = pool.get(i);
+            SFMEnchantmentKey tmp = pool.get(i);
             pool.set(i, pool.get(swapIndex));
             pool.set(swapIndex, tmp);
         }
@@ -130,10 +139,10 @@ public class FallingAnvilXpShardGameTest extends SFMGameTestDefinition {
         int selectionSize = random.nextIntBetweenInclusive(1, pool.size());
         SFMEnchantmentCollection enchantments = new SFMEnchantmentCollection();
         for (int i = 0; i < selectionSize; i++) {
-            Enchantment enchantment = pool.get(i);
+            SFMEnchantmentKey enchantment = pool.get(i);
             int maxLevel = Math.max(1, enchantment.getMaxLevel());
             int level = random.nextIntBetweenInclusive(1, maxLevel);
-            SFMEnchantmentEntry entry = helper.createEnchantmentEntry(enchantment, level);
+            SFMEnchantmentEntry entry = new SFMEnchantmentEntry(enchantment, level);
             enchantments.add(entry);
         }
         return enchantments;

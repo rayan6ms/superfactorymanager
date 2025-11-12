@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.gametest;
 
+import ca.teamdman.sfm.common.util.SFMItemUtils;
 import net.minecraft.world.Container;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.ItemLike;
@@ -34,14 +35,38 @@ public class SFMGameTestCountHelpers {
                 .sum();
     }
 
+    public static int count(
+            Container inventory,
+            ItemStack comparisonStack
+    ) {
+
+        return IntStream.range(0, inventory.getContainerSize())
+                .mapToObj(inventory::getItem)
+                .filter(stack -> SFMItemUtils.isSameItemSameTags(stack, comparisonStack))
+                .mapToInt(ItemStack::getCount)
+                .sum();
+    }
+
+    public static int count(
+            IItemHandler inventory,
+            ItemStack comparisonStack
+    ) {
+
+        return IntStream.range(0, inventory.getSlots())
+                .mapToObj(inventory::getStackInSlot)
+                .filter(stack -> SFMItemUtils.isSameItemSameTags(stack, comparisonStack))
+                .mapToInt(ItemStack::getCount)
+                .sum();
+    }
+
     public static int count(Container inventory) {
 
-        return count(inventory, null);
+        return count(inventory, (ItemLike) null);
     }
 
     public static int count(IItemHandler inventory) {
 
-        return count(inventory, null);
+        return count(inventory, (ItemLike) null);
     }
 
     public static void assertCount(
@@ -73,12 +98,40 @@ public class SFMGameTestCountHelpers {
     }
 
     public static void assertCount(
+            Container inventory,
+            ItemStack comparisonStack,
+            int expectedCount,
+            String message
+    ) {
+
+        int actualCount = count(inventory, comparisonStack);
+        SFMGameTestMethodHelpers.assertTrue(
+                actualCount == expectedCount,
+                message + ": expected " + expectedCount + " but got " + actualCount
+        );
+    }
+
+    public static void assertCount(
+            IItemHandler inventory,
+            ItemStack comparisonStack,
+            int expectedCount,
+            String message
+    ) {
+
+        int actualCount = count(inventory, comparisonStack);
+        SFMGameTestMethodHelpers.assertTrue(
+                actualCount == expectedCount,
+                message + ": expected " + expectedCount + " but got " + actualCount
+        );
+    }
+
+    public static void assertCount(
             IItemHandler inventory,
             int expectedCount,
             String message
     ) {
 
-        assertCount(inventory, null, expectedCount, message);
+        assertCount(inventory, (ItemLike) null, expectedCount, message);
     }
 
     public static void assertCount(
@@ -87,7 +140,7 @@ public class SFMGameTestCountHelpers {
             String message
     ) {
 
-        assertCount(inventory, null, expectedCount, message);
+        assertCount(inventory, (ItemLike) null, expectedCount, message);
     }
 
     public static void assertCount(
