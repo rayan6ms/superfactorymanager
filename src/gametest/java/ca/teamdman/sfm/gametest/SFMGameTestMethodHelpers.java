@@ -57,19 +57,4 @@ public class SFMGameTestMethodHelpers {
                 "Program did not start running " + DiskItem.getErrors(manager.getDisk())
         );
     }
-
-    public static IItemHandler getItemHandler(
-            GameTestHelper helper,
-            @NotStored BlockPos pos
-    ) {
-        BlockEntity blockEntity = helper
-                .getBlockEntity(pos);
-        SFMGameTestMethodHelpers.assertTrue(blockEntity != null, "No block entity found at " + pos);
-        Optional<IItemHandler> found = blockEntity
-                .getCapability(Capabilities.ITEM_HANDLER)
-                .resolve();
-        SFMGameTestMethodHelpers.assertTrue(found.isPresent(), "No item handler found at " + pos);
-        return found.get();
-    }
-
 }
