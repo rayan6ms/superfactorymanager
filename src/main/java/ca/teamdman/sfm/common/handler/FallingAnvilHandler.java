@@ -96,7 +96,7 @@ public class FallingAnvilHandler {
         }
     }
 
-    public static long getShardCountForEnchantments(
+    public static int getShardCountForEnchantments(
             SFMServerConfig.LevelsToShards config,
             SFMEnchantmentCollection enchantments
     ) {
