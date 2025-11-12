@@ -16,7 +16,6 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.phys.AABB;
@@ -40,14 +39,6 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 })
 @SFMGameTest
 public class FallingAnvilXpShardGameTest extends SFMGameTestDefinition {
-
-    private static final List<Enchantment> ENCHANTMENT_POOL = List.of(
-            SFMEnchantmentAliases.EFFICIENCY,
-            Enchantments.SHARPNESS,
-            SFMEnchantmentAliases.FORTUNE,
-            Enchantments.UNBREAKING,
-            Enchantments.MENDING
-    );
 
     @Override
     public String template() {
