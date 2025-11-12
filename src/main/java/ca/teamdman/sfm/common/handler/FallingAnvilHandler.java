@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.handler;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.config.SFMConfig;
+import ca.teamdman.sfm.common.config.SFMServerConfig;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollectionKind;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
@@ -89,6 +90,36 @@ public class FallingAnvilHandler {
             // Disenchant items
             removeEnchantmentsFromItems(level, anvilPos, itemEntities);
         }
+    }
+
+    public static long getShardCountForEnchantments(
+            SFMServerConfig.LevelsToShards config,
+            SFMEnchantmentCollection enchantments
+    ) {
+
+        return switch (config) {
+            case JustOne -> 1;
+            case EachOne -> enchantments.size();
+            case SumLevels -> {
+                int sum = 0;
+                for (SFMEnchantmentEntry enchantment : enchantments) {
+                    sum += enchantment.level();
+                }
+                yield sum;
+            }
+            case SumLevelsScaledExponentially -> {
+                int sum = 0;
+                for (SFMEnchantmentEntry enchantment : enchantments) {
+                    int incr = 1 << Math.max(0, enchantment.level() - 1);
+                    if (sum + incr > 0) {
+                        sum += incr;
+                    } else {
+                        sum = Integer.MAX_VALUE; // lol
+                    }
+                }
+                yield sum;
+            }
+        };
     }
 
     private static void removeEnchantmentsFromItems(
@@ -211,7 +242,10 @@ public class FallingAnvilHandler {
             );
 
             // Determine how many shards the book is worth
-            long shardsForEnchantments = getShardCountForEnchantments(enchantments);
+            long shardsForEnchantments = getShardCountForEnchantments(
+                    SFMConfig.SERVER_CONFIG.levelsToShards.get(),
+                    enchantments
+            );
 
             // Determine the total number of shards based on the stack size
             long shardsToSpawn = (long) stack.getCount() * shardsForEnchantments;
@@ -297,33 +331,6 @@ public class FallingAnvilHandler {
             level.setBlockAndUpdate(anvilPos.below(), Blocks.AIR.defaultBlockState());
         }
 
-    }
-
-    private static long getShardCountForEnchantments(SFMEnchantmentCollection enchantments) {
-
-        return switch (SFMConfig.SERVER_CONFIG.levelsToShards.get()) {
-            case JustOne -> 1;
-            case EachOne -> enchantments.size();
-            case SumLevels -> {
-                int sum = 0;
-                for (SFMEnchantmentEntry enchantment : enchantments) {
-                    sum += enchantment.level();
-                }
-                yield sum;
-            }
-            case SumLevelsScaledExponentially -> {
-                int sum = 0;
-                for (SFMEnchantmentEntry enchantment : enchantments) {
-                    int incr = 1 << Math.max(0, enchantment.level() - 1);
-                    if (sum + incr > 0) {
-                        sum += incr;
-                    } else {
-                        sum = Integer.MAX_VALUE; // lol
-                    }
-                }
-                yield sum;
-            }
-        };
     }
 
 }
