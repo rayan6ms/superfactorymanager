@@ -85,3 +85,15 @@ Okay so it seems to have to do with using -XX:+AllowEnhancedClassRedefinition as
 - Look at the run configuration and make sure the correct JDK and module are specified
 - If you have problems with `runClient` not working in debug mode, try it in normal play mode first. If that fails, try running the gradle task directly instead of using the IntelliJ run configuration.
 - Go to project structure and remove all the modules, remove all the run configurations, and re-import the Gradle project, then run `genIntellijRuns` 
+
+## Problem 2 - No tests found
+
+Sometimes, the game test classes refuse to update.
+
+Idk what causes this.
+
+After running `gradlew clean` and removing the `run` dir, the game will say "0 tests found".
+
+Running `gradlew runGameTestServer` seems to fix the problem, where after doing so the `runClient teamy` task will then successfully find the tests again.
+
+Yikes.
