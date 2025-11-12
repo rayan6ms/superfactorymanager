@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.gametest.tests.falling_anvil;
 
 import ca.teamdman.sfm.common.config.SFMServerConfig.LevelsToShards;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentAliases;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
 import ca.teamdman.sfm.common.handler.FallingAnvilHandler;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
@@ -126,7 +127,7 @@ public class FallingAnvilXpShardManyGameTest extends SFMGameTestDefinition {
         }
 
         SFMEnchantmentCollection fallback = new SFMEnchantmentCollection();
-        fallback.add(helper.createEnchantmentEntry(Enchantments.BLOCK_EFFICIENCY, 2));
+        fallback.add(helper.createEnchantmentEntry(SFMEnchantmentAliases.EFFICIENCY, 2));
         fallback.add(helper.createEnchantmentEntry(Enchantments.SHARPNESS, 4));
         ItemStack bookTemplate = fallback.createEnchantedBook();
         return new TestParameters(fallback, bookTemplate, 10);
