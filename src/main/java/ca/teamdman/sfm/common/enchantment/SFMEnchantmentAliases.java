@@ -7,4 +7,5 @@ import net.minecraft.world.item.enchantment.Enchantments;
 @MCVersionDependentBehaviour
 public class SFMEnchantmentAliases {
     public static final Enchantment EFFICIENCY = Enchantments.BLOCK_EFFICIENCY;
+    public static final Enchantment FORTUNE = Enchantments.BLOCK_FORTUNE;
 }
