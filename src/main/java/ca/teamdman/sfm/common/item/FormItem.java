@@ -17,8 +17,19 @@ public class FormItem extends Item {
     }
 
     public static ItemStack createFormFromReference(ItemStack stack) {
+        // Immutability: create a copy of the stack we received by reference
+        stack = stack.copy();
+
+        // Create the form stack
         var formStack = new ItemStack(SFMItems.FORM_ITEM.get());
+
+        // Set the inner item
         formStack.set(SFMDataComponents.FORM_REFERENCE, new ItemStackBox(stack));
+
+        // Set the stack size
+        formStack.setCount(stack.getCount());
+
+        // Return the result
         return formStack;
     }
 

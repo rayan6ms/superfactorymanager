@@ -10,11 +10,13 @@ import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.ItemLike;
 import net.neoforged.neoforge.items.IItemHandler;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.count;
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 public abstract class SFMTestBuilder {
@@ -106,7 +108,7 @@ public abstract class SFMTestBuilder {
                         Map.Entry<String, IItemHandler> source = null;
                         for (int i = 0; i < chests.size(); i++) {
                             IItemHandler chest = chests.get(i).getValue();
-                            if (count(chest, null) > 0) {
+                            if (count(chest, (ItemLike) null) > 0) {
                                 source = chests.remove(i);
                                 break;
                             }

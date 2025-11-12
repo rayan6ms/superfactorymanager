@@ -5,9 +5,12 @@ import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.common.program.ExecuteProgramBehaviour;
 import ca.teamdman.sfm.common.program.IProgramHooks;
 import ca.teamdman.sfm.common.program.ProgramContext;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.BoolExpr;
@@ -17,6 +20,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestAssertPosException;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Mirror;
 import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -25,6 +30,7 @@ import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemp
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.text.NumberFormat;
@@ -35,15 +41,29 @@ import java.util.Locale;
 import java.util.Set;
 
 public class SFMGameTestHelper extends GameTestHelper {
-    public final SFMDelegatedTestFunction sfmTestDefinition;
 
     public SFMGameTestHelper(
-            SFMDelegatedTestFunction sfmDelegatedTestFunction,
             GameTestHelper helper
     ) {
 
         super(helper.testInfo);
-        this.sfmTestDefinition = sfmDelegatedTestFunction;
+    }
+
+    @MCVersionDependentBehaviour
+    public SFMEnchantmentEntry createEnchantmentEntry(
+            ResourceKey<Enchantment> id,
+            int enchantmentLevel
+    ) {
+
+        return new SFMEnchantmentEntry(
+                new SFMEnchantmentKey(getLevel().registryAccess(), id),
+                enchantmentLevel
+        );
+    }
+
+    @MCVersionDependentBehaviour
+    public @NotNull SFMEnchantmentKey createEnchantmentKey(ResourceKey<Enchantment> enchantment) {
+        return new SFMEnchantmentKey(getLevel().registryAccess(), enchantment);
     }
 
     public <CAP> CAP discoverCapability(

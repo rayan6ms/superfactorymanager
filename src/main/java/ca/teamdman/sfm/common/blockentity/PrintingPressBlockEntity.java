@@ -28,7 +28,6 @@ import org.jetbrains.annotations.Nullable;
  */
 public class PrintingPressBlockEntity extends BlockEntity implements RecipeInput {
 
-
     private final ItemStackHandler FORM = new ItemStackHandler(1) {
         @Override
         protected void onContentsChanged(int slot) {
@@ -59,11 +58,8 @@ public class PrintingPressBlockEntity extends BlockEntity implements RecipeInput
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (getLevel() == null) return false;
-            return getLevel()
-                    .getRecipeManager()
-                    .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get())
-                    .stream()
-                    .anyMatch(r -> r.value().ink().test(stack));
+            return getLevel().getRecipeManager()
+                    .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get()).stream().anyMatch(r -> r.value().ink().test(stack));
         }
     };
 
@@ -83,11 +79,8 @@ public class PrintingPressBlockEntity extends BlockEntity implements RecipeInput
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
             if (getLevel() == null) return false;
-            return getLevel()
-                    .getRecipeManager()
-                    .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get())
-                    .stream()
-                    .anyMatch(r -> r.value().paper().test(stack));
+            return getLevel().getRecipeManager()
+                    .getAllRecipesFor(SFMRecipeTypes.PRINTING_PRESS.get()).stream().anyMatch(r -> r.value().paper().test(stack));
         }
     };
     public final CombinedInvWrapper INVENTORY = new CombinedInvWrapper(FORM, INK, PAPER);
@@ -128,16 +121,18 @@ public class PrintingPressBlockEntity extends BlockEntity implements RecipeInput
         writeItems(pTag, pRegistries);
     }
 
-    private void writeItems(CompoundTag tag,
-                            HolderLookup.Provider pRegistries
+    private void writeItems(
+            CompoundTag tag,
+            HolderLookup.Provider pRegistries
     ) {
         tag.put("form", FORM.serializeNBT(pRegistries));
         tag.put("paper", PAPER.serializeNBT(pRegistries));
         tag.put("ink", INK.serializeNBT(pRegistries));
     }
 
-    private void readItems(CompoundTag tag,
-                           HolderLookup.Provider pRegistries
+    private void readItems(
+            CompoundTag tag,
+            HolderLookup.Provider pRegistries
     ) {
         INK.deserializeNBT(pRegistries, tag.getCompound("ink"));
         PAPER.deserializeNBT(pRegistries, tag.getCompound("paper"));

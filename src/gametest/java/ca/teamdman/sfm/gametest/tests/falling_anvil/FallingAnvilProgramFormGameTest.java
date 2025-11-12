@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.gametest.tests.migrated;
+package ca.teamdman.sfm.gametest.tests.falling_anvil;
 
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.item.FormItem;

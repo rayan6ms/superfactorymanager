@@ -11,6 +11,8 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.HopperBlock;
 import net.minecraft.world.level.block.entity.HopperBlockEntity;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.assertCount;
+
 @SuppressWarnings({"DataFlowIssue", "RedundantSuppression"})
 @SFMGameTest
 public class TunnelledManagerHopperLongGameTest extends SFMGameTestDefinition {

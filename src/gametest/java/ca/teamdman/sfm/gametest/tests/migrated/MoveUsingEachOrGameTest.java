@@ -14,6 +14,8 @@ import net.minecraft.world.level.block.Blocks;
 
 import java.util.Objects;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.assertCount;
+
 /**
  * Migrated from SFMCorrectnessGameTests.move_using_each_or
  */

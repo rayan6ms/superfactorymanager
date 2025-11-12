@@ -24,12 +24,10 @@ public class PrintingPressJEICategory implements IRecipeCategory<PrintingPressRe
             "printing_press",
             PrintingPressRecipe.class
     );
-    private final IDrawable background;
     private final IDrawable icon;
     private final IDrawable slot;
 
     public PrintingPressJEICategory(IJeiHelpers jeiHelpers) {
-        background = jeiHelpers.getGuiHelper().createBlankDrawable(50, 54);
         icon = jeiHelpers.getGuiHelper().createDrawableItemStack(new ItemStack(SFMBlocks.PRINTING_PRESS_BLOCK.get()));
         slot = jeiHelpers.getGuiHelper().getSlotDrawable();
     }
@@ -45,8 +43,15 @@ public class PrintingPressJEICategory implements IRecipeCategory<PrintingPressRe
     }
 
     @Override
-    public IDrawable getBackground() {
-        return background;
+    public int getWidth() {
+
+        return 50;
+    }
+
+    @Override
+    public int getHeight() {
+
+        return 54;
     }
 
     @Override
@@ -58,10 +63,10 @@ public class PrintingPressJEICategory implements IRecipeCategory<PrintingPressRe
     public void setRecipe(IRecipeLayoutBuilder builder, PrintingPressRecipe recipe, IFocusGroup focuses) {
         builder
                 .addSlot(RecipeIngredientRole.INPUT, 0, 0)
-                .addItemStacks(Arrays.stream(recipe.FORM.getItems()).map(FormItem::createFormFromReference).toList())
+                .addItemStacks(Arrays.stream(recipe.form().getItems()).map(FormItem::createFormFromReference).toList())
                 .setBackground(slot, -1, -1);
-        builder.addSlot(RecipeIngredientRole.INPUT, 0, 18).addIngredients(recipe.INK).setBackground(slot, -1, -1);
-        builder.addSlot(RecipeIngredientRole.INPUT, 0, 36).addIngredients(recipe.PAPER).setBackground(slot, -1, -1);
-        builder.addSlot(RecipeIngredientRole.OUTPUT, 25, 18).addIngredients(recipe.FORM);
+        builder.addSlot(RecipeIngredientRole.INPUT, 0, 18).addIngredients(recipe.ink()).setBackground(slot, -1, -1);
+        builder.addSlot(RecipeIngredientRole.INPUT, 0, 36).addIngredients(recipe.paper()).setBackground(slot, -1, -1);
+        builder.addSlot(RecipeIngredientRole.OUTPUT, 25, 18).addIngredients(recipe.form());
     }
 }
