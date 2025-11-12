@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.gametest.tests.falling_anvil;
 
 import ca.teamdman.sfm.common.config.SFMServerConfig.LevelsToShards;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentAliases;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
 import ca.teamdman.sfm.common.handler.FallingAnvilHandler;
@@ -45,9 +46,9 @@ public class FallingAnvilXpShardManyGameTest extends SFMGameTestDefinition {
     private static final int CHEST_SLOTS = 27;
 
     private static final List<Enchantment> ENCHANTMENT_POOL = List.of(
-            Enchantments.BLOCK_EFFICIENCY,
+            SFMEnchantmentAliases.EFFICIENCY,
             Enchantments.SHARPNESS,
-            Enchantments.BLOCK_FORTUNE,
+            SFMEnchantmentAliases.FORTUNE,
             Enchantments.UNBREAKING,
             Enchantments.MENDING
     );
