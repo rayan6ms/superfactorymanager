@@ -122,7 +122,7 @@ public class FallingAnvilDisenchantGameTest extends SFMGameTestDefinition {
     ) {
 
         List<ItemStack> foundItemStacks = new ArrayList<>();
-        AABB seekArea = new AABB(new BlockPos(itemSpawnPos));
+        AABB seekArea = new AABB(new BlockPos((int) itemSpawnPos.x(), (int) itemSpawnPos.y(), (int) itemSpawnPos.z()));
         helper
                 .getLevel()
                 .getEntitiesOfClass(ItemEntity.class, seekArea.inflate(3))

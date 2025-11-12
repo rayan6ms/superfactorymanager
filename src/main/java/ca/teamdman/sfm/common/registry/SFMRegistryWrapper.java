@@ -9,7 +9,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.MappedRegistry;
 import net.minecraft.core.Registry;
-import net.minecraft.data.BuiltinRegistries;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.registries.IForgeRegistry;
@@ -126,7 +126,7 @@ public final class SFMRegistryWrapper<T> implements Iterable<T> {
 
         // Look up the registry in the registry of registries
         //noinspection unchecked,rawtypes
-        maybeInnerVanilla = (Registry<T>) BuiltinRegistries.REGISTRY.get((ResourceKey) registryKey);
+        maybeInnerVanilla = (Registry<T>) BuiltInRegistries.REGISTRY.get((ResourceKey) registryKey);
         if (maybeInnerVanilla != null) {
             return maybeInnerVanilla;
         }
@@ -174,7 +174,7 @@ public final class SFMRegistryWrapper<T> implements Iterable<T> {
 
     public HolderLookup.RegistryLookup<T> asHolderLookup() {
 
-        return new HolderLookup.RegistryLookup<>(getVanillaRegistry());
+        return getVanillaRegistry().asLookup();
     }
 
 }

@@ -42,7 +42,7 @@ public class RecipesGameTest extends SFMGameTestDefinition {
         // For each recipe
         for (CraftingRecipe recipe : craftingRecipes) {
             // If the resulting item is from SFM
-            ResourceLocation resultItemId = SFMWellKnownRegistries.ITEMS.getId(recipe.getResultItem().getItem());
+            ResourceLocation resultItemId = SFMWellKnownRegistries.ITEMS.getId(recipe.getResultItem(helper.getLevel().registryAccess()).getItem());
             if (resultItemId.getNamespace().equals(SFM.MOD_ID)) {
                 // Track it as seen
                 seenSFMItemIds.put(resultItemId, recipe);
