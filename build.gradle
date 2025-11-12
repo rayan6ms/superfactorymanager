@@ -286,6 +286,8 @@ dependencies {
 
 //    runtimeOnly "curse.maven:easy-villagers-400514:5153632" // Easy Villagers 1.20.4-1.1.4
 
+    implementation "mezz.jei:jei-1.21-neoforge:19.8.2.99"
+
 
     implementation "mezz.jei:jei-1.21.1-neoforge:19.25.0.325"
 

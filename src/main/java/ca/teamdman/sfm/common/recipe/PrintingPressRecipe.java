@@ -4,6 +4,7 @@ import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.registry.SFMRecipeSerializers;
 import ca.teamdman.sfm.common.registry.SFMRecipeTypes;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import net.minecraft.core.HolderLookup;
@@ -23,7 +24,9 @@ import java.util.Objects;
  */
 public record PrintingPressRecipe(
         Ingredient form,
+
         Ingredient ink,
+
         Ingredient paper
 ) implements Recipe<PrintingPressBlockEntity> {
 
@@ -32,11 +35,13 @@ public record PrintingPressRecipe(
             PrintingPressBlockEntity pContainer,
             Level pLevel
     ) {
+
         return paper.test(pContainer.getPaper())
                && ink.test(pContainer.getInk())
                && form.test(FormItem.getBorrowedReferenceFromForm(pContainer.getForm()));
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public ItemStack assemble(
             PrintingPressBlockEntity pContainer,
@@ -52,9 +57,11 @@ public record PrintingPressRecipe(
             int pWidth,
             int pHeight
     ) {
+
         return true;
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public ItemStack getResultItem(HolderLookup.Provider pRegistries) {
         return ItemStack.EMPTY;
@@ -62,38 +69,45 @@ public record PrintingPressRecipe(
 
     @Override
     public RecipeSerializer<?> getSerializer() {
+
         return SFMRecipeSerializers.PRINTING_PRESS.get();
     }
 
     @Override
     public RecipeType<?> getType() {
+
         return SFMRecipeTypes.PRINTING_PRESS.get();
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public boolean equals(Object obj) {
+
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (PrintingPressRecipe) obj;
-        return
-                Objects.equals(this.form, that.form) &&
-                Objects.equals(this.ink, that.ink) &&
-                Objects.equals(this.paper, that.paper);
+        return Objects.equals(this.form, that.form) &&
+               Objects.equals(this.ink, that.ink) &&
+               Objects.equals(this.paper, that.paper);
     }
 
+    @MCVersionDependentBehaviour
     @Override
     public int hashCode() {
+
         return Objects.hash(form, ink, paper);
     }
 
     @Override
     public String toString() {
+
         return "PrintingPressRecipe[" +
                "form=" + form + ", " +
                "ink=" + ink + ", " +
                "paper=" + paper + ']';
     }
 
+    @MCVersionDependentBehaviour
     public static class Serializer implements RecipeSerializer<PrintingPressRecipe> {
         private final MapCodec<PrintingPressRecipe> CODEC = RecordCodecBuilder.mapCodec(builder -> builder.group(
                 Ingredient.CODEC.fieldOf("form").forGetter(PrintingPressRecipe::form),
@@ -130,6 +144,7 @@ public record PrintingPressRecipe(
             Ingredient.CONTENTS_STREAM_CODEC.encode(buf, pRecipe.ink);
             Ingredient.CONTENTS_STREAM_CODEC.encode(buf, pRecipe.paper);
         }
+
     }
 
 }

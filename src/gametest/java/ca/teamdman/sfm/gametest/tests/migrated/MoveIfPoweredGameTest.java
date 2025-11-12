@@ -12,6 +12,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.assertCount;
+
 /**
  * Migrated from SFMIfStatementGameTests.move_if_powered
  */

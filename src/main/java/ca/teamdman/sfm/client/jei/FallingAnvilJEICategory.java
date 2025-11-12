@@ -1,40 +1,40 @@
 package ca.teamdman.sfm.client.jei;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollectionKind;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
+import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMComponentUtils;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
-import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.builder.IRecipeSlotBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IJeiHelpers;
+import mezz.jei.api.recipe.IFocus;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
-import net.minecraft.core.Holder;
-import net.minecraft.core.HolderLookup;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.item.EnchantedBookItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.Ingredient;
-import net.minecraft.world.item.enchantment.Enchantment;
-import net.minecraft.world.item.enchantment.EnchantmentInstance;
-import net.minecraft.world.item.enchantment.ItemEnchantments;
 import net.minecraft.world.level.block.Blocks;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
-import java.util.Objects;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilRecipe> {
 
@@ -43,7 +43,6 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
             "falling_anvil",
             FallingAnvilRecipe.class
     );
-
 
     private final IDrawable icon;
 
@@ -82,6 +81,10 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
         return icon;
     }
 
+    public static Stream<SFMEnchantmentKey> streamEnchantments() {
+
+        return SFMWellKnownRegistries.ENCHANTMENTS.holders().map(SFMEnchantmentKey::new);
+    }
 
     @Override
     public void setRecipe(
@@ -109,37 +112,34 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
                                            .toList());
         } else if (recipe instanceof FallingAnvilDisenchantRecipe) {
 
-            // Get a registry lookup helper for enchantments
-            HolderLookup.RegistryLookup<Enchantment> lookup = SFMWellKnownRegistries.ENCHANTMENTS
-                    .getInnerRegistry()
-                    .asLookup();
-
             // If a focus is present for an input or output item, we want to only show those enchantments
-            ItemEnchantments.Mutable seekingEnchantments = new ItemEnchantments.Mutable(ItemEnchantments.EMPTY);
+            SFMEnchantmentCollection seekingEnchantments = new SFMEnchantmentCollection();
 
             // Create the list of input items to display
             List<ItemStack> enchantedInputItems = new ArrayList<>();
 
             // Add any focused input items
             focuses.getFocuses(RecipeIngredientRole.INPUT)
-                    .map(focus -> focus.getTypedValue().getCastIngredient(VanillaTypes.ITEM_STACK))
-                    .filter(Objects::nonNull)
+                    .map(FallingAnvilJEICategory::getIngredientItemStack)
+                    .filter(Predicate.not(ItemStack::isEmpty))
                     .forEach(inputItemStack -> {
 
                         // Get the enchantments on the input item
-                        ItemEnchantments itemEnchantments = inputItemStack.getAllEnchantments(lookup);
-
-                        // Track the input item's enchantments
-                        boolean seenAny = false;
-                        for (Object2IntMap.Entry<Holder<Enchantment>> itemEnchantment : itemEnchantments.entrySet()) {
-                            seekingEnchantments.set(itemEnchantment.getKey(), itemEnchantment.getIntValue());
-                            seenAny = true;
-                        }
+                        SFMEnchantmentCollection itemEnchantments = SFMEnchantmentCollection.fromItemStack(
+                                inputItemStack,
+                                SFMEnchantmentCollectionKind.EnchantedLikeATool
+                        );
 
                         // Only track the item if it was enchanted, otherwise we will use the default list
-                        if (seenAny) {
-                            enchantedInputItems.add(inputItemStack);
+                        if (itemEnchantments.isEmpty()) {
+                            return;
                         }
+
+                        // Track the input item's enchantments
+                        seekingEnchantments.addAll(itemEnchantments);
+
+                        // Track the item
+                        enchantedInputItems.add(inputItemStack);
                     });
 
             // Populate using default items if no focused items present
@@ -187,7 +187,7 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
                         Items.WOODEN_SWORD,
                         Items.BOW,
                         Items.CROSSBOW,
-                        Items.MACE,
+//                        Items.MACE,
                         Items.TRIDENT,
                         Items.FISHING_ROD,
                         Items.STICK
@@ -197,36 +197,32 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
                 }
             }
 
-            // Add any focused output enchantments
+            // Add enchanted book enchantments from focused output items
             focuses
                     .getFocuses(RecipeIngredientRole.OUTPUT)
-                    .map(focus -> focus.getTypedValue().getCastIngredient(VanillaTypes.ITEM_STACK))
-                    .filter(Objects::nonNull)
-                    .map(stack -> stack.get(DataComponents.STORED_ENCHANTMENTS))
-                    .filter(Objects::nonNull)
-                    .flatMap(itemEnchantments -> itemEnchantments.entrySet().stream())
-                    .forEach(enchantmentEntry -> seekingEnchantments.set(
-                            enchantmentEntry.getKey(),
-                            enchantmentEntry.getIntValue()
-                    ));
+                    .map(FallingAnvilJEICategory::getIngredientItemStack)
+                    .filter(Predicate.not(ItemStack::isEmpty))
+                    .map(stack -> SFMEnchantmentCollection.fromItemStack(
+                            stack,
+                            SFMEnchantmentCollectionKind.HoldingLikeABook
+                    ))
+                    .flatMap(Collection::stream)
+                    .forEach(seekingEnchantments::add);
 
             // Show all enchantments if no focused ingredients present
             // It means the user is looking at the entire recipe category
-            boolean showingAllEnchantments = seekingEnchantments.keySet().isEmpty();
+            boolean showingAllEnchantments = seekingEnchantments.isEmpty();
 
             // Prepare ingredient collections
             var inputEnchantedItemIngredients = new ArrayList<ItemStack>();
             var outputEnchantedBookIngredients = new ArrayList<ItemStack>();
 
             // For each enchantment from the registry
-            Iterable<Holder.Reference<Enchantment>> holders = SFMWellKnownRegistries.ENCHANTMENTS
-                    .getInnerRegistry()
-                    .holders()
-                    ::iterator;
-            for (Holder.Reference<Enchantment> enchant : holders) {
+            Iterable<SFMEnchantmentKey> holders = streamEnchantments()::iterator;
+            for (SFMEnchantmentKey enchantmentKey : holders) {
 
                 // Determine the max level of the enchantment
-                int maxLevel = enchant.value().getMaxLevel();
+                int maxLevel = enchantmentKey.getMaxLevel();
 
                 // Determine which levels to show
                 IntArraySet enchantmentLevelsToDisplay = new IntArraySet();
@@ -237,7 +233,7 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
                     }
                 } else {
                     // Show only the specified level
-                    int level = seekingEnchantments.getLevel(enchant);
+                    int level = seekingEnchantments.getLevel(enchantmentKey);
                     if (level <= 0) {
                         continue;
                     } else {
@@ -258,7 +254,7 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
                 for (ItemStack checkStack : enchantedInputItems) {
 
                     // Only track if the tool supports the enchantment or if the tool is a stick as a catch-all
-                    if (!checkStack.supportsEnchantment(enchant) && checkStack.getItem() != Items.STICK) {
+                    if (!enchantmentKey.canEnchant(checkStack) && checkStack.getItem() != Items.STICK) {
                         continue;
                     }
 
@@ -269,11 +265,13 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
                         ItemStack toolStack = checkStack.copy();
 
                         // Enchant the tool
-                        toolStack.enchant(enchant, level);
+                        SFMEnchantmentEntry enchantment = new SFMEnchantmentEntry(enchantmentKey, level);
+                        SFMEnchantmentCollection collection = new SFMEnchantmentCollection();
+                        collection.add(enchantment);
+                        collection.write(toolStack, SFMEnchantmentCollectionKind.EnchantedLikeATool);
 
                         // Create the enchanted book
-                        EnchantmentInstance enchantmentInstance = new EnchantmentInstance(enchant, level);
-                        ItemStack enchantedBook = EnchantedBookItem.createForEnchantment(enchantmentInstance);
+                        ItemStack enchantedBook = enchantment.createEnchantedBook();
 
                         // Track the enchanted book
                         outputEnchantedBookIngredients.add(enchantedBook);
@@ -327,6 +325,12 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
                     .addSlot(RecipeIngredientRole.OUTPUT, 50, 18)
                     .addItemStack(new ItemStack(SFMItems.EXPERIENCE_SHARD_ITEM.get()));
         }
+    }
+
+    @MCVersionDependentBehaviour
+    private static ItemStack getIngredientItemStack(IFocus<?> focus) {
+
+        return focus.getTypedValue().getIngredient(VanillaTypes.ITEM_STACK).orElse(ItemStack.EMPTY);
     }
 
 }

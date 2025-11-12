@@ -14,6 +14,8 @@ import net.minecraft.world.item.Items;
 
 import java.util.Objects;
 
+import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.assertCount;
+import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.count;
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /**
