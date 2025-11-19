@@ -6,9 +6,7 @@ NAME "Changelog"
 -- SFM submit new issue:
 -- https://github.com/TeamDman/SuperFactoryManager/issues/new
 
-
--- TODO: FIX SCROLLING on 1.21.1??
----- 4.27.0 (pre) ----
+---- 4.27.0 ----
 -- Published a new video [TeamDman - SFM Bug Hunt](https://www.youtube.com/watch?v=8GtBrKhSWq0)
 -- Fix capabilities not being invalidated properly on 1.20.3+
 -- Add tunnelled manager block from #189, thanks @Qther
@@ -57,6 +55,7 @@ END
 ---- Not being used by production logic yet
 -- Fix text editor caret blink, previously was solid or blinked too fast before/after MC 1.20.2
 -- Add JEI support for 1.21.0, 1.21.1, thanks @Saereth for the suggestion <3, #401
+-- Updated JEI support to correctly pair enchantments for disenchanting
 
 ---- 4.26.0 ----
 -- Add new textures from #343, thanks MHanHanBing
