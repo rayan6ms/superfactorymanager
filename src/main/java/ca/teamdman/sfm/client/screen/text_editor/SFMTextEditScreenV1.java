@@ -410,9 +410,9 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         public void setFocused(boolean focused) {
 
             super.setFocused(focused);
-            if (!focused) {
-                this.scrollbarDragActive = false;
-            }
+//            if (!focused) {
+//                this.scrollbarDragActive = false;
+//            }
         }
 
         public int getCursorPosition() {
