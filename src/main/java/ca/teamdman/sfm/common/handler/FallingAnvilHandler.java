@@ -311,9 +311,6 @@ public class FallingAnvilHandler {
                 // Create the form stack
                 ItemStack formStack = FormItem.createFormFromReference(itemEntity.getItem());
 
-                // Consume the item
-                itemEntity.discard();
-
                 // Spawn the new item
                 level.addFreshEntity(new ItemEntity(
                         level,
@@ -322,6 +319,12 @@ public class FallingAnvilHandler {
                         anvilPos.getZ(),
                         formStack
                 ));
+
+                // Consume the item
+                // SAFETY: this MUST happen AFTER spawning the new item because we are in an EntityLeaveLevelEvent handler
+                // [TeamDman - SFM Bug Hunt](https://www.youtube.com/watch?v=8GtBrKhSWq0)
+                itemEntity.discard();
+
 
                 // Mark the block for consumption
                 consumeBlock = true;
