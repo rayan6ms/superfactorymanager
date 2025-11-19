@@ -6,7 +6,10 @@ NAME "Changelog"
 -- SFM submit new issue:
 -- https://github.com/TeamDman/SuperFactoryManager/issues/new
 
+
+-- TODO: FIX SCROLLING on 1.21.1??
 ---- 4.27.0 (pre) ----
+-- Published a new video [TeamDman - SFM Bug Hunt](https://www.youtube.com/watch?v=8GtBrKhSWq0)
 -- Fix capabilities not being invalidated properly on 1.20.3+
 -- Add tunnelled manager block from #189, thanks @Qther
 ---- When capabilities are queried, will pass through to the opposite side
