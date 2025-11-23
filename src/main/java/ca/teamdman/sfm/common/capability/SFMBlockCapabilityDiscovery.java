@@ -107,14 +107,16 @@ public class SFMBlockCapabilityDiscovery {
             BlockPos pos
     ) {
 
-        return SFMWellKnownCapabilities.streamCapabilities().anyMatch(cap -> {
-            for (Direction direction : SFMDirections.DIRECTIONS_WITH_NULL) {
-                if (discoverCapabilityFromLevel(level, cap, pos, direction).isPresent()) {
-                    return true;
-                }
-            }
-            return false;
-        });
+        return SFMWellKnownCapabilities.streamCapabilities()
+                .filter(cap -> !cap.equals(SFMWellKnownCapabilities.REDSTONE_HANDLER))
+                .anyMatch(cap -> {
+                    for (Direction direction : SFMDirections.DIRECTIONS_WITH_NULL) {
+                        if (discoverCapabilityFromLevel(level, cap, pos, direction).isPresent()) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
     }
 
     @MCVersionDependentBehaviour
