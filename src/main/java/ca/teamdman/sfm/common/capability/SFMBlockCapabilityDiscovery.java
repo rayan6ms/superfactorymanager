@@ -17,9 +17,9 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.common.extensions.ILevelExtension;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -104,21 +104,23 @@ public class SFMBlockCapabilityDiscovery {
     }
 
     public static boolean hasAnyCapabilityAnyDirection(
-            ILevelExtension levelExt,
+            LevelAccessor levelAccessor,
             BlockPos pos
     ) {
-
-        if (!(levelExt instanceof Level level)) {
+        if (!(levelAccessor instanceof Level level)) {
             return false;
         }
-        return SFMWellKnownCapabilities.streamCapabilities().anyMatch(cap -> {
-            for (Direction direction : SFMDirections.DIRECTIONS_WITH_NULL) {
-                if (discoverCapabilityFromLevel(level, cap, pos, direction).isPresent()) {
-                    return true;
-                }
-            }
-            return false;
-        });
+
+        return SFMWellKnownCapabilities.streamCapabilities()
+                .filter(cap -> !cap.equals(SFMWellKnownCapabilities.REDSTONE_HANDLER))
+                .anyMatch(cap -> {
+                    for (Direction direction : SFMDirections.DIRECTIONS_WITH_NULL) {
+                        if (discoverCapabilityFromLevel(level, cap, pos, direction).isPresent()) {
+                            return true;
+                        }
+                    }
+                    return false;
+                });
     }
 
     @MCVersionDependentBehaviour
