@@ -8,6 +8,7 @@ NAME "Changelog"
 
 ---- 4.28.0 ----
 -- Fix #430 where fancy cable improperly visually connects to blocks it should not
+-- Fixed LabelNotConnectedProgramLinter not working properly because it detected that any block has redstone capability
 
 ---- 4.27.0 ----
 -- Published a new video [TeamDman - SFM Bug Hunt](https://www.youtube.com/watch?v=8GtBrKhSWq0)
