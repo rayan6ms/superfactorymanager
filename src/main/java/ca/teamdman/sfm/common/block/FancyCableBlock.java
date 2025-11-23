@@ -14,7 +14,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -185,11 +184,6 @@ public class FancyCableBlock extends CableBlock implements IFacadableBlock {
         BlockPos relative = pos.relative(direction);
         if (level.getBlockState(relative).getBlock() instanceof ICableBlock) {
             return true;
-        }
-
-        BlockEntity blockEntity = level.getBlockEntity(relative);
-        if (blockEntity == null) {
-            return false;
         }
 
         return SFMBlockCapabilityDiscovery.hasAnyCapabilityAnyDirection(level, relative);
