@@ -6,6 +6,9 @@ NAME "Changelog"
 -- SFM submit new issue:
 -- https://github.com/TeamDman/SuperFactoryManager/issues/new
 
+---- 4.28.0 ----
+-- Fix #430 where fancy cable improperly visually connects to blocks it should not
+
 ---- 4.27.0 ----
 -- Published a new video [TeamDman - SFM Bug Hunt](https://www.youtube.com/watch?v=8GtBrKhSWq0)
 -- Fix capabilities not being invalidated properly on 1.20.3+
