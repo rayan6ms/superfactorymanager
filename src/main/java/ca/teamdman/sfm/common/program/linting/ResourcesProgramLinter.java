@@ -4,7 +4,6 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfml.ast.Program;
-import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -24,8 +23,6 @@ public class ResourcesProgramLinter implements IProgramLinter {
             @Nullable ManagerBlockEntity managerBlockEntity,
             ProblemTracker tracker
     ) {
-        ArrayList<TranslatableContents> warnings = new ArrayList<>();
-
         // Check all referenced resources to see if they exist
         for (var resource : program.referencedResources()) {
             Optional<?> loc = resource.getLocation();
@@ -40,7 +37,7 @@ public class ResourcesProgramLinter implements IProgramLinter {
             }
             // If it doesn't exist in the registry, add a warning
             if (!resourceType.registryKeyExists((ResourceLocation) loc.get())) {
-                warnings.add(PROGRAM_WARNING_UNKNOWN_RESOURCE_ID.get(resource));
+                tracker.add(PROGRAM_WARNING_UNKNOWN_RESOURCE_ID.get(resource));
             }
         }
     }
