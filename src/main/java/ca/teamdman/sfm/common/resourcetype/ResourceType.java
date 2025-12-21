@@ -89,6 +89,10 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             boolean simulate
     );
 
+    public boolean canExtract(CAP capability, int slot) {
+        return true;
+    }
+
     public abstract int getSlots(CAP handler);
 
     public abstract long getMaxStackSize(STACK stack);
@@ -107,6 +111,10 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             STACK stack,
             boolean simulate
     );
+
+    public boolean canInsert(CAP capability, int slot) {
+        return true;
+    }
 
     public abstract boolean isEmpty(STACK stack);
 
