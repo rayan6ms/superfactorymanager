@@ -171,7 +171,7 @@ public class ProjectTestMethodMigrator {
     }
 
     private static void generateTestClass(TestMethodInfo info) throws IOException {
-        // compute the new package value and on-disk path
+        // compute the new package name and on-disk path
         String origPkg = info.originalPackage;
         String suffix = "";
         if (origPkg.startsWith(BASE_TEST_PACKAGE)) {

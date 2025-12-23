@@ -193,7 +193,7 @@ public class DiskItem extends Item {
     public static String getProgramName(ItemStack stack) {
         return stack
                 .getOrCreateTag()
-                .getString("sfm:value");
+                .getString("sfm:name");
     }
 
     public static void setProgramName(
@@ -203,7 +203,7 @@ public class DiskItem extends Item {
         if (stack.getItem() instanceof DiskItem) {
             stack
                     .getOrCreateTag()
-                    .putString("sfm:value", name);
+                    .putString("sfm:name", name);
         }
     }
 

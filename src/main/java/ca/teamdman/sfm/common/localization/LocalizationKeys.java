@@ -182,7 +182,7 @@ public final class LocalizationKeys {
     );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry MOD_NAME = new LocalizationEntry(
-            "mod.value",
+            "mod.name",
             "Super Factory Manager"
     );
     public static final LocalizationEntry CREATIVE_TAB = new LocalizationEntry(

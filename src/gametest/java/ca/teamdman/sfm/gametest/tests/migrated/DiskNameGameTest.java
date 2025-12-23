@@ -47,10 +47,10 @@ public class DiskNameGameTest extends SFMGameTestDefinition {
             DiskItem.setProgram(disk, programString);
             DiskItem.compileAndUpdateErrorsAndWarnings(disk, null, true);
             chest.insertItem(0, disk, false);
-            assertTrue(DiskItem.getProgramName(disk).equals("bruh"), "program value should be bruh for disk 1");
+            assertTrue(DiskItem.getProgramName(disk).equals("bruh"), "program name should be bruh for disk 1");
             assertTrue(DiskItem.getWarnings(disk).isEmpty(), "there should be no warnings on disk 1");
             assertTrue(DiskItem.getErrors(disk).isEmpty(), "there should be no errors on disk 1");
-            assertTrue(disk.getHoverName().getString().equals("bruh"), "display value should be \"bruh\" for disk 1");
+            assertTrue(disk.getHoverName().getString().equals("bruh"), "display name should be \"bruh\" for disk 1");
         }
         {
             ItemStack disk = new ItemStack(SFMItems.DISK_ITEM.get());
@@ -61,12 +61,12 @@ public class DiskNameGameTest extends SFMGameTestDefinition {
             DiskItem.setProgram(disk, programString);
             DiskItem.compileAndUpdateErrorsAndWarnings(disk, null, true);
             chest.insertItem(1, disk, false);
-            assertTrue(DiskItem.getProgramName(disk).isEmpty(), "program value should be empty for disk 2");
+            assertTrue(DiskItem.getProgramName(disk).isEmpty(), "program name should be empty for disk 2");
             assertTrue(DiskItem.getWarnings(disk).isEmpty(), "there should be no warnings on disk 2");
             assertTrue(DiskItem.getErrors(disk).isEmpty(), "there should be no errors on disk 2");
             assertTrue(
                     disk.getHoverName().contains(LocalizationKeys.DISK_ITEM.getComponent()),
-                    "display value should be default for disk 2"
+                    "display name should be default for disk 2"
             );
         }
         helper.succeed();

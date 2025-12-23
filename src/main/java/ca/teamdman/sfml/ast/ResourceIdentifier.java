@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-// resourceTypeName resourceNamespace, resourceTypeName value, resource resourceNamespace, resource value
+// resourceTypeName resourceNamespace, resourceTypeName name, resource resourceNamespace, resource name
 // sfm:item:minecraft:stone
 public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode, ToStringCondensed {
 
