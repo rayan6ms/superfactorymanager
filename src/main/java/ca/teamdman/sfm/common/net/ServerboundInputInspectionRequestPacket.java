@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.common.program.ProgramContext;
+import ca.teamdman.sfm.common.program.ProgramHooks;
 import ca.teamdman.sfm.common.program.SimulateExploreAllPathsProgramBehaviour;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMASTUtils;
@@ -59,10 +60,11 @@ public record ServerboundInputInspectionRequestPacket(
                                                 .append(inputStatement.toStringPretty())
                                                 .append("\n-- peek results --\n");
 
-                                        ProgramContext programContext = new ProgramContext(
+                                        ProgramContext programContext = ProgramContext.of(
                                                 program,
                                                 managerBlockEntity,
-                                                new SimulateExploreAllPathsProgramBehaviour()
+                                                new SimulateExploreAllPathsProgramBehaviour(),
+                                                ProgramHooks.EMPTY
                                         );
                                         int preLen = payload.length();
                                         inputStatement.gatherSlots(
@@ -70,7 +72,7 @@ public record ServerboundInputInspectionRequestPacket(
                                                 slot -> SFMASTUtils
                                                         .getInputStatementForSlot(
                                                                 slot,
-                                                                inputStatement.labelAccess()
+                                                                inputStatement.resourceAccess()
                                                         )
                                                         .ifPresent(is -> payload
                                                                 .append(is.toStringPretty())

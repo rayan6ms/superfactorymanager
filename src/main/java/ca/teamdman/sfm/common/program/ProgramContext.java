@@ -1,227 +1,137 @@
 package ca.teamdman.sfm.common.program;
 
+import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.logging.TranslatableLogger;
+import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfml.ast.InputStatement;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.world.level.Level;
+import org.apache.commons.lang3.mutable.MutableBoolean;
+import org.apache.commons.lang3.mutable.MutableInt;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Stream;
 
-public class ProgramContext {
-    private final Program PROGRAM;
+/// A common group of objects used in the execution of a {@link Program}.
+///
+/// The {@link #inputs} list must be mutable; caution against using {@link Stream#toList()} which uses {@link java.util.Collections#unmodifiableList(List)}.
+public record ProgramContext(
+        TranslatableLogger logger,
 
-    private final ManagerBlockEntity MANAGER;
+        Program program,
 
-    private final CableNetwork NETWORK;
+        LabelPositionHolder labelPositionHolder,
 
-    private final List<InputStatement> INPUTS = new ArrayList<>();
+        @Nullable ManagerBlockEntity manager,
 
-    private final Level LEVEL;
+        @Nullable CableNetwork network,
 
-    private final ProgramBehaviour BEHAVIOUR;
+        @Nullable Level level,
 
-    private final int REDSTONE_PULSES;
+        List<InputStatement> inputs,
 
-    private final LabelPositionHolder LABEL_POSITIONS;
+        ProgramBehaviour behaviour,
 
-    private final TranslatableLogger LOGGER;
+        MutableInt unhandledRedstonePulseCount,
 
-    private boolean did_something = false;
+        MutableBoolean didSomething,
 
-    private ProgramContext(
-            Program program,
-            ManagerBlockEntity manager,
-            CableNetwork network,
-            Level level,
-            int redstonePulses,
-            ProgramBehaviour executionBehaviour,
-            LabelPositionHolder labelPositions,
-            TranslatableLogger logger
-    ) {
-
-        this.PROGRAM = program;
-        this.MANAGER = manager;
-        this.NETWORK = network;
-        this.LEVEL = level;
-        this.REDSTONE_PULSES = redstonePulses;
-        this.BEHAVIOUR = executionBehaviour;
-        this.LABEL_POSITIONS = labelPositions;
-        this.LOGGER = logger;
-    }
-
-    public ProgramContext(
-            Program program,
-            ManagerBlockEntity manager,
-            ProgramBehaviour executionBehaviour
-    ) {
-
-        this.PROGRAM = program;
-        this.MANAGER = manager;
-        //noinspection OptionalGetWithoutIsPresent // program shouldn't be ticking if the network is bad
-        NETWORK = CableNetworkManager
-                .getOrRegisterNetworkFromManagerPosition(MANAGER)
-                .get();
-        assert MANAGER.getLevel() != null;
-        LEVEL = MANAGER.getLevel();
-        REDSTONE_PULSES = MANAGER.getUnprocessedRedstonePulseCount();
-        BEHAVIOUR = executionBehaviour;
-        LABEL_POSITIONS = LabelPositionHolder.from(Objects.requireNonNull(manager.getDisk()));
-        LOGGER = manager.logger;
-    }
-
+        ProgramHooks hooks
+) {
     private ProgramContext(ProgramContext other) {
 
-        PROGRAM = other.PROGRAM;
-        MANAGER = other.MANAGER;
-        NETWORK = other.NETWORK;
-        LEVEL = other.LEVEL;
-        REDSTONE_PULSES = other.REDSTONE_PULSES;
-        BEHAVIOUR = other.BEHAVIOUR.fork();
-        INPUTS.addAll(other.INPUTS);
-        did_something = other.did_something;
-        LABEL_POSITIONS = other.LABEL_POSITIONS;
-        LOGGER = other.LOGGER;
-    }
-
-    public Level getLevel() {
-
-        return LEVEL;
-    }
-
-    public boolean didSomething() {
-
-        return did_something;
-    }
-
-    public void setDidSomething(boolean value) {
-
-        this.did_something = value;
-    }
-
-    public static ProgramContext createSimulationContext(
-            Program program,
-            LabelPositionHolder labelPositionHolder,
-            int redstonePulses,
-            SimulateExploreAllPathsProgramBehaviour behaviour
-    ) {
-        //noinspection DataFlowIssue // simulation mode must be able to run without world access
-        return new ProgramContext(
-                program,
-                null,
-                null,
-                null,
-                redstonePulses,
-                behaviour,
-                labelPositionHolder,
-                new TranslatableLogger("simulated" + Objects.hash(program, labelPositionHolder, behaviour))
+        this(
+                other.logger, other.program,
+                other.labelPositionHolder, other.manager,
+                other.network,
+                other.level, new ArrayList<>(other.inputs),
+                other.behaviour,
+                new MutableInt(other.unhandledRedstonePulseCount().intValue()),
+                new MutableBoolean(other.didSomething.booleanValue()),
+                other.hooks
         );
     }
 
-    public static ProgramContext createSimulationContext(
+    public static ProgramContext of(
             Program program,
             ManagerBlockEntity manager,
-            CableNetwork network,
+            ProgramBehaviour executionBehaviour,
+            ProgramHooks hooks
+    ) {
+
+        //noinspection OptionalGetWithoutIsPresent // program shouldn't be ticking if the network is bad
+        CableNetwork network = CableNetworkManager
+                .getOrRegisterNetworkFromManagerPosition(manager)
+                .get();
+        Level level = manager.getLevel();
+        assert level != null;
+
+        int unhandledRedstonePulseCount = manager.getUnprocessedRedstonePulseCount();
+        LabelPositionHolder labelPositionHolder = LabelPositionHolder.from(Objects.requireNonNull(manager.getDisk()));
+        TranslatableLogger logger = manager.logger;
+        return new ProgramContext(
+                logger, program,
+                labelPositionHolder, manager,
+                network,
+                level, new ArrayList<>(),
+                executionBehaviour,
+                new MutableInt(unhandledRedstonePulseCount),
+                new MutableBoolean(false),
+                hooks
+        );
+    }
+
+    public static ProgramContext createSimulationContext(
+            Program program,
             LabelPositionHolder labelPositionHolder,
             int redstonePulses,
             SimulateExploreAllPathsProgramBehaviour behaviour
     ) {
-        //noinspection DataFlowIssue,ConstantValue // simulation mode must be able to run without world access
         return new ProgramContext(
+                new TranslatableLogger("simulated@" + Objects.hash(program, labelPositionHolder, behaviour)),
                 program,
-                manager,
-                network,
-                manager.getLevel(),
-                redstonePulses,
-                behaviour,
                 labelPositionHolder,
-                new TranslatableLogger("simulated" + Objects.hash(program, labelPositionHolder, behaviour))
+                null,
+                null,
+                null,
+                new ArrayList<>(),
+                behaviour,
+                new MutableInt(redstonePulses),
+                new MutableBoolean(false),
+                ProgramHooks.EMPTY
         );
     }
 
-    public LabelPositionHolder getLabelPositionHolder() {
-
-        return LABEL_POSITIONS;
-    }
-
-    public ProgramBehaviour getBehaviour() {
-
-        return BEHAVIOUR;
-    }
-
-    public Program getProgram() {
-
-        return PROGRAM;
-    }
-
-    /**
-     * Copy the context, used in branch investigation.
-     * <p>
-     * This does not fork input statement state.
-     *
-     * @return shallow copy of this context
-     */
+    /// Copy this context, this is used in branch investigation.
+    /// This MUST NOT be used when {@link #inputs} is not empty.
     public ProgramContext fork() {
 
-        return new ProgramContext(this);
-    }
-
-    public int getRedstonePulses() {
-
-        return REDSTONE_PULSES;
+        ProgramContext programContext = new ProgramContext(this);
+        if (!programContext.inputs().isEmpty()) {
+            SFM.LOGGER.error("Forking program context with non-empty inputs list has occurred, this will result in a double-free causing desynchronizing in the SFM object pool!");
+            if (SFMEnvironmentUtils.isInIDE()) {
+                throw new IllegalStateException("Forking program context with non-empty inputs list");
+            }
+        }
+        return programContext;
     }
 
     public void free() {
 
-        INPUTS.forEach(InputStatement::freeSlots);
+        inputs.forEach(InputStatement::freeSlots);
     }
 
-
-    public ManagerBlockEntity getManager() {
-
-        return MANAGER;
-    }
-
-    public TranslatableLogger getLogger() {
-
-        return LOGGER;
-    }
 
     public void addInput(InputStatement input) {
 
-        INPUTS.add(input);
-    }
-
-    public List<InputStatement> getInputs() {
-
-        return INPUTS;
-    }
-
-
-    public CableNetwork getNetwork() {
-
-        return NETWORK;
-    }
-
-    @Override
-    public String toString() {
-
-        return "ProgramContext{" +
-               "PROGRAM=" + PROGRAM +
-               ", MANAGER=" + MANAGER +
-               ", NETWORK=" + NETWORK +
-               ", INPUTS=" + INPUTS +
-               ", LEVEL=" + LEVEL +
-               ", EXECUTION_POLICY=" + BEHAVIOUR +
-               ", REDSTONE_PULSES=" + REDSTONE_PULSES +
-               ", LABEL_POSITIONS=" + LABEL_POSITIONS +
-               ", did_something=" + did_something +
-               '}';
+        inputs.add(input);
     }
 
 }

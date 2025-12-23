@@ -42,7 +42,7 @@ public class SFMAutomaticEventSubscriber {
         // Create a display representation of the method for logging
         String methodDisplay = handlerMethodParentClass.getName() + "#" + annotationData.memberName();
 
-        // Discover the annotated method by correlating the name and descriptor
+        // Discover the annotated method by correlating the value and descriptor
         Method found = null;
         for (Method method : handlerMethodParentClass.getDeclaredMethods()) {
             String methodName = method.getName() + Type.getMethodDescriptor(method);

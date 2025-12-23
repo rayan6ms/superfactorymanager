@@ -3,7 +3,9 @@ package ca.teamdman.sfml.ast;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.program.SimulateExploreAllPathsProgramBehaviour;
 
-public record RedstoneTrigger(
+import java.util.List;
+
+public record RedstonePulseTrigger(
         Block block
 ) implements Trigger, ToStringCondensed {
     @Override
@@ -12,19 +14,29 @@ public record RedstoneTrigger(
     }
 
     @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of(block);
+    }
+
+    @Override
     public void tick(ProgramContext context) {
-        for (int i = 0; i < context.getRedstonePulses(); i++) {
+
+        for (int i = 0; i < context.unhandledRedstonePulseCount().intValue(); i++) {
             block.tick(context);
         }
-        if (context.getBehaviour() instanceof  SimulateExploreAllPathsProgramBehaviour simulation) {
+
+        if (context.behaviour() instanceof  SimulateExploreAllPathsProgramBehaviour simulation) {
             simulation.onTriggerDropped(context, this);
         }
     }
 
     @Override
     public boolean shouldTick(ProgramContext context) {
-        if (context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour) return true;
-        return context.getManager().getUnprocessedRedstonePulseCount() > 0;
+
+        if (context.behaviour() instanceof SimulateExploreAllPathsProgramBehaviour) return true;
+
+        return context.manager().getUnprocessedRedstonePulseCount() > 0;
     }
 
     @Override

@@ -7,19 +7,24 @@ import net.minecraft.core.BlockPos;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-public record LabelAccess(
-        List<Label> labels,
+public record ResourceAccess(
+        List<LabelExpression> labelExpressions,
+
+        RoundRobin roundRobin,
+
         SideQualifier sides,
-        NumberRangeSet slots,
-        RoundRobin roundRobin
+
+        SlotQualifier slots
 ) implements ASTNode {
     @Override
     public String toString() {
+
         StringBuilder builder = new StringBuilder();
-        builder.append(labels.stream().map(Objects::toString).collect(Collectors.joining(", ")));
-        if (roundRobin.isEnabled()) {
+        builder.append(labelExpressions.stream().map(Objects::toString).collect(Collectors.joining(", ")));
+        if (roundRobin.isModified()) {
             builder.append(" ").append(roundRobin);
         }
         if (!sides.equals(SideQualifier.NULL)) {
@@ -30,18 +35,30 @@ public record LabelAccess(
                                     .collect(Collectors.joining(", ")))
                     .append(" SIDE");
         }
-        if (slots.ranges().length > 0) {
-            if (slots.ranges().length != 1 || !slots.ranges()[0].equals(NumberRange.MAX_RANGE)) {
-                builder.append(" SLOTS");
-                for (NumberRange range : slots.ranges()) {
-                    builder.append(" ").append(range);
-                }
-            }
+        if (!slots.isDefault()) {
+            builder.append(slots);
         }
         return builder.toString();
     }
 
-    public ArrayList<Pair<Label, BlockPos>> getLabelledPositions(LabelPositionHolder labelPositionHolder) {
-        return roundRobin().getPositionsForLabels(labels(), labelPositionHolder);
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+        ArrayList<ASTNode> rtn = new ArrayList<>(labelExpressions.size() + 3);
+        rtn.addAll(labelExpressions);
+        rtn.add(roundRobin);
+        rtn.add(sides);
+        rtn.add(slots);
+        return rtn;
     }
+
+    public ArrayList<Pair<Label, BlockPos>> getLabelledPositions(LabelPositionHolder labelPositionHolder) {
+
+        return roundRobin().behaviour().getPositions(labelExpressions, labelPositionHolder);
+    }
+
+    public void visitLabels(Consumer<Label> consumer) {
+
+        labelExpressions.forEach(labelExpression -> labelExpression.visitLabels(consumer));
+    }
+
 }

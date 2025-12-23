@@ -17,7 +17,7 @@ import java.util.function.Predicate;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
-// resourceTypeName resourceNamespace, resourceTypeName name, resource resourceNamespace, resource name
+// resourceTypeName resourceNamespace, resourceTypeName value, resource resourceNamespace, resource value
 // sfm:item:minecraft:stone
 public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode, ToStringCondensed {
 
@@ -290,4 +290,11 @@ public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode, ToStringCo
     public boolean usesRegex() {
         return RegexCache.isRegexPattern(resourceNamespace) || RegexCache.isRegexPattern(resourceName);
     }
+
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of();
+    }
+
 }

@@ -2,6 +2,8 @@ package ca.teamdman.sfml.ast;
 
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 
+import java.util.List;
+
 public record With(
         WithClause condition,
         WithMode mode
@@ -31,8 +33,20 @@ public record With(
         };
     }
 
-    public enum WithMode {
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of(mode, condition);
+    }
+
+    public enum WithMode implements ASTNode {
         WITH,
-        WITHOUT
+        WITHOUT;
+
+        @Override
+        public List<? extends ASTNode> getChildNodes() {
+
+            return List.of();
+        }
     }
 }

@@ -62,6 +62,12 @@ public class TagMatcher implements Predicate<Object>, ASTNode {
         }
     }
 
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of();
+    }
+
     private boolean testPath(
             String checkNamespace,
             String[] checkPathElements

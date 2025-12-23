@@ -14,11 +14,11 @@ import java.util.function.Consumer;
 public record BoolHas(
         SetOperator setOperator,
 
-        LabelAccess labelAccess,
+        ResourceAccess resourceAccess,
 
         ComparisonOperator comparisonOperator,
 
-        long quantity,
+        Number quantity,
 
         ResourceIdSet resourceIdSet,
 
@@ -32,8 +32,9 @@ public record BoolHas(
 
         AtomicLong overallCount = new AtomicLong(0);
         List<Boolean> satisfactionResults = new ArrayList<>();
-        LabelPositionHolder labelPositionHolder = programContext.getLabelPositionHolder();
-        ArrayList<Pair<Label, BlockPos>> labelledPositions = labelAccess.getLabelledPositions(labelPositionHolder);
+
+        LabelPositionHolder labelPositionHolder = programContext.labelPositionHolder();
+        ArrayList<Pair<Label, BlockPos>> labelledPositions = resourceAccess.getLabelledPositions(labelPositionHolder);
         for (Pair<Label, BlockPos> entry : labelledPositions) {
             BlockPos pos = entry.getSecond();
             AtomicLong inThisInv = new AtomicLong(0);
@@ -46,10 +47,10 @@ public record BoolHas(
                         resourceType
                 );
             }
-            satisfactionResults.add(comparisonOperator.test(inThisInv.get(), quantity));
+            satisfactionResults.add(comparisonOperator.test(inThisInv.get(), quantity.value()));
         }
 
-        var isOverallSatisfied = this.comparisonOperator.test(overallCount.get(), this.quantity);
+        var isOverallSatisfied = this.comparisonOperator.test(overallCount.get(), this.quantity.value());
         return setOperator.test(isOverallSatisfied, satisfactionResults);
     }
 
@@ -58,7 +59,7 @@ public record BoolHas(
 
         return setOperator
                + " "
-               + labelAccess
+               + resourceAccess
                + " HAS "
                + comparisonOperator
                + " "
@@ -75,9 +76,23 @@ public record BoolHas(
             Consumer<BlockPos> posConsumer
     ) {
 
-        labelAccess
-                .getLabelledPositions(context.getLabelPositionHolder())
+        resourceAccess
+                .getLabelledPositions(context.labelPositionHolder())
                 .forEach(entry -> posConsumer.accept(entry.getSecond()));
+    }
+
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of(
+                setOperator,
+                resourceAccess,
+                comparisonOperator,
+                quantity,
+                resourceIdSet,
+                with,
+                except
+        );
     }
 
     private <STACK, ITEM, CAP> void accumulate(
@@ -89,18 +104,22 @@ public record BoolHas(
     ) {
 
         resourceType.forEachDirectionalCapability(
-                programContext,
-                labelAccess.sides(),
+                programContext.logger(),
+                programContext.level(),
+                programContext.network(),
+                resourceAccess.sides(),
                 pos,
-                (direction, cap) -> resourceType.getStacksInSlots(cap, labelAccess.slots()).forEach(stack -> {
-                    if (this.resourceIdSet.getMatchingFromStack(stack) != null) {
-                        if (with.matchesStack(resourceType, stack)) {
-                            long amount = resourceType.getAmount(stack);
-                            invAccumulator.addAndGet(amount);
-                            overallAccumulator.addAndGet(amount);
-                        }
-                    }
-                })
+                (direction, cap) -> resourceType
+                        .getStacksInSlots(cap, resourceAccess.slots().numberSet())
+                        .forEach(stack -> {
+                            if (this.resourceIdSet.getMatchingFromStack(stack) != null) {
+                                if (with.matchesStack(resourceType, stack)) {
+                                    long amount = resourceType.getAmount(stack);
+                                    invAccumulator.addAndGet(amount);
+                                    overallAccumulator.addAndGet(amount);
+                                }
+                            }
+                        })
         );
     }
 

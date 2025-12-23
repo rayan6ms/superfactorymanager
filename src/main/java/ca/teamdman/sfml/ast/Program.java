@@ -38,7 +38,7 @@ public record Program(
         Set<String> referencedLabels,
 
         Set<ResourceIdentifier<?, ?, ?>> referencedResources
-) implements Statement {
+) implements Tickable {
     /**
      * This comes from {@link java.io.DataOutputStream#writeUTF(String, DataOutput)}
      * and {@link NetworkHooks#openScreen(ServerPlayer, MenuProvider, Consumer)}
@@ -59,7 +59,7 @@ public record Program(
      */
     public boolean tick(ManagerBlockEntity manager) {
 
-        var context = new ProgramContext(this, manager, new ExecuteProgramBehaviour());
+        var context = ProgramContext.of(this, manager, new ExecuteProgramBehaviour(), ProgramHooks.EMPTY);
 
         // log if there are unprocessed redstone pulses
         int unprocessedRedstonePulseCount = manager.getUnprocessedRedstonePulseCount();
@@ -73,13 +73,12 @@ public record Program(
 
         manager.clearRedstonePulseQueue();
 
-        return context.didSomething();
+        return context.didSomething().booleanValue();
     }
 
     @Override
-    public List<Statement> getStatements() {
-        //noinspection unchecked
-        return (List<Statement>) (List<? extends Statement>) triggers;
+    public List<Trigger> getChildNodes() {
+        return triggers;
     }
 
     @Override
@@ -95,16 +94,18 @@ public record Program(
             }
 
             // Set flag and log on first trigger
-            if (!context.didSomething()) {
-                context.setDidSomething(true);
-                context.getLogger().trace(getTraceLogWriter(context));
-                context.getLogger().debug(debug -> debug.accept(LocalizationKeys.LOG_PROGRAM_TICK.get()));
+            if (!context.didSomething().booleanValue()) {
+                context.didSomething().setTrue();
+
+                context.logger().trace(getTraceLogWriter(context));
+
+                context.logger().debug(debug -> debug.accept(LocalizationKeys.LOG_PROGRAM_TICK.get()));
             }
 
             // Log pretty triggers
             if (triggers instanceof ToStringCondensed ss) {
-                context
-                        .getLogger()
+
+                context.logger()
                         .debug(x -> x.accept(LocalizationKeys.LOG_PROGRAM_TICK_TRIGGER_STATEMENT.get(
                                 ss.toStringCondensed())));
             }
@@ -113,7 +114,8 @@ public record Program(
             SFMInstant start = SFMInstant.now();
 
             // Perform tick
-            if (context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
+
+            if (context.behaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
                 int maxConditionCount = SFMConfig.getOrDefault(SFMConfig.SERVER_CONFIG.maxIfStatementsInTriggerBeforeSimulationIsntAllowed);
                 int conditionCount = trigger.getConditionCount();
                 if (conditionCount <= maxConditionCount) {
@@ -122,10 +124,12 @@ public record Program(
                         ProgramContext forkedContext = context.fork();
                         trigger.tick(forkedContext);
                         forkedContext.free();
-                        ((SimulateExploreAllPathsProgramBehaviour) forkedContext.getBehaviour()).terminatePathAndBeginAnew();
+
+                        ((SimulateExploreAllPathsProgramBehaviour) forkedContext.behaviour()).terminatePathAndBeginAnew();
                     }
                 } else {
-                    context.getLogger().warn(LocalizationKeys.PROGRAM_WARNING_TOO_MANY_CONDITIONS.get(
+
+                    context.logger().warn(LocalizationKeys.PROGRAM_WARNING_TOO_MANY_CONDITIONS.get(
                             trigger.toString(),
                             conditionCount,
                             maxConditionCount
@@ -142,7 +146,8 @@ public record Program(
             Duration elapsed = start.elapsed();
 
             // Log trigger time
-            context.getLogger().info(x -> x.accept(LocalizationKeys.PROGRAM_TICK_TRIGGER_TIME_MS.get(
+
+            context.logger().info(x -> x.accept(LocalizationKeys.PROGRAM_TICK_TRIGGER_TIME_MS.get(
                     elapsed.toMillis(),
                     trigger.toString()
             )));
@@ -151,7 +156,7 @@ public record Program(
         LimitedInputSlotObjectPool.checkInvariant();
         LimitedOutputSlotObjectPool.checkInvariant();
 
-        if (context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
+        if (context.behaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
             simulation.onProgramFinished(context, this);
         }
     }
@@ -187,13 +192,13 @@ public record Program(
             throw new IllegalArgumentException(
                     "Mutation is not allowed on this Program object because it is cached! Program = " + this);
         }
-        Deque<Statement> toPatch = new ArrayDeque<>();
+        Deque<ASTNode> toPatch = new ArrayDeque<>();
         toPatch.add(this);
         while (!toPatch.isEmpty()) {
-            Statement statement = toPatch.pollFirst();
-            List<Statement> children = statement.getStatements();
+            ASTNode statement = toPatch.pollFirst();
+            List<? extends ASTNode> children = statement.getChildNodes();
             for (int i = 0; i < children.size(); i++) {
-                Statement child = children.get(i);
+                ASTNode child = children.get(i);
                 if (child == oldStatement) {
                     children.set(i, newStatement);
                 } else {
@@ -208,12 +213,12 @@ public record Program(
         return trace -> {
             trace.accept(LocalizationKeys.LOG_CABLE_NETWORK_DETAILS_HEADER_1.get());
             trace.accept(LocalizationKeys.LOG_CABLE_NETWORK_DETAILS_HEADER_2.get());
-            Level level = context
-                    .getManager()
+
+            Level level = context.manager()
                     .getLevel();
             //noinspection DataFlowIssue
-            context
-                    .getNetwork()
+
+            context.network()
                     .getCablePositions()
                     .map(pos -> "- "
                                 + pos.toString()
@@ -225,8 +230,8 @@ public record Program(
                             body)));
             trace.accept(LocalizationKeys.LOG_CABLE_NETWORK_DETAILS_HEADER_3.get());
             //noinspection DataFlowIssue
-            context
-                    .getNetwork()
+
+            context.network()
                     .getCapabilityProviderPositions()
                     .map(pos -> "- " + pos.toString() + " " + level
                             .getBlockState(pos))
@@ -236,8 +241,8 @@ public record Program(
 
             trace.accept(LocalizationKeys.LOG_LABEL_POSITION_HOLDER_DETAILS_HEADER.get());
             //noinspection DataFlowIssue
-            context
-                    .getLabelPositionHolder()
+
+            context.labelPositionHolder()
                     .labels()
                     .forEach((label, positions) -> positions
                             .stream()

@@ -2,6 +2,8 @@ package ca.teamdman.sfml.ast;
 
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 
+import java.util.List;
+
 public final class WithAlwaysTrue implements WithClause {
     @Override
     public <STACK> boolean matchesStack(
@@ -15,4 +17,11 @@ public final class WithAlwaysTrue implements WithClause {
     public String toString() {
         return "(ALWAYS => TRUE)";
     }
+
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of();
+    }
+
 }

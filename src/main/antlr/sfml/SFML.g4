@@ -1,3 +1,10 @@
+// GOALS:
+// - label tag operations; INPUT FROM * WITH ID "*phyto*"
+// - test binary operator precidence for sets and numeric expressions; https://stackoverflow.com/questions/64257414/antlr4-operator-precedence-changes
+// - OUTPUT 5 BUNDLES OF 3 SAME *shard*, 1 stick TO EMPTY infuser
+// - OUTPUT 5 BUNDLES OF 1 *seed* IN SLOT 0, 1 *ingot* TO EMPTY altar
+// -- bundles, EMPTY qualifier, IN SLOT(s) qualifier
+
 grammar SFML;
 @header {
 package ca.teamdman.langs;
@@ -10,66 +17,74 @@ program : name? trigger* EOF;
 
 name: NAME string ;
 
-//
-// TRIGGERS
-//
-
 trigger : EVERY interval DO block END           #TimerTrigger
         | EVERY REDSTONE PULSE DO block END     #PulseTrigger
         ;
 
-interval: NUMBER? GLOBAL? (PLUS NUMBER)? (TICKS | TICK | SECONDS | SECOND)      # IntervalSpace
-        | NUMBER_WITH_G_SUFFIX (PLUS NUMBER)? (TICKS | TICK | SECONDS | SECOND) # IntervalNoSpace;
+interval: numberExpression? GLOBAL? durationUnit (OFFSET BY numberExpression durationUnit?)?;
+durationUnit: (TICKS | TICK | SECONDS | SECOND);
 
-//
-// BLOCK STATEMENT
-//
+numberExpression  : NUMBER                                      # NumberExpressionLiteral
+                  | LPAREN numberExpression RPAREN              # NumberExpressionParen
+                  | numberExpression CARET numberExpression     # NumberExpressionExponential
+                  | numberExpression ASTERISK numberExpression  # NumberExpressionMultiplication
+                  | numberExpression SLASH numberExpression     # NumberExpressionDivision
+                  | numberExpression PLUS numberExpression      # NumberExpressionAddition
+                  | numberExpression DASH numberExpression      # NumberExpressionSubtraction
+                  | numberExpression PERCENT numberExpression   # NumberExpressionModulus
+                  ;
 
-block           : statement* ;
+block           : statement*;
 statement       : inputStatement
                 | outputStatement
                 | ifStatement
                 | forgetStatement
                 ;
 
-// IO STATEMENT
-forgetStatement : FORGET label? (COMMA label)* COMMA?;
-inputStatement  : INPUT inputResourceLimits? resourceExclusion? FROM EACH? labelAccess
-                | FROM EACH? labelAccess INPUT inputResourceLimits? resourceExclusion?
+inputStatement  : INPUT inputResourceLimits? resourceExclusion? FROM EACH? resourceAccess
+                | FROM EACH? resourceAccess INPUT inputResourceLimits? resourceExclusion?
                 ;
-outputStatement : OUTPUT outputResourceLimits? resourceExclusion? TO emptyslots? EACH? labelAccess
-                | TO emptyslots? EACH? labelAccess OUTPUT outputResourceLimits? resourceExclusion?
+outputStatement : OUTPUT outputResourceLimits? resourceExclusion? TO emptyslots? EACH? resourceAccess
+                | TO emptyslots? EACH? resourceAccess OUTPUT outputResourceLimits? resourceExclusion?
+                ;
+
+forgetStatement : FORGET label? (COMMA label)* COMMA?;
+
+label           : (identifier)  #RawLabel
+                | string        #StringLabel
                 ;
 
 inputResourceLimits   : resourceLimitList; // separate for different defaults
 outputResourceLimits  : resourceLimitList; // separate for different defaults
 
-resourceLimitList  : resourceLimit (COMMA resourceLimit)* COMMA?;
-resourceLimit   : limit? resourceIdDisjunction with?
-                | limit with?
-                | with
-                ;
-limit           : quantity retention    #QuantityRetentionLimit
-                | retention             #RetentionLimit
-                | quantity              #QuantityLimit
-                ;
+resourceLimitList   : resourceLimit (COMMA resourceLimit)* COMMA?;
+resourceLimit       : limit? resourceIdDisjunction with?
+                    | limit with?
+                    | with
+                    ;
 
-quantity        : number EACH?;
-retention       : RETAIN number EACH?;
+limit   : quantity retention    #QuantityRetentionLimit
+        | retention             #RetentionLimit
+        | quantity              #QuantityLimit
+        ;
 
-resourceExclusion       : EXCEPT resourceIdList;
+quantity        : numberExpression EACH?;
+retention       : RETAIN numberExpression EACH?;
 
-resourceId      : (identifier) (COLON (identifier)? (COLON (identifier)? (COLON (identifier)?)?)?)? # Resource
-                | string                                                                            # StringResource
-                ;
+resourceExclusion : EXCEPT resourceIdList;
+
+resourceId  : (identifier) (COLON (identifier)? (COLON (identifier)? (COLON (identifier)?)?)?)? # Resource
+            | string                                                                            # StringResource
+            ;
 
 resourceIdList          : resourceId (COMMA resourceId)* COMMA?;
 resourceIdDisjunction   : resourceId (OR resourceId)* OR?;
 
 
-with        : WITH withClause
-            | WITHOUT withClause
-            ;
+with    : WITH withClause
+        | WITHOUT withClause
+        ;
+
 withClause  : LPAREN withClause RPAREN           # WithParen
             | NOT withClause                     # WithNegation
             | withClause AND withClause          # WithConjunction
@@ -81,29 +96,6 @@ tagMatcher  : identifier COLON identifier (SLASH identifier)*
             | identifier (SLASH identifier)*
             ;
 
-
-sidequalifier   : EACH SIDE                  #EachSide
-                | side (COMMA side)* SIDE    #ListedSides
-                ;
-
-side            : TOP
-                | BOTTOM
-                | NORTH
-                | EAST
-                | SOUTH
-                | WEST
-                | LEFT
-                | RIGHT
-                | FRONT
-                | BACK
-                | NULL
-                ;
-
-slotqualifier   : (SLOTS | SLOT) rangeset;
-rangeset        : range (COMMA range)*;
-range           : number (DASH number)? ;
-
-
 ifStatement     : IF boolexpr THEN block (ELSE IF boolexpr THEN block)* (ELSE block)? END;
 boolexpr        : TRUE                              #BooleanTrue
                 | FALSE                             #BooleanFalse
@@ -111,8 +103,8 @@ boolexpr        : TRUE                              #BooleanTrue
                 | NOT boolexpr                      #BooleanNegation
                 | boolexpr AND boolexpr             #BooleanConjunction
                 | boolexpr OR boolexpr              #BooleanDisjunction
-                | setOp? labelAccess HAS comparisonOp number resourceIdDisjunction? with? (EXCEPT resourceIdList)?  #BooleanHas
-                | REDSTONE (comparisonOp number)?   #BooleanRedstone
+                | setOp? resourceAccess HAS comparisonOp numberExpression resourceIdDisjunction? with? (EXCEPT resourceIdList)?  #BooleanHas
+                | REDSTONE (comparisonOp numberExpression)?   #BooleanRedstone
                 ;
 
 comparisonOp    : GT
@@ -134,19 +126,38 @@ setOp           : OVERALL
                 | LONE
                 ;
 
+resourceAccess : labelExpression (COMMA labelExpression)* roundrobin? sideQualifier? slotQualifier?;
 
-
-
-
-//
-// IO HELPERS
-//
-labelAccess     : label (COMMA label)* roundrobin? sidequalifier? slotqualifier?;
-roundrobin      : ROUND ROBIN BY (LABEL | BLOCK);
-
-label           : (identifier)  #RawLabel
-                | string        #StringLabel
+labelExpression : label                                      # LabelExpressionSingle
+                | LPAREN labelExpression RPAREN              # LabelExpressionParen
+                | labelExpression EXCEPT    labelExpression  # LabelExpressionExclusion
+                | labelExpression INTERSECT labelExpression  # LabelExpressionIntersection
+                | labelExpression UNION     labelExpression  # LabelExpressionUnion
                 ;
+
+roundrobin : ROUND ROBIN BY (LABEL | BLOCK);
+
+sideQualifier   : ALL (SIDE|SIDES)                      #AllSides
+                | EACH? side (COMMA side)* (SIDE|SIDES) #ListedSides
+                ;
+
+side            : TOP
+                | BOTTOM
+                | NORTH
+                | EAST
+                | SOUTH
+                | WEST
+                | LEFT
+                | RIGHT
+                | FRONT
+                | BACK
+                | NULL
+                ;
+
+slotQualifier   : EACH? (SLOTS | SLOT) numberSet;
+numberSet       : numberRange (COMMA numberRange)*;
+numberRange     : NOT? numberExpression (DASH numberExpression)? ;
+
 
 emptyslots      : EMPTY (SLOTS | SLOT) IN ;
 
@@ -154,7 +165,6 @@ identifier : (IDENTIFIER | REDSTONE | GLOBAL | SECOND | SECONDS | TOP | BOTTOM |
 
 // GENERAL
 string: STRING ;
-number: NUMBER ;
 
 
 
@@ -199,10 +209,13 @@ INPUT   : I N P U T ;
 OUTPUT  : O U T P U T ;
 WHERE   : W H E R E ;
 SLOTS   : S L O T S ;
-SLOT   : S L O T ;
+SLOT    : S L O T ;
 RETAIN  : R E T A I N ;
 EACH    : E A C H ;
+ALL     : A N Y ;
 EXCEPT  : E X C E P T ;
+INTERSECT  : I N T E R S E C T ;
+UNION   : U N I O N ;
 FORGET  : F O R G E T ;
 EMPTY   : E M P T Y ;
 IN      : I N ;
@@ -227,6 +240,7 @@ NORTH   : N O R T H ;
 EAST    : E A S T ;
 SOUTH   : S O U T H ;
 WEST    : W E S T ;
+SIDES   : S I D E S ;
 SIDE    : S I D E ;
 LEFT    : L E F T ;
 RIGHT   : R I G H T ;
@@ -241,7 +255,7 @@ TICK    : T I C K ;
 SECONDS : S E C O N D S ;
 SECOND  : S E C O N D ;
 GLOBAL  : (G L O B A L) | G;
-PLUS    : '+' | P L U S;
+OFFSET : O F F S E T ;
 
 // REDSTONE TRIGGER
 REDSTONE        : R E D S T O N E ;
@@ -260,13 +274,15 @@ COMMA   : ',';
 COLON   : ':';
 SLASH   : '/';
 DASH    : '-';
+PERCENT : '%';
+CARET   : '^';
+PLUS    : '+';
 LPAREN  : '(';
 RPAREN  : ')';
+ASTERISK: '*';
 
-
-NUMBER_WITH_G_SUFFIX    : [0-9]+[gG] ;
 NUMBER                  : [0-9]+ ;
-IDENTIFIER              : [a-zA-Z_*][a-zA-Z0-9_*]* | '*'; // Note that the * in the square brackets is a literl
+IDENTIFIER              : [a-zA-Z_*][a-zA-Z0-9_*]* | ASTERISK; // Note that the * in the square brackets is a literl
 
 STRING : '"' (~'"'|'\\"')* '"' ;
 

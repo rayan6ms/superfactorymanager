@@ -71,11 +71,11 @@ public class CodegenTests {
 
     @Test
     public void codegen() {
-        var aLabel = new LabelAccess(
+
+        var aLabel = new ResourceAccess(
                 List.of(new Label("a")),
-                SideQualifier.NULL,
-                NumberRangeSet.MAX_RANGE,
-                RoundRobin.disabled()
+                new RoundRobin(RoundRobinBehaviour.UNMODIFIED), SideQualifier.NULL,
+                NumberSet.MAX_RANGE
         );
         var program = new Program(
                 new ASTBuilder(),

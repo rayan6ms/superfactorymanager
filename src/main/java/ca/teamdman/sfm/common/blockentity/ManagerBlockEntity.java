@@ -89,14 +89,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
     ) {
 
         super(pType, blockPos, blockState);
-        // Logger name should be unique to (isClient,managerpos)
-        // We can't check isClient here, so instead to guarantee uniqueness we can just use hash
-        // This is necessary because setLogLevel in game tests will get clobbered when the client constructs the block entity
-        // so the name must be unique so that the client default logger construction doesn't overwrite changes to the server logger
-        String loggerName = SFM.MOD_ID
-                            + ":manager@"
-                            + blockPos.toShortString() + "@" + Integer.toHexString(System.identityHashCode(this));
-        logger = new TranslatableLogger(loggerName);
+        logger = new TranslatableLogger(TranslatableLogger.createName(blockPos, this));
     }
 
     @Override

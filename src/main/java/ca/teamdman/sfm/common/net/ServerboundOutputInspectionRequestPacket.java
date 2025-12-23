@@ -4,8 +4,9 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.program.LimitedInputSlot;
 import ca.teamdman.sfm.common.program.ProgramContext;
+import ca.teamdman.sfm.common.program.ProgramHooks;
 import ca.teamdman.sfm.common.program.SimulateExploreAllPathsProgramBehaviour;
-import ca.teamdman.sfm.common.program.SimulateExploreAllPathsProgramBehaviour.Branch;
+import ca.teamdman.sfm.common.program.SimulateExploreAllPathsProgramBehaviour.BranchPathElement;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
@@ -17,6 +18,7 @@ import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
 import org.antlr.v4.runtime.misc.Pair;
+import org.apache.commons.lang3.NotImplementedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,10 +45,11 @@ public record ServerboundOutputInspectionRequestPacket(
         payload.append("-- predictions may differ from actual execution results\n");
 
         AtomicInteger branchCount = new AtomicInteger(0);
+        throw new NotImplementedException("todo: use hooks here");
         successProgram.replaceOutputStatement(
                 outputStatement,
                 new OutputStatement(
-                        outputStatement.labelAccess(),
+                        outputStatement.resourceAccess(),
                         outputStatement.resourceLimits(),
                         outputStatement.each(),
                         outputStatement.emptySlotsOnly()
@@ -54,7 +57,7 @@ public record ServerboundOutputInspectionRequestPacket(
                     @Override
                     public void tick(ProgramContext context) {
 
-                        if (!(context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour behaviour)) {
+                        if (!(context.behaviour() instanceof SimulateExploreAllPathsProgramBehaviour behaviour)) {
                             throw new IllegalStateException(
                                     "Expected behaviour to be SimulateExploreAllPathsProgramBehaviour");
                         }
@@ -64,12 +67,12 @@ public record ServerboundOutputInspectionRequestPacket(
                                 .append("-- POSSIBILITY ")
                                 .append(branchCount.getAndIncrement())
                                 .append(" --");
-                        if (behaviour.getCurrentPath().streamBranches().allMatch(Branch::wasTrue)) {
+                        if (behaviour.getCurrentPath().streamBranches().allMatch(BranchPathElement::wasTrue)) {
                             payload.append(" all true\n");
                         } else if (behaviour
                                 .getCurrentPath()
                                 .streamBranches()
-                                .allMatch(Predicate.not(Branch::wasTrue))) {
+                                .allMatch(Predicate.not(BranchPathElement::wasTrue))) {
                             payload.append(" all false\n");
                         } else {
                             payload.append('\n');
@@ -92,14 +95,14 @@ public record ServerboundOutputInspectionRequestPacket(
 
 
                         branchPayload.append("-- predicted inputs:\n");
-                        List<Pair<LimitedInputSlot<?, ?, ?>, LabelAccess>> inputSlots = new ArrayList<>();
-                        context
-                                .getInputs()
+                        List<Pair<LimitedInputSlot<?, ?, ?>, ResourceAccess>> inputSlots = new ArrayList<>();
+
+                        context.inputs()
                                 .forEach(inputStatement -> inputStatement.gatherSlots(
                                         context,
                                         slot -> inputSlots.add(new Pair<>(
                                                 slot,
-                                                inputStatement.labelAccess()
+                                                inputStatement.resourceAccess()
                                         ))
                                 ));
                         List<InputStatement> inputStatements = inputSlots.stream()
@@ -194,15 +197,15 @@ public record ServerboundOutputInspectionRequestPacket(
                                         } else {
                                             iter.set(resourceLimit.withLimit(new Limit(
                                                     new ResourceQuantity(
-                                                            new Number(Long.min(
+                                                            resourceLimit.limit().quantity()
+                                                                    .idExpansionBehaviour(), new Number(Long.min(
                                                                     accept,
                                                                     resourceLimit
                                                                             .limit()
                                                                             .quantity()
                                                                             .number()
                                                                             .value()
-                                                            )), resourceLimit.limit().quantity()
-                                                                    .idExpansionBehaviour()
+                                                            ))
                                                     ),
                                                     ResourceQuantity.MAX_QUANTITY
                                             )));
@@ -219,7 +222,7 @@ public record ServerboundOutputInspectionRequestPacket(
                             } else {
                                 branchPayload
                                         .append(new OutputStatement(
-                                                outputStatement.labelAccess(),
+                                                outputStatement.resourceAccess(),
                                                 condensedResourceLimits,
                                                 outputStatement.each(),
                                                 outputStatement.emptySlotsOnly()
@@ -233,10 +236,11 @@ public record ServerboundOutputInspectionRequestPacket(
                 }
         );
 
-        successProgram.tick(new ProgramContext(
+        successProgram.tick(ProgramContext.of(
                 successProgram,
                 manager,
-                new SimulateExploreAllPathsProgramBehaviour()
+                new SimulateExploreAllPathsProgramBehaviour(),
+                ProgramHooks.EMPTY
         ));
 
         return payload.toString().strip();
@@ -262,7 +266,7 @@ public record ServerboundOutputInspectionRequestPacket(
         long remainingObligation = limitedInputSlot.tracker.getRemainingRetentionObligation(resourceType, stack);
         amount -= Long.min(amount, remainingObligation);
         Limit amountLimit = new Limit(
-                new ResourceQuantity(new Number(amount), ResourceQuantity.IdExpansionBehaviour.NO_EXPAND),
+                new ResourceQuantity(ResourceQuantity.IdExpansionBehaviour.NO_EXPAND, new Number(amount)),
                 ResourceQuantity.MAX_QUANTITY
         );
         ResourceLocation stackId = resourceType.getRegistryKeyForStack(stack);

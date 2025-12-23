@@ -8,7 +8,6 @@ import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -25,7 +24,7 @@ import java.util.stream.Collectors;
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.*;
 
 public class OutputStatement implements IOStatement {
-    private final LabelAccess labelAccess;
+    private final ResourceAccess resourceAccess;
     private final ResourceLimits resourceLimits;
     private final boolean each;
     private final boolean emptySlotsOnly;
@@ -34,12 +33,12 @@ public class OutputStatement implements IOStatement {
     private int lastOutputCapacity = 32;
 
     public OutputStatement(
-            LabelAccess labelAccess,
+            ResourceAccess resourceAccess,
             ResourceLimits resourceLimits,
             boolean each,
             boolean emptySlotsOnly
     ) {
-        this.labelAccess = labelAccess;
+        this.resourceAccess = resourceAccess;
         this.resourceLimits = resourceLimits;
         this.each = each;
         this.emptySlotsOnly = emptySlotsOnly;
@@ -61,11 +60,13 @@ public class OutputStatement implements IOStatement {
             LimitedInputSlot<STACK, ITEM, CAP> source,
             LimitedOutputSlot<STACK, ITEM, CAP> destination
     ) {
-        context.getLogger().trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_BEGIN.get(source, destination)));
+
+        context.logger().trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_BEGIN.get(source, destination)));
         // always ensure types match
         // items and fluids are incompatible, etc
         if (!source.type.equals(destination.type)) {
-            context.getLogger().trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_TYPE_MISMATCH.get()));
+
+            context.logger().trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_TYPE_MISMATCH.get()));
             return;
         }
         ResourceType<STACK, ITEM, CAP> resourceType = source.type;
@@ -78,8 +79,8 @@ public class OutputStatement implements IOStatement {
 
         // ensure the output slot allows this item
         if (!destination.tracker.matchesStack(extractPotential)) {
-            context
-                    .getLogger()
+
+            context.logger()
                     .trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_DESTINATION_TRACKER_REJECT.get()));
             return;
         }
@@ -112,8 +113,8 @@ public class OutputStatement implements IOStatement {
                     source.pos,
                     dedicatingToObligation
             );
-            context
-                    .getLogger()
+
+            context.logger()
                     .trace(x -> {
                         long newRemainingObligation = remainingObligation - dedicatingToObligation;
                         x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_RETENTION_OBLIGATION.get(
@@ -125,8 +126,8 @@ public class OutputStatement implements IOStatement {
 
         // if we can't move anything after our retention obligations, we're done
         if (amountAvailableToMove <= 0) {
-            context
-                    .getLogger()
+
+            context.logger()
                     .trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_RETENTION_OBLIGATION_NO_MOVE.get()));
             source.setDone();
             return;
@@ -150,8 +151,8 @@ public class OutputStatement implements IOStatement {
                     + ")."
             );
         } else if (amountThatFitsInDestination == 0) {
-            context
-                    .getLogger()
+
+            context.logger()
                     .trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_ZERO_SIMULATED_MOVEMENT.get(
                             potentialRemainder,
                             extractPotential
@@ -175,8 +176,8 @@ public class OutputStatement implements IOStatement {
         amountAvailableToMove = Math.min(amountAvailableToMove, maxStackSize);
         {
             long logToMove = amountAvailableToMove;
-            context
-                    .getLogger()
+
+            context.logger()
                     .trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_STACK_LIMIT_NEW_TO_MOVE.get(
                             destinationAmountLimit,
                             sourceAmountLimit,
@@ -187,14 +188,15 @@ public class OutputStatement implements IOStatement {
 
         // check if we can move anything at all
         if (amountAvailableToMove <= 0) {
-            context.getLogger().trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_ZERO_TO_MOVE.get()));
+
+            context.logger().trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_ZERO_TO_MOVE.get()));
             return;
         }
 
         // extract item for real
         STACK extracted = source.extract(amountAvailableToMove);
-        context
-                .getLogger()
+
+        context.logger()
                 .debug(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_EXTRACTED.get(extracted, source)));
 
         // insert item for real
@@ -206,8 +208,8 @@ public class OutputStatement implements IOStatement {
         destination.tracker.trackTransfer(resourceType, extracted, moved);
 
         // log
-        context
-                .getLogger()
+
+        context.logger()
                 .info(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_END.get(
                         moved,
                         resourceType.getRegistryKeyForStack(extracted),
@@ -221,7 +223,8 @@ public class OutputStatement implements IOStatement {
         if (!resourceType.isEmpty(extractedRemainder)) {
             ResourceLocation resourceTypeName = SFMResourceTypes.registry().getId(resourceType);
             String stackName = resourceType.getItem(extractPotential).toString();
-            Level level = context.getManager().getLevel();
+
+            Level level = context.manager().getLevel();
             assert level != null;
             StringBuilder report = new StringBuilder();
             report.append("!!!RESOURCE LOSS HAS OCCURRED!!!");
@@ -269,7 +272,8 @@ public class OutputStatement implements IOStatement {
                     .append(" (")
                     .append(level)
                     .append(")\n");
-            report.append("Position: ").append(context.getManager().getBlockPos()).append("\n");
+
+            report.append("Position: ").append(context.manager().getBlockPos()).append("\n");
 
             report.append("=== Input Slot ===\n");
             addSlotDetailsToReport(report, source, level);
@@ -277,7 +281,7 @@ public class OutputStatement implements IOStatement {
             report.append("=== Output Slot ===\n");
             addSlotDetailsToReport(report, destination, level);
 
-            context.getLogger().error(x -> x.accept(LOG_PROGRAM_VOIDED_RESOURCES.get(report.toString())));
+            context.logger().error(x -> x.accept(LOG_PROGRAM_VOIDED_RESOURCES.get(report.toString())));
             if (SFMConfig.SERVER_CONFIG.logResourceLossToConsole.get()) {
                 report.append("\nThis can be silenced in the SFM config.\n");
                 report.append(
@@ -301,12 +305,13 @@ public class OutputStatement implements IOStatement {
     @Override
     public void tick(ProgramContext context) {
         // Log the output statement
-        context
-                .getLogger()
+
+        context.logger()
                 .debug(x -> x.accept(LocalizationKeys.LOG_PROGRAM_TICK_OUTPUT_STATEMENT.get(this.toString())));
 
         // Skip if simulating
-        if (context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour behaviour) {
+
+        if (context.behaviour() instanceof SimulateExploreAllPathsProgramBehaviour behaviour) {
             behaviour.onOutputStatementExecution(context, this);
             return;
         }
@@ -319,7 +324,8 @@ public class OutputStatement implements IOStatement {
         // gather the input slots from all the input statements, +27 to hopefully avoid resizing
         //noinspection rawtypes
         ArrayDeque<LimitedInputSlot> inputSlots = new ArrayDeque<>(lastInputCapacity + 27);
-        for (var inputStatement : context.getInputs()) {
+
+        for (var inputStatement : context.inputs()) {
             inputStatement.gatherSlots(context, inputSlots::add);
         }
 
@@ -327,15 +333,15 @@ public class OutputStatement implements IOStatement {
         lastInputCapacity = inputSlots.size();
 
         // Log the number of input slots
-        context
-                .getLogger()
+
+        context.logger()
                 .info(x -> x.accept(LOG_PROGRAM_TICK_OUTPUT_STATEMENT_DISCOVERED_INPUT_SLOT_COUNT.get(inputSlots.size())));
 
         // Short-circuit if we have nothing to move
         if (inputSlots.isEmpty()) {
             // Log the short-circuit
-            context
-                    .getLogger()
+
+            context.logger()
                     .debug(x -> x.accept(LOG_PROGRAM_TICK_OUTPUT_STATEMENT_SHORT_CIRCUIT_NO_INPUT_SLOTS.get()));
 
             // Stop processing
@@ -355,15 +361,15 @@ public class OutputStatement implements IOStatement {
         lastOutputCapacity = outputSlots.size();
 
         // Log the number of output slots
-        context
-                .getLogger()
+
+        context.logger()
                 .info(x -> x.accept(LOG_PROGRAM_TICK_OUTPUT_STATEMENT_DISCOVERED_OUTPUT_SLOT_COUNT.get(outputSlots.size())));
 
         // Short-circuit if we have nothing to move
         if (outputSlots.isEmpty()) {
             // Log the short-circuit
-            context
-                    .getLogger()
+
+            context.logger()
                     .debug(x -> x.accept(LOG_PROGRAM_TICK_OUTPUT_STATEMENT_SHORT_CIRCUIT_NO_OUTPUT_SLOTS.get()));
 
             // Free the output slots (we acquired no slots but the assertion is still valid)
@@ -432,62 +438,80 @@ public class OutputStatement implements IOStatement {
             ProgramContext context,
             Consumer<LimitedOutputSlot<?, ?, ?>> slotConsumer
     ) {
-        context.getLogger().debug(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS.get(toStringPretty())));
+
+        context.logger().debug(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS.get(toStringPretty())));
 
         if (!each) {
-            context.getLogger().debug(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_NOT_EACH.get()));
+
+            context.logger().debug(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_NOT_EACH.get()));
             // create a single list of trackers to be shared between all limited slots
             List<IOutputResourceTracker> outputTracker = resourceLimits.createOutputTrackers();
             for (var resourceType : resourceLimits.getReferencedResourceTypes()) {
-                context
-                        .getLogger()
+
+                context.logger()
                         .debug(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_FOR_RESOURCE_TYPE.get(
                                 resourceType.displayAsCapabilityClass(),
                                 resourceType.displayAsCapabilityClass()
                         )));
-                resourceType.forEachCapability(context, labelAccess, (
-                        (label, pos, direction, cap) -> gatherSlotsForCap(
-                                context,
-                                (ResourceType<Object, Object, Object>) resourceType,
-                                label,
-                                pos,
-                                direction,
-                                cap,
-                                outputTracker,
-                                slotConsumer
+                resourceType.forEachCapability(
+                        context.logger(),
+                        context.level(),
+                        context.network(),
+                        context.labelPositionHolder(),
+                        resourceAccess,
+                        (
+                                (label, pos, direction, cap) -> gatherSlotsForCap(
+                                        context,
+                                        (ResourceType<Object, Object, Object>) resourceType,
+                                        label,
+                                        pos,
+                                        direction,
+                                        cap,
+                                        outputTracker,
+                                        slotConsumer
+                                )
                         )
-                ));
+                );
             }
         } else {
-            context.getLogger().debug(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_EACH.get()));
+
+            context.logger().debug(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_EACH.get()));
             for (var resourceType : resourceLimits.getReferencedResourceTypes()) {
-                context
-                        .getLogger()
+
+                context.logger()
                         .debug(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_FOR_RESOURCE_TYPE.get(
                                 resourceType.displayAsCapabilityClass(),
                                 resourceType.displayAsCapabilityClass()
                         )));
-                resourceType.forEachCapability(context, labelAccess, (label, pos, direction, cap) -> {
-                    // create a new list of trackers for each limited slot
-                    List<IOutputResourceTracker> outputTracker = resourceLimits.createOutputTrackers();
-                    gatherSlotsForCap(
-                            context,
-                            (ResourceType<Object, Object, Object>) resourceType,
-                            label,
-                            pos,
-                            direction,
-                            cap,
-                            outputTracker,
-                            slotConsumer
-                    );
-                });
+                // create a new list of trackers for each limited slot
+                resourceType.forEachCapability(
+                        context.logger(),
+                        context.level(),
+                        context.network(),
+                        context.labelPositionHolder(),
+                        resourceAccess,
+                        (label, pos, direction, cap) -> {
+                            // create a new list of trackers for each limited slot
+                            List<IOutputResourceTracker> outputTracker = resourceLimits.createOutputTrackers();
+                            gatherSlotsForCap(
+                                    context,
+                                    (ResourceType<Object, Object, Object>) resourceType,
+                                    label,
+                                    pos,
+                                    direction,
+                                    cap,
+                                    outputTracker,
+                                    slotConsumer
+                            );
+                        }
+                );
             }
         }
     }
 
     @Override
-    public LabelAccess labelAccess() {
-        return labelAccess;
+    public ResourceAccess resourceAccess() {
+        return resourceAccess;
     }
 
     @Override
@@ -509,7 +533,7 @@ public class OutputStatement implements IOStatement {
         if (obj == this) return true;
         if (obj == null || obj.getClass() != this.getClass()) return false;
         var that = (OutputStatement) obj;
-        return Objects.equals(this.labelAccess, that.labelAccess) && Objects.equals(
+        return Objects.equals(this.resourceAccess, that.resourceAccess) && Objects.equals(
                 this.resourceLimits,
                 that.resourceLimits
         ) && this.each == that.each && this.emptySlotsOnly == that.emptySlotsOnly;
@@ -517,7 +541,7 @@ public class OutputStatement implements IOStatement {
 
     @Override
     public int hashCode() {
-        return Objects.hash(labelAccess, resourceLimits, each, emptySlotsOnly);
+        return Objects.hash(resourceAccess, resourceLimits, each, emptySlotsOnly);
     }
 
     @Override
@@ -529,7 +553,7 @@ public class OutputStatement implements IOStatement {
         rtn.append("TO");
         if (emptySlotsOnly) rtn.append(" EMPTY SLOTS IN");
         if (each) rtn.append(" EACH");
-        rtn.append(" ").append(labelAccess);
+        rtn.append(" ").append(resourceAccess);
         return rtn.toString();
     }
 
@@ -552,7 +576,7 @@ public class OutputStatement implements IOStatement {
         sb.append("TO ");
         if (emptySlotsOnly) sb.append("EMPTY SLOTS IN ");
         sb.append(each ? "EACH " : "");
-        sb.append(labelAccess);
+        sb.append(resourceAccess);
         return sb.toString();
     }
 
@@ -597,18 +621,19 @@ public class OutputStatement implements IOStatement {
             ProgramContext context,
             ResourceType<STACK, ITEM, CAP> type,
             Label label,
-            @Stored BlockPos pos,
+            BlockPos pos,
             Direction direction,
             CAP capability,
             List<IOutputResourceTracker> trackers,
             Consumer<LimitedOutputSlot<?, ?, ?>> acceptor
     ) {
-        context
-                .getLogger()
-                .debug(x -> x.accept(LocalizationKeys.LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_RANGE.get(labelAccess.slots())));
+
+        context.logger()
+                .debug(x -> x.accept(LocalizationKeys.LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_RANGE.get(
+                        resourceAccess.slots())));
         for (int slot = 0; slot < type.getSlots(capability); slot++) {
             int finalSlot = slot;
-            if (labelAccess.slots().contains(slot)) {
+            if (resourceAccess.slots().contains(slot)) {
                 STACK stack = type.getStackInSlot(capability, slot);
                 boolean shouldCreateSlot = shouldCreateSlot(type, capability, stack, slot);
                 for (IOutputResourceTracker tracker : trackers) {
@@ -617,8 +642,8 @@ public class OutputStatement implements IOStatement {
                         tracker.updateRetentionObservation(type, stack);
 
                         if (shouldCreateSlot) {
-                            context
-                                    .getLogger()
+
+                            context.logger()
                                     .debug(x -> x.accept(LocalizationKeys.LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_SLOT_CREATED.get(
                                             finalSlot,
                                             stack,
@@ -635,8 +660,8 @@ public class OutputStatement implements IOStatement {
                                     type
                             ));
                         } else {
-                            context
-                                    .getLogger()
+
+                            context.logger()
                                     .debug(x -> x.accept(LocalizationKeys.LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_SLOT_SHOULD_NOT_CREATE.get(
                                             finalSlot,
                                             type.getAmount(stack)
@@ -649,8 +674,8 @@ public class OutputStatement implements IOStatement {
                     }
                 }
             } else {
-                context
-                        .getLogger()
+
+                context.logger()
                         .debug(x -> x.accept(LocalizationKeys.LOG_PROGRAM_TICK_IO_STATEMENT_GATHER_SLOTS_SLOT_NOT_IN_RANGE.get(
                                 finalSlot)));
             }

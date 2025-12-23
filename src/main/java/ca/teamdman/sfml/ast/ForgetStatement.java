@@ -14,33 +14,36 @@ import static ca.teamdman.sfm.common.localization.LocalizationKeys.LOG_PROGRAM_T
 
 public record ForgetStatement(
         Set<Label> labelToForget
-) implements Statement {
+) implements Tickable {
     @Override
     public void tick(ProgramContext context) {
         List<InputStatement> newInputs = new ArrayList<>();
-        for (InputStatement oldInputStatement : context.getInputs()) {
-            var newLabels = oldInputStatement.labelAccess().labels().stream()
+
+        for (InputStatement oldInputStatement : context.inputs()) {
+            var newLabels = oldInputStatement.resourceAccess().labelExpressions().stream()
                     .filter(label -> !this.labelToForget.contains(label))
                     .toList();
 
             // always fire event from old to new, even if new has no labels
             InputStatement newInputStatement = new InputStatement(
-                    new LabelAccess(
+                    new ResourceAccess(
                             newLabels,
-                            oldInputStatement.labelAccess().sides(),
-                            oldInputStatement.labelAccess().slots(),
-                            oldInputStatement.labelAccess().roundRobin()
+                            oldInputStatement.resourceAccess().roundRobin(), oldInputStatement.resourceAccess().sides(),
+                            oldInputStatement.resourceAccess().slots()
                     ),
                     oldInputStatement.resourceLimits(),
                     oldInputStatement.each()
             );
-            if (!(context.getBehaviour() instanceof ExecuteProgramBehaviour)) {
+
+            if (!(context.behaviour() instanceof ExecuteProgramBehaviour)) {
                 /// This is a waste when running the program.
                 /// Only needed for {@link ca.teamdman.sfm.common.program.linting.GatherWarningsProgramBehaviour}.
                 /// Will allow it for other non-execute behaviours just to avoid trouble.
-                context.getProgram().astBuilder().setLocationFromOtherNode(newInputStatement, oldInputStatement);
+
+                context.program().astBuilder().setLocationFromOtherNode(newInputStatement, oldInputStatement);
             }
-            if (context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
+
+            if (context.behaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
                 simulation.onInputStatementForgetTransform(context, oldInputStatement, newInputStatement);
             }
             // this could be a set instead of list contains check, but whatever. Should be small
@@ -53,9 +56,12 @@ public record ForgetStatement(
                 newInputs.add(newInputStatement);
             }
         }
-        context.getInputs().clear();
-        context.getInputs().addAll(newInputs);
-        context.getLogger().debug(x -> x.accept(LOG_PROGRAM_TICK_FORGET_STATEMENT.get(
+
+        context.inputs().clear();
+
+        context.inputs().addAll(newInputs);
+
+        context.logger().debug(x -> x.accept(LOG_PROGRAM_TICK_FORGET_STATEMENT.get(
                 labelToForget.stream().map(Objects::toString).collect(Collectors.joining(", "))
         )));
     }
@@ -64,4 +70,11 @@ public record ForgetStatement(
     public String toString() {
         return "FORGET " + labelToForget.stream().map(Objects::toString).collect(Collectors.joining(", "));
     }
+
+    @Override
+    public List<ASTNode> getChildNodes() {
+
+        return List.of();
+    }
+
 }

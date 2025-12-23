@@ -4,15 +4,13 @@ import java.util.List;
 import java.util.stream.Stream;
 
 public interface ASTNode {
-    default List<Statement> getStatements() {
-        return List.of();
-    }
+    List<? extends ASTNode> getChildNodes();
 
-    default Stream<Statement> getDescendantStatements() {
-        Stream.Builder<Statement> builder = Stream.builder();
-        getStatements().forEach(s -> {
+    default Stream<ASTNode> getDescendantNodes() {
+        Stream.Builder<ASTNode> builder = Stream.builder();
+        getChildNodes().forEach(s -> {
             builder.accept(s);
-            s.getDescendantStatements().forEach(builder);
+            s.getDescendantNodes().forEach(builder);
         });
         return builder.build();
     }
@@ -22,7 +20,7 @@ public interface ASTNode {
             return ioStatement.resourceLimits().resourceLimitList().stream()
                     .flatMap(resourceLimit -> resourceLimit.resourceIds().stream());
         }
-        return getDescendantStatements()
+        return getDescendantNodes()
                 .filter(IOStatement.class::isInstance)
                 .map(IOStatement.class::cast)
                 .flatMap(statement -> statement.resourceLimits().resourceLimitList().stream())

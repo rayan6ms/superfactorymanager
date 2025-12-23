@@ -17,16 +17,18 @@ public record IfStatement(
     public void tick(ProgramContext context) {
         Predicate<ProgramContext> condition = this.condition;
         boolean test;
-        if (context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
+
+        if (context.behaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
             condition = ctx -> {
-                int conditionIndex = ctx.getProgram().getConditionIndex(this);
+
+                int conditionIndex = ctx.program().getConditionIndex(this);
                 if (conditionIndex == -1) {
                     SFM.LOGGER.warn("Condition index not found for {}", this);
                 }
                 return simulation.getTriggerPathCount().testBit(conditionIndex);
             };
             test = condition.test(context);
-            simulation.pushPathElement(new SimulateExploreAllPathsProgramBehaviour.Branch(this, test));
+            simulation.pushPathElement(new SimulateExploreAllPathsProgramBehaviour.BranchPathElement(this, test));
         } else {
             test = condition.test(context);
         }
@@ -41,7 +43,7 @@ public record IfStatement(
     @Override
     public String toString() {
         var rtn = "IF " + condition + " THEN\n" + trueBlock.toString().strip().indent(1).stripTrailing();
-        if (!falseBlock.getStatements().isEmpty()) {
+        if (!falseBlock.getChildNodes().isEmpty()) {
             rtn += "\nELSE\n" + falseBlock.toString().strip().indent(1);
         }
         rtn += "\nEND";
@@ -49,8 +51,8 @@ public record IfStatement(
     }
 
     @Override
-    public List<Statement> getStatements() {
-        return List.of(trueBlock, falseBlock);
+    public List<ASTNode> getChildNodes() {
+        return List.of(condition, trueBlock, falseBlock);
     }
 
     @Override
@@ -59,13 +61,15 @@ public record IfStatement(
     }
 
     private void tickFalseBlock(ProgramContext context) {
-        context.getLogger().debug(x -> x.accept(
+
+        context.logger().debug(x -> x.accept(
                 LocalizationKeys.LOG_PROGRAM_TICK_IF_STATEMENT_WAS_FALSE.get(this.condition.toStringPretty())));
         falseBlock.tick(context);
     }
 
     private void tickTrueBlock(ProgramContext context) {
-        context.getLogger().debug(x -> x.accept(
+
+        context.logger().debug(x -> x.accept(
                 LocalizationKeys.LOG_PROGRAM_TICK_IF_STATEMENT_WAS_TRUE.get(this.condition.toStringPretty())));
         trueBlock.tick(context);
     }

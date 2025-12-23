@@ -2,6 +2,8 @@ package ca.teamdman.sfml.ast;
 
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 
+import java.util.List;
+
 public record WithTag(TagMatcher tagMatcher) implements ASTNode, WithClause, ToStringPretty {
     @Override
     public <STACK> boolean matchesStack(
@@ -15,4 +17,11 @@ public record WithTag(TagMatcher tagMatcher) implements ASTNode, WithClause, ToS
     public String toString() {
         return "TAG " + tagMatcher;
     }
+
+    @Override
+    public List<TagMatcher> getChildNodes() {
+
+        return List.of(tagMatcher);
+    }
+
 }

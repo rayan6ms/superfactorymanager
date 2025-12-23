@@ -1,5 +1,6 @@
 package ca.teamdman.sfml.ast;
 
+import java.util.List;
 import java.util.Locale;
 import java.util.function.BiPredicate;
 
@@ -41,5 +42,11 @@ public enum ComparisonOperator implements ASTNode, BiPredicate<Long, Long>, ToSt
     @Override
     public boolean test(Long a, Long b) {
         return PRED.test(a, b);
+    }
+
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of();
     }
 }

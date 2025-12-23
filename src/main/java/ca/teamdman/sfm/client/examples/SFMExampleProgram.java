@@ -86,9 +86,9 @@ public record SFMExampleProgram(
 
         // Build the program
         ProgramBuildResult result = new ProgramBuilder(programString).build();
-        String displayName = result.program() == null
+        String displayName = result.maybeProgram() == null
                              ? String.format("(compile failed) %s", path.toString())
-                             : result.program().name();
+                             : result.maybeProgram().name();
         return new SFMExampleProgram(displayName, programString);
     }
 

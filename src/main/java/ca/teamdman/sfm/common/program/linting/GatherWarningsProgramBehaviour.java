@@ -80,7 +80,7 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
                 .getReferencedIOResourceIds()
                 .map(ResourceIdentifier::getResourceType)
                 .collect(Collectors.toSet());
-        for (Label label : inputStatement.labelAccess().labels()) {
+        for (Label label : inputStatement.resourceAccess().labelExpressions()) {
             for (ResourceType resourceType : inputtingResourceTypes) {
                 resourceTypesInputted.put(resourceType, label);
             }
@@ -105,11 +105,12 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
         for (ResourceType resourceType : seekingResourceTypes) {
             if (!resourceTypesInputted.containsKey(resourceType)) {
                 // if the resource type was never inputted, warn
+
                 warnings.add(Pair.of(
                         getLatestPathElement(),
                         PROGRAM_WARNING_OUTPUT_RESOURCE_TYPE_NOT_FOUND_IN_INPUTS.get(
                                 outputStatement,
-                                context.getProgram().astBuilder().getLineColumnForNode(outputStatement),
+                                context.program().astBuilder().getLineColumnForNode(outputStatement),
                                 resourceType.displayAsCode()
                         )
                 ));
@@ -138,8 +139,8 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
 
 
         // Identify labels that are no longer active
-        Set<Label> oldLabels = new HashSet<>(old.labelAccess().labels());
-        Set<Label> newLabels = new HashSet<>(next.labelAccess().labels());
+        Set<Label> oldLabels = new HashSet<>(old.resourceAccess().labelExpressions());
+        Set<Label> newLabels = new HashSet<>(next.resourceAccess().labelExpressions());
         Set<Label> removedLabels = new HashSet<>(oldLabels);
         removedLabels.removeAll(newLabels);
 
@@ -184,7 +185,7 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
                 .collect(Collectors.toSet());
 
         // identify the labels being dropped from
-        Set<Label> droppingLabels = new HashSet<>(inputStatement.labelAccess().labels());
+        Set<Label> droppingLabels = new HashSet<>(inputStatement.resourceAccess().labelExpressions());
 
         warnUnusedInputLabels(context, inputStatement, droppingLabels, droppingResourceTypes);
     }
@@ -261,11 +262,12 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
                     if (offendingNode == null) {
                         SFM.LOGGER.warn("Failed to find node for element during warning generation: {}", old);
                     }
+
                     warnings.add(Pair.of(
                             offendingNode,
                             PROGRAM_WARNING_UNUSED_INPUT_LABEL.get(
                                     old,
-                                    context.getProgram().astBuilder().getLineColumnForNode(old),
+                                    context.program().astBuilder().getLineColumnForNode(old),
                                     resourceType.displayAsCode(),
                                     label,
                                     resourceType.displayAsCode()

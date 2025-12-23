@@ -39,4 +39,10 @@ public enum SetOperator implements ASTNode, BiPredicate<Boolean, List<Boolean>>,
     public String toString() {
         return this.name().toUpperCase(Locale.ROOT);
     }
+
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of();
+    }
 }

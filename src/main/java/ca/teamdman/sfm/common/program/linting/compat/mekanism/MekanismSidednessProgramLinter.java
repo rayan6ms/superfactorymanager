@@ -47,7 +47,7 @@ public class MekanismSidednessProgramLinter implements IProgramLinter {
         if (level == null) return;
 
         // We only care about IO statements in the program
-        Stream<IOStatement> ioStatements = program.getDescendantStatements()
+        Stream<IOStatement> ioStatements = program.getDescendantNodes()
                 .filter(IOStatement.class::isInstance)
                 .map(IOStatement.class::cast);
         for (IOStatement statement : SFMStreamUtils.iterate(ioStatements)) {
@@ -65,7 +65,7 @@ public class MekanismSidednessProgramLinter implements IProgramLinter {
             Level level,
             ItemStack disk
     ) {
-        program.getDescendantStatements()
+        program.getDescendantNodes()
                 .filter(IOStatement.class::isInstance)
                 .map(IOStatement.class::cast)
                 .forEach(statement ->
@@ -85,9 +85,9 @@ public class MekanismSidednessProgramLinter implements IProgramLinter {
             ProblemTracker warnings
     ) {
 
-        SideQualifier sides = statement.labelAccess().sides();
+        SideQualifier sides = statement.resourceAccess().sides();
         Stream<Pair<ca.teamdman.sfml.ast.Label, BlockPos>> mekanismBlocks = statement
-                .labelAccess()
+                .resourceAccess()
                 .getLabelledPositions(labelPositionHolder)
                 .stream()
                 .filter(pair -> level.isLoaded(pair.getSecond()))
@@ -159,9 +159,9 @@ public class MekanismSidednessProgramLinter implements IProgramLinter {
             Level level
     ) {
 
-        SideQualifier sides = statement.labelAccess().sides();
+        SideQualifier sides = statement.resourceAccess().sides();
         Stream<Pair<Label, BlockPos>> mekanismBlocks = statement
-                .labelAccess()
+                .resourceAccess()
                 .getLabelledPositions(labelPositionHolder)
                 .stream()
                 .filter(pair -> level.isLoaded(pair.getSecond()))
@@ -201,7 +201,13 @@ public class MekanismSidednessProgramLinter implements IProgramLinter {
                         boolean anySuccess = directions.stream().anyMatch(activeSides::contains);
                         if (!anySuccess) {
                             // we want to enable a side for the transmission type
-                            @Nullable Direction directionToEnable = sides.getNonNullDirection(blockState);
+                            @Nullable Direction directionToEnable = null;
+                            for (Direction direction : sides.resolve(blockState)) {
+                                if (direction != null) {
+                                    directionToEnable = direction;
+                                    break;
+                                }
+                            }
                             if (directionToEnable != null) {
                                 RelativeSide relativeSide = RelativeSide.fromDirections(
                                         mekBlockEntity.getDirection(),

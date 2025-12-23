@@ -1,26 +1,39 @@
 package ca.teamdman.sfml.ast;
 
+import java.util.List;
+
 public record ResourceQuantity(
-        Number number,
-        IdExpansionBehaviour idExpansionBehaviour
+        IdExpansionBehaviour idExpansionBehaviour,
+
+        Number number
 ) implements ASTNode {
     @SuppressWarnings("DataFlowIssue")
-    public static final ResourceQuantity UNSET = new ResourceQuantity(null, IdExpansionBehaviour.NO_EXPAND);
+    public static final ResourceQuantity UNSET = new ResourceQuantity(IdExpansionBehaviour.NO_EXPAND, null);
     public static final ResourceQuantity MAX_QUANTITY = new ResourceQuantity(
-            new Number(Long.MAX_VALUE),
-            IdExpansionBehaviour.NO_EXPAND
+            IdExpansionBehaviour.NO_EXPAND, new Number(Long.MAX_VALUE)
     );
 
     public ResourceQuantity add(ResourceQuantity quantity) {
         return new ResourceQuantity(
-                number.add(quantity.number),
-                idExpansionBehaviour
+                idExpansionBehaviour, number.add(quantity.number)
         );
     }
 
-    public enum IdExpansionBehaviour {
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of(idExpansionBehaviour, number);
+    }
+
+    public enum IdExpansionBehaviour implements ASTNode {
         EXPAND,
-        NO_EXPAND
+        NO_EXPAND;
+
+        @Override
+        public List<? extends ASTNode> getChildNodes() {
+
+            return List.of();
+        }
     }
 
     @Override

@@ -47,7 +47,7 @@ public class ProgramBuilder {
     /// If so, mutating the program object is a disallowed behaviour.
     public static boolean isMutationAllowed(Program program) {
 
-        return cache.values().stream().noneMatch(result -> result.program() == program);
+        return cache.values().stream().noneMatch(result -> result.maybeProgram() == program);
     }
 
     /// MUST be set to {@code false} if the resulting {@link Program} will be mutated.

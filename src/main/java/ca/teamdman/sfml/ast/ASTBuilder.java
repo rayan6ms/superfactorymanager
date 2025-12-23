@@ -6,7 +6,6 @@ import ca.teamdman.sfm.common.config.SFMConfig;
 import com.mojang.datafixers.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
-import org.antlr.v4.runtime.tree.TerminalNode;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
@@ -23,7 +22,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     /// Used for program editor context actions; ctrl+space on a token
     private final List<Pair<WeakReference<ASTNode>, ParserRuleContext>> AST_NODE_CONTEXTS = new LinkedList<>();
 
-    /// @return hierarchy of nodes; e.g., Program > Trigger > Block > IOStatement > LabelAccess > Label
+    /// @return hierarchy of nodes; e.g., Program > Trigger > Block > IOStatement > ResourceAccess > Label
     public List<Pair<ASTNode, ParserRuleContext>> getNodesUnderCursor(int cursorPos) {
 
         return AST_NODE_CONTEXTS
@@ -82,8 +81,13 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     public String getLineColumnForNode(ASTNode node) {
         // todo: return TranslatableContents
         return getContextForNode(node)
-                .map(ctx -> "Line " + ctx.start.getLine() + ", Column " + ctx.start.getCharPositionInLine())
+                .map(ASTBuilder::getLineColumnForContext)
                 .orElse("Unknown location");
+    }
+
+    public static String getLineColumnForContext(ParserRuleContext ctx) {
+
+        return "Line " + ctx.start.getLine() + ", Column " + ctx.start.getCharPositionInLine();
     }
 
     @Override
@@ -139,9 +143,9 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     public Label visitRawLabel(SFMLParser.RawLabelContext ctx) {
 
         var label = new Label(ctx.getText());
-        if (label.name().length() > Program.MAX_LABEL_LENGTH) {
+        if (label.value().length() > Program.MAX_LABEL_LENGTH) {
             throw new IllegalArgumentException(
-                    "Label name cannot be longer than "
+                    "Label value cannot be longer than "
                     + Program.MAX_LABEL_LENGTH
                     + " characters."
             );
@@ -155,9 +159,9 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     public Label visitStringLabel(SFMLParser.StringLabelContext ctx) {
 
         var label = new Label(visitString(ctx.string()).value());
-        if (label.name().length() > Program.MAX_LABEL_LENGTH) {
+        if (label.value().length() > Program.MAX_LABEL_LENGTH) {
             throw new IllegalArgumentException(
-                    "Label name cannot be longer than "
+                    "Label value cannot be longer than "
                     + Program.MAX_LABEL_LENGTH
                     + " characters."
             );
@@ -182,7 +186,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
                 .collect(Collectors.toList());
         var labels = USED_LABELS
                 .stream()
-                .map(Label::name)
+                .map(Label::value)
                 .collect(Collectors.toSet());
         Program program = new Program(this, name.value(), triggers, labels, USED_RESOURCES);
         trackNode(program, ctx);
@@ -202,7 +206,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
                           : SFMConfig.getOrDefault(SFMConfig.SERVER_CONFIG.timerTriggerMinimumIntervalInTicks);
 
         // validate interval
-        if (time.ticks() < minInterval) {
+        if (time.intervalTicks() < minInterval) {
             throw new IllegalArgumentException("Minimum trigger interval is " + minInterval + " ticks.");
         }
 
@@ -215,14 +219,14 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
 
         ComparisonOperator comp = ComparisonOperator.GREATER_OR_EQUAL;
         Number num = new Number(0);
-        if (ctx.comparisonOp() != null && ctx.number() != null) {
+        if (ctx.comparisonOp() != null && ctx.numberExpression() != null) {
             comp = visitComparisonOp(ctx.comparisonOp());
-            num = visitNumber(ctx.number());
+            num = (Number) visit(ctx.numberExpression());
         }
         if (num.value() > Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Redstone signal strength cannot be greater than " + Integer.MAX_VALUE);
         }
-        BoolExpr boolExpr = new BoolRedstone(comp, (int) num.value());
+        BoolExpr boolExpr = new BoolRedstone(comp, num);
         trackNode(boolExpr, ctx);
         return boolExpr;
     }
@@ -231,13 +235,23 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     public ASTNode visitPulseTrigger(SFMLParser.PulseTriggerContext ctx) {
 
         var block = visitBlock(ctx.block());
-        RedstoneTrigger redstoneTrigger = new RedstoneTrigger(block);
-        trackNode(redstoneTrigger, ctx);
-        return redstoneTrigger;
+        RedstonePulseTrigger redstonePulseTrigger = new RedstonePulseTrigger(block);
+        trackNode(redstonePulseTrigger, ctx);
+        return redstonePulseTrigger;
     }
 
     @Override
-    public Number visitNumber(SFMLParser.NumberContext ctx) {
+    public Number visitNumberExpressionMultiplication(SFMLParser.NumberExpressionMultiplicationContext ctx) {
+
+        Number left = (Number) visit(ctx.numberExpression(0));
+        Number right = (Number) visit(ctx.numberExpression(1));
+        Number rtn = new Number(left.value() * right.value());
+        trackNode(rtn, ctx);
+        return rtn;
+    }
+
+    @Override
+    public Number visitNumberExpressionLiteral(SFMLParser.NumberExpressionLiteralContext ctx) {
 
         Number number = new Number(Long.parseLong(ctx.getText()));
         trackNode(number, ctx);
@@ -245,72 +259,126 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     }
 
     @Override
-    public ASTNode visitIntervalSpace(SFMLParser.IntervalSpaceContext ctx) {
+    public Number visitNumberExpressionAddition(SFMLParser.NumberExpressionAdditionContext ctx) {
 
-        TerminalNode firstNumber = ctx.NUMBER(0);
-        int ticks;
-        if (firstNumber == null) {
-            ticks = 1;
-        } else {
-            ticks = Integer.parseInt(firstNumber.getText());
-        }
-        if (ctx.SECONDS() != null || ctx.SECOND() != null) {
-            ticks *= 20;
-        }
-
-        Interval.IntervalAlignment alignment = Interval.IntervalAlignment.LOCAL;
-        if (ctx.GLOBAL() != null) {
-            alignment = Interval.IntervalAlignment.GLOBAL;
-        }
-
-        int offset = 0;
-        TerminalNode secondNumber = ctx.NUMBER(1);
-        if (secondNumber != null) {
-            offset = Integer.parseInt(secondNumber.getText());
-            if (ctx.SECONDS() != null || ctx.SECOND() != null) {
-                offset *= 20;
-            }
-        }
-
-        Interval interval = new Interval(ticks, alignment, offset);
-        trackNode(interval, ctx);
-        return interval;
+        Number left = (Number) visit(ctx.numberExpression(0));
+        Number right = (Number) visit(ctx.numberExpression(1));
+        Number rtn = new Number(left.value() + right.value());
+        trackNode(rtn, ctx);
+        return rtn;
     }
 
     @Override
-    public ASTNode visitIntervalNoSpace(SFMLParser.IntervalNoSpaceContext ctx) {
+    public Number visitNumberExpressionSubtraction(SFMLParser.NumberExpressionSubtractionContext ctx) {
 
-        String firstNumber = ctx.NUMBER_WITH_G_SUFFIX().getText();
-        String front = firstNumber.substring(0, firstNumber.length() - 1);
-        int ticks = Integer.parseInt(front);
-        if (ctx.SECONDS() != null || ctx.SECOND() != null) {
-            ticks *= 20;
+        Number left = (Number) visit(ctx.numberExpression(0));
+        Number right = (Number) visit(ctx.numberExpression(1));
+        Number rtn = new Number(left.value() - right.value());
+        trackNode(rtn, ctx);
+        return rtn;
+    }
+
+    @Override
+    public Number visitNumberExpressionModulus(SFMLParser.NumberExpressionModulusContext ctx) {
+
+        Number left = (Number) visit(ctx.numberExpression(0));
+        Number right = (Number) visit(ctx.numberExpression(1));
+        Number rtn = new Number(left.value() % right.value());
+        trackNode(rtn, ctx);
+        return rtn;
+    }
+
+    @Override
+    public Number visitNumberExpressionExponential(SFMLParser.NumberExpressionExponentialContext ctx) {
+
+        Number left = (Number) visit(ctx.numberExpression(0));
+        Number right = (Number) visit(ctx.numberExpression(1));
+        Number rtn = new Number((long) Math.pow(left.value(), right.value()));
+        trackNode(rtn, ctx);
+        return rtn;
+    }
+
+    @Override
+    public Number visitNumberExpressionDivision(SFMLParser.NumberExpressionDivisionContext ctx) {
+
+        Number left = (Number) visit(ctx.numberExpression(0));
+        Number right = (Number) visit(ctx.numberExpression(1));
+        if (right.value() == 0) {
+            throw new IllegalArgumentException("Division by zero at "
+                                               + getLineColumnForContext(ctx.numberExpression(1)));
+        }
+        Number rtn = new Number(left.value() / right.value());
+        trackNode(rtn, ctx);
+        return rtn;
+    }
+
+    @Override
+    public Number visitNumberExpressionParen(SFMLParser.NumberExpressionParenContext ctx) {
+
+        Number number = (Number) visit(ctx.numberExpression());
+        trackNode(number, ctx);
+        return number;
+    }
+
+    @Override
+    public Interval visitInterval(SFMLParser.IntervalContext ctx) {
+
+        Number interval = (Number) visit(ctx.numberExpression(0));
+        DurationUnit intervalUnit = visitDurationUnit(ctx.durationUnit(0));
+
+        @Nullable Number offset = (Number) visit(ctx.numberExpression(1));
+        if (offset == null) {
+            offset = new Number(0);
         }
 
-        Interval.IntervalAlignment alignment = Interval.IntervalAlignment.GLOBAL;
-
-        int offset = 0;
-        TerminalNode secondNumber = ctx.NUMBER();
-        if (secondNumber != null) {
-            offset = Integer.parseInt(secondNumber.getText());
-            if (ctx.SECONDS() != null || ctx.SECOND() != null) {
-                offset *= 20;
-            }
+        DurationUnit offsetUnit;
+        if (ctx.durationUnit(1) != null) {
+            offsetUnit = visitDurationUnit(ctx.durationUnit(1));
+        } else {
+            offsetUnit = intervalUnit;
         }
 
-        Interval interval = new Interval(ticks, alignment, offset);
-        trackNode(interval, ctx);
-        return interval;
+        Interval.IntervalAlignment alignment;
+        if (ctx.GLOBAL() != null) {
+            alignment = Interval.IntervalAlignment.GLOBAL;
+        } else {
+            alignment = Interval.IntervalAlignment.LOCAL;
+        }
+
+        Interval rtn = new Interval(
+                interval,
+                intervalUnit,
+                alignment,
+                offset,
+                offsetUnit
+        );
+        trackNode(rtn, ctx);
+        return rtn;
+    }
+
+    @Override
+    public DurationUnit visitDurationUnit(SFMLParser.DurationUnitContext ctx) {
+
+        DurationUnit rtn;
+        if (ctx.SECOND() != null || ctx.SECONDS() != null) {
+            rtn = DurationUnit.SECONDS;
+        } else if (ctx.TICK() != null || ctx.TICKS() != null) {
+            rtn = DurationUnit.TICKS;
+        } else {
+            throw new IllegalArgumentException("Invalid duration unit: " + ctx.getText());
+        }
+        trackNode(rtn, ctx);
+        return rtn;
     }
 
     @Override
     public InputStatement visitInputStatement(SFMLParser.InputStatementContext ctx) {
 
-        var labelAccess = visitLabelAccess(ctx.labelAccess());
+        var resourceAccess = visitResourceAccess(ctx.resourceAccess());
         var matchers = visitInputResourceLimits(ctx.inputResourceLimits());
         var exclusions = visitResourceExclusion(ctx.resourceExclusion());
         var each = ctx.EACH() != null;
-        InputStatement inputStatement = new InputStatement(labelAccess, matchers.withExclusions(exclusions), each);
+        InputStatement inputStatement = new InputStatement(resourceAccess, matchers.withExclusions(exclusions), each);
         trackNode(inputStatement, ctx);
         return inputStatement;
     }
@@ -318,13 +386,13 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     @Override
     public OutputStatement visitOutputStatement(SFMLParser.OutputStatementContext ctx) {
 
-        var labelAccess = visitLabelAccess(ctx.labelAccess());
+        var resourceAccess = visitResourceAccess(ctx.resourceAccess());
         var matchers = visitOutputResourceLimits(ctx.outputResourceLimits());
         var exclusions = visitResourceExclusion(ctx.resourceExclusion());
         var each = ctx.EACH() != null;
         boolean emptySlotsOnly = ctx.emptyslots() != null;
         OutputStatement outputStatement = new OutputStatement(
-                labelAccess,
+                resourceAccess,
                 matchers.withExclusions(exclusions),
                 each,
                 emptySlotsOnly
@@ -334,32 +402,88 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     }
 
     @Override
-    public LabelAccess visitLabelAccess(SFMLParser.LabelAccessContext ctx) {
+    public ResourceAccess visitResourceAccess(SFMLParser.ResourceAccessContext ctx) {
 
-        var directionQualifierCtx = ctx.sidequalifier();
-        SideQualifier sideQualifier;
-        if (directionQualifierCtx == null) {
-            sideQualifier = SideQualifier.NULL;
-        } else {
-            sideQualifier = (SideQualifier) visit(directionQualifierCtx);
-        }
-        LabelAccess labelAccess = new LabelAccess(
-                ctx.label().stream().map(this::visit).map(Label.class::cast).collect(Collectors.toList()),
-                sideQualifier,
-                visitSlotqualifier(ctx.slotqualifier()),
-                visitRoundrobin(ctx.roundrobin())
+        List<LabelExpression> labelExpressions = ctx
+                .labelExpression()
+                .stream()
+                .map(this::visit)
+                .map(LabelExpression.class::cast)
+                .toList();
+
+        RoundRobin roundRobin = visitRoundrobin(ctx.roundrobin());
+
+        SideQualifier sides = Objects.requireNonNullElse(
+                (SideQualifier) visit(ctx.sideQualifier()),
+                SideQualifier.NULL
         );
-        trackNode(labelAccess, ctx);
-        return labelAccess;
+
+        SlotQualifier slots = visitSlotQualifier(ctx.slotQualifier());
+
+        ResourceAccess resourceAccess = new ResourceAccess(
+                labelExpressions,
+                roundRobin,
+                sides,
+                slots
+        );
+
+        trackNode(resourceAccess, ctx);
+        return resourceAccess;
     }
 
     @Override
     public RoundRobin visitRoundrobin(@Nullable SFMLParser.RoundrobinContext ctx) {
 
-        if (ctx == null) return RoundRobin.disabled();
+        if (ctx == null) return new RoundRobin(RoundRobinBehaviour.UNMODIFIED);
         RoundRobin rtn = ctx.BLOCK() != null
-                         ? new RoundRobin(RoundRobin.Behaviour.BY_BLOCK)
-                         : new RoundRobin(RoundRobin.Behaviour.BY_LABEL);
+                         ? new RoundRobin(RoundRobinBehaviour.BY_BLOCK)
+                         : new RoundRobin(RoundRobinBehaviour.BY_LABEL);
+        trackNode(rtn, ctx);
+        return rtn;
+    }
+
+    @Override
+    public LabelExpression visitLabelExpressionExclusion(SFMLParser.LabelExpressionExclusionContext ctx) {
+
+        LabelExpression left = (LabelExpression) visit(ctx.labelExpression(0));
+        LabelExpression right = (LabelExpression) visit(ctx.labelExpression(1));
+        LabelExpression rtn = new LabelExpressionExclusion(left, right);
+        trackNode(rtn, ctx);
+        return rtn;
+    }
+
+    @Override
+    public LabelExpression visitLabelExpressionSingle(SFMLParser.LabelExpressionSingleContext ctx) {
+
+        LabelExpression expr = new LabelExpressionSingle((Label) visit(ctx.label()));
+        trackNode(expr, ctx);
+        return expr;
+    }
+
+    @Override
+    public LabelExpression visitLabelExpressionUnion(SFMLParser.LabelExpressionUnionContext ctx) {
+
+        LabelExpression left = (LabelExpression) visit(ctx.labelExpression(0));
+        LabelExpression right = (LabelExpression) visit(ctx.labelExpression(1));
+        LabelExpression rtn = new LabelExpressionUnion(left, right);
+        trackNode(rtn, ctx);
+        return rtn;
+    }
+
+    @Override
+    public LabelExpression visitLabelExpressionParen(SFMLParser.LabelExpressionParenContext ctx) {
+
+        LabelExpression expr = (LabelExpression) visit(ctx.labelExpression());
+        trackNode(expr, ctx);
+        return expr;
+    }
+
+    @Override
+    public LabelExpression visitLabelExpressionIntersection(SFMLParser.LabelExpressionIntersectionContext ctx) {
+
+        LabelExpression left = (LabelExpression) visit(ctx.labelExpression(0));
+        LabelExpression right = (LabelExpression) visit(ctx.labelExpression(1));
+        LabelExpression rtn = new LabelExpressionIntersection(left, right);
         trackNode(rtn, ctx);
         return rtn;
     }
@@ -412,9 +536,9 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     public BoolExpr visitBooleanHas(SFMLParser.BooleanHasContext ctx) {
 
         var setOperator = visitSetOp(ctx.setOp());
-        var labelAccess = visitLabelAccess(ctx.labelAccess());
+        var resourceAccess = visitResourceAccess(ctx.resourceAccess());
         ComparisonOperator comparisonOperator = visitComparisonOp(ctx.comparisonOp());
-        Number num = visitNumber(ctx.number());
+        Number num = (Number) visit(ctx.numberExpression());
         ResourceIdSet resourceIdSet;
         if (ctx.resourceIdDisjunction() == null) {
             resourceIdSet = ResourceIdSet.MATCH_ALL;
@@ -435,9 +559,9 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         }
         BoolHas rtn = new BoolHas(
                 setOperator,
-                labelAccess,
+                resourceAccess,
                 comparisonOperator,
-                num.value(),
+                num,
                 resourceIdSet,
                 with,
                 except
@@ -711,14 +835,54 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     }
 
     @Override
-    public NumberRangeSet visitSlotqualifier(@Nullable SFMLParser.SlotqualifierContext ctx) {
+    public SlotQualifier visitSlotQualifier(@Nullable SFMLParser.SlotQualifierContext ctx) {
 
-        NumberRangeSet numberRangeSet = visitRangeset(ctx == null ? null : ctx.rangeset());
-        if (ctx != null) {
-            trackNode(numberRangeSet, ctx);
+        if (ctx == null) {
+            return new SlotQualifier(false, NumberSet.MAX_RANGE);
+        } else {
+            boolean each = ctx.EACH() != null;
+            NumberSet numberSet = visitNumberSet(ctx.numberSet());
+            SlotQualifier slotQualifier = new SlotQualifier(each, numberSet);
+            trackNode(slotQualifier, ctx);
+            return slotQualifier;
         }
-        return numberRangeSet;
     }
+
+
+    @Override
+    public NumberSet visitNumberSet(SFMLParser.NumberSetContext ctx) {
+
+        List<NumberRange> include = new ArrayList<>();
+        List<NumberRange> exclude = new ArrayList<>();
+        for (SFMLParser.NumberRangeContext numberRangeContext : ctx.numberRange()) {
+            NumberRange range = visitNumberRange(numberRangeContext);
+            if (numberRangeContext.NOT() == null) {
+                include.add(range);
+            } else {
+                exclude.add(range);
+            }
+        }
+        NumberSet numberSet = new NumberSet(
+                include.toArray(NumberRange[]::new),
+                exclude.toArray(NumberRange[]::new)
+        );
+        trackNode(numberSet, ctx);
+        return numberSet;
+    }
+
+    @Override
+    public NumberRange visitNumberRange(SFMLParser.NumberRangeContext ctx) {
+
+        Number start = (Number) visit(ctx.numberExpression(0));
+        Number end = (Number) visit(ctx.numberExpression(1));
+        NumberRange numberRange = new NumberRange(
+                start,
+                Objects.requireNonNullElse(end, start)
+        );
+        trackNode(numberRange, ctx);
+        return numberRange;
+    }
+
 
     @Override
     public ForgetStatement visitForgetStatement(SFMLParser.ForgetStatementContext ctx) {
@@ -735,38 +899,6 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         ForgetStatement rtn = new ForgetStatement(labels);
         trackNode(rtn, ctx);
         return rtn;
-    }
-
-    @Override
-    public NumberRangeSet visitRangeset(@Nullable SFMLParser.RangesetContext ctx) {
-
-        if (ctx == null) return NumberRangeSet.MAX_RANGE;
-        NumberRangeSet numberRangeSet = new NumberRangeSet(
-                ctx
-                        .range()
-                        .stream()
-                        .map(this::visitRange)
-                        .toArray(NumberRange[]::new)
-        );
-        trackNode(numberRangeSet, ctx);
-        return numberRangeSet;
-    }
-
-    @Override
-    public NumberRange visitRange(SFMLParser.RangeContext ctx) {
-
-        var iter = ctx.number().stream().map(this::visitNumber).mapToLong(Number::value).iterator();
-        var start = iter.next();
-        if (iter.hasNext()) {
-            var end = iter.next();
-            NumberRange numberRange = new NumberRange(start, end);
-            trackNode(numberRange, ctx);
-            return numberRange;
-        } else {
-            NumberRange numberRange = new NumberRange(start, start);
-            trackNode(numberRange, ctx);
-            return numberRange;
-        }
     }
 
     @Override
@@ -790,13 +922,13 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     @Override
     public ResourceQuantity visitRetention(@Nullable SFMLParser.RetentionContext ctx) {
 
-        if (ctx == null)
+        if (ctx == null) {
             return ResourceQuantity.UNSET;
+        }
         ResourceQuantity quantity = new ResourceQuantity(
-                visitNumber(ctx.number()),
                 ctx.EACH() != null
                 ? ResourceQuantity.IdExpansionBehaviour.EXPAND
-                : ResourceQuantity.IdExpansionBehaviour.NO_EXPAND
+                : ResourceQuantity.IdExpansionBehaviour.NO_EXPAND, (Number) visit(ctx.numberExpression())
         );
         trackNode(quantity, ctx);
         return quantity;
@@ -807,21 +939,19 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
 
         if (ctx == null) return ResourceQuantity.MAX_QUANTITY;
         ResourceQuantity quantity = new ResourceQuantity(
-                visitNumber(ctx.number()),
                 ctx.EACH() != null
                 ? ResourceQuantity.IdExpansionBehaviour.EXPAND
-                : ResourceQuantity.IdExpansionBehaviour.NO_EXPAND
+                : ResourceQuantity.IdExpansionBehaviour.NO_EXPAND, (Number) visit(ctx.numberExpression())
         );
         trackNode(quantity, ctx);
         return quantity;
     }
 
     @Override
-    public SideQualifier visitEachSide(SFMLParser.EachSideContext ctx) {
+    public SideQualifier visitAllSides(SFMLParser.AllSidesContext ctx) {
 
-        var rtn = SideQualifier.ALL;
-        trackNode(rtn, ctx);
-        return rtn;
+        // we aren't tracking this since we would have to clone the obj, means no ctrl+space actions supported here
+        return SideQualifier.ALL;
     }
 
     @Override
@@ -852,7 +982,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
                 .statement()
                 .stream()
                 .map(this::visit)
-                .map(Statement.class::cast)
+                .map(Tickable.class::cast)
                 .collect(Collectors.toList());
         Block block = new Block(statements);
         trackNode(block, ctx);

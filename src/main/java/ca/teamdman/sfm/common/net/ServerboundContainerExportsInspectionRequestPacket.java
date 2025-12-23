@@ -118,11 +118,10 @@ public record ServerboundContainerExportsInspectionRequestPacket(
                     resourceLimitList.add(resourceLimit);
                 });
                 InputStatement inputStatement = new InputStatement(
-                        new LabelAccess(
-                                List.of(new Label("target")),
-                                new SideQualifier(List.of(Side.fromDirection(direction))),
-                                NumberRangeSet.MAX_RANGE,
-                                RoundRobin.disabled()
+                        new ResourceAccess(
+                                List.of(new LabelExpressionSingle( new Label("target"))),
+                                new RoundRobin(RoundRobinBehaviour.UNMODIFIED), new SideQualifier(List.of(Side.fromDirection(direction))),
+                                SlotQualifier.DEFAULT
                         ),
                         new ResourceLimits(
                                 resourceLimitList.stream().distinct().toList(),

@@ -16,20 +16,22 @@ public record TimerTrigger(
 
     @Override
     public boolean shouldTick(ProgramContext context) {
-        if (context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour) return true;
+
+        if (context.behaviour() instanceof SimulateExploreAllPathsProgramBehaviour) return true;
         return interval.shouldTick(context);
     }
 
     @Override
     public void tick(ProgramContext context) {
         block.tick(context);
-        if (context.getBehaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
+
+        if (context.behaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
             simulation.onTriggerDropped(context, this);
         }
     }
 
     @Override
-    public List<Statement> getStatements() {
+    public List<ASTNode> getChildNodes() {
         return List.of(block);
     }
 

@@ -2,6 +2,8 @@ package ca.teamdman.sfml.ast;
 
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 
+import java.util.List;
+
 public record WithNegation(WithClause inner) implements ASTNode, WithClause, ToStringPretty {
     @Override
     public <STACK> boolean matchesStack(
@@ -15,4 +17,11 @@ public record WithNegation(WithClause inner) implements ASTNode, WithClause, ToS
     public String toString() {
         return "NOT " + inner;
     }
+
+    @Override
+    public List<WithClause> getChildNodes() {
+
+        return List.of(inner);
+    }
+
 }

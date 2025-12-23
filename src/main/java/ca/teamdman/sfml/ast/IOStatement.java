@@ -1,7 +1,16 @@
 package ca.teamdman.sfml.ast;
 
+import java.util.List;
+
 public interface IOStatement extends Statement, ToStringPretty {
-    LabelAccess labelAccess();
+    ResourceAccess resourceAccess();
     ResourceLimits resourceLimits();
     boolean each();
+
+    @Override
+    default List<? extends ASTNode> getChildNodes() {
+
+        return List.of(resourceLimits(), resourceAccess());
+    }
+
 }

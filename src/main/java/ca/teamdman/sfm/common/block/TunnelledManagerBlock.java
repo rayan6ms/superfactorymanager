@@ -2,7 +2,6 @@ package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.blockentity.TunnelledManagerBlockEntity;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
-import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -13,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class TunnelledManagerBlock extends ManagerBlock {
     @Override
-    public BlockEntity newBlockEntity(@Stored BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
         return SFMBlockEntities.TUNNELLED_MANAGER_BLOCK_ENTITY
                 .get()
                 .create(pos, state);

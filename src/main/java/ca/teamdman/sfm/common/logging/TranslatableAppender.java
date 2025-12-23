@@ -27,7 +27,7 @@ public class TranslatableAppender extends AbstractAppender {
     }
 
     @PluginFactory
-    public static TranslatableAppender createAppender(@PluginBuilderAttribute("name") String name) {
+    public static TranslatableAppender createAppender(@PluginBuilderAttribute("value") String name) {
         Layout<? extends Serializable> layout = PatternLayout.createDefaultLayout();
         return new TranslatableAppender(name, layout);
     }

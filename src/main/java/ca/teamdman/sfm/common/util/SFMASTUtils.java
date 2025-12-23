@@ -16,8 +16,9 @@ import java.util.Optional;
 public class SFMASTUtils {
     public static <STACK, ITEM, CAP> Optional<InputStatement> getInputStatementForSlot(
             LimitedInputSlot<STACK, ITEM, CAP> slot,
-            LabelAccess labelAccess
+            ResourceAccess resourceAccess
     ) {
+
         STACK potential = slot.peekExtractPotential();
         ResourceType<STACK, ITEM, CAP> resourceType = slot.type;
         if (resourceType.isEmpty(potential)) return Optional.empty();
@@ -43,13 +44,14 @@ public class SFMASTUtils {
                         null
                 ))
                 // update the labels
-                .map(inputStatement -> new InputStatement(new LabelAccess(
-                        labelAccess.labels(),
-                        labelAccess.sides(),
-                        inputStatement.labelAccess()
-                                .slots(),
-                        RoundRobin.disabled()
-                ), inputStatement.resourceLimits(), inputStatement.each()));
+                .map(inputStatement -> new InputStatement(
+                        new ResourceAccess(
+                                resourceAccess.labelExpressions(),
+                                new RoundRobin(RoundRobinBehaviour.UNMODIFIED), resourceAccess.sides(),
+                                inputStatement.resourceAccess()
+                                        .slots()
+                        ), inputStatement.resourceLimits(), inputStatement.each()
+                ));
     }
 
     public static <STACK, ITEM, CAP> InputStatement getInputStatementForStack(
@@ -61,22 +63,25 @@ public class SFMASTUtils {
             boolean each,
             @Nullable Direction direction
     ) {
-        LabelAccess labelAccess = new LabelAccess(
-                List.of(new Label(label)),
-                new SideQualifier(List.of(Side.fromDirection(direction))),
-                new NumberRangeSet(
-                        new NumberRange[]{new NumberRange(slot, slot)}
-                ),
-                RoundRobin.disabled()
+
+        ResourceAccess resourceAccess = new ResourceAccess(
+                List.of(new LabelExpressionSingle(new Label(label))),
+                new RoundRobin(RoundRobinBehaviour.UNMODIFIED), new SideQualifier(List.of(Side.fromDirection(direction))),
+                new SlotQualifier(
+                        false,
+                        new NumberSet(
+                                new NumberRange[]{new NumberRange(new Number(slot), new Number(slot))},
+                                new NumberRange[]{}
+                        )
+                )
         );
         Limit limit = new Limit(
                 new ResourceQuantity(
-                        new ca.teamdman.sfml.ast.Number(resourceType.getAmount(stack)),
-                        ResourceQuantity.IdExpansionBehaviour.NO_EXPAND
+                        ResourceQuantity.IdExpansionBehaviour.NO_EXPAND,
+                        new ca.teamdman.sfml.ast.Number(resourceType.getAmount(stack))
                 ),
                 new ResourceQuantity(
-                        new Number(0),
-                        ResourceQuantity.IdExpansionBehaviour.NO_EXPAND
+                        ResourceQuantity.IdExpansionBehaviour.NO_EXPAND, new Number(0)
                 )
         );
         ResourceLocation stackId = resourceType.getRegistryKeyForStack(stack);
@@ -96,9 +101,10 @@ public class SFMASTUtils {
 
         // todo: add WITH logic here to also build code to match any item/block tags present
         return new InputStatement(
-                labelAccess,
+                resourceAccess,
                 resourceLimits,
                 each
         );
     }
+
 }

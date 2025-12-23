@@ -4,8 +4,6 @@ import ca.teamdman.sfm.common.block.shape.ShapeCache;
 import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.util.NotStored;
-import ca.teamdman.sfm.common.util.Stored;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -85,9 +83,9 @@ public class FancyCableBlock extends CableBlock implements IFacadableBlock {
     public void neighborChanged(
             BlockState state,
             Level level,
-            @Stored BlockPos pos,
+            BlockPos pos,
             Block block,
-            @Stored BlockPos fromPos,
+            BlockPos fromPos,
             boolean isMoving
     ) {
         super.neighborChanged(state, level, pos, block, fromPos, isMoving);
@@ -100,7 +98,7 @@ public class FancyCableBlock extends CableBlock implements IFacadableBlock {
     public VoxelShape getShape(
             BlockState state,
             BlockGetter world,
-            @NotStored BlockPos pos,
+            BlockPos pos,
             CollisionContext ctx
     ) {
         return ShapeCache.getOrCompute(state, FancyCableBlock::getShape);
@@ -113,8 +111,8 @@ public class FancyCableBlock extends CableBlock implements IFacadableBlock {
             Direction dir,
             BlockState facingState,
             LevelAccessor world,
-            @NotStored BlockPos pos,
-            @NotStored BlockPos facingPos
+            BlockPos pos,
+            BlockPos facingPos
     ) {
         return getState(state, world, pos);
     }
@@ -122,7 +120,7 @@ public class FancyCableBlock extends CableBlock implements IFacadableBlock {
     @Override
     public BlockState getStateForPlacementByFacadePlan(
             LevelAccessor level,
-            @NotStored BlockPos pos
+            BlockPos pos
     ) {
         return getState(defaultBlockState(), level, pos);
     }
@@ -157,7 +155,7 @@ public class FancyCableBlock extends CableBlock implements IFacadableBlock {
     protected BlockState getState(
             BlockState currentState,
             LevelAccessor level,
-            @NotStored BlockPos pos
+            BlockPos pos
     ) {
         boolean north = hasConnection(level, pos, Direction.NORTH);
         boolean south = hasConnection(level, pos, Direction.SOUTH);
@@ -177,7 +175,7 @@ public class FancyCableBlock extends CableBlock implements IFacadableBlock {
 
     protected boolean hasConnection(
             LevelAccessor level,
-            @NotStored BlockPos pos,
+            BlockPos pos,
             Direction direction
     ) {
         // Directly connect to other cables

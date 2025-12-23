@@ -1,5 +1,7 @@
 package ca.teamdman.sfml.ast;
 
+import java.util.List;
+
 import static ca.teamdman.sfml.ast.ResourceQuantity.IdExpansionBehaviour.NO_EXPAND;
 
 public record Limit(
@@ -7,12 +9,12 @@ public record Limit(
         ResourceQuantity retention
 ) implements ASTNode {
     public static final Limit MAX_QUANTITY_NO_RETENTION = new Limit(
-            new ResourceQuantity(new Number(Long.MAX_VALUE), NO_EXPAND),
-            new ResourceQuantity(new Number(0), NO_EXPAND)
+            new ResourceQuantity(NO_EXPAND, new Number(Long.MAX_VALUE)),
+            new ResourceQuantity(NO_EXPAND, new Number(0))
     );
     public static final Limit MAX_QUANTITY_MAX_RETENTION = new Limit(
-            new ResourceQuantity(new Number(Long.MAX_VALUE), NO_EXPAND),
-            new ResourceQuantity(new Number(Long.MAX_VALUE), NO_EXPAND)
+            new ResourceQuantity(NO_EXPAND, new Number(Long.MAX_VALUE)),
+            new ResourceQuantity(NO_EXPAND, new Number(Long.MAX_VALUE))
     );
 
     public static final Limit UNSET = new Limit(
@@ -53,4 +55,11 @@ public record Limit(
         }
         return sb.toString();
     }
+
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of(quantity, retention);
+    }
+
 }

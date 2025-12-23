@@ -142,7 +142,7 @@ public class SFMLIntellisenseTests {
             failure.metadata().errors().forEach(error -> System.out.println(error.toString()));
             throw new RuntimeException("Failed to compile program");
         });
-        Program program = Objects.requireNonNull(buildResult.program());
+        Program program = Objects.requireNonNull(buildResult.maybeProgram());
         for (int cursorPos = 0; cursorPos < programString.length(); cursorPos++) {
             System.out.print("||| ");
             System.out.printf("%s", SFMDisplayUtils.getCursorPositionDisplay(programString, cursorPos));

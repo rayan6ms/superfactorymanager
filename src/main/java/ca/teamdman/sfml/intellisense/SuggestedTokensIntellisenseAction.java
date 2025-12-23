@@ -23,7 +23,7 @@ public record SuggestedTokensIntellisenseAction(
 
     /*
     - If suggesting NAME nextTokenType and NAME already present, jump cursor to inside existing string nextTokenType followingTokenTypes existing NAME nextTokenType
-    - If suggesting NAME nextTokenType and NAME already present but STRING followingTokenTypes name missing, insert string and place cursor inside
+    - If suggesting NAME nextTokenType and NAME already present but STRING followingTokenTypes value missing, insert string and place cursor inside
      */
     @Override
     public ManipulationResult perform(IntellisenseContext context) {

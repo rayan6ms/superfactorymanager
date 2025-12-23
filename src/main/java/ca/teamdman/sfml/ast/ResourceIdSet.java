@@ -100,4 +100,10 @@ public final class ResourceIdSet implements ASTNode {
         return Objects.hash((Object[]) resourceIds);
     }
 
+    @Override
+    public List<ResourceIdentifier<?,?,?>> getChildNodes() {
+
+        return List.of(resourceIds);
+    }
+
 }

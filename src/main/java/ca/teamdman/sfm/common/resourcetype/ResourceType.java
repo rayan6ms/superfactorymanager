@@ -1,18 +1,20 @@
 package ca.teamdman.sfm.common.resourcetype;
 
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntityContents;
+import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
+import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.program.CapabilityConsumer;
-import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
-import ca.teamdman.sfm.common.util.Stored;
 import ca.teamdman.sfml.ast.*;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
@@ -89,7 +91,11 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             boolean simulate
     );
 
-    public boolean canExtract(CAP capability, int slot) {
+    public boolean canExtract(
+            CAP capability,
+            int slot
+    ) {
+
         return true;
     }
 
@@ -112,7 +118,11 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             boolean simulate
     );
 
-    public boolean canInsert(CAP capability, int slot) {
+    public boolean canInsert(
+            CAP capability,
+            int slot
+    ) {
+
         return true;
     }
 
@@ -139,25 +149,29 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     public abstract boolean matchesCapabilityHandler(Object o);
 
     public void forEachCapability(
-            ProgramContext programContext,
-            LabelAccess labelAccess,
+            TranslatableLogger logger,
+            Level level,
+            CableNetwork network,
+            LabelPositionHolder labelPositionHolder,
+            ResourceAccess resourceAccess,
             CapabilityConsumer<CAP> consumer
     ) {
         // Log
-        programContext
-                .getLogger()
-                .trace(x -> x.accept(LocalizationKeys.LOG_RESOURCE_TYPE_GET_CAPABILITIES_BEGIN.get(
+        logger.trace(x -> x.accept(
+                LocalizationKeys.LOG_RESOURCE_TYPE_GET_CAPABILITIES_BEGIN.get(
                         displayAsCode(),
                         displayAsCapabilityClass(),
-                        labelAccess
+                        resourceAccess
                 )));
 
-        for (Pair<Label, BlockPos> pair : labelAccess.getLabelledPositions(programContext.getLabelPositionHolder())) {
+        for (Pair<Label, BlockPos> pair : resourceAccess.getLabelledPositions(labelPositionHolder)) {
             Label label = pair.getFirst();
             BlockPos pos = pair.getSecond();
             forEachDirectionalCapability(
-                    programContext,
-                    labelAccess.sides(),
+                    logger,
+                    level,
+                    network,
+                    resourceAccess.sides(),
                     pos,
                     (dir, cap) -> consumer.accept(label, pos, dir, cap)
             );
@@ -165,18 +179,20 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     }
 
     public void forEachDirectionalCapability(
-            ProgramContext programContext,
+            TranslatableLogger logger,
+            Level level,
+            CableNetwork network,
             SideQualifier sides,
-            @Stored BlockPos pos,
+            BlockPos pos,
             BiConsumer<Direction, CAP> consumer
     ) {
+        for (Direction dir : sides.resolve(level.getBlockState(pos))) {
 
-        for (Direction dir : sides.resolve(programContext.getLevel().getBlockState(pos))) {
-            SFMBlockCapabilityResult<CAP> maybeCap = programContext.getNetwork()
-                    .getCapability(CAPABILITY_KIND, pos, dir, programContext.getLogger());
+            SFMBlockCapabilityResult<CAP> maybeCap = network
+                    .getCapability(CAPABILITY_KIND, pos, dir, logger);
             if (maybeCap.isPresent()) {
-                programContext
-                        .getLogger()
+
+                logger
                         .debug(x -> x.accept(LocalizationKeys.LOG_RESOURCE_TYPE_GET_CAPABILITIES_CAP_PRESENT.get(
                                 displayAsCapabilityClass(),
                                 pos,
@@ -186,8 +202,8 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
                 consumer.accept(dir, cap);
             } else {
                 // Log error
-                programContext
-                        .getLogger()
+
+                logger
                         .error(x -> x.accept(LocalizationKeys.LOG_RESOURCE_TYPE_GET_CAPABILITIES_CAP_NOT_PRESENT.get(
                                 displayAsCapabilityClass(),
                                 pos,
@@ -201,7 +217,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
 
     public Stream<STACK> getStacksInSlots(
             CAP cap,
-            NumberRangeSet slots
+            NumberSet slots
     ) {
 
         var rtn = Stream.<STACK>builder();

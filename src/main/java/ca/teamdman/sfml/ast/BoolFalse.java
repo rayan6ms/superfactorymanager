@@ -2,6 +2,8 @@ package ca.teamdman.sfml.ast;
 
 import ca.teamdman.sfm.common.program.ProgramContext;
 
+import java.util.List;
+
 public record BoolFalse() implements BoolExpr {
     @Override
     public boolean test(ProgramContext programContext) {
@@ -12,4 +14,11 @@ public record BoolFalse() implements BoolExpr {
     public String toString() {
         return "FALSE";
     }
+
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of();
+    }
+
 }

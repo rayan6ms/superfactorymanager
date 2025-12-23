@@ -1,13 +1,16 @@
 package ca.teamdman.sfm.common.program.linting;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
+import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationEntry;
-import ca.teamdman.sfm.common.program.ProgramContext;
-import ca.teamdman.sfm.common.program.SimulateExploreAllPathsProgramBehaviour;
+import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import ca.teamdman.sfml.ast.*;
+import ca.teamdman.sfml.ast.IOStatement;
+import ca.teamdman.sfml.ast.InputStatement;
+import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.ResourceAccess;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -15,11 +18,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.*;
-import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNING_NO_VIABLE_INPUT_SLOTS;
-import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNING_NO_VIABLE_OUTPUT_SLOTS;
 
-public class NoSlotStatementProgramLinter implements IProgramLinter {
-    // Check for input and output statements that gather no valid slots
+/// Evaluate {@link IOStatement} where the {@link ResourceAccess} has bad slots.
+/// Bad slots determined via {@link ResourceType#canExtract(Object, int)} and {@link ResourceType#canInsert(Object, int)} responses.
+public class NoEligibleSlotsProgramLinter implements IProgramLinter {
+
     @Override
     public void gatherWarnings(
             Program program,
@@ -27,39 +30,56 @@ public class NoSlotStatementProgramLinter implements IProgramLinter {
             @Nullable ManagerBlockEntity manager,
             ProblemTracker tracker
     ) {
+
         if (manager == null || manager.getLevel() == null) {
             return;
         }
 
-        var network = CableNetworkManager.getOrRegisterNetworkFromManagerPosition(manager);
-        if (network.isEmpty()) {
+        var network = CableNetworkManager.getOrRegisterNetworkFromManagerPosition(manager).orElse(null);
+        if (network == null) {
             return;
         }
 
-        var simulationContext = ProgramContext.createSimulationContext(
-                program,
-                manager,
-                network.get(),
-                labelPositionHolder,
-                0,
-                // We won't actually be executing the program, but to be safe we use a simulation behaviour
-                new SimulateExploreAllPathsProgramBehaviour()
-        );
-        program.getDescendantStatements()
+        program.getDescendantNodes()
                 .filter(IOStatement.class::isInstance)
                 .map(IOStatement.class::cast)
                 .forEach(statement ->
-                        findEmptyIOStatement(tracker, simulationContext, statement, IODirection.of(statement))
+                                 findEmptyIOStatement(
+                                         program,
+                                         manager.logger,
+                                         manager.getLevel(),
+                                         network,
+                                         labelPositionHolder,
+                                         tracker,
+                                         statement,
+                                         IODirection.of(statement)
+                                 )
                 );
 
     }
 
+    @Override
+    public void fixWarnings(
+            Program program,
+            LabelPositionHolder labels,
+            ManagerBlockEntity manager,
+            Level level,
+            ItemStack disk
+    ) {
+
+    }
+
     private void findEmptyIOStatement(
+            Program program,
+            TranslatableLogger logger,
+            Level level,
+            CableNetwork network,
+            LabelPositionHolder labelPositionHolder,
             ProblemTracker tracker,
-            ProgramContext context,
             IOStatement inputStatement,
             IODirection ioDirection
     ) {
+
         if (tracker.isSaturated()) {
             return;
         }
@@ -68,21 +88,24 @@ public class NoSlotStatementProgramLinter implements IProgramLinter {
         final AtomicBoolean anyMatches = new AtomicBoolean(false);
         final AtomicBoolean ioDirectionMatches = new AtomicBoolean(false);
         for (var resourceType : inputStatement.resourceLimits().getReferencedResourceTypes()) {
+            ResourceAccess resourceAccess = inputStatement.resourceAccess();
             resourceType.forEachCapability(
-                    context,
-                    inputStatement.labelAccess(),
+                    logger,
+                    level,
+                    network,
+                    labelPositionHolder,
+                    resourceAccess,
                     (label, pos, direction, cap) -> {
                         anyCapability.set(true);
                         searchForValidSlots(
                                 (ResourceType<Object, Object, Object>) resourceType,
-                                inputStatement.labelAccess(),
+                                inputStatement.resourceAccess(),
                                 cap,
                                 ioDirection,
                                 anyMatches,
                                 ioDirectionMatches
                         );
                     }
-
             );
         }
 
@@ -98,9 +121,10 @@ public class NoSlotStatementProgramLinter implements IProgramLinter {
                 };
             }
             if (warning != null) {
+
                 tracker.add(warning.get(
                         inputStatement,
-                        context.getProgram().astBuilder().getLineColumnForNode(inputStatement)
+                        program.astBuilder().getLineColumnForNode(inputStatement)
                 ));
             }
         }
@@ -108,14 +132,15 @@ public class NoSlotStatementProgramLinter implements IProgramLinter {
 
     private <STACK, ITEM, CAP> void searchForValidSlots(
             ResourceType<STACK, ITEM, CAP> type,
-            LabelAccess labelAccess,
+            ResourceAccess resourceAccess,
             CAP capability,
             IODirection ioDirection,
             AtomicBoolean anyMatches,
             AtomicBoolean ioDirectionMatches
     ) {
+
         for (int slot = 0; slot < type.getSlots(capability); slot++) {
-            if (labelAccess.slots().contains(slot)) {
+            if (resourceAccess.slots().contains(slot)) {
                 anyMatches.set(true);
                 boolean canPerformDirection = switch (ioDirection) {
                     case INPUT -> type.canExtract(capability, slot);
@@ -129,23 +154,15 @@ public class NoSlotStatementProgramLinter implements IProgramLinter {
         }
     }
 
-    @Override
-    public void fixWarnings(
-            Program program,
-            LabelPositionHolder labels,
-            ManagerBlockEntity manager,
-            Level level,
-            ItemStack disk
-    ) {
-    }
-
 
     enum IODirection {
         INPUT,
         OUTPUT;
 
         public static IODirection of(IOStatement statement) {
+
             return statement instanceof InputStatement ? IODirection.INPUT : IODirection.OUTPUT;
         }
     }
+
 }

@@ -8,10 +8,7 @@ import it.unimi.dsi.fastutil.objects.ObjectArrayList;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -126,6 +123,15 @@ public final class ResourceLimits implements ASTNode, ToStringPretty {
     @Override
     public int hashCode() {
         return Objects.hash(resourceLimitList, exclusions);
+    }
+
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        ArrayList<ASTNode> rtn = new ArrayList<>(resourceLimitList.size() + 1);
+        rtn.addAll(resourceLimitList);
+        rtn.add(exclusions);
+        return rtn;
     }
 
 }

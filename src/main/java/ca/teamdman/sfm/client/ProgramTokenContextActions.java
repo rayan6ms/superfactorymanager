@@ -82,7 +82,7 @@ public class ProgramTokenContextActions {
         } else if (node instanceof Label label) {
             SFM.LOGGER.info("Found context action for label node");
             return Optional.of(() -> SFMPackets.sendToServer(new ServerboundLabelInspectionRequestPacket(
-                    label.name()
+                    label.value()
             )));
         } else if (node instanceof InputStatement) {
             if (cursorPosition > parserRuleContext.getStart().getStartIndex() + "INPUT".length()) {

@@ -33,7 +33,7 @@ public interface BoolExpr extends Predicate<ProgramContext>, ASTNode, ToStringPr
                                     .triggers()
                                     .get(0)
                                     .getBlock()
-                                    .getStatements()
+                                    .getChildNodes()
                                     .get(0)
                     ).condition();
                     rtn.setValue(condition);

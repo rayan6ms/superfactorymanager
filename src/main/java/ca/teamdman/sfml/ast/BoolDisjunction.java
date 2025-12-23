@@ -3,6 +3,7 @@ package ca.teamdman.sfml.ast;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import net.minecraft.core.BlockPos;
 
+import java.util.List;
 import java.util.function.Consumer;
 
 public record BoolDisjunction(BoolExpr left, BoolExpr right) implements BoolExpr {
@@ -23,6 +24,12 @@ public record BoolDisjunction(BoolExpr left, BoolExpr right) implements BoolExpr
     ) {
         left.collectPositions(context, posConsumer);
         right.collectPositions(context, posConsumer);
+    }
+
+    @Override
+    public List<BoolExpr> getChildNodes() {
+
+        return List.of(left, right);
     }
 
 }

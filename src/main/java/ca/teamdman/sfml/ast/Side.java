@@ -5,6 +5,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+
 public enum Side implements ASTNode {
     TOP,
     BOTTOM,
@@ -58,5 +60,11 @@ public enum Side implements ASTNode {
                     .orElse(null);
             case NULL -> null;
         };
+    }
+
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of();
     }
 }

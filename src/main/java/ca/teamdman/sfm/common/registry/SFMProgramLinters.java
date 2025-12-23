@@ -63,10 +63,10 @@ public class SFMProgramLinters {
             IncompleteIOProgramLinter::new
     );
 
-    public static final SFMRegistryObject<IProgramLinter, NoSlotStatementProgramLinter>
+    public static final SFMRegistryObject<IProgramLinter, NoEligibleSlotsProgramLinter>
             NO_SLOT_STATEMENT_PROGRAM_LINTER = REGISTERER.register(
             "no_slot_statement",
-            NoSlotStatementProgramLinter::new
+            NoEligibleSlotsProgramLinter::new
     );
 
     static {

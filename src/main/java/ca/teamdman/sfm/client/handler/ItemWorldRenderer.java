@@ -6,7 +6,6 @@ import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.item.NetworkToolItem;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.HelpsWithMinecraftVersionIndependence;
-import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import com.google.common.collect.HashMultimap;
 import com.mojang.blaze3d.platform.GlStateManager;
@@ -298,7 +297,7 @@ public class ItemWorldRenderer {
     private static void drawLabelsForPos(
             PoseStack poseStack,
             Camera camera,
-            @NotStored BlockPos pos,
+            BlockPos pos,
             MultiBufferSource mbs,
             Collection<String> labels
     ) {

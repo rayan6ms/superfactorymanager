@@ -1,5 +1,7 @@
 package ca.teamdman.sfml.ast;
 
+import java.util.List;
+
 public record Number(long value) implements ASTNode {
     @Override
     public String toString() {
@@ -8,5 +10,11 @@ public record Number(long value) implements ASTNode {
 
     public Number add(Number number) {
         return new Number(value + number.value);
+    }
+
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of();
     }
 }

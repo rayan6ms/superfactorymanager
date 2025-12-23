@@ -1,37 +1,12 @@
 package ca.teamdman.sfml.ast;
 
-import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import com.mojang.datafixers.util.Pair;
-import it.unimi.dsi.fastutil.longs.LongOpenHashSet;
-import net.minecraft.core.BlockPos;
-
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
-public class RoundRobin implements ASTNode {
-    private final Behaviour behaviour;
-    private int nextIndex = 0;
-
-    public RoundRobin(Behaviour behaviour) {
-        this.behaviour = behaviour;
-    }
-
-    public static RoundRobin disabled() {
-        return new RoundRobin(Behaviour.UNMODIFIED);
-    }
-
-    public Behaviour getBehaviour() {
-        return behaviour;
-    }
-
-    public int next(int length) {
-        // this never exists long enough to roll over
-        return nextIndex++ % length;
-    }
+public record RoundRobin(RoundRobinBehaviour behaviour) implements ASTNode {
 
     @Override
     public String toString() {
+
         return switch (behaviour) {
             case UNMODIFIED -> "NOT ROUND ROBIN";
             case BY_BLOCK -> "ROUND ROBIN BY BLOCK";
@@ -39,59 +14,15 @@ public class RoundRobin implements ASTNode {
         };
     }
 
-    public boolean isEnabled() {
-        return behaviour != Behaviour.UNMODIFIED;
+    public boolean isModified() {
+
+        return behaviour != RoundRobinBehaviour.UNMODIFIED;
     }
 
-    public ArrayList<Pair<Label, BlockPos>> getPositionsForLabels(
-            List<Label> labels,
-            LabelPositionHolder labelPositionHolder
-    ) {
-        ArrayList<Pair<Label, BlockPos>> positions = new ArrayList<>();
-        switch (getBehaviour()) {
-            case BY_LABEL -> {
-                int index = next(labels.size());
-                Label label = labels.get(index);
-                Set<BlockPos> labelPositions = labelPositionHolder.getPositions(label.name());
-                positions.ensureCapacity(labelPositions.size());
-                for (BlockPos pos : labelPositions) {
-                    positions.add(Pair.of(label, pos));
-                }
-            }
-            case BY_BLOCK -> {
-                // This can be optimized
-                // - ensure capacity where possible
-                // - determine index beforehand and stop collecting positions once we have enough
-                // to determine the next index do we not need to know the number of candidates?
-                // might be able to cache inside the object, as long as the object is nuked when labels are modified
-                List<Pair<Label, BlockPos>> candidates = new ArrayList<>();
-                LongOpenHashSet seen = new LongOpenHashSet();
-                for (Label label : labels) {
-                    for (BlockPos pos : labelPositionHolder.getPositions(label.name())) {
-                        if (!seen.add(pos.asLong())) continue;
-                        candidates.add(Pair.of(label, pos));
-                    }
-                }
-                if (!candidates.isEmpty()) {
-                    positions.add(candidates.get(next(candidates.size())));
-                }
-            }
-            case UNMODIFIED -> {
-                for (Label label : labels) {
-                    var labelPositions = labelPositionHolder.getPositions(label.name());
-                    positions.ensureCapacity(labelPositions.size());
-                    for (BlockPos pos : labelPositions) {
-                        positions.add(Pair.of(label, pos));
-                    }
-                }
-            }
-        }
-        return positions;
+    @Override
+    public List<RoundRobinBehaviour> getChildNodes() {
+
+        return List.of(behaviour);
     }
 
-    public enum Behaviour {
-        UNMODIFIED,
-        BY_BLOCK,
-        BY_LABEL
-    }
 }

@@ -4,15 +4,17 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import net.minecraft.world.level.Level;
 
-public record BoolRedstone(ComparisonOperator operator, long number) implements BoolExpr {
-    @SuppressWarnings("UnnecessaryLocalVariable")
+import java.util.List;
+
+public record BoolRedstone(ComparisonOperator operator, Number number) implements BoolExpr {
     @Override
     public boolean test(ProgramContext programContext) {
-        ManagerBlockEntity manager = programContext.getManager();
+
+        ManagerBlockEntity manager = programContext.manager();
         Level level = manager.getLevel();
         assert level != null;
         long lhs = level.getBestNeighborSignal(manager.getBlockPos());
-        long rhs = number;
+        long rhs = number.value();
         return operator.test(lhs, rhs);
     }
 
@@ -20,4 +22,11 @@ public record BoolRedstone(ComparisonOperator operator, long number) implements 
     public String toString() {
         return "REDSTONE " + operator + " " + number;
     }
+
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of(operator, number);
+    }
+
 }

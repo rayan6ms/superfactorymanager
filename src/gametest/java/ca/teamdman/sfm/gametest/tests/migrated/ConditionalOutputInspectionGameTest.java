@@ -82,7 +82,7 @@ public class ConditionalOutputInspectionGameTest extends SFMGameTestDefinition {
                 .triggers()
                 .get(0)
                 .getBlock()
-                .getStatements()
+                .getChildNodes()
                 .get(1);
 
         String inspectionResults = ServerboundOutputInspectionRequestPacket.getOutputStatementInspectionResultsString(

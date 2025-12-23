@@ -674,7 +674,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                 String cursorPositionDisplay = SFMDisplayUtils.getCursorPositionDisplay(programString, cursorPosition);
                 String cursorTokenDisplay = SFMDisplayUtils.getCursorTokenDisplay(buildResult, cursorPosition);
                 String tokenHierarchyDisplay;
-                @Nullable Program program = buildResult.program();
+                @Nullable Program program = buildResult.maybeProgram();
                 if (program == null) {
                     tokenHierarchyDisplay = "<INVALID PROGRAM>";
                 } else {

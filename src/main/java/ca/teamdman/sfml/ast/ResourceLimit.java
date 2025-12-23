@@ -3,6 +3,8 @@ package ca.teamdman.sfml.ast;
 import ca.teamdman.sfm.common.program.*;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 
+import java.util.List;
+
 public record ResourceLimit(
         ResourceIdSet resourceIds,
         Limit limit,
@@ -84,4 +86,11 @@ public record ResourceLimit(
                 )
         ).trim();
     }
+
+    @Override
+    public List<? extends ASTNode> getChildNodes() {
+
+        return List.of(resourceIds, limit, with);
+    }
+
 }

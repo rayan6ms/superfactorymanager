@@ -23,7 +23,7 @@ public class EachInIOWithoutPatternProgramLinter implements IProgramLinter {
             @Nullable ManagerBlockEntity managerBlockEntity,
             ProblemTracker tracker
     ) {
-        program.getDescendantStatements()
+        program.getDescendantNodes()
                 .filter(IOStatement.class::isInstance)
                 .map(IOStatement.class::cast)
                 .forEach(statement -> {

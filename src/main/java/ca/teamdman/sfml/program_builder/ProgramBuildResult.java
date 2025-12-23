@@ -9,16 +9,16 @@ import java.util.function.Consumer;
 
 @SuppressWarnings("UnusedReturnValue")
 public record ProgramBuildResult(
-        @Nullable Program program,
+        @Nullable Program maybeProgram,
         ProgramMetadata metadata
 ) {
     public boolean isBuildSuccessful() {
-        return program != null && metadata.errors().isEmpty();
+        return maybeProgram != null && metadata.errors().isEmpty();
     }
 
     public ProgramBuildResult caseSuccess(BiConsumer<Program, ProgramMetadata> callback) {
         if (isBuildSuccessful()) {
-            callback.accept(this.program(), this.metadata());
+            callback.accept(this.maybeProgram(), this.metadata());
         }
         return this;
     }

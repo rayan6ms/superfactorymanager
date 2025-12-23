@@ -14,10 +14,13 @@ import java.util.stream.Stream;
 
 public class SimulateExploreAllPathsProgramBehaviour implements ProgramBehaviour {
     protected List<ExecutionPath> seenPaths = new ArrayList<>();
+
     protected ExecutionPath currentPath = new ExecutionPath();
+
     protected AtomicReference<BigInteger> triggerPathCount = new AtomicReference<>(BigInteger.ZERO);
 
     public SimulateExploreAllPathsProgramBehaviour() {
+
     }
 
     public SimulateExploreAllPathsProgramBehaviour(
@@ -25,30 +28,36 @@ public class SimulateExploreAllPathsProgramBehaviour implements ProgramBehaviour
             ExecutionPath currentPath,
             AtomicReference<BigInteger> triggerPathCount
     ) {
+
         this.seenPaths = seenPaths;
         this.currentPath = currentPath.fork();
         this.triggerPathCount = triggerPathCount;
     }
 
     public void terminatePathAndBeginAnew() {
+
         seenPaths.add(currentPath);
         currentPath = new ExecutionPath();
         triggerPathCount.set(triggerPathCount.get().add(BigInteger.ONE));
     }
 
     public BigInteger getTriggerPathCount() {
+
         return triggerPathCount.get();
     }
 
     public void prepareNextTrigger() {
+
         triggerPathCount.set(BigInteger.ZERO);
     }
 
     public void pushPathElement(ExecutionPathElement statement) {
+
         currentPath.history.add(statement);
     }
 
     public @Nullable ExecutionPathElement getLatestPathElement() {
+
         if (currentPath.history.isEmpty()) {
             return null;
         }
@@ -56,12 +65,13 @@ public class SimulateExploreAllPathsProgramBehaviour implements ProgramBehaviour
     }
 
     public @Nullable ExecutionPathElement getPathElementForNode(ASTNode node) {
+
         var iterator = currentPath.history.listIterator(currentPath.history.size());
         while (iterator.hasPrevious()) {
             var element = iterator.previous();
-            if (element instanceof Branch branch && branch.ifStatement == node) {
+            if (element instanceof BranchPathElement branch && branch.ifStatement == node) {
                 return element;
-            } else if (element instanceof IO io && io.statement == node) {
+            } else if (element instanceof IOPathElement io && io.statement == node) {
                 return element;
             }
         }
@@ -72,14 +82,16 @@ public class SimulateExploreAllPathsProgramBehaviour implements ProgramBehaviour
             ProgramContext context,
             OutputStatement outputStatement
     ) {
-        pushPathElement(new SimulateExploreAllPathsProgramBehaviour.IO(outputStatement));
+
+        pushPathElement(IOPathElement.of(outputStatement));
     }
 
     public void onInputStatementExecution(
             ProgramContext context,
             InputStatement inputStatement
     ) {
-        pushPathElement(new SimulateExploreAllPathsProgramBehaviour.IO(inputStatement));
+
+        pushPathElement(IOPathElement.of(inputStatement));
     }
 
     public void onInputStatementForgetTransform(
@@ -87,12 +99,14 @@ public class SimulateExploreAllPathsProgramBehaviour implements ProgramBehaviour
             InputStatement old,
             InputStatement next
     ) {
+
     }
 
     public void onInputStatementDropped(
             ProgramContext context,
             InputStatement inputStatement
     ) {
+
     }
 
 
@@ -100,26 +114,31 @@ public class SimulateExploreAllPathsProgramBehaviour implements ProgramBehaviour
             ProgramContext context,
             @SuppressWarnings("unused") Trigger trigger
     ) {
-        context.getInputs().forEach(inputStatement -> onInputStatementDropped(context, inputStatement));
+
+        context.inputs().forEach(inputStatement -> onInputStatementDropped(context, inputStatement));
     }
 
     @Override
     public ProgramBehaviour fork() {
+
         return new SimulateExploreAllPathsProgramBehaviour(this.seenPaths, this.currentPath, this.triggerPathCount);
     }
 
     public ExecutionPath getCurrentPath() {
+
         return currentPath;
     }
 
     public List<ExecutionPath> getSeenPaths() {
+
         return seenPaths;
     }
 
     public int[] getSeenIOStatementCountForEachPath() {
+
         return seenPaths
                 .stream()
-                .mapToInt(path -> (int) path.history.stream().filter(IO.class::isInstance).count())
+                .mapToInt(path -> (int) path.history.stream().filter(IOPathElement.class::isInstance).count())
                 .toArray();
     }
 
@@ -142,47 +161,63 @@ public class SimulateExploreAllPathsProgramBehaviour implements ProgramBehaviour
             List<ExecutionPathElement> history
     ) {
         public ExecutionPath() {
+
             this(new ArrayList<>());
         }
 
         public ExecutionPath fork() {
+
             return new ExecutionPath(new ArrayList<>(history));
         }
 
         public Stream<ExecutionPathElement> stream() {
+
             return history.stream();
         }
 
-        public Stream<Branch> streamBranches() {
-            return history.stream().filter(Branch.class::isInstance).map(Branch.class::cast);
+        public Stream<BranchPathElement> streamBranches() {
+
+            return history.stream().filter(BranchPathElement.class::isInstance).map(BranchPathElement.class::cast);
         }
+
     }
 
-    public record Branch(
+    public record BranchPathElement(
             IfStatement ifStatement,
+
             boolean wasTrue
     ) implements ExecutionPathElement {
     }
 
-    public record IO(
+    public record IOPathElement(
             IOStatement statement,
+
             IOKind kind,
-            ResourceType<?,?,?>[] usedResourceTypes,
+
+            ResourceType<?, ?, ?>[] usedResourceTypes,
+
             Set<Label> usedLabels
     ) implements ExecutionPathElement {
-        public IO(IOStatement statement) {
-            //noinspection DataFlowIssue
-            this(
-                    statement,
-                    statement instanceof InputStatement
-                    ? IOKind.INPUT
-                    : (statement instanceof OutputStatement ? IOKind.OUTPUT : null),
-                    statement.resourceLimits().getReferencedResourceTypes(),
-                    new HashSet<>(statement.labelAccess().labels())
-            );
-            if (kind == null) {
-                throw new IllegalArgumentException("Unknown IO statement type: " + statement);
+
+        public static IOPathElement of(IOStatement statement) {
+
+            IOKind kind;
+            if (statement instanceof InputStatement) {
+                kind = IOKind.INPUT;
+            } else if (statement instanceof OutputStatement) {
+                kind = IOKind.OUTPUT;
+            } else {
+                throw new IllegalStateException("Unexpected value: " + statement);
             }
+
+            ResourceType<?, ?, ?>[] usedResourceTypes = statement.resourceLimits().getReferencedResourceTypes();
+
+            HashSet<Label> usedLabels = new HashSet<>();
+            statement.resourceAccess().visitLabels(usedLabels::add);
+
+            return new IOPathElement(statement, kind, usedResourceTypes, usedLabels);
         }
+
     }
+
 }

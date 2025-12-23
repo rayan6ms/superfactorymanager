@@ -112,7 +112,6 @@ public class ProgramSyntaxHighlightingHelper {
             case SFMLLexer.TICKS:
             case SFMLLexer.TICK:
             case SFMLLexer.GLOBAL:
-            case SFMLLexer.NUMBER_WITH_G_SUFFIX:
             case SFMLLexer.SECONDS:
             case SFMLLexer.SECOND:
             case SFMLLexer.SLOTS:
