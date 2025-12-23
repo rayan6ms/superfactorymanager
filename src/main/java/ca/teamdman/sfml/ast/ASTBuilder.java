@@ -887,16 +887,13 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     @Override
     public ForgetStatement visitForgetStatement(SFMLParser.ForgetStatementContext ctx) {
 
-        Set<Label> labels = ctx
-                .label()
+        Set<LabelExpression> labelExpressionsToForget = ctx
+                .labelExpression()
                 .stream()
                 .map(this::visit)
-                .map(Label.class::cast)
+                .map(LabelExpression.class::cast)
                 .collect(Collectors.toSet());
-        if (labels.isEmpty()) {
-            labels = USED_LABELS;
-        }
-        ForgetStatement rtn = new ForgetStatement(labels);
+        ForgetStatement rtn = new ForgetStatement(labelExpressionsToForget);
         trackNode(rtn, ctx);
         return rtn;
     }

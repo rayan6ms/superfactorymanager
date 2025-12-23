@@ -1,13 +1,8 @@
 package ca.teamdman.sfml.ast;
 
-import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import com.mojang.datafixers.util.Pair;
-import net.minecraft.core.BlockPos;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
-import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 public record ResourceAccess(
@@ -43,22 +38,13 @@ public record ResourceAccess(
 
     @Override
     public List<? extends ASTNode> getChildNodes() {
+
         ArrayList<ASTNode> rtn = new ArrayList<>(labelExpressions.size() + 3);
         rtn.addAll(labelExpressions);
         rtn.add(roundRobin);
         rtn.add(sides);
         rtn.add(slots);
         return rtn;
-    }
-
-    public ArrayList<Pair<Label, BlockPos>> getLabelledPositions(LabelPositionHolder labelPositionHolder) {
-
-        return roundRobin().behaviour().getPositions(labelExpressions, labelPositionHolder);
-    }
-
-    public void visitLabels(Consumer<Label> consumer) {
-
-        labelExpressions.forEach(labelExpression -> labelExpression.visitLabels(consumer));
     }
 
 }

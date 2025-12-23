@@ -6,13 +6,17 @@ import java.util.stream.Stream;
 public interface ASTNode {
     List<? extends ASTNode> getChildNodes();
 
-    default Stream<ASTNode> getDescendantNodes() {
+    default Stream<? extends ASTNode> getDescendantNodes() {
         Stream.Builder<ASTNode> builder = Stream.builder();
         getChildNodes().forEach(s -> {
             builder.accept(s);
             s.getDescendantNodes().forEach(builder);
         });
         return builder.build();
+    }
+
+    default <T> Stream<T> getDescendantNodes(Class<T> clazz) {
+        return getDescendantNodes().filter(clazz::isInstance).map(clazz::cast);
     }
 
     default Stream<ResourceIdentifier<?, ?, ?>> getReferencedIOResourceIds() {

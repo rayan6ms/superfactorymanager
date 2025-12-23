@@ -3,7 +3,7 @@ package ca.teamdman.sfm.common.program;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.SFMPerformanceTweaks;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import ca.teamdman.sfml.ast.Label;
+import ca.teamdman.sfml.ast.LabelExpression;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraftforge.event.server.ServerStoppedEvent;
@@ -29,7 +29,7 @@ public class LimitedOutputSlotObjectPool {
      * Acquire a {@link LimitedOutputSlot} from the pool, or creates a new one if none available
      */
     public static <STACK, ITEM, CAP> LimitedOutputSlot<STACK, ITEM, CAP> acquire(
-            Label label,
+            LabelExpression labelExpression,
             BlockPos pos,
             Direction direction,
             int slot,
@@ -39,10 +39,10 @@ public class LimitedOutputSlotObjectPool {
             ResourceType<STACK, ITEM, CAP> type
     ) {
         if (!SFMPerformanceTweaks.OBJECT_POOL_ENABLED) {
-            return new LimitedOutputSlot<>(label, pos, direction, slot, handler, tracker, stack, type);
+            return new LimitedOutputSlot<>(labelExpression, pos, direction, slot, handler, tracker, stack, type);
         }
         if (index == -1) {
-            var rtn = new LimitedOutputSlot<>(label, pos, direction, slot, handler, tracker, stack, type);
+            var rtn = new LimitedOutputSlot<>(labelExpression, pos, direction, slot, handler, tracker, stack, type);
             if (SFMPerformanceTweaks.OBJECT_POOL_VALIDATION && LEASED.put(rtn, true) != null) {
                 SFM.LOGGER.warn("new output slot was somehow already leased, this should literally never happen: {}", rtn);
             }
@@ -50,7 +50,7 @@ public class LimitedOutputSlotObjectPool {
         } else {
             @SuppressWarnings("unchecked") LimitedOutputSlot<STACK, ITEM, CAP> obj = pool[index];
             index--;
-            obj.init(handler, label, pos, direction, slot, tracker, stack, type);
+            obj.init(handler, labelExpression, pos, direction, slot, tracker, stack, type);
             if (SFMPerformanceTweaks.OBJECT_POOL_VALIDATION && LEASED.put(obj, true) != null) {
                 SFM.LOGGER.warn("tried to lease output slot a second time: {}", obj);
             }

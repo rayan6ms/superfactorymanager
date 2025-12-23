@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.program;
 
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import ca.teamdman.sfml.ast.Label;
+import ca.teamdman.sfml.ast.LabelExpression;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 
@@ -12,7 +12,7 @@ public interface LimitedSlot<STACK, ITEM, CAP> {
 
     BlockPos getPos();
 
-    Label getLabel();
+    LabelExpression getLabelExpression();
 
     Direction getDirection();
 

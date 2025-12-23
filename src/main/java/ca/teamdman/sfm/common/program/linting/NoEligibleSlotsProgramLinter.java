@@ -95,7 +95,7 @@ public class NoEligibleSlotsProgramLinter implements IProgramLinter {
                     network,
                     labelPositionHolder,
                     resourceAccess,
-                    (label, pos, direction, cap) -> {
+                    (labelExpression, pos, direction, cap) -> {
                         anyCapability.set(true);
                         searchForValidSlots(
                                 (ResourceType<Object, Object, Object>) resourceType,

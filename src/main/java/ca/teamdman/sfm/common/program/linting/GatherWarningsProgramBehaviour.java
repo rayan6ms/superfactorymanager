@@ -30,7 +30,7 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
 
     private final List<Pair<ExecutionPathElement, TranslatableContents>> warnings = new ArrayList<>();
 
-    private final Multimap<ResourceType, Label> resourceTypesInputted = HashMultimap.create();
+    private final Multimap<ResourceType, LabelExpression> resourceTypesInputted = HashMultimap.create();
 
     private final Set<ResourceType> resourceTypesOutputted = new HashSet<>();
 
@@ -80,9 +80,9 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
                 .getReferencedIOResourceIds()
                 .map(ResourceIdentifier::getResourceType)
                 .collect(Collectors.toSet());
-        for (Label label : inputStatement.resourceAccess().labelExpressions()) {
+        for (LabelExpression labelExpression : inputStatement.resourceAccess().labelExpressions()) {
             for (ResourceType resourceType : inputtingResourceTypes) {
-                resourceTypesInputted.put(resourceType, label);
+                resourceTypesInputted.put(resourceType, labelExpression);
             }
         }
     }
@@ -139,10 +139,10 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
 
 
         // Identify labels that are no longer active
-        Set<Label> oldLabels = new HashSet<>(old.resourceAccess().labelExpressions());
-        Set<Label> newLabels = new HashSet<>(next.resourceAccess().labelExpressions());
-        Set<Label> removedLabels = new HashSet<>(oldLabels);
-        removedLabels.removeAll(newLabels);
+        Set<LabelExpression> oldLabels = new HashSet<>(old.resourceAccess().labelExpressions());
+        Set<LabelExpression> newLabels = new HashSet<>(next.resourceAccess().labelExpressions());
+        Set<LabelExpression> removedLabelExpressions = new HashSet<>(oldLabels);
+        removedLabelExpressions.removeAll(newLabels);
 
         // Identify resource types being dropped
         Set<? extends ResourceType<?, ?, ?>> droppingResourceTypes = old
@@ -150,7 +150,7 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
                 .map(ResourceIdentifier::getResourceType)
                 .collect(Collectors.toSet());
 
-        warnUnusedInputLabels(context, old, removedLabels, droppingResourceTypes);
+        warnUnusedInputLabelExpressions(context, old, removedLabelExpressions, droppingResourceTypes);
     }
 
     @Override
@@ -179,15 +179,20 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
         */
 
         // identify resource types being dropped
-        Set<? extends ResourceType<?, ?, ?>> droppingResourceTypes = inputStatement
+        Set<? extends ResourceType<?, ?, ?>> resourceTypesBeingDropped = inputStatement
                 .getReferencedIOResourceIds()
                 .map(ResourceIdentifier::getResourceType)
                 .collect(Collectors.toSet());
 
-        // identify the labels being dropped from
-        Set<Label> droppingLabels = new HashSet<>(inputStatement.resourceAccess().labelExpressions());
+        // identify the expressions being dropped
+        Set<LabelExpression> labelExpressionsToBeDropped = new HashSet<>(inputStatement.resourceAccess().labelExpressions());
 
-        warnUnusedInputLabels(context, inputStatement, droppingLabels, droppingResourceTypes);
+        warnUnusedInputLabelExpressions(
+                context,
+                inputStatement,
+                labelExpressionsToBeDropped,
+                resourceTypesBeingDropped
+        );
     }
 
     @Override
@@ -247,14 +252,14 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
         }
     }
 
-    private void warnUnusedInputLabels(
+    private void warnUnusedInputLabelExpressions(
             ProgramContext context,
             InputStatement old,
-            Set<Label> removedLabels,
+            Set<LabelExpression> removedLabelExpressions,
             Set<? extends ResourceType<?, ?, ?>> droppingResourceTypes
     ) {
 
-        for (Label label : removedLabels) {
+        for (LabelExpression labelExpression : removedLabelExpressions) {
             for (ResourceType resourceType : droppingResourceTypes) {
                 // if the label was never used, warn
                 if (!resourceTypesOutputted.contains(resourceType)) {
@@ -269,13 +274,13 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
                                     old,
                                     context.program().astBuilder().getLineColumnForNode(old),
                                     resourceType.displayAsCode(),
-                                    label,
+                                    labelExpression,
                                     resourceType.displayAsCode()
                             )
                     ));
                 }
                 // mark as no longer active
-                resourceTypesInputted.remove(resourceType, label);
+                resourceTypesInputted.remove(resourceType, labelExpression);
             }
         }
     }

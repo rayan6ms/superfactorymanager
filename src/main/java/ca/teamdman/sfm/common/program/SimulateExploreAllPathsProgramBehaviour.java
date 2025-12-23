@@ -213,7 +213,9 @@ public class SimulateExploreAllPathsProgramBehaviour implements ProgramBehaviour
             ResourceType<?, ?, ?>[] usedResourceTypes = statement.resourceLimits().getReferencedResourceTypes();
 
             HashSet<Label> usedLabels = new HashSet<>();
-            statement.resourceAccess().visitLabels(usedLabels::add);
+            ResourceAccess resourceAccess = statement.resourceAccess();
+
+            resourceAccess.getDescendantNodes(Label.class).forEach(usedLabels::add);
 
             return new IOPathElement(statement, kind, usedResourceTypes, usedLabels);
         }

@@ -3,7 +3,6 @@ package ca.teamdman.sfml.ast;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 
 import java.util.ArrayList;
@@ -34,20 +33,20 @@ public record BoolHas(
         List<Boolean> satisfactionResults = new ArrayList<>();
 
         LabelPositionHolder labelPositionHolder = programContext.labelPositionHolder();
-        ArrayList<Pair<Label, BlockPos>> labelledPositions = resourceAccess.getLabelledPositions(labelPositionHolder);
-        for (Pair<Label, BlockPos> entry : labelledPositions) {
-            BlockPos pos = entry.getSecond();
-            AtomicLong inThisInv = new AtomicLong(0);
-            for (ResourceType<?, ?, ?> resourceType : resourceIdSet.getReferencedResourceTypes()) {
-                accumulate(
-                        programContext,
-                        pos,
-                        overallCount,
-                        inThisInv,
-                        resourceType
-                );
+        for (LabelExpression labelExpression : resourceAccess.labelExpressions()) {
+            for (BlockPos pos : labelExpression.getPositions(labelPositionHolder)) {
+                AtomicLong inThisInv = new AtomicLong(0);
+                for (ResourceType<?, ?, ?> resourceType : resourceIdSet.getReferencedResourceTypes()) {
+                    accumulate(
+                            programContext,
+                            pos,
+                            overallCount,
+                            inThisInv,
+                            resourceType
+                    );
+                }
+                satisfactionResults.add(comparisonOperator.test(inThisInv.get(), quantity.value()));
             }
-            satisfactionResults.add(comparisonOperator.test(inThisInv.get(), quantity.value()));
         }
 
         var isOverallSatisfied = this.comparisonOperator.test(overallCount.get(), this.quantity.value());
@@ -76,9 +75,10 @@ public record BoolHas(
             Consumer<BlockPos> posConsumer
     ) {
 
-        resourceAccess
-                .getLabelledPositions(context.labelPositionHolder())
-                .forEach(entry -> posConsumer.accept(entry.getSecond()));
+        LabelPositionHolder labelPositionHolder = context.labelPositionHolder();
+        for (LabelExpression labelExpression : resourceAccess.labelExpressions()) {
+            labelExpression.getPositions(labelPositionHolder).forEach(posConsumer);
+        }
     }
 
     @Override

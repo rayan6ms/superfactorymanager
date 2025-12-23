@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public record LabelExpressionUnion(
         LabelExpression left,
@@ -17,12 +16,6 @@ public record LabelExpressionUnion(
         Set<BlockPos> rightPositions = right().getPositions(labelPositionHolder);
         leftPositions.addAll(rightPositions);
         return leftPositions;
-    }
-
-    @Override
-    public void visitLabels(Consumer<Label> consumer) {
-        left.visitLabels(consumer);
-        right.visitLabels(consumer);
     }
 
     @Override

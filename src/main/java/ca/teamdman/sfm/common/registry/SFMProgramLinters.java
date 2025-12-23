@@ -69,6 +69,12 @@ public class SFMProgramLinters {
             NoEligibleSlotsProgramLinter::new
     );
 
+    public static final SFMRegistryObject<IProgramLinter, ForgetStatementNoMatchesProgramLinter>
+            FORGET_STATEMENT_NO_MATCH_PROGRAM_LINTER = REGISTERER.register(
+            "forget_statement_no_match",
+            ForgetStatementNoMatchesProgramLinter::new
+    );
+
     static {
         if (SFMModCompat.isMekanismLoaded()) {
             SFMMekanismCompat.registerProgramLinters(REGISTERER);

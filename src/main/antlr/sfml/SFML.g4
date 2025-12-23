@@ -50,7 +50,7 @@ outputStatement : OUTPUT outputResourceLimits? resourceExclusion? TO emptyslots?
                 | TO emptyslots? EACH? resourceAccess OUTPUT outputResourceLimits? resourceExclusion?
                 ;
 
-forgetStatement : FORGET label? (COMMA label)* COMMA?;
+forgetStatement : FORGET labelExpression? (COMMA labelExpression)* COMMA?;
 
 label           : (identifier)  #RawLabel
                 | string        #StringLabel

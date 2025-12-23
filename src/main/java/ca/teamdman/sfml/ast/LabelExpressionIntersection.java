@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 
 import java.util.List;
 import java.util.Set;
-import java.util.function.Consumer;
 
 public record LabelExpressionIntersection(
         LabelExpression left,
@@ -17,12 +16,6 @@ public record LabelExpressionIntersection(
         Set<BlockPos> rightPositions = right().getPositions(labelPositionHolder);
         leftPositions.retainAll(rightPositions);
         return leftPositions;
-    }
-
-    @Override
-    public void visitLabels(Consumer<Label> consumer) {
-        left.visitLabels(consumer);
-        right.visitLabels(consumer);
     }
 
     @Override

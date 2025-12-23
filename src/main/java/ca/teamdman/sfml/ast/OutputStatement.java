@@ -460,10 +460,10 @@ public class OutputStatement implements IOStatement {
                         context.labelPositionHolder(),
                         resourceAccess,
                         (
-                                (label, pos, direction, cap) -> gatherSlotsForCap(
+                                (labelExpression, pos, direction, cap) -> gatherSlotsForCap(
                                         context,
                                         (ResourceType<Object, Object, Object>) resourceType,
-                                        label,
+                                        labelExpression,
                                         pos,
                                         direction,
                                         cap,
@@ -490,13 +490,13 @@ public class OutputStatement implements IOStatement {
                         context.network(),
                         context.labelPositionHolder(),
                         resourceAccess,
-                        (label, pos, direction, cap) -> {
+                        (labelExpression, pos, direction, cap) -> {
                             // create a new list of trackers for each limited slot
                             List<IOutputResourceTracker> outputTracker = resourceLimits.createOutputTrackers();
                             gatherSlotsForCap(
                                     context,
                                     (ResourceType<Object, Object, Object>) resourceType,
-                                    label,
+                                    labelExpression,
                                     pos,
                                     direction,
                                     cap,
@@ -620,7 +620,7 @@ public class OutputStatement implements IOStatement {
     private <STACK, ITEM, CAP> void gatherSlotsForCap(
             ProgramContext context,
             ResourceType<STACK, ITEM, CAP> type,
-            Label label,
+            LabelExpression labelExpression,
             BlockPos pos,
             Direction direction,
             CAP capability,
@@ -650,7 +650,7 @@ public class OutputStatement implements IOStatement {
                                             tracker.toString()
                                     )));
                             acceptor.accept(LimitedOutputSlotObjectPool.acquire(
-                                    label,
+                                    labelExpression,
                                     pos,
                                     direction,
                                     slot,

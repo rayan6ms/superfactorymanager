@@ -10,7 +10,6 @@ import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.program.CapabilityConsumer;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfml.ast.*;
-import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
@@ -164,17 +163,17 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
                         resourceAccess
                 )));
 
-        for (Pair<Label, BlockPos> pair : resourceAccess.getLabelledPositions(labelPositionHolder)) {
-            Label label = pair.getFirst();
-            BlockPos pos = pair.getSecond();
-            forEachDirectionalCapability(
-                    logger,
-                    level,
-                    network,
-                    resourceAccess.sides(),
-                    pos,
-                    (dir, cap) -> consumer.accept(label, pos, dir, cap)
-            );
+        for (LabelExpression labelExpression : resourceAccess.labelExpressions()) {
+            for (BlockPos pos : labelExpression.getPositions(labelPositionHolder)) {
+                forEachDirectionalCapability(
+                        logger,
+                        level,
+                        network,
+                        resourceAccess.sides(),
+                        pos,
+                        (dir, cap) -> consumer.accept(labelExpression, pos, dir, cap)
+                );
+            }
         }
     }
 

@@ -108,10 +108,13 @@ public final class InputStatement implements IOStatement {
                         context.network(),
                         context.labelPositionHolder(),
                         resourceAccess,
-                        (label, pos, direction, cap) -> gatherSlotsForCap(
+                        (labelExpression, pos, direction, cap) -> gatherSlotsForCap(
                                 context,
                                 (ResourceType<Object, Object, Object>) resourceType,
-                                label, pos, direction, cap,
+                                labelExpression,
+                                pos,
+                                direction,
+                                cap,
                                 inputTrackers,
                                 finalSlotConsumer
                         )
@@ -139,12 +142,15 @@ public final class InputStatement implements IOStatement {
                         context.network(),
                         context.labelPositionHolder(),
                         resourceAccess,
-                        (label, pos, direction, cap) -> {
+                        (labelExpression, pos, direction, cap) -> {
                             List<IInputResourceTracker> inputTrackers = resourceLimits.createInputTrackers();
                             gatherSlotsForCap(
                                     context,
                                     (ResourceType<Object, Object, Object>) resourceType,
-                                    label, pos, direction, cap,
+                                    labelExpression,
+                                    pos,
+                                    direction,
+                                    cap,
                                     inputTrackers,
                                     finalSlotConsumer
                             );
@@ -261,7 +267,7 @@ public final class InputStatement implements IOStatement {
     private <STACK, ITEM, CAP> void gatherSlotsForCap(
             ProgramContext context,
             ResourceType<STACK, ITEM, CAP> type,
-            Label label,
+            LabelExpression labelExpression,
             BlockPos pos,
             Direction direction,
             CAP capability,
@@ -287,7 +293,11 @@ public final class InputStatement implements IOStatement {
                                             tracker.toString()
                                     )));
                             acceptor.accept(LimitedInputSlotObjectPool.acquire(
-                                    label, pos, direction, slot, capability,
+                                    labelExpression,
+                                    pos,
+                                    direction,
+                                    slot,
+                                    capability,
                                     tracker,
                                     stack,
                                     type
