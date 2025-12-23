@@ -77,6 +77,7 @@ public class ItemWorldRenderer {
     private static final int capabilityColor = FastColor.ARGB32.color(100, 100, 0, 255);
     private static final int capabilityColorLimitedView = FastColor.ARGB32.color(100, 0, 100, 255);
     private static final int cableColor = FastColor.ARGB32.color(100, 100, 255, 0);
+    private static final int noNetworkErrorColor = FastColor.ARGB32.color(200, 255, 50, 50);
     private static final VBOCache vboCache = new VBOCache();
 
     @SubscribeEvent
@@ -244,9 +245,19 @@ public class ItemWorldRenderer {
 
         RENDER_TYPE.setupRenderState();
 
-        drawVbo(VBOKind.NETWORK_TOOL_CABLES, poseStack, cablePositions, cableColor, event);
-        drawVbo(VBOKind.NETWORK_TOOL_CAPABILITIES, poseStack, capabilityPositions, capabilityColor, event);
-
+        var selectedPos = NetworkToolItem.getSelectedNetworkBlockPos(networkTool);
+        if (cablePositions.isEmpty() && selectedPos != null) {
+            drawVbo(
+                    VBOKind.NETWORK_TOOL_CABLES,
+                    poseStack,
+                    Set.of(selectedPos),
+                    noNetworkErrorColor,
+                    event
+            );
+        } else {
+            drawVbo(VBOKind.NETWORK_TOOL_CABLES, poseStack, cablePositions, cableColor, event);
+            drawVbo(VBOKind.NETWORK_TOOL_CAPABILITIES, poseStack, capabilityPositions, capabilityColor, event);
+        }
         RENDER_TYPE.clearRenderState();
 
 
