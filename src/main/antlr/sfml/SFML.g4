@@ -3,7 +3,9 @@
 // - test binary operator precidence for sets and numeric expressions; https://stackoverflow.com/questions/64257414/antlr4-operator-precedence-changes
 // - OUTPUT 5 BUNDLES OF 3 SAME *shard*, 1 stick TO EMPTY infuser
 // - OUTPUT 5 BUNDLES OF 1 *seed* IN SLOT 0, 1 *ingot* TO EMPTY altar
-// -- bundles, EMPTY qualifier, IN SLOT(s) qualifier
+// - OUTPUT EXACTLY 3 BUNDLES of 1 *seed*, 1 stone TO chest
+// - OUTPUT 3 BUNDLES of 1 *seed*, 1 stone TO EACH chest
+// -- bundles, EMPTY qualifier, IN SLOT(s) qualifier, EXACTLY, EACH chest
 
 grammar SFML;
 @header {
