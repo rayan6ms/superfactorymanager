@@ -7,6 +7,6 @@ import java.util.Set;
 import java.util.function.Consumer;
 
 public interface LabelExpression extends ASTNode {
-    Set<BlockPos> evaluate(LabelPositionHolder labelPositionHolder);
+    Set<BlockPos> getPositions(LabelPositionHolder labelPositionHolder);
     void visitLabels(Consumer<Label> consumer);
 }

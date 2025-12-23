@@ -9,7 +9,7 @@ import java.util.function.Consumer;
 
 public record LabelExpressionSingle(Label label) implements LabelExpression {
     @Override
-    public Set<BlockPos> evaluate(LabelPositionHolder labelPositionHolder) {
+    public Set<BlockPos> getPositions(LabelPositionHolder labelPositionHolder) {
 
         return labelPositionHolder.getPositions(label.value());
     }

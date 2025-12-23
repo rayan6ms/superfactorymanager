@@ -77,7 +77,7 @@ public class SFMMekanismCompat {
     @MCVersionDependentBehaviour
     public static Set<Direction> getSides(
             ConfigInfo config,
-            ISideConfiguration facing,
+            ISideConfiguration mekBlockEntity,
             Predicate<DataType> condition
     ) {
         return config.getSides(condition);

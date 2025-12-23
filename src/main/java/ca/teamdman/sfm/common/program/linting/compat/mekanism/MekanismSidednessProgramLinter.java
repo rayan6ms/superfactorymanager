@@ -8,7 +8,6 @@ import ca.teamdman.sfm.common.program.linting.IProgramLinter;
 import ca.teamdman.sfm.common.program.linting.ProblemTracker;
 import ca.teamdman.sfm.common.util.SFMStreamUtils;
 import ca.teamdman.sfml.ast.*;
-import com.mojang.datafixers.util.Pair;
 import mekanism.api.RelativeSide;
 import mekanism.common.lib.transmitter.TransmissionType;
 import mekanism.common.tile.component.TileComponentConfig;
@@ -51,7 +50,7 @@ public class MekanismSidednessProgramLinter implements IProgramLinter {
                 .filter(IOStatement.class::isInstance)
                 .map(IOStatement.class::cast);
         for (IOStatement statement : SFMStreamUtils.iterate(ioStatements)) {
-            if (gatherWarningsForIOStatement(statement, labels, statement, level, tracker).isSaturated()) {
+            if (gatherWarningsForIOStatement(program, labels, statement, level, tracker).isSaturated()) {
                 break;
             }
         }
@@ -65,6 +64,7 @@ public class MekanismSidednessProgramLinter implements IProgramLinter {
             Level level,
             ItemStack disk
     ) {
+
         program.getDescendantNodes()
                 .filter(IOStatement.class::isInstance)
                 .map(IOStatement.class::cast)
@@ -78,149 +78,226 @@ public class MekanismSidednessProgramLinter implements IProgramLinter {
     }
 
     private static ProblemTracker.AddProblemResult gatherWarningsForIOStatement(
-            IOStatement ioStatement,
+            Program program,
             LabelPositionHolder labelPositionHolder,
-            IOStatement statement,
+            IOStatement ioStatement,
             Level level,
             ProblemTracker warnings
     ) {
+        // Identify which sides the program expects to succeed
+        SideQualifier sides = ioStatement.resourceAccess().sides();
 
-        SideQualifier sides = statement.resourceAccess().sides();
-        Stream<Pair<ca.teamdman.sfml.ast.Label, BlockPos>> mekanismBlocks = statement
-                .resourceAccess()
-                .getLabelledPositions(labelPositionHolder)
-                .stream()
-                .filter(pair -> level.isLoaded(pair.getSecond()))
-                .filter(pair -> SFMModCompat.isMekanismBlock(level, pair.getSecond()));
+        // Identify if the null side is used
+        boolean nullSideUsed = sides.sides().contains(Side.NULL);
 
-        if (sides.sides().contains(Side.NULL)) {
-            for (Pair<Label, BlockPos> pair : SFMStreamUtils.iterate(mekanismBlocks)) {
-                Label label = pair.getFirst();
-                if (warnings.add(PROGRAM_WARNING_MEKANISM_USED_WITH_NULL_DIRECTION.get(
-                        label,
-                        statement.toStringPretty()
-                )).isSaturated()) {
-                    return ProblemTracker.AddProblemResult.TOO_MANY_PROBLEMS;
+        // For each label expression, check the positions
+        for (LabelExpression labelExpression : ioStatement.resourceAccess().labelExpressions()) {
+            Set<BlockPos> positions = labelExpression.getPositions(labelPositionHolder);
+            for (BlockPos pos : positions) {
+                if (!level.isLoaded(pos)) {
+                    continue;
                 }
-            }
-        } else {
-            // Check side config
-            EnumSet<TransmissionType> referencedTransmissionTypes = SFMMekanismCompat
-                    .getReferencedTransmissionTypes(statement);
+                if (!SFMModCompat.isMekanismBlock(level, pos)) {
+                    continue;
+                }
+                if (nullSideUsed) {
+                    // Warn the user that NULL SIDE is read-only
+                    ProblemTracker.AddProblemResult result = warnings.add(
+                            PROGRAM_WARNING_MEKANISM_USED_WITH_NULL_DIRECTION.get(
+                                    labelExpression,
+                                    ioStatement.toStringPretty() + " at " + program
+                                            .astBuilder()
+                                            .getLineColumnForNode(ioStatement)
+                            )
+                    );
+                    if (result.isSaturated()) {
+                        return ProblemTracker.AddProblemResult.TOO_MANY_PROBLEMS;
+                    }
+                } else {
+                    // Check if the side config aligns with the program's expectations
 
-            Predicate<DataType> dataTypePredicate;
-            if (ioStatement instanceof InputStatement) {
-                dataTypePredicate = dataType -> dataType.canOutput() || dataType == DataType.EXTRA;
-            } else if (ioStatement instanceof OutputStatement) {
-                dataTypePredicate = dataType -> dataType == DataType.INPUT
-                                                || dataType == DataType.INPUT_OUTPUT
-                                                || dataType == DataType.INPUT_1
-                                                || dataType == DataType.INPUT_2
-                                                || dataType == DataType.EXTRA;
-            } else {
-                throw new IllegalStateException("Unexpected value: " + ioStatement);
-            }
+                    // Get the block entity
+                    BlockEntity blockEntity = level.getBlockEntity(pos);
+                    if (!(blockEntity instanceof ISideConfiguration mekBlockEntity)) {
+                        continue;
+                    }
 
-            mekanismBlocks.forEach(pair -> {
-                BlockPos blockPos = pair.getSecond();
-                BlockEntity blockEntity = level.getBlockEntity(blockPos);
-                if (blockEntity instanceof ISideConfiguration mekBlockEntity) {
-                    TileComponentConfig config = mekBlockEntity.getConfig();
+                    // Get the block state
                     BlockState blockState = blockEntity.getBlockState();
+
+                    // Determine which transmission types the statement is using
+                    EnumSet<TransmissionType> referencedTransmissionTypes
+                            = SFMMekanismCompat.getReferencedTransmissionTypes(ioStatement);
+
+                    // Get the current side config
+                    TileComponentConfig config = mekBlockEntity.getConfig();
+
+                    // Create a matcher for the input, output, extra mekanism slots
+                    Predicate<DataType> expectedDataTypePredicate = getDataTypePredicate(ioStatement);
+
+
+                    // Get the directions that the program is using
+                    Set<@Nullable Direction> directions = new HashSet<>(sides.resolve(blockState));
+
+                    // For each of the transmission types, ensure one of the program sides matches the mek config
                     for (TransmissionType transmissionType : referencedTransmissionTypes) {
-                        boolean anySuccess = false;
+                        boolean mekAndProgramSideConfigAgree = false;
+
+                        // Determine the sides active for that transmission type
                         ConfigInfo transmissionConfig = config.getConfig(transmissionType);
-                        if (transmissionConfig != null) {
-                            Set<Direction> activeSides = transmissionConfig.getSides(dataTypePredicate);
-                            for (Direction direction : sides.resolve(blockState)) {
-                                if (activeSides.contains(direction)) {
-                                    anySuccess = true;
-                                    break;
-                                }
+                        if (transmissionConfig == null) {
+                            continue;
+                        }
+                        Set<Direction> activeSides = SFMMekanismCompat.getSides(
+                                transmissionConfig,
+                                mekBlockEntity,
+                                expectedDataTypePredicate
+                        );
+
+                        // Resolve the relative sides to absolute directions
+                        for (Direction direction : directions) {
+                            if (activeSides.contains(direction)) {
+                                mekAndProgramSideConfigAgree = true;
+                                break;
                             }
                         }
-                        if (!anySuccess) {
+
+                        // Only warn if no sides agreed for this transmission type
+                        if (!mekAndProgramSideConfigAgree) {
                             warnings.add(PROGRAM_WARNING_MEKANISM_BAD_SIDE_CONFIG.get(
-                                    blockPos,
-                                    pair.getFirst(),
-                                    statement.toStringPretty()
+                                    pos,
+                                    labelExpression,
+                                    ioStatement.toStringPretty() + " at " + program
+                                            .astBuilder()
+                                            .getLineColumnForNode(ioStatement)
                             ));
                         }
                     }
+
                 }
-            });
+
+            }
         }
         return ProblemTracker.AddProblemResult.SUCCESS;
     }
 
+    private static Predicate<DataType> getDataTypePredicate(IOStatement ioStatement) {
+
+        if (ioStatement instanceof InputStatement) {
+            return dataType -> dataType.canOutput() || dataType == DataType.EXTRA;
+        } else if (ioStatement instanceof OutputStatement) {
+            return dataType -> dataType == DataType.INPUT
+                               || dataType == DataType.INPUT_OUTPUT
+                               || dataType == DataType.INPUT_1
+                               || dataType == DataType.INPUT_2
+                               || dataType == DataType.EXTRA;
+        } else {
+            throw new IllegalStateException("Unexpected value: " + ioStatement);
+        }
+    }
+
     private static void fixWarningsByModifyingMekanismAccess(
-            IOStatement statement,
+            IOStatement ioStatement,
             LabelPositionHolder labelPositionHolder,
             Level level
     ) {
 
-        SideQualifier sides = statement.resourceAccess().sides();
-        Stream<Pair<Label, BlockPos>> mekanismBlocks = statement
-                .resourceAccess()
-                .getLabelledPositions(labelPositionHolder)
-                .stream()
-                .filter(pair -> level.isLoaded(pair.getSecond()))
-                .filter(pair -> SFMModCompat.isMekanismBlock(level, pair.getSecond()));
+        SideQualifier sides = ioStatement.resourceAccess().sides();
 
-        // add warning if interacting with mekanism but the mekanism side config is not ALLOW
-        EnumSet<TransmissionType> referencedTransmissionTypes = SFMMekanismCompat
-                .getReferencedTransmissionTypes(statement);
+        // Determine which transmission types the statement is using
+        EnumSet<TransmissionType> referencedTransmissionTypes
+                = SFMMekanismCompat.getReferencedTransmissionTypes(ioStatement);
 
-        // Decide which DataType is correct for this statement
-        Predicate<DataType> dataTypePredicate;
-        DataType fixed;
-        if (statement instanceof InputStatement) {
-            dataTypePredicate = DataType::canOutput;
-            fixed = DataType.OUTPUT; // to input from it, it must be set to output
-        } else if (statement instanceof OutputStatement) {
-            dataTypePredicate = dataType -> dataType == DataType.INPUT
+        // Determine the correct DataType for the side to be configured as
+        Predicate<DataType> expectedDataTypePredicate;
+        DataType newDataType;
+        if (ioStatement instanceof InputStatement) {
+            // to input from it, it must be set to output
+            expectedDataTypePredicate = DataType::canOutput;
+            newDataType = DataType.OUTPUT;
+        } else if (ioStatement instanceof OutputStatement) {
+            // to output from it, it must be set to input
+            expectedDataTypePredicate = dataType -> dataType == DataType.INPUT
                                             || dataType == DataType.INPUT_OUTPUT
                                             || dataType == DataType.INPUT_1
                                             || dataType == DataType.INPUT_2;
-            fixed = DataType.INPUT; // to output from it, it must be set to input
+            newDataType = DataType.INPUT;
         } else {
-            throw new IllegalStateException("Unexpected value: " + statement);
+            throw new IllegalStateException("Unexpected value: " + ioStatement);
         }
 
-        mekanismBlocks.forEach(pair -> {
-            BlockPos blockPos = pair.getSecond();
-            BlockEntity blockEntity = level.getBlockEntity(blockPos);
-            if (blockEntity instanceof ISideConfiguration mekBlockEntity) {
-                TileComponentConfig mekBlockEntityConfig = mekBlockEntity.getConfig();
+
+        // For each label expression, check the positions
+        for (LabelExpression labelExpression : ioStatement.resourceAccess().labelExpressions()) {
+            Set<BlockPos> positions = labelExpression.getPositions(labelPositionHolder);
+            for (BlockPos pos : positions) {
+                // Position must be loaded
+                if (!level.isLoaded(pos)) {
+                    continue;
+                }
+
+                // Block entity must support ISideConfiguration from Mekanism
+                BlockEntity blockEntity = level.getBlockEntity(pos);
+                if (!(blockEntity instanceof ISideConfiguration mekBlockEntity)) {
+                    continue;
+                }
+
+                // Get the block state
                 BlockState blockState = blockEntity.getBlockState();
+
+                // Get the current side config
+                TileComponentConfig mekBlockEntityConfig = mekBlockEntity.getConfig();
+
+                // Get the directions that the program is using
                 Set<@Nullable Direction> directions = new HashSet<>(sides.resolve(blockState));
+
+                // For each of the transmission types, ensure one of the program sides matches the mek config
                 for (TransmissionType transmissionType : referencedTransmissionTypes) {
+
+                    // Determine the sides active for that transmission type
                     ConfigInfo transmissionConfig = mekBlockEntityConfig.getConfig(transmissionType);
-                    if (transmissionConfig != null) {
-                        Set<Direction> activeSides = SFMMekanismCompat.getSides(transmissionConfig, mekBlockEntity, dataTypePredicate);
-                        boolean anySuccess = directions.stream().anyMatch(activeSides::contains);
-                        if (!anySuccess) {
-                            // we want to enable a side for the transmission type
-                            @Nullable Direction directionToEnable = null;
-                            for (Direction direction : sides.resolve(blockState)) {
-                                if (direction != null) {
-                                    directionToEnable = direction;
-                                    break;
-                                }
-                            }
-                            if (directionToEnable != null) {
-                                RelativeSide relativeSide = RelativeSide.fromDirections(
-                                        mekBlockEntity.getDirection(),
-                                        directionToEnable
-                                );
-                                transmissionConfig.setDataType(fixed, relativeSide);
-                                mekBlockEntityConfig.sideChanged(transmissionType, relativeSide);
-                            }
+                    if (transmissionConfig == null) {
+                        continue;
+                    }
+                    Set<Direction> activeSides = SFMMekanismCompat.getSides(
+                            transmissionConfig,
+                            mekBlockEntity,
+                            expectedDataTypePredicate
+                    );
+
+                    // Determine if a fix-up is necessary
+                    if (directions.stream().anyMatch(activeSides::contains)) {
+                        continue;
+                    }
+
+                    // Determine which direction to enable
+                    @Nullable Direction directionToEnable = null;
+                    for (Direction direction : directions) {
+                        if (direction != null) {
+                            directionToEnable = direction;
+                            break;
                         }
                     }
+                    if (directionToEnable == null) {
+                        continue;
+                    }
+
+                    // Convert the direction to a relative side
+                    RelativeSide relativeSide = RelativeSide.fromDirections(
+                            mekBlockEntity.getDirection(),
+                            directionToEnable
+                    );
+
+                    // Enable the data type to flow through that side
+                    transmissionConfig.setDataType(newDataType, relativeSide);
+
+                    // Mark the side config as having changed
+                    mekBlockEntityConfig.sideChanged(transmissionType, relativeSide);
                 }
+
             }
-        });
+        }
+
     }
 
 }

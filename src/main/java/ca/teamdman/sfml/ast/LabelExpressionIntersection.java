@@ -12,9 +12,9 @@ public record LabelExpressionIntersection(
         LabelExpression right
 ) implements LabelExpression {
     @Override
-    public Set<BlockPos> evaluate(LabelPositionHolder labelPositionHolder) {
-        Set<BlockPos> leftPositions = left().evaluate(labelPositionHolder);
-        Set<BlockPos> rightPositions = right().evaluate(labelPositionHolder);
+    public Set<BlockPos> getPositions(LabelPositionHolder labelPositionHolder) {
+        Set<BlockPos> leftPositions = left().getPositions(labelPositionHolder);
+        Set<BlockPos> rightPositions = right().getPositions(labelPositionHolder);
         leftPositions.retainAll(rightPositions);
         return leftPositions;
     }

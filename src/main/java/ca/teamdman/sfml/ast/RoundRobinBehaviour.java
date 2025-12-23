@@ -42,13 +42,13 @@ public enum RoundRobinBehaviour implements ASTNode {
         switch (this) {
             case UNMODIFIED -> {
                 for (LabelExpression labelExpression : labelExpressions) {
-                    rtn.addAll(labelExpression.evaluate(labelPositionHolder));
+                    rtn.addAll(labelExpression.getPositions(labelPositionHolder));
                 }
             }
             case BY_BLOCK -> {
                 LongOpenHashSet candidates = new LongOpenHashSet();
                 for (LabelExpression labelExpression : labelExpressions) {
-                    Set<BlockPos> satisfying = labelExpression.evaluate(labelPositionHolder);
+                    Set<BlockPos> satisfying = labelExpression.getPositions(labelPositionHolder);
                     for (BlockPos blockPos : satisfying) {
                         candidates.add(blockPos.asLong());
                     }
@@ -65,7 +65,7 @@ public enum RoundRobinBehaviour implements ASTNode {
             }
             case BY_LABEL -> {
                 LabelExpression expression = labelExpressions.get(tick % labelExpressions.size());
-                rtn.addAll(expression.evaluate(labelPositionHolder));
+                rtn.addAll(expression.getPositions(labelPositionHolder));
             }
         }
         return rtn;
