@@ -1,7 +1,6 @@
 package ca.teamdman.sfm.common.program;
 
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import ca.teamdman.sfm.common.util.Stored;
 import ca.teamdman.sfml.ast.Label;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -76,7 +75,7 @@ public class LimitedOutputSlot<STACK, ITEM, CAP> implements LimitedSlot<STACK, I
     public void init(
             CAP handler,
             Label label,
-            @Stored BlockPos pos,
+            BlockPos pos,
             Direction direction,
             int slot,
             IOutputResourceTracker tracker,

@@ -7,7 +7,6 @@ import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.net.ServerboundFacadePacket;
 import ca.teamdman.sfm.common.util.InPlaceBlockPlaceContext;
 import ca.teamdman.sfm.common.util.SFMStreamUtils;
-import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -101,7 +100,7 @@ public class FacadePlanner {
     private static @NotNull Set<BlockPos> getPositions(
             Level level,
             ServerboundFacadePacket msg,
-            @Stored BlockPos hitPos,
+            BlockPos hitPos,
             Block hitBlock
     ) {
         Set<BlockPos> positions = switch (msg.spreadLogic()) {

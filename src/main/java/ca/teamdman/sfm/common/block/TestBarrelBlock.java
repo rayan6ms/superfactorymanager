@@ -1,7 +1,6 @@
 package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.blockentity.TestBarrelBlockEntity;
-import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BarrelBlock;
@@ -21,7 +20,7 @@ public class TestBarrelBlock extends BarrelBlock {
     public void onRemove(
             BlockState pState,
             Level pLevel,
-            @Stored BlockPos pPos,
+            BlockPos pPos,
             BlockState pNewState,
             boolean pIsMoving
     ) {
@@ -38,7 +37,7 @@ public class TestBarrelBlock extends BarrelBlock {
 
     @Override
     public @Nullable BlockEntity newBlockEntity(
-            @Stored BlockPos pPos,
+            BlockPos pPos,
             BlockState pState
     ) {
         return new TestBarrelBlockEntity(pPos, pState);

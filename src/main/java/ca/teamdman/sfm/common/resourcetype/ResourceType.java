@@ -7,7 +7,6 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.CapabilityConsumer;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
-import ca.teamdman.sfm.common.util.Stored;
 import ca.teamdman.sfml.ast.*;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
@@ -167,7 +166,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     public void forEachDirectionalCapability(
             ProgramContext programContext,
             SideQualifier sides,
-            @Stored BlockPos pos,
+            BlockPos pos,
             BiConsumer<Direction, CAP> consumer
     ) {
 

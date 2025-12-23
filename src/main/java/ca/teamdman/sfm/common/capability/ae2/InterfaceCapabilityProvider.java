@@ -14,7 +14,6 @@ import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
-import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -76,7 +75,7 @@ public class InterfaceCapabilityProvider implements SFMBlockCapabilityProvider<O
 
     private static @Nullable InterfaceBlockEntity interfaceAt(
             LevelAccessor level,
-            @NotStored BlockPos pos
+            BlockPos pos
     ) {
         var be = level.getBlockEntity(pos);
         if (be instanceof InterfaceBlockEntity in) {

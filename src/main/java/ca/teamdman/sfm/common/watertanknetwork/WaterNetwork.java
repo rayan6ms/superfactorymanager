@@ -2,7 +2,6 @@ package ca.teamdman.sfm.common.watertanknetwork;
 
 import ca.teamdman.sfm.common.block.WaterTankBlock;
 import ca.teamdman.sfm.common.blockentity.WaterTankBlockEntity;
-import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import ca.teamdman.sfm.common.util.SFMStreamUtils;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -29,17 +28,17 @@ public record WaterNetwork(
         this(level, new Long2ObjectOpenHashMap<>(), new Long2ObjectOpenHashMap<>());
     }
 
-    public void rebuildNetwork(@NotStored BlockPos start) {
+    public void rebuildNetwork(BlockPos start) {
         members.clear();
         discoverMembers(start).forEach(this::addMember);
         updateMembers();
     }
 
-    public @Nullable WaterTankBlockEntity getMember(@NotStored BlockPos memberPos) {
+    public @Nullable WaterTankBlockEntity getMember(BlockPos memberPos) {
         return members.get(memberPos.asLong());
     }
 
-    public void addMember(@NotStored BlockPos pos) {
+    public void addMember(BlockPos pos) {
         addMember((WaterTankBlockEntity) level.getBlockEntity(pos));
     }
 
@@ -55,7 +54,7 @@ public record WaterNetwork(
         }
     }
 
-    public Stream<WaterTankBlockEntity> discoverMembers(@NotStored BlockPos start) {
+    public Stream<WaterTankBlockEntity> discoverMembers(BlockPos start) {
         return SFMStreamUtils.getRecursiveStream((current, next, results) -> {
             if (!(level.getBlockEntity(current) instanceof WaterTankBlockEntity blockEntity)) return;
             if (!current.equals(start)) {
@@ -70,7 +69,7 @@ public record WaterNetwork(
     }
 
     public Stream<WaterTankBlockEntity> discoverMembersFromCache(
-            @NotStored BlockPos start,
+            BlockPos start,
             WaterNetwork cache
     ) {
         return SFMStreamUtils.getRecursiveStream((current, next, results) -> {
@@ -94,7 +93,7 @@ public record WaterNetwork(
     }
 
     private void rebuildNetworkFromCache(
-            @NotStored BlockPos start,
+            BlockPos start,
             WaterNetwork cache
     ) {
         members.clear();
@@ -105,7 +104,7 @@ public record WaterNetwork(
         members.putAll(other.members);
     }
 
-    List<WaterNetwork> withoutMember(@NotStored BlockPos pos) {
+    List<WaterNetwork> withoutMember(BlockPos pos) {
         members.remove(pos.asLong());
         List<WaterNetwork> branches = new ArrayList<>();
         BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();

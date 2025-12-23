@@ -2,7 +2,6 @@ package ca.teamdman.sfm.common.cablenetwork;
 
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
-import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -51,7 +50,7 @@ public class SFMBlockCapabilityCacheForLevel {
     }
 
     public void overwriteFromOther(
-            @NotStored BlockPos pos,
+            BlockPos pos,
             SFMBlockCapabilityCacheForLevel other
     ) {
 
@@ -63,7 +62,7 @@ public class SFMBlockCapabilityCacheForLevel {
     }
 
     public <CAP> @Nullable SFMBlockCapabilityResult<CAP> getCapability(
-            @NotStored BlockPos pos,
+            BlockPos pos,
             SFMBlockCapabilityKind<CAP> capKind,
             @Nullable Direction direction
     ) {
@@ -118,7 +117,7 @@ public class SFMBlockCapabilityCacheForLevel {
     }
 
     public void remove(
-            @NotStored BlockPos pos,
+            BlockPos pos,
             SFMBlockCapabilityKind<?> capKind,
             @Nullable Direction direction
     ) {
@@ -157,7 +156,7 @@ public class SFMBlockCapabilityCacheForLevel {
     }
 
     public <CAP> void putCapability(
-            @NotStored BlockPos posIn,
+            BlockPos posIn,
             SFMBlockCapabilityKind<CAP> capKind,
             @Nullable Direction direction,
             SFMBlockCapabilityResult<CAP> cap
@@ -198,7 +197,7 @@ public class SFMBlockCapabilityCacheForLevel {
         }
     }
 
-    private void addToChunkMap(@NotStored BlockPos pos) {
+    private void addToChunkMap(BlockPos pos) {
 
         ChunkPos chunkPos = new ChunkPos(pos);
         long chunkKey = chunkPos.toLong();
@@ -206,7 +205,7 @@ public class SFMBlockCapabilityCacheForLevel {
         CHUNK_TO_BLOCK_POSITIONS.computeIfAbsent(chunkKey, k -> new LongArraySet()).add(blockPos);
     }
 
-    private void removeFromChunkMap(@NotStored BlockPos pos) {
+    private void removeFromChunkMap(BlockPos pos) {
 
         ChunkPos chunkPos = new ChunkPos(pos);
         long chunkKey = chunkPos.toLong();
