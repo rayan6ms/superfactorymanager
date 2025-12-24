@@ -10,7 +10,6 @@ import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.common.program.ExecuteProgramBehaviour;
 import ca.teamdman.sfm.common.program.IProgramHooks;
 import ca.teamdman.sfm.common.program.ProgramContext;
-import ca.teamdman.sfm.common.program.ProgramHooks;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.BoolExpr;
@@ -181,8 +180,7 @@ public class SFMGameTestHelper extends GameTestHelper {
         ProgramContext programContext = ProgramContext.of(
                 new Program(new ASTBuilder(), "temp lol", List.of(), Set.of(), Set.of()),
                 manager,
-                ExecuteProgramBehaviour::new,
-                ProgramHooks.EMPTY
+                ExecuteProgramBehaviour::new
         );
         boolean passed = expr.test(programContext);
         if (!passed) {

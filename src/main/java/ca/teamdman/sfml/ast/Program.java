@@ -18,8 +18,6 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.DataOutput;
 import java.time.Duration;
-import java.util.ArrayDeque;
-import java.util.Deque;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -59,7 +57,7 @@ public record Program(
      */
     public boolean tick(ManagerBlockEntity manager) {
 
-        var context = ProgramContext.of(this, manager, new ExecuteProgramBehaviour(), ProgramHooks.EMPTY);
+        var context = ProgramContext.of(this, manager, new ExecuteProgramBehaviour());
 
         // log if there are unprocessed redstone pulses
         int unprocessedRedstonePulseCount = manager.getUnprocessedRedstonePulseCount();
@@ -181,31 +179,6 @@ public record Program(
             rtn.append(trigger).append("\n");
         }
         return rtn.toString();
-    }
-
-    public void replaceOutputStatement(
-            OutputStatement oldStatement,
-            OutputStatement newStatement
-    ) {
-
-        if (!ProgramBuilder.isMutationAllowed(this)) {
-            throw new IllegalArgumentException(
-                    "Mutation is not allowed on this Program object because it is cached! Program = " + this);
-        }
-        Deque<ASTNode> toPatch = new ArrayDeque<>();
-        toPatch.add(this);
-        while (!toPatch.isEmpty()) {
-            ASTNode statement = toPatch.pollFirst();
-            List<? extends ASTNode> children = statement.getChildNodes();
-            for (int i = 0; i < children.size(); i++) {
-                ASTNode child = children.get(i);
-                if (child == oldStatement) {
-                    children.set(i, newStatement);
-                } else {
-                    toPatch.add(child);
-                }
-            }
-        }
     }
 
     private static @NotNull Consumer<Consumer<TranslatableContents>> getTraceLogWriter(ProgramContext context) {

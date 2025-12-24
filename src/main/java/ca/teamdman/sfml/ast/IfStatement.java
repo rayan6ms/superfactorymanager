@@ -16,7 +16,7 @@ public record IfStatement(
     @Override
     public void tick(ProgramContext context) {
         Predicate<ProgramContext> condition = this.condition;
-        boolean test;
+        boolean result;
 
         if (context.behaviour() instanceof SimulateExploreAllPathsProgramBehaviour simulation) {
             condition = ctx -> {
@@ -27,13 +27,13 @@ public record IfStatement(
                 }
                 return simulation.getTriggerPathCount().testBit(conditionIndex);
             };
-            test = condition.test(context);
-            simulation.pushPathElement(new SimulateExploreAllPathsProgramBehaviour.BranchPathElement(this, test));
+            result = condition.test(context);
+            simulation.onIfStatementExecution(context, this, result);
         } else {
-            test = condition.test(context);
+            result = condition.test(context);
         }
 
-        if (test) {
+        if (result) {
             tickTrueBlock(context);
         } else {
             tickFalseBlock(context);

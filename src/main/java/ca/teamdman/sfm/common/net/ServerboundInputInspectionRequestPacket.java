@@ -1,7 +1,6 @@
 package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.common.program.ProgramContext;
-import ca.teamdman.sfm.common.program.ProgramHooks;
 import ca.teamdman.sfm.common.program.SimulateExploreAllPathsProgramBehaviour;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMASTUtils;
@@ -63,8 +62,7 @@ public record ServerboundInputInspectionRequestPacket(
                                         ProgramContext programContext = ProgramContext.of(
                                                 program,
                                                 managerBlockEntity,
-                                                new SimulateExploreAllPathsProgramBehaviour(),
-                                                ProgramHooks.EMPTY
+                                                new SimulateExploreAllPathsProgramBehaviour()
                                         );
                                         int preLen = payload.length();
                                         inputStatement.gatherSlots(

@@ -86,6 +86,14 @@ public class SimulateExploreAllPathsProgramBehaviour implements ProgramBehaviour
         pushPathElement(IOPathElement.of(outputStatement));
     }
 
+    public void onIfStatementExecution(
+            ProgramContext context,
+            IfStatement ifStatement,
+            boolean wasTrue
+    ) {
+        pushPathElement(new BranchPathElement(ifStatement, wasTrue));
+    }
+
     public void onInputStatementExecution(
             ProgramContext context,
             InputStatement inputStatement

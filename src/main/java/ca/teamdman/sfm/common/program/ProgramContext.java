@@ -41,9 +41,8 @@ public record ProgramContext(
 
         MutableInt unhandledRedstonePulseCount,
 
-        MutableBoolean didSomething,
+        MutableBoolean didSomething
 
-        ProgramHooks hooks
 ) {
     private ProgramContext(ProgramContext other) {
 
@@ -54,16 +53,14 @@ public record ProgramContext(
                 other.level, new ArrayList<>(other.inputs),
                 other.behaviour,
                 new MutableInt(other.unhandledRedstonePulseCount().intValue()),
-                new MutableBoolean(other.didSomething.booleanValue()),
-                other.hooks
+                new MutableBoolean(other.didSomething.booleanValue())
         );
     }
 
     public static ProgramContext of(
             Program program,
             ManagerBlockEntity manager,
-            ProgramBehaviour executionBehaviour,
-            ProgramHooks hooks
+            ProgramBehaviour executionBehaviour
     ) {
 
         //noinspection OptionalGetWithoutIsPresent // program shouldn't be ticking if the network is bad
@@ -80,11 +77,11 @@ public record ProgramContext(
                 logger, program,
                 labelPositionHolder, manager,
                 network,
-                level, new ArrayList<>(),
+                level,
+                new ArrayList<>(),
                 executionBehaviour,
                 new MutableInt(unhandledRedstonePulseCount),
-                new MutableBoolean(false),
-                hooks
+                new MutableBoolean(false)
         );
     }
 
@@ -104,8 +101,7 @@ public record ProgramContext(
                 new ArrayList<>(),
                 behaviour,
                 new MutableInt(redstonePulses),
-                new MutableBoolean(false),
-                ProgramHooks.EMPTY
+                new MutableBoolean(false)
         );
     }
 

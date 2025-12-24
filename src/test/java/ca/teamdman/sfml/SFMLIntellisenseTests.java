@@ -372,8 +372,8 @@ public class SFMLIntellisenseTests {
                 parser,
                 Set.of(
                         SFMLParser.RULE_identifier,
-                        SFMLParser.RULE_string,
-                        SFMLParser.RULE_number
+                        SFMLParser.RULE_string
+//                        SFMLParser.RULE_number
 //                        SFMLParser.RULE_label,
 //                        SFMLParser.RULE_resourceId
                 ),
