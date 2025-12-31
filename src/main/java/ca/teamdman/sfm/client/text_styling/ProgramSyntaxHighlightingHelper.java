@@ -83,7 +83,11 @@ public class ProgramSyntaxHighlightingHelper {
                 lexer.INCLUDE_UNUSED = true;
                 yield lexer;
             }
-            case TOML -> new TomlLexer(CharStreams.fromString(programString));
+            case TOML -> {
+                TomlLexer lexer = new TomlLexer(CharStreams.fromString(programString));
+                lexer.INCLUDE_UNUSED = true;
+                yield lexer;
+            }
             case PLAINTEXT -> throw new IllegalArgumentException("PLAINTEXT should be handled separately");
         };
     }

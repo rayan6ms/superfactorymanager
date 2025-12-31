@@ -69,7 +69,7 @@ public class SfmTomlTests {
                 
                 [[array_of_tables]]
                 name = "second"
-                """.stripIndent();
+                """.stripTrailing().stripIndent();
         var lines = rawInput.split("\n", -1);
 
         var colouredLines = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(

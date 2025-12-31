@@ -25,8 +25,11 @@ lexer grammar TomlLexer;
 @header {
 package ca.teamdman.langs;
 }
+@members {
+    public boolean INCLUDE_UNUSED = false; // we want syntax highlighting to not break on unexpected tokens
+}
 
-WS               : [ \t]+ -> skip;
+WS               : [ \t]+ -> channel(HIDDEN);
 NL               : ('\r'? '\n')+;
 COMMENT          : '#' (~[\n])*;
 L_BRACKET        : '[';
@@ -54,7 +57,7 @@ UNQUOTED_KEY: (ALPHA | DIGIT | '-' | '_')+;
 
 mode SIMPLE_VALUE_MODE;
 
-VALUE_WS: WS -> skip;
+VALUE_WS: WS -> channel(HIDDEN);
 
 L_BRACE     : '{'       -> mode(INLINE_TABLE_MODE);
 ARRAY_START : L_BRACKET -> type(L_BRACKET), mode(ARRAY_MODE);
@@ -108,7 +111,7 @@ LOCAL_TIME            : PARTIAL_TIME                 -> popMode;
 
 mode INLINE_TABLE_MODE;
 
-INLINE_TABLE_WS      : WS    -> skip;
+INLINE_TABLE_WS      : WS    -> channel(HIDDEN);
 INLINE_TABLE_KEY_DOT : DOT   -> type(DOT);
 INLINE_TABLE_COMMA   : COMMA -> type(COMMA);
 R_BRACE              : '}'   -> popMode;
@@ -121,7 +124,7 @@ INLINE_TABLE_EQUALS: EQUALS -> type(EQUALS), pushMode(SIMPLE_VALUE_MODE);
 
 mode ARRAY_MODE;
 
-ARRAY_WS      : WS      -> skip;
+ARRAY_WS      : WS      -> channel(HIDDEN);
 ARRAY_NL      : NL      -> type(NL);
 ARRAY_COMMENT : COMMENT -> type(COMMENT);
 ARRAY_COMMA   : COMMA   -> type(COMMA);
@@ -150,3 +153,5 @@ ARRAY_OFFSET_DATE_TIME : OFFSET_DATE_TIME -> type(OFFSET_DATE_TIME);
 ARRAY_LOCAL_DATE_TIME  : LOCAL_DATE_TIME  -> type(LOCAL_DATE_TIME);
 ARRAY_LOCAL_DATE       : LOCAL_DATE       -> type(LOCAL_DATE);
 ARRAY_LOCAL_TIME       : LOCAL_TIME       -> type(LOCAL_TIME);
+
+UNUSED : {INCLUDE_UNUSED}? . -> channel(HIDDEN);
