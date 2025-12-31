@@ -4,8 +4,8 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.registry.SFMPackets;
-import ca.teamdman.sfml.ast.Program;
-import ca.teamdman.sfml.program_builder.ProgramBuilder;
+import ca.teamdman.sfml.ast.SFMLProgram;
+import ca.teamdman.sfml.program_builder.SFMLProgramBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -144,7 +144,7 @@ public class SFMPacketHandlingContext {
         }
         //todo: localize
 
-        new ProgramBuilder(programString)
+        new SFMLProgramBuilder(programString)
                 .useCache(!willMutateProgram)
                 .build()
                 .caseSuccess((program, metadata) -> callback.accept(
@@ -152,7 +152,7 @@ public class SFMPacketHandlingContext {
                         player,
                         manager
                 ))
-                .caseFailure(result -> {
+                .caseFailure(() -> {
                     //todo: localize
                     SFMPackets.sendToPlayer(
                             () -> player,
@@ -164,7 +164,7 @@ public class SFMPacketHandlingContext {
     @FunctionalInterface
     public interface ProgramConsumer {
         void accept(
-                Program program,
+                SFMLProgram program,
                 ServerPlayer player,
                 ManagerBlockEntity managerBlockEntity
         );

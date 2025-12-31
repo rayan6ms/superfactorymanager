@@ -3,6 +3,7 @@ package ca.teamdman.sfml.ast;
 import ca.teamdman.langs.SFMLBaseVisitor;
 import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfm.common.config.SFMConfig;
+import ca.teamdman.sfml.program_builder.IAstBuilder;
 import com.mojang.datafixers.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -12,82 +13,19 @@ import java.lang.ref.WeakReference;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
+public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAstBuilder<SfmlAstNode> {
     /// Used for linting and for label gun pull behaviour
-    private final Set<Label> USED_LABELS = new HashSet<>();
+    private final Set<Label> usedLabels = new HashSet<>();
 
     /// Used for linting and for energy-specific timer minimum interval restrictions
-    private final Set<ResourceIdentifier<?, ?, ?>> USED_RESOURCES = new HashSet<>();
+    private final Set<ResourceIdentifier<?, ?, ?>> usedResources = new HashSet<>();
 
-    /// Used for program editor context actions; ctrl+space on a token
-    private final List<Pair<WeakReference<ASTNode>, ParserRuleContext>> AST_NODE_CONTEXTS = new LinkedList<>();
+    private final List<Pair<WeakReference<SfmlAstNode>, ParserRuleContext>> contexts = new LinkedList<>();
 
-    /// @return hierarchy of nodes; e.g., Program > Trigger > Block > IOStatement > ResourceAccess > Label
-    public List<Pair<ASTNode, ParserRuleContext>> getNodesUnderCursor(int cursorPos) {
+    @Override
+    public List<Pair<WeakReference<SfmlAstNode>, ParserRuleContext>> contexts() {
 
-        return AST_NODE_CONTEXTS
-                .stream()
-                .filter(pair -> pair.getSecond() != null)
-                .filter(pair -> pair.getSecond().start.getStartIndex() <= cursorPos
-                                && pair.getSecond().stop.getStopIndex() >= cursorPos)
-                .map(pair -> Pair.of(pair.getFirst().get(), pair.getSecond()))
-                .filter(pair -> pair.getFirst() != null)
-                .collect(Collectors.toList());
-    }
-
-    /// @return {@link #AST_NODE_CONTEXTS}.get({@code index})
-    public Optional<ASTNode> getNodeAtIndex(int index) {
-
-        if (index < 0 || index >= AST_NODE_CONTEXTS.size()) return Optional.empty();
-        WeakReference<ASTNode> nodeRef = AST_NODE_CONTEXTS.get(index).getFirst();
-        return Optional.ofNullable(nodeRef.get());
-    }
-
-    /// Used by {@link ForgetStatement} to track the provenance of dynamically generated {@link InputStatement} instances.
-    /// We should use weak references for these dynamically generated nodes to let them get garbage collected; <a href="https://github.com/TeamDman/SuperFactoryManager/issues/405">#405</a>.
-    public void setLocationFromOtherNode(
-            ASTNode node,
-            ASTNode otherNode
-    ) {
-
-        trackNode(node, AST_NODE_CONTEXTS.get(getIndexForNode(otherNode)).getSecond());
-    }
-
-    /// Used for client-server collaboration to make context menu actions work.
-    /// The client calls {@link #getNodesUnderCursor(int)} and then {@link ca.teamdman.sfm.client.ProgramTokenContextActions#getContextAction(String, int)} to build the pick list.
-    /// When a context action is invoked, a packet is sent to the server containing the index of the node so that the
-    /// packet handler can do its work with the server's instance of the {@link ASTNode}.
-    public int getIndexForNode(ASTNode node) {
-
-        for (int i = 0; i < AST_NODE_CONTEXTS.size(); i++) {
-            Pair<WeakReference<ASTNode>, ParserRuleContext> pair = AST_NODE_CONTEXTS.get(i);
-            // Intentional reference equality check, don't forget the `.get()`!
-            if (pair.getFirst().get() == node) {
-                return i;
-            }
-        }
-        return -1;
-    }
-
-    public Optional<ParserRuleContext> getContextForNode(ASTNode node) {
-
-        return AST_NODE_CONTEXTS
-                .stream()
-                .filter(pair -> pair.getFirst().get() == node)
-                .map(Pair::getSecond)
-                .findFirst();
-    }
-
-    public String getLineColumnForNode(ASTNode node) {
-        // todo: return TranslatableContents
-        return getContextForNode(node)
-                .map(ASTBuilder::getLineColumnForContext)
-                .orElse("Unknown location");
-    }
-
-    public static String getLineColumnForContext(ParserRuleContext ctx) {
-
-        return "Line " + ctx.start.getLine() + ", Column " + ctx.start.getCharPositionInLine();
+        return contexts;
     }
 
     @Override
@@ -100,7 +38,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     }
 
     @Override
-    public ASTNode visitResource(SFMLParser.ResourceContext ctx) {
+    public SfmlAstNode visitResource(SFMLParser.ResourceContext ctx) {
 
         var str = ctx
                 .children
@@ -113,7 +51,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
                 .toLowerCase(Locale.ROOT);
 
         var rtn = ResourceIdentifier.fromString(str);
-        USED_RESOURCES.add(rtn);
+        usedResources.add(rtn);
         rtn.assertValid();
         trackNode(rtn, ctx);
         return rtn;
@@ -123,7 +61,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     public ResourceIdentifier<?, ?, ?> visitStringResource(SFMLParser.StringResourceContext ctx) {
 
         var rtn = ResourceIdentifier.fromString(visitString(ctx.string()).value());
-        USED_RESOURCES.add(rtn);
+        usedResources.add(rtn);
         rtn.assertValid();
         trackNode(rtn, ctx);
         return rtn;
@@ -143,14 +81,14 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     public Label visitRawLabel(SFMLParser.RawLabelContext ctx) {
 
         var label = new Label(ctx.getText());
-        if (label.value().length() > Program.MAX_LABEL_LENGTH) {
+        if (label.value().length() > SFMLProgram.MAX_LABEL_LENGTH) {
             throw new IllegalArgumentException(
                     "Label value cannot be longer than "
-                    + Program.MAX_LABEL_LENGTH
+                    + SFMLProgram.MAX_LABEL_LENGTH
                     + " characters."
             );
         }
-        USED_LABELS.add(label);
+        usedLabels.add(label);
         trackNode(label, ctx);
         return label;
     }
@@ -159,20 +97,20 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     public Label visitStringLabel(SFMLParser.StringLabelContext ctx) {
 
         var label = new Label(visitString(ctx.string()).value());
-        if (label.value().length() > Program.MAX_LABEL_LENGTH) {
+        if (label.value().length() > SFMLProgram.MAX_LABEL_LENGTH) {
             throw new IllegalArgumentException(
                     "Label value cannot be longer than "
-                    + Program.MAX_LABEL_LENGTH
+                    + SFMLProgram.MAX_LABEL_LENGTH
                     + " characters."
             );
         }
-        USED_LABELS.add(label);
+        usedLabels.add(label);
         trackNode(label, ctx);
         return label;
     }
 
     @Override
-    public Program visitProgram(SFMLParser.ProgramContext ctx) {
+    public SFMLProgram visitProgram(SFMLParser.ProgramContext ctx) {
 
         if (SFMConfig.getOrDefault(SFMConfig.SERVER_CONFIG.disableProgramExecution)) {
             throw new AssertionError("Program execution is disabled via config");
@@ -184,17 +122,17 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
                 .map(this::visit)
                 .map(Trigger.class::cast)
                 .collect(Collectors.toList());
-        var labels = USED_LABELS
+        var labels = usedLabels
                 .stream()
                 .map(Label::value)
                 .collect(Collectors.toSet());
-        Program program = new Program(this, name.value(), triggers, labels, USED_RESOURCES);
+        SFMLProgram program = new SFMLProgram(this, name.value(), triggers, labels, usedResources);
         trackNode(program, ctx);
         return program;
     }
 
     @Override
-    public ASTNode visitTimerTrigger(SFMLParser.TimerTriggerContext ctx) {
+    public SfmlAstNode visitTimerTrigger(SFMLParser.TimerTriggerContext ctx) {
         // create timer trigger
         var time = (Interval) visit(ctx.interval());
         var block = visitBlock(ctx.block());
@@ -215,7 +153,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     }
 
     @Override
-    public ASTNode visitBooleanRedstone(SFMLParser.BooleanRedstoneContext ctx) {
+    public SfmlAstNode visitBooleanRedstone(SFMLParser.BooleanRedstoneContext ctx) {
 
         ComparisonOperator comp = ComparisonOperator.GREATER_OR_EQUAL;
         Number num = new Number(0);
@@ -232,7 +170,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     }
 
     @Override
-    public ASTNode visitPulseTrigger(SFMLParser.PulseTriggerContext ctx) {
+    public SfmlAstNode visitPulseTrigger(SFMLParser.PulseTriggerContext ctx) {
 
         var block = visitBlock(ctx.block());
         RedstonePulseTrigger redstonePulseTrigger = new RedstonePulseTrigger(block);
@@ -305,7 +243,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         Number right = (Number) visit(ctx.numberExpression(1));
         if (right.value() == 0) {
             throw new IllegalArgumentException("Division by zero at "
-                                               + getLineColumnForContext(ctx.numberExpression(1)));
+                                               + IAstBuilder.getLineColumnForContext(ctx.numberExpression(1)));
         }
         Number rtn = new Number(left.value() / right.value());
         trackNode(rtn, ctx);
@@ -758,7 +696,7 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
     }
 
     @Override
-    public ASTNode visitWith(SFMLParser.WithContext ctx) {
+    public SfmlAstNode visitWith(SFMLParser.WithContext ctx) {
 
         WithClause clause = (WithClause) visit(ctx.withClause());
         With.WithMode mode = ctx.WITHOUT() != null ? With.WithMode.WITHOUT : With.WithMode.WITH;
@@ -984,17 +922,6 @@ public class ASTBuilder extends SFMLBaseVisitor<ASTNode> {
         Block block = new Block(statements);
         trackNode(block, ctx);
         return block;
-    }
-
-    /// Tracks an {@link ASTNode} and its {@link ParserRuleContext} for later retrieval for editor context actions.
-    private void trackNode(
-            ASTNode node,
-            ParserRuleContext ctx
-    ) {
-
-        WeakReference<ASTNode> nodeRef = new WeakReference<>(node);
-
-        AST_NODE_CONTEXTS.add(new Pair<>(nodeRef, ctx));
     }
 
 }

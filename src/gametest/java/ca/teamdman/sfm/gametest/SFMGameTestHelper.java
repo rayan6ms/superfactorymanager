@@ -11,9 +11,9 @@ import ca.teamdman.sfm.common.program.ExecuteProgramBehaviour;
 import ca.teamdman.sfm.common.program.IProgramHooks;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.BoolExpr;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.SFMLProgram;
+import ca.teamdman.sfml.ast.SfmlAstBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTestAssertPosException;
@@ -178,7 +178,7 @@ public class SFMGameTestHelper extends GameTestHelper {
 
         BoolExpr expr = BoolExpr.from(exprString);
         ProgramContext programContext = ProgramContext.of(
-                new Program(new ASTBuilder(), "temp lol", List.of(), Set.of(), Set.of()),
+                new SFMLProgram(new SfmlAstBuilder(), "temp lol", List.of(), Set.of(), Set.of()),
                 manager,
                 ExecuteProgramBehaviour::new
         );

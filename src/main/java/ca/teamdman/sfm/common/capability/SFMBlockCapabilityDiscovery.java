@@ -146,7 +146,7 @@ public class SFMBlockCapabilityDiscovery {
                     return capability;
                 }
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             SFM.LOGGER.error(
                     """
                             SFM encountered an exception while querying capabilities. Please report this!

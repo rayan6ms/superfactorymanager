@@ -101,7 +101,7 @@ public record ForgetStatement(
     }
 
     @Override
-    public List<ASTNode> getChildNodes() {
+    public List<SfmlAstNode> getChildNodes() {
 
         return List.of();
     }

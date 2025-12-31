@@ -6,7 +6,6 @@ import ca.teamdman.sfm.client.screen.text_editor.ISFMTextEditScreen;
 import ca.teamdman.sfm.client.screen.text_editor.SFMTextEditScreenV1;
 import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
 import ca.teamdman.sfm.client.text_editor.ISFMTextEditorRegistration;
-import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenDiskOpenContext;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenExampleProgramOpenContext;
 import ca.teamdman.sfm.common.config.SFMClientTextEditorConfig;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
@@ -53,7 +52,7 @@ public class SFMScreenChangeHelpers {
         setOrPushScreen(new LabelGunScreen(stack, hand));
     }
 
-    public static ISFMTextEditScreen createProgramEditScreen(
+    public static ISFMTextEditScreen createPreferredTextEditScreen(
             ISFMTextEditScreenOpenContext openContext
     ) {
 
@@ -61,14 +60,14 @@ public class SFMScreenChangeHelpers {
         return textEditorRegistration.createScreen(openContext);
     }
 
-    public static void showProgramEditScreen(
+    public static void showPreferredTextEditScreen(
             ISFMTextEditScreenOpenContext context
     ) {
 
-        showTextEditScreen(createProgramEditScreen(context));
+        showPreferredTextEditScreen(createPreferredTextEditScreen(context));
     }
 
-    public static void showTextEditScreen(
+    public static void showPreferredTextEditScreen(
             ISFMTextEditScreen screen
     ) {
 
@@ -76,26 +75,6 @@ public class SFMScreenChangeHelpers {
             case Push -> setOrPushScreen(screen.asScreen());
             case Replace -> setScreen(screen.asScreen());
         }
-    }
-
-    public static void showTomlEditScreen(
-            TomlEditScreenOpenContext context
-    ) {
-
-        SFMTextEditScreenV1 screen = new TomlEditScreen(context);
-        setOrPushScreen(screen);
-        screen.scrollToTop();
-    }
-
-    public static void showProgramEditScreen(String initialContent) {
-
-        ISFMTextEditScreenOpenContext openContext = new SFMTextEditScreenDiskOpenContext(
-                initialContent,
-                LabelPositionHolder.empty(),
-                (x) -> {
-                }
-        );
-        showProgramEditScreen(openContext);
     }
 
     public static void showExampleListScreen(

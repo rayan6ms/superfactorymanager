@@ -13,14 +13,14 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMComponentUtils;
 import ca.teamdman.sfm.common.util.SFMDisplayUtils;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.SFMLProgram;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
 import ca.teamdman.sfml.intellisense.IntellisenseContext;
 import ca.teamdman.sfml.intellisense.SFMLIntellisense;
 import ca.teamdman.sfml.manipulation.ManipulationResult;
 import ca.teamdman.sfml.manipulation.ProgramStringManipulationUtils;
-import ca.teamdman.sfml.program_builder.ProgramBuildResult;
-import ca.teamdman.sfml.program_builder.ProgramBuilder;
+import ca.teamdman.sfml.program_builder.SFMLProgramBuildResult;
+import ca.teamdman.sfml.program_builder.SFMLProgramBuilder;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import com.mojang.math.Matrix4f;
@@ -183,7 +183,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
 
             ManipulationResult result = action.perform(
                     new IntellisenseContext(
-                            new ProgramBuilder(textarea.getValue()).build(),
+                            new SFMLProgramBuilder(textarea.getValue()).build(),
                             textarea.getCursorPosition(),
                             textarea.getSelectionCursorPosition(),
                             openContext.labelPositionHolder(),
@@ -373,7 +373,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
         private final List<Integer> displayedLineStartOffsets = new ArrayList<>();
 
         // Cache to avoid reparsing on cursor-only moves
-        private @Nullable ProgramBuildResult cachedBuildResult;
+        private @Nullable SFMLProgramBuildResult cachedBuildResult;
 
         private String cachedBuildProgram = "";
 
@@ -643,12 +643,12 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
 
             // Build the program only when text changed; reuse parse on cursor-only
             // moves
-            ProgramBuildResult buildResult;
+            SFMLProgramBuildResult buildResult;
             if (programString.equals(cachedBuildProgram) && cachedBuildResult != null) {
                 buildResult = cachedBuildResult;
             } else {
 
-                buildResult = new ProgramBuilder(programString).build();
+                buildResult = new SFMLProgramBuilder(programString).build();
                 cachedBuildProgram = programString;
                 cachedBuildResult = buildResult;
             }
@@ -674,11 +674,11 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
                 String cursorPositionDisplay = SFMDisplayUtils.getCursorPositionDisplay(programString, cursorPosition);
                 String cursorTokenDisplay = SFMDisplayUtils.getCursorTokenDisplay(buildResult, cursorPosition);
                 String tokenHierarchyDisplay;
-                @Nullable Program program = buildResult.maybeProgram();
+                @Nullable SFMLProgram program = buildResult.maybeProgram();
                 if (program == null) {
                     tokenHierarchyDisplay = "<INVALID PROGRAM>";
                 } else {
-                    tokenHierarchyDisplay = SFMDisplayUtils.getTokenHierarchyDisplay(program, cursorPosition);
+                    tokenHierarchyDisplay = SFMDisplayUtils.getTokenHierarchyDisplay(program.astBuilder(), cursorPosition);
                 }
 
                 String suggestionsDisplay = suggestedActions.getItems()

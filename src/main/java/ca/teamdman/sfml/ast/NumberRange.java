@@ -6,7 +6,7 @@ public record NumberRange(
         Number start,
 
         Number end
-) implements ASTNode {
+) implements SfmlAstNode {
     public static final NumberRange MAX_RANGE = new NumberRange(new Number(Long.MIN_VALUE), new Number(Long.MAX_VALUE));
 
     /**

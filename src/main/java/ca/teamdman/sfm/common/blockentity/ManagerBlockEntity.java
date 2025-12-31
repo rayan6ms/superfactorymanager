@@ -20,7 +20,7 @@ import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.timing.SFMEpochInstant;
 import ca.teamdman.sfm.common.timing.SFMInstant;
 import ca.teamdman.sfm.common.util.SFMContainerUtil;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.SFMLProgram;
 import com.google.common.base.Joiner;
 import net.minecraft.ChatFormatting;
 import net.minecraft.CrashReportCategory;
@@ -55,7 +55,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
 
     private final Duration[] tickTimes = new Duration[TICK_TIME_HISTORY_SIZE];
 
-    private @Nullable Program program = null;
+    private @Nullable SFMLProgram program = null;
 
     private int configRevision = -1;
 
@@ -182,7 +182,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
                         oldLogLevel
                 );
             }
-        } catch (Throwable t) {
+        } catch (Exception e) {
             // Inform the user that they can disable the manager in the config
             String configPath;
             var found = SFMConfigTracker.getPathForConfig(SFMConfig.SERVER_CONFIG_SPEC);
@@ -197,7 +197,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
                     configValuePath,
                     configPath
             );
-            throw t;
+            throw e;
         }
     }
 
@@ -242,7 +242,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         return tick;
     }
 
-    public @Nullable Program getProgram() {
+    public @Nullable SFMLProgram getProgram() {
 
         return program;
     }

@@ -68,8 +68,8 @@ public class SFMDiagnostics {
 
             var labels = LabelPositionHolder.from(diskStack);
             content.append("\n-- Labels\n").append(labels.toDebugString());
-        } catch (Throwable t) {
-            SFM.LOGGER.error("Failed gathering diagnostic info, returning partial results. Error: ", t);
+        } catch (Exception e) {
+            SFM.LOGGER.error("Failed gathering diagnostic info, returning partial results. Error: ", e);
         }
         return content.toString();
     }

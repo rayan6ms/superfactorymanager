@@ -25,6 +25,7 @@ public class SFMTextEditorConfigScreen extends Screen {
     private Button intellisenseAdvancedButton;
     private Button preferredEditorV1Button;
     private Button preferredEditorV2Button;
+    private Button preferredEditorV3Button;
     private final boolean editorSelectorFeatureFlag = SFMEnvironmentUtils.isInIDE();
 
     public SFMTextEditorConfigScreen(
@@ -193,10 +194,22 @@ public class SFMTextEditorConfigScreen extends Screen {
                             updateButtonStates();
                         })
                         .build();
+        preferredEditorV3Button =
+                new SFMButtonBuilder()
+                        .setPosition(x + 2 * (buttonWidth + buttonSpacing), y + 2 * spacing)
+                        .setSize(buttonWidth, buttonHeight)
+                        .setText(LocalizationKeys.PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V3)
+                        .setOnPress(button -> {
+                            //noinspection OptionalGetWithoutIsPresent
+                            config.preferredEditor.set(SFMTextEditors.V3.getId().get().location().toString());
+                            updateButtonStates();
+                        })
+                        .build();
         if (editorSelectorFeatureFlag) {
             // This behaviour is not ready for release.
             this.addRenderableWidget(preferredEditorV1Button);
             this.addRenderableWidget(preferredEditorV2Button);
+            this.addRenderableWidget(preferredEditorV3Button);
         }
 
 
@@ -228,5 +241,7 @@ public class SFMTextEditorConfigScreen extends Screen {
         preferredEditorV1Button.active = !currentEditor.equals(SFMTextEditors.V1.getId().get().location().toString());
         //noinspection OptionalGetWithoutIsPresent
         preferredEditorV2Button.active = !currentEditor.equals(SFMTextEditors.V2.getId().get().location().toString());
+        //noinspection OptionalGetWithoutIsPresent
+        preferredEditorV3Button.active = !currentEditor.equals(SFMTextEditors.V3.getId().get().location().toString());
     }
 }

@@ -2,7 +2,7 @@ package ca.teamdman.sfml.ast;
 
 import java.util.List;
 
-public record ProgramName(StringHolder value) implements ASTNode {
+public record ProgramName(StringHolder value) implements SfmlAstNode {
     @Override
     public List<StringHolder> getChildNodes() {
 

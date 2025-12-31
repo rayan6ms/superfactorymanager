@@ -2,8 +2,8 @@ package ca.teamdman.sfm.gametest;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.item.DiskItem;
-import ca.teamdman.sfml.ast.Program;
-import ca.teamdman.sfml.program_builder.ProgramBuilder;
+import ca.teamdman.sfml.ast.SFMLProgram;
+import ca.teamdman.sfml.program_builder.SFMLProgramBuilder;
 import net.minecraft.gametest.framework.GameTestAssertException;
 
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,16 +25,16 @@ public class SFMGameTestMethodHelpers {
         }
     }
 
-    public static Program compile(String code) {
+    public static SFMLProgram compile(String code) {
 
-        AtomicReference<Program> rtn = new AtomicReference<>();
+        AtomicReference<SFMLProgram> rtn = new AtomicReference<>();
 
-        new ProgramBuilder(code)
+        new SFMLProgramBuilder(code)
                 .useCache(false)
                 .build()
                 .caseSuccess((program, metadata) -> rtn.set(program))
-                .caseFailure(result -> {
-                    throw new GameTestAssertException("Failed to compile program: " + result.metadata().errors()
+                .caseFailure((metadata) -> {
+                    throw new GameTestAssertException("Failed to compile program: " + metadata.errors()
                             .stream()
                             .map(Object::toString)
                             .reduce("", (a, b) -> a + "\n" + b));

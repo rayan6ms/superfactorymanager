@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfml.ext_antlr4c3.CodeCompletionCore;
+import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.Vocabulary;
 import org.jetbrains.annotations.Nullable;
@@ -31,7 +32,7 @@ public class SFMLIntellisense {
         }
 
         // Create code completion core
-        SFMLParser parser = context.programBuildResult().metadata().parser();
+        Parser parser = context.programBuildResult().metadata().parser();
         Set<Integer> preferredRules = Set.of(
                 SFMLParser.RULE_resourceId,
                 SFMLParser.RULE_label

@@ -3,7 +3,7 @@ package ca.teamdman.sfm.common.net;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.timing.SFMDurationNetworkUtils;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.SFMLProgram;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.network.FriendlyByteBuf;
@@ -36,7 +36,7 @@ public record ClientboundManagerGuiUpdatePacket(
                 FriendlyByteBuf friendlyByteBuf
         ) {
             friendlyByteBuf.writeVarInt(msg.windowId());
-            friendlyByteBuf.writeUtf(msg.program(), Program.MAX_PROGRAM_LENGTH);
+            friendlyByteBuf.writeUtf(msg.program(), SFMLProgram.MAX_PROGRAM_LENGTH);
             friendlyByteBuf.writeEnum(msg.state());
             SFMDurationNetworkUtils.writeDurationArray(msg.tickTimes, friendlyByteBuf);
         }
@@ -45,7 +45,7 @@ public record ClientboundManagerGuiUpdatePacket(
         public ClientboundManagerGuiUpdatePacket decode(FriendlyByteBuf friendlyByteBuf) {
             return new ClientboundManagerGuiUpdatePacket(
                     friendlyByteBuf.readVarInt(),
-                    friendlyByteBuf.readUtf(Program.MAX_PROGRAM_LENGTH),
+                    friendlyByteBuf.readUtf(SFMLProgram.MAX_PROGRAM_LENGTH),
                     friendlyByteBuf.readEnum(ManagerBlockEntity.State.class),
                     SFMDurationNetworkUtils.readDurationArray(friendlyByteBuf.readLongArray())
             );

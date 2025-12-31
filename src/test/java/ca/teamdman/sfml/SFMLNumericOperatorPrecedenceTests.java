@@ -2,9 +2,9 @@ package ca.teamdman.sfml;
 
 import ca.teamdman.langs.SFMLLexer;
 import ca.teamdman.langs.SFMLParser;
-import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.Number;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.SFMLProgram;
+import ca.teamdman.sfml.ast.SfmlAstBuilder;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Test;
@@ -19,14 +19,14 @@ public class SFMLNumericOperatorPrecedenceTests {
         var lexer = new SFMLLexer(CharStreams.fromString(expr));
         var tokens = new CommonTokenStream(lexer);
         var parser = new SFMLParser(tokens);
-        var builder = new ASTBuilder();
+        var builder = new SfmlAstBuilder();
         var lexerErrors = new ArrayList<String>();
         var parserErrors = new ArrayList<String>();
         var visitProblems = new ArrayList<Throwable>();
         lexer.removeErrorListeners();
-        lexer.addErrorListener(new Program.ListErrorListener(lexerErrors));
+        lexer.addErrorListener(new SFMLProgram.ListErrorListener(lexerErrors));
         parser.removeErrorListeners();
-        parser.addErrorListener(new Program.ListErrorListener(parserErrors));
+        parser.addErrorListener(new SFMLProgram.ListErrorListener(parserErrors));
 
         var context = parser.numberExpression();
         Number number = null;

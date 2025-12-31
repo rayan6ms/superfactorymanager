@@ -105,14 +105,14 @@ public class SFMEventListenerMethod<T extends Event> {
 
             return new Consumer<>() {
                 @Override
-                public void accept(T e) {
+                public void accept(T obj) {
 
                     try {
-                        adapted.invokeExact((Object) e);
-                    } catch (Throwable t) {
-                        if (t instanceof RuntimeException re) throw re;
-                        if (t instanceof Error err) throw err;
-                        throw new RuntimeException(t);
+                        adapted.invokeExact((Object) obj);
+                    } catch (Throwable e) {
+                        if (e instanceof RuntimeException re) throw re;
+                        if (e instanceof Error err) throw err;
+                        throw new RuntimeException(e);
                     }
                 }
 

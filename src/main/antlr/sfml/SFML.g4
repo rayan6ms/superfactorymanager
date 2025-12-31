@@ -26,14 +26,14 @@ trigger : EVERY interval DO block END           #TimerTrigger
 interval: numberExpression? GLOBAL? durationUnit (OFFSET BY numberExpression durationUnit?)?;
 durationUnit: (TICKS | TICK | SECONDS | SECOND);
 
-numberExpression  : NUMBER                                      # NumberExpressionLiteral
-                  | LPAREN numberExpression RPAREN              # NumberExpressionParen
-                  | numberExpression CARET numberExpression     # NumberExpressionExponential
-                  | numberExpression ASTERISK numberExpression  # NumberExpressionMultiplication
-                  | numberExpression SLASH numberExpression     # NumberExpressionDivision
-                  | numberExpression PLUS numberExpression      # NumberExpressionAddition
-                  | numberExpression DASH numberExpression      # NumberExpressionSubtraction
-                  | numberExpression PERCENT numberExpression   # NumberExpressionModulus
+numberExpression  : NUMBER                                      # NumberExpressionLiteral         // NEEDS TEST
+                  | LPAREN numberExpression RPAREN              # NumberExpressionParen           // NEEDS TEST
+                  | numberExpression CARET numberExpression     # NumberExpressionExponential     // NEEDS TEST
+                  | numberExpression ASTERISK numberExpression  # NumberExpressionMultiplication  // NEEDS TEST
+                  | numberExpression SLASH numberExpression     # NumberExpressionDivision        // NEEDS TEST
+                  | numberExpression PLUS numberExpression      # NumberExpressionAddition        // NEEDS TEST
+                  | numberExpression DASH numberExpression      # NumberExpressionSubtraction     // NEEDS TEST
+                  | numberExpression PERCENT numberExpression   # NumberExpressionModulus         // NEEDS TEST
                   ;
 
 block           : statement*;
@@ -50,7 +50,7 @@ outputStatement : OUTPUT outputResourceLimits? resourceExclusion? TO emptyslots?
                 | TO emptyslots? EACH? resourceAccess OUTPUT outputResourceLimits? resourceExclusion?
                 ;
 
-forgetStatement : FORGET labelExpression? (COMMA labelExpression)* COMMA?;
+forgetStatement : FORGET labelExpression? (COMMA labelExpression)* COMMA?; // NEEDS TEST
 
 label           : (identifier)  #RawLabel
                 | string        #StringLabel
@@ -130,17 +130,17 @@ setOp           : OVERALL
 
 resourceAccess : labelExpression (COMMA labelExpression)* roundrobin? sideQualifier? slotQualifier?;
 
-labelExpression : label                                      # LabelExpressionSingle
-                | LPAREN labelExpression RPAREN              # LabelExpressionParen
-                | labelExpression EXCEPT    labelExpression  # LabelExpressionExclusion
-                | labelExpression INTERSECT labelExpression  # LabelExpressionIntersection
-                | labelExpression UNION     labelExpression  # LabelExpressionUnion
+labelExpression : label                                      # LabelExpressionSingle          // NEEDS TEST
+                | LPAREN labelExpression RPAREN              # LabelExpressionParen           // NEEDS TEST
+                | labelExpression EXCEPT    labelExpression  # LabelExpressionExclusion       // NEEDS TEST
+                | labelExpression INTERSECT labelExpression  # LabelExpressionIntersection    // NEEDS TEST
+                | labelExpression UNION     labelExpression  # LabelExpressionUnion           // NEEDS TEST
                 ;
 
 roundrobin : ROUND ROBIN BY (LABEL | BLOCK);
 
-sideQualifier   : ALL (SIDE|SIDES)                      #AllSides
-                | EACH? side (COMMA side)* (SIDE|SIDES) #ListedSides
+sideQualifier   : ALL (SIDE|SIDES)                      #AllSides     // NEEDS TEST
+                | EACH? side (COMMA side)* (SIDE|SIDES) #ListedSides  // NEEDS TEST
                 ;
 
 side            : TOP
@@ -156,9 +156,9 @@ side            : TOP
                 | NULL
                 ;
 
-slotQualifier   : EACH? (SLOTS | SLOT) numberSet;
+slotQualifier   : EACH? (SLOTS | SLOT) numberSet;                   // NEEDS TEST
 numberSet       : numberRange (COMMA numberRange)*;
-numberRange     : NOT? numberExpression (DASH numberExpression)? ;
+numberRange     : NOT? numberExpression (DASH numberExpression)? ;  // NEEDS TEST
 
 
 emptyslots      : EMPTY (SLOTS | SLOT) IN ;
@@ -284,7 +284,7 @@ RPAREN  : ')';
 ASTERISK: '*';
 
 NUMBER                  : [0-9]+ ;
-IDENTIFIER              : [a-zA-Z_*][a-zA-Z0-9_*]* | ASTERISK; // Note that the * in the square brackets is a literl
+IDENTIFIER              : [a-zA-Z_*][a-zA-Z0-9_*]* | ASTERISK; // Note that the * in the square brackets is a literal
 
 STRING : '"' (~'"'|'\\"')* '"' ;
 

@@ -2,7 +2,8 @@ package ca.teamdman.sfm.client.screen;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
-import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenDiskOpenContext;
+import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenOpenContext;
+import ca.teamdman.sfm.client.text_editor.TextEditScreenContentLanguage;
 import ca.teamdman.sfm.client.widget.SFMButtonBuilder;
 import ca.teamdman.sfm.client.widget.SFMExtendedButtonWithTooltip;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
@@ -15,7 +16,7 @@ import ca.teamdman.sfm.common.net.*;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.SFMLProgram;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
@@ -306,9 +307,10 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     private void onEditButtonClicked() {
-        SFMScreenChangeHelpers.showProgramEditScreen(new SFMTextEditScreenDiskOpenContext(
+        SFMScreenChangeHelpers.showPreferredTextEditScreen(new SFMTextEditScreenOpenContext(
                 getProgram(),
                 LabelPositionHolder.from(menu.getDisk()),
+                TextEditScreenContentLanguage.SFML,
                 this::sendProgram
         ));
     }
@@ -372,7 +374,7 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
     }
 
     private void sendProgram(String program) {
-        program = SFMPacketDaddy.truncate(program, Program.MAX_PROGRAM_LENGTH);
+        program = SFMPacketDaddy.truncate(program, SFMLProgram.MAX_PROGRAM_LENGTH);
         SFMPackets.sendToServer(new ServerboundManagerProgramPacket(
                 menu.containerId,
                 menu.MANAGER_POSITION,
@@ -404,8 +406,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
             Minecraft.getInstance().keyboardHandler.setClipboard(menu.program);
             status = MANAGER_GUI_STATUS_SAVED_CLIPBOARD.getComponent();
             statusCountdown = STATUS_DURATION;
-        } catch (Throwable t) {
-            SFM.LOGGER.error("failed to save clipboard", t);
+        } catch (Exception e) {
+            SFM.LOGGER.error("failed to save clipboard", e);
         }
     }
 
@@ -425,8 +427,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
             Minecraft.getInstance().keyboardHandler.setClipboard(diagnosticInfo);
             status = MANAGER_GUI_STATUS_SAVED_CLIPBOARD.getComponent();
             statusCountdown = STATUS_DURATION;
-        } catch (Throwable t) {
-            SFM.LOGGER.error("failed saving clipboard", t);
+        } catch (Exception e) {
+            SFM.LOGGER.error("failed saving clipboard", e);
         }
     }
 
@@ -434,8 +436,8 @@ public class ManagerScreen extends AbstractContainerScreen<ManagerContainerMenu>
         String clipboardContents;
         try {
             clipboardContents = Minecraft.getInstance().keyboardHandler.getClipboard();
-        } catch (Throwable t) {
-            SFM.LOGGER.error("failed loading clipboard", t);
+        } catch (Exception e) {
+            SFM.LOGGER.error("failed loading clipboard", e);
             return;
         }
         String existingProgram = getProgram();

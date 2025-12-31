@@ -30,7 +30,7 @@ public class RedstoneSignalCapabilityProvider implements SFMBlockCapabilityProvi
             @SuppressWarnings("DataFlowIssue")
             int signal = state.getSignal(levelAccessor, pos, direction);
             return SFMBlockCapabilityResult.of(new RedstoneSignalStorage(signal, 15));
-        } catch (Throwable t) {
+        } catch (Exception e) {
             return SFMBlockCapabilityResult.empty();
         }
     }

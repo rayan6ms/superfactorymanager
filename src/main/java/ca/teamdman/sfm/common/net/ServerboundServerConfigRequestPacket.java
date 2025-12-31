@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.command.ConfigCommandBehaviourInput;
+import ca.teamdman.sfm.common.command.ConfigCommandVariantInput;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.config.SFMConfigReadWriter;
 import ca.teamdman.sfm.common.registry.SFMPackets;
@@ -15,6 +16,7 @@ public record ServerboundServerConfigRequestPacket(
     public static class Daddy implements SFMPacketDaddy<ServerboundServerConfigRequestPacket> {
         @Override
         public PacketDirection getPacketDirection() {
+
             return PacketDirection.SERVERBOUND;
         }
 
@@ -23,11 +25,13 @@ public record ServerboundServerConfigRequestPacket(
                 ServerboundServerConfigRequestPacket msg,
                 FriendlyByteBuf friendlyByteBuf
         ) {
+
             friendlyByteBuf.writeEnum(msg.requestingEditMode());
         }
 
         @Override
         public ServerboundServerConfigRequestPacket decode(FriendlyByteBuf friendlyByteBuf) {
+
             return new ServerboundServerConfigRequestPacket(friendlyByteBuf.readEnum(ConfigCommandBehaviourInput.class));
         }
 
@@ -36,6 +40,7 @@ public record ServerboundServerConfigRequestPacket(
                 ServerboundServerConfigRequestPacket msg,
                 SFMPacketHandlingContext context
         ) {
+
             ServerPlayer player = context.sender();
             if (player == null) {
                 SFM.LOGGER.error("Received {} from null player", this.getPacketClass().getName());
@@ -60,13 +65,20 @@ public record ServerboundServerConfigRequestPacket(
             SFM.LOGGER.info("Sending config to player: {}", player.getName().getString());
             SFMPackets.sendToPlayer(
                     () -> player,
-                    new ClientboundServerConfigCommandPacket(configToml, msg.requestingEditMode())
+                    new ClientboundShowConfigScreenPacket(
+                            ConfigCommandVariantInput.SERVER,
+                            msg.requestingEditMode(),
+                            configToml
+                    )
             );
         }
 
         @Override
         public Class<ServerboundServerConfigRequestPacket> getPacketClass() {
+
             return ServerboundServerConfigRequestPacket.class;
         }
+
     }
+
 }

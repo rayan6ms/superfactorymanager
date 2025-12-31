@@ -9,9 +9,9 @@ import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfm.common.util.SFMTranslationUtils;
-import ca.teamdman.sfml.ast.ASTBuilder;
-import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.ast.ResourceIdentifier;
+import ca.teamdman.sfml.ast.SFMLProgram;
+import ca.teamdman.sfml.ast.SfmlAstBuilder;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
@@ -24,10 +24,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.WeakHashMap;
 
-/// Helper for building programs and acquiring a {@link ProgramBuildResult}
-public class ProgramBuilder {
+/// Helper for building programs and acquiring a {@link SFMLProgramBuildResult}
+public class SFMLProgramBuilder {
     /// Reduce duplication of effort compiling the same program over and over again
-    private static final WeakHashMap<String, ProgramBuildResult> cache = new WeakHashMap<>();
+    private static final WeakHashMap<String, SFMLProgramBuildResult> cache = new WeakHashMap<>();
 
     /// The Super Factory Manager Language source code
     private final String programString;
@@ -35,7 +35,7 @@ public class ProgramBuilder {
     /// Indicates that the resulting program may be mutated in naughty ways that we don't want interfering with our cache.
     private boolean useCache = true;
 
-    public ProgramBuilder(@Nullable String programString) {
+    public SFMLProgramBuilder(@Nullable String programString) {
 
         if (programString == null) {
             programString = "";
@@ -43,25 +43,18 @@ public class ProgramBuilder {
         this.programString = programString;
     }
 
-    /// Checks if the program object is stored in the cache.
-    /// If so, mutating the program object is a disallowed behaviour.
-    public static boolean isMutationAllowed(Program program) {
-
-        return cache.values().stream().noneMatch(result -> result.maybeProgram() == program);
-    }
-
-    /// MUST be set to {@code false} if the resulting {@link Program} will be mutated.
-    public ProgramBuilder useCache(boolean useCache) {
+    /// MUST be set to {@code false} if the resulting {@link SFMLProgram} will be mutated.
+    public SFMLProgramBuilder useCache(boolean useCache) {
 
         this.useCache = useCache;
         return this;
     }
 
-    public ProgramBuildResult build(
+    public SFMLProgramBuildResult build(
     ) {
 
         if (useCache) {
-            @Nullable ProgramBuildResult cached = cache.get(programString);
+            @Nullable SFMLProgramBuildResult cached = cache.get(programString);
             if (cached != null) {
                 if (cached.metadata().errors().isEmpty()) {
                     return cached;
@@ -75,7 +68,7 @@ public class ProgramBuilder {
         SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(programString));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         SFMLParser parser = new SFMLParser(tokens);
-        ASTBuilder builder = new ASTBuilder();
+        SfmlAstBuilder builder = new SfmlAstBuilder();
 
         // set up error capturing
         lexer.removeErrorListeners();
@@ -92,7 +85,7 @@ public class ProgramBuilder {
 
 
         // build program from AST only when there are no errors from previous phases
-        @Nullable Program program = null;
+        @Nullable SFMLProgram program = null;
         if (errors.isEmpty()) {
             try {
                 program = builder.visitProgram(context);
@@ -100,25 +93,25 @@ public class ProgramBuilder {
                 checkResourceTypes(program, errors);
             } catch (ResourceLocationException | IllegalArgumentException | AssertionError e) {
                 errors.add(LocalizationKeys.PROGRAM_ERROR_LITERAL.get(e.getMessage()));
-            } catch (Throwable t) {
+            } catch (Exception e) {
                 errors.add(LocalizationKeys.PROGRAM_ERROR_COMPILE_FAILED.get());
                 SFM.LOGGER.warn(
                         "Encountered unhandled error while compiling program\n```\n{}\n```",
                         programString,
-                        t
+                        e
                 );
-                var message = t.getMessage();
+                var message = e.getMessage();
                 if (message != null) {
                     errors.add(SFMTranslationUtils.getTranslatableContents(
-                            t.getClass().getSimpleName() + ": " + message
+                            e.getClass().getSimpleName() + ": " + message
                     ));
                 } else {
-                    errors.add(SFMTranslationUtils.getTranslatableContents(t.getClass().getSimpleName()));
+                    errors.add(SFMTranslationUtils.getTranslatableContents(e.getClass().getSimpleName()));
                 }
             }
         }
 
-        ProgramMetadata metadata = new ProgramMetadata(
+        SFMLProgramMetadata metadata = new SFMLProgramMetadata(
                 programString,
                 lexer,
                 tokens,
@@ -126,7 +119,7 @@ public class ProgramBuilder {
                 builder,
                 errors
         );
-        ProgramBuildResult programBuildResult = new ProgramBuildResult(program, metadata);
+        SFMLProgramBuildResult programBuildResult = new SFMLProgramBuildResult(program, metadata);
 
         // We don't cache results with errors because the server config can change, and it affects the outcome.
         if (useCache && buildErrors.isEmpty()) {
@@ -138,7 +131,7 @@ public class ProgramBuilder {
 
 
     private static void checkResourceTypes(
-            Program program,
+            SFMLProgram program,
             List<TranslatableContents> errors
     ) {
 

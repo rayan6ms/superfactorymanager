@@ -3,7 +3,7 @@ package ca.teamdman.sfm.common.program.linting;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.registry.SFMProgramLinters;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.SFMLProgram;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
 import org.jetbrains.annotations.Nullable;
@@ -14,7 +14,7 @@ public class ProgramLinter {
 
     /// Apply the registered linters until saturation.
     public static Collection<TranslatableContents> gatherWarnings(
-            Program program,
+            SFMLProgram program,
             LabelPositionHolder labelPositionHolder,
             @Nullable ManagerBlockEntity manager
     ) {
@@ -41,7 +41,7 @@ public class ProgramLinter {
     public static void fixWarnings(
             ManagerBlockEntity manager,
             ItemStack disk,
-            Program program
+            SFMLProgram program
     ) {
 
         LabelPositionHolder labels = LabelPositionHolder.from(disk);

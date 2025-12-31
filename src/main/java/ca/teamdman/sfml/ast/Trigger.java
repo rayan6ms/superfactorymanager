@@ -11,11 +11,11 @@ public interface Trigger extends Tickable {
     Block getBlock();
 
     default int getConditionIndex(IfStatement statement) {
-        Deque<ASTNode> toVisit = new ArrayDeque<>();
+        Deque<SfmlAstNode> toVisit = new ArrayDeque<>();
         toVisit.add(this);
         int seen = 0;
         while (!toVisit.isEmpty()) {
-            ASTNode current = toVisit.pollFirst();
+            SfmlAstNode current = toVisit.pollFirst();
             if (current instanceof IfStatement ifStatement) {
                 if (ifStatement == statement) {
                     return seen;
@@ -28,11 +28,11 @@ public interface Trigger extends Tickable {
     }
 
     default int getConditionCount() {
-        Deque<ASTNode> toVisit = new ArrayDeque<>();
+        Deque<SfmlAstNode> toVisit = new ArrayDeque<>();
         toVisit.add(this);
         int seen = 0;
         while (!toVisit.isEmpty()) {
-            ASTNode current = toVisit.pollFirst();
+            SfmlAstNode current = toVisit.pollFirst();
             if (current instanceof IfStatement) {
                 seen++;
             }

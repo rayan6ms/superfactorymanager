@@ -4,7 +4,7 @@ import ca.teamdman.sfm.common.resourcetype.ResourceType;
 
 import java.util.List;
 
-public record WithTag(TagMatcher tagMatcher) implements ASTNode, WithClause, ToStringPretty {
+public record WithTag(TagMatcher tagMatcher) implements SfmlAstNode, WithClause, ToStringPretty {
     @Override
     public <STACK> boolean matchesStack(
             ResourceType<STACK, ?, ?> resourceType,

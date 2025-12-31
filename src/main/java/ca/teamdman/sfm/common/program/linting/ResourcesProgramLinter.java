@@ -3,13 +3,12 @@ package ca.teamdman.sfm.common.program.linting;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.SFMLProgram;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.Optional;
 
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNING_UNKNOWN_RESOURCE_ID;
@@ -18,7 +17,7 @@ public class ResourcesProgramLinter implements IProgramLinter {
 
     @Override
     public void gatherWarnings(
-            Program program,
+            SFMLProgram program,
             LabelPositionHolder labelPositionHolder,
             @Nullable ManagerBlockEntity managerBlockEntity,
             ProblemTracker tracker
@@ -44,7 +43,7 @@ public class ResourcesProgramLinter implements IProgramLinter {
 
     @Override
     public void fixWarnings(
-            Program program,
+            SFMLProgram program,
             LabelPositionHolder labels,
             ManagerBlockEntity manager,
             Level level,

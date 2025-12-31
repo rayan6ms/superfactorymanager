@@ -41,4 +41,5 @@ public interface ISFMTextEditScreenOpenContext {
     }
     Consumer<String> saveWriter();
     LabelPositionHolder labelPositionHolder();
+    TextEditScreenContentLanguage contentLanguage();
 }

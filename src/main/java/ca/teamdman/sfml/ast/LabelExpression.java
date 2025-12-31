@@ -5,6 +5,6 @@ import net.minecraft.core.BlockPos;
 
 import java.util.Set;
 
-public interface LabelExpression extends ASTNode {
+public interface LabelExpression extends SfmlAstNode {
     Set<BlockPos> getPositions(LabelPositionHolder labelPositionHolder);
 }

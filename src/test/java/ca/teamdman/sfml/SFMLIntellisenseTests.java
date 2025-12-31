@@ -5,14 +5,15 @@ import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditorIntellisenseLevel;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.SFMDisplayUtils;
-import ca.teamdman.sfml.ast.ASTNode;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.IAstNode;
+import ca.teamdman.sfml.ast.SFMLProgram;
 import ca.teamdman.sfml.ext_antlr4c3.CodeCompletionCore;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
 import ca.teamdman.sfml.intellisense.IntellisenseContext;
 import ca.teamdman.sfml.intellisense.SFMLIntellisense;
-import ca.teamdman.sfml.program_builder.ProgramBuildResult;
-import ca.teamdman.sfml.program_builder.ProgramBuilder;
+import ca.teamdman.sfml.program_builder.IProgramBuildResult;
+import ca.teamdman.sfml.program_builder.SFMLProgramBuildResult;
+import ca.teamdman.sfml.program_builder.SFMLProgramBuilder;
 import com.mojang.datafixers.util.Pair;
 import org.antlr.v4.runtime.*;
 import org.junit.jupiter.api.Test;
@@ -81,7 +82,7 @@ public class SFMLIntellisenseTests {
         for (int cursorPosition = 0; cursorPosition < countTokens(programString); cursorPosition++) {
             StringBuilder display = new StringBuilder();
 
-            ProgramBuildResult buildResult = new ProgramBuilder(programString).build();
+            IProgramBuildResult<?,?,?> buildResult = new SFMLProgramBuilder(programString).build();
             List<IntellisenseAction> suggestions = SFMLIntellisense.getSuggestions(new IntellisenseContext(
                     buildResult,
                     cursorPosition,
@@ -107,12 +108,12 @@ public class SFMLIntellisenseTests {
         String programString = SIMPLE_PROGRAM_STRING;
 
         // Build the program
-        AtomicReference<Program> program = new AtomicReference<>();
+        AtomicReference<SFMLProgram> program = new AtomicReference<>();
 
-        new ProgramBuilder(programString).build()
+        new SFMLProgramBuilder(programString).build()
                 .caseSuccess((successProgram, metadata) -> program.set(successProgram))
-                .caseFailure(result -> {
-                    result.metadata().errors().forEach(error -> System.out.println(error.toString()));
+                .caseFailure((metadata) -> {
+                    metadata.errors().forEach(error -> System.out.println(error.toString()));
                     throw new RuntimeException("Failed to compile program");
                 });
         assertNotNull(program.get());
@@ -123,8 +124,8 @@ public class SFMLIntellisenseTests {
 
             // print the tokens under the cursor
 //            System.out.print(" [");
-            for (Pair<ASTNode, ParserRuleContext> pair : program.get().astBuilder().getNodesUnderCursor(cursorPos)) {
-                ASTNode node = pair.getFirst();
+            for (Pair<? extends IAstNode<?>, ParserRuleContext> pair : program.get().astBuilder().getNodesUnderCursor(cursorPos)) {
+                IAstNode<?> node = pair.getFirst();
                 ParserRuleContext nodeContext = pair.getSecond();
                 System.out.printf("%s(%s) ", node.getClass().getSimpleName(), nodeContext.getText());
             }
@@ -138,16 +139,16 @@ public class SFMLIntellisenseTests {
 
         String programString = SIMPLE_PROGRAM_STRING;
 
-        ProgramBuildResult buildResult = new ProgramBuilder(programString).build().caseFailure(failure -> {
-            failure.metadata().errors().forEach(error -> System.out.println(error.toString()));
+        SFMLProgramBuildResult buildResult = new SFMLProgramBuilder(programString).build().caseFailure((metadata) -> {
+            metadata.errors().forEach(error -> System.out.println(error.toString()));
             throw new RuntimeException("Failed to compile program");
         });
-        Program program = Objects.requireNonNull(buildResult.maybeProgram());
+        SFMLProgram program = Objects.requireNonNull(buildResult.maybeProgram());
         for (int cursorPos = 0; cursorPos < programString.length(); cursorPos++) {
             System.out.print("||| ");
             System.out.printf("%s", SFMDisplayUtils.getCursorPositionDisplay(programString, cursorPos));
             System.out.print(" ||| ");
-            System.out.printf("%s", SFMDisplayUtils.getTokenHierarchyDisplay(program, cursorPos));
+            System.out.printf("%s", SFMDisplayUtils.getTokenHierarchyDisplay(program.astBuilder(), cursorPos));
             System.out.print(" ||| ");
             System.out.printf("%s", SFMDisplayUtils.getSuggestionsDisplay(buildResult, cursorPos));
             System.out.print(" |||");
@@ -278,7 +279,7 @@ public class SFMLIntellisenseTests {
         for (int chop = outerProgramString.length() - 1; chop < outerProgramString.length(); chop++) {
             String programString = outerProgramString.substring(0, chop);
 
-            ProgramBuildResult buildResult = new ProgramBuilder(programString).build();
+            SFMLProgramBuildResult buildResult = new SFMLProgramBuilder(programString).build();
             SFMLParser parser = buildResult.metadata().parser();
             var contexts = new ParserRuleContext[]{
                     parser.program(),
@@ -366,7 +367,7 @@ public class SFMLIntellisenseTests {
                 END
                 """.stripTrailing().stripIndent();
 
-        ProgramBuildResult buildResult = new ProgramBuilder(programString).build();
+        SFMLProgramBuildResult buildResult = new SFMLProgramBuilder(programString).build();
         SFMLParser parser = buildResult.metadata().parser();
         CodeCompletionCore core = new CodeCompletionCore(
                 parser,
@@ -425,7 +426,7 @@ public class SFMLIntellisenseTests {
                 END
                 """.stripTrailing().stripIndent();
 
-        ProgramBuildResult buildResult = new ProgramBuilder(programString).build();
+        SFMLProgramBuildResult buildResult = new SFMLProgramBuilder(programString).build();
         SFMLParser parser = buildResult.metadata().parser();
         CodeCompletionCore core = new CodeCompletionCore(
                 parser,
@@ -482,9 +483,9 @@ public class SFMLIntellisenseTests {
      */
     @Test
     public void testCursorInsideResourceId() {
-        // 1) Build the snippet into a ProgramBuildResult
+        // 1) Build the snippet into a IProgramBuildResult
 
-        ProgramBuildResult buildResult = new ProgramBuilder(PROGRAM_SNIPPET).build();
+        SFMLProgramBuildResult buildResult = new SFMLProgramBuilder(PROGRAM_SNIPPET).build();
         assertTrue(buildResult.isBuildSuccessful(), "Snippet must parse successfully");
 
         // 2) Find a cursor position somewhere in IRON_INGOT
@@ -527,7 +528,7 @@ public class SFMLIntellisenseTests {
     public void testCursorInsideLabel() {
         // Use the same snippet, but put the cursor in the label area
 
-        ProgramBuildResult buildResult = new ProgramBuilder(PROGRAM_SNIPPET).build();
+        SFMLProgramBuildResult buildResult = new SFMLProgramBuilder(PROGRAM_SNIPPET).build();
         assertTrue(buildResult.isBuildSuccessful(), "Snippet must parse successfully");
 
         // Cursor in "Minecart"

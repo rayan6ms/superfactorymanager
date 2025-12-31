@@ -16,7 +16,7 @@ public record Interval(
         Number offset,
 
         DurationUnit offsetUnit
-) implements ASTNode {
+) implements SfmlAstNode {
     public boolean shouldTick(ProgramContext context) {
 
         final ManagerBlockEntity manager = context.manager();
@@ -55,17 +55,17 @@ public record Interval(
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of(interval, intervalUnit, alignment, offset, offsetUnit);
     }
 
-    public enum IntervalAlignment implements ASTNode{
+    public enum IntervalAlignment implements SfmlAstNode {
         LOCAL,
         GLOBAL;
 
         @Override
-        public List<? extends ASTNode> getChildNodes() {
+        public List<? extends SfmlAstNode> getChildNodes() {
 
             return List.of();
         }

@@ -4,8 +4,8 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
-import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenDiskOpenContext;
-import ca.teamdman.sfm.common.label.LabelPositionHolder;
+import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenOpenContext;
+import ca.teamdman.sfm.client.text_editor.TextEditScreenContentLanguage;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
@@ -33,13 +33,11 @@ public class SelectWorldScreenOpenTextEditorKeyHandler {
                     .map(WorldSelectionList.WorldListEntry.class::cast)
                     .map(entry -> entry.getLevelName() + "\n" + new Date(entry.summary.getLastPlayed()) + "\n" + entry.summary.getInfo().getString())
                     .collect(Collectors.joining("\n\n"));
-            ISFMTextEditScreenOpenContext openContext = new SFMTextEditScreenDiskOpenContext(
+            ISFMTextEditScreenOpenContext openContext = new SFMTextEditScreenOpenContext(
                     initialContent,
-                    LabelPositionHolder.empty(),
-                    (x) -> {
-                    }
+                    TextEditScreenContentLanguage.PLAINTEXT
             );
-            SFMScreenChangeHelpers.showProgramEditScreen(openContext);
+            SFMScreenChangeHelpers.showPreferredTextEditScreen(openContext);
         }
     }
 }

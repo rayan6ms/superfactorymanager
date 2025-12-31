@@ -8,7 +8,7 @@ public record NumberSet(
         NumberRange[] ranges,
 
         NumberRange[] exclusions
-) implements ASTNode {
+) implements SfmlAstNode {
     public static final NumberSet MAX_RANGE = new NumberSet(
             new NumberRange[]{NumberRange.MAX_RANGE},
             new NumberRange[]{}

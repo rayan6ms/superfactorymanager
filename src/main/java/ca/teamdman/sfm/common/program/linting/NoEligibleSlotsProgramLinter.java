@@ -9,8 +9,8 @@ import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfml.ast.IOStatement;
 import ca.teamdman.sfml.ast.InputStatement;
-import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.ast.ResourceAccess;
+import ca.teamdman.sfml.ast.SFMLProgram;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +25,7 @@ public class NoEligibleSlotsProgramLinter implements IProgramLinter {
 
     @Override
     public void gatherWarnings(
-            Program program,
+            SFMLProgram program,
             LabelPositionHolder labelPositionHolder,
             @Nullable ManagerBlockEntity manager,
             ProblemTracker tracker
@@ -60,7 +60,7 @@ public class NoEligibleSlotsProgramLinter implements IProgramLinter {
 
     @Override
     public void fixWarnings(
-            Program program,
+            SFMLProgram program,
             LabelPositionHolder labels,
             ManagerBlockEntity manager,
             Level level,
@@ -70,7 +70,7 @@ public class NoEligibleSlotsProgramLinter implements IProgramLinter {
     }
 
     private void findEmptyIOStatement(
-            Program program,
+            SFMLProgram program,
             TranslatableLogger logger,
             Level level,
             CableNetwork network,

@@ -6,7 +6,7 @@ public record ResourceQuantity(
         IdExpansionBehaviour idExpansionBehaviour,
 
         Number number
-) implements ASTNode {
+) implements SfmlAstNode {
     @SuppressWarnings("DataFlowIssue")
     public static final ResourceQuantity UNSET = new ResourceQuantity(IdExpansionBehaviour.NO_EXPAND, null);
     public static final ResourceQuantity MAX_QUANTITY = new ResourceQuantity(
@@ -20,17 +20,17 @@ public record ResourceQuantity(
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of(idExpansionBehaviour, number);
     }
 
-    public enum IdExpansionBehaviour implements ASTNode {
+    public enum IdExpansionBehaviour implements SfmlAstNode {
         EXPAND,
         NO_EXPAND;
 
         @Override
-        public List<? extends ASTNode> getChildNodes() {
+        public List<? extends SfmlAstNode> getChildNodes() {
 
             return List.of();
         }

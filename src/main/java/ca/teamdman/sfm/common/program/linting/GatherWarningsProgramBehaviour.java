@@ -198,7 +198,7 @@ public class GatherWarningsProgramBehaviour extends SimulateExploreAllPathsProgr
     @Override
     public void onProgramFinished(
             ProgramContext context,
-            Program program
+            SFMLProgram program
     ) {
 
         super.onProgramFinished(context, program);

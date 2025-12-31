@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public record SideQualifier(List<Side> sides) implements ASTNode {
+public record SideQualifier(List<Side> sides) implements SfmlAstNode {
     public static final SideQualifier NULL = new SideQualifier(List.of(Side.NULL));
 
     public static final SideQualifier DEFAULT = NULL;

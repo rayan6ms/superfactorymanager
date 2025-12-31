@@ -36,7 +36,7 @@ public class SFMPackets {
 
     public static void register() {
         registerPacket(new ClientboundBoolExprStatementInspectionResultsPacket.Daddy());
-        registerPacket(new ClientboundClientConfigCommandPacket.Daddy());
+        registerPacket(new ClientboundShowConfigScreenPacket.Daddy());
         registerPacket(new ClientboundContainerExportsInspectionResultsPacket.Daddy());
         registerPacket(new ClientboundIfStatementInspectionResultsPacket.Daddy());
         registerPacket(new ClientboundInputInspectionResultsPacket.Daddy());
@@ -46,7 +46,7 @@ public class SFMPackets {
         registerPacket(new ClientboundManagerLogLevelUpdatedPacket.Daddy());
         registerPacket(new ClientboundManagerLogsPacket.Daddy());
         registerPacket(new ClientboundOutputInspectionResultsPacket.Daddy());
-        registerPacket(new ClientboundServerConfigCommandPacket.Daddy());
+        registerPacket(new ClientboundResetTextEditorPreferencesPacket.Daddy());
         registerPacket(new ClientboundShowChangelogPacket.Daddy());
         registerPacket(new ServerboundBoolExprStatementInspectionRequestPacket.Daddy());
         registerPacket(new ServerboundContainerExportsInspectionRequestPacket.Daddy());

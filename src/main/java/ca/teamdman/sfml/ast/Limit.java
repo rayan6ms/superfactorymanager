@@ -7,7 +7,7 @@ import static ca.teamdman.sfml.ast.ResourceQuantity.IdExpansionBehaviour.NO_EXPA
 public record Limit(
         ResourceQuantity quantity,
         ResourceQuantity retention
-) implements ASTNode {
+) implements SfmlAstNode {
     public static final Limit MAX_QUANTITY_NO_RETENTION = new Limit(
             new ResourceQuantity(NO_EXPAND, new Number(Long.MAX_VALUE)),
             new ResourceQuantity(NO_EXPAND, new Number(0))
@@ -57,7 +57,7 @@ public record Limit(
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of(quantity, retention);
     }

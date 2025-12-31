@@ -40,6 +40,12 @@ public record SFMTextEditScreenExampleProgramOpenContext(
     }
 
     @Override
+    public TextEditScreenContentLanguage contentLanguage() {
+
+        return TextEditScreenContentLanguage.SFML;
+    }
+
+    @Override
     public String initialValue() {
         return initialExampleContent();
     }

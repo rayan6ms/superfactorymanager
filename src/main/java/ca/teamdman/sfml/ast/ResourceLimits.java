@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * A set of {@link ResourceLimit} objects.
  * Do NOT modify this after creation since the {@link this#referencedResourceTypes} will become inaccurate.
  */
-public final class ResourceLimits implements ASTNode, ToStringPretty {
+public final class ResourceLimits implements SfmlAstNode, ToStringPretty {
     private final List<ResourceLimit> resourceLimitList;
     private final ResourceIdSet exclusions;
     private @NotNull ResourceType<?, ?, ?> @Nullable [] referencedResourceTypes = null;
@@ -126,9 +126,9 @@ public final class ResourceLimits implements ASTNode, ToStringPretty {
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
-        ArrayList<ASTNode> rtn = new ArrayList<>(resourceLimitList.size() + 1);
+        ArrayList<SfmlAstNode> rtn = new ArrayList<>(resourceLimitList.size() + 1);
         rtn.addAll(resourceLimitList);
         rtn.add(exclusions);
         return rtn;

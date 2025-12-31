@@ -31,7 +31,7 @@ public record TimerTrigger(
     }
 
     @Override
-    public List<ASTNode> getChildNodes() {
+    public List<SfmlAstNode> getChildNodes() {
         return List.of(block);
     }
 

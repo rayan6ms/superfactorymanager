@@ -1,13 +1,16 @@
 package ca.teamdman.sfm.client.text_styling;
 
 import ca.teamdman.langs.SFMLLexer;
+import ca.teamdman.langs.TomlLexer;
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
+import ca.teamdman.sfm.client.text_editor.TextEditScreenContentLanguage;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.network.chat.Style;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.Lexer;
 import org.antlr.v4.runtime.Token;
 
 import java.util.ArrayList;
@@ -16,8 +19,19 @@ import java.util.List;
 public class ProgramSyntaxHighlightingHelper {
 
     public static List<MutableComponent> withSyntaxHighlighting(String programString, boolean showContextActionHints) {
-        SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(programString));
-        lexer.INCLUDE_UNUSED = true;
+        return withSyntaxHighlighting(programString, showContextActionHints, TextEditScreenContentLanguage.SFML);
+    }
+
+    public static List<MutableComponent> withSyntaxHighlighting(
+            String programString,
+            boolean showContextActionHints,
+            TextEditScreenContentLanguage language
+    ) {
+        if (language == TextEditScreenContentLanguage.PLAINTEXT) {
+            return getPlaintextComponents(programString);
+        }
+
+        Lexer lexer = createLexer(programString, language);
         CommonTokenStream tokens = new CommonTokenStream(lexer) {
             // This is a hack to make hidden tokens show up in the token stream
             @Override
@@ -42,7 +56,7 @@ public class ProgramSyntaxHighlightingHelper {
         MutableComponent lineComponent = Component.empty();
         tokens.fill();
         for (Token token : tokens.getTokens()) {
-            if (token.getType() == SFMLLexer.EOF) break;
+            if (token.getType() == Token.EOF) break;
             // the token may contain newlines in it, so we need to split it up
             String[] lines = token.getText().split("\n", -1);
             for (int i = 0; i < lines.length; i++) {
@@ -52,7 +66,7 @@ public class ProgramSyntaxHighlightingHelper {
                 }
                 String line = lines[i];
                 if (!line.isEmpty()) {
-                    var text = Component.literal(line).withStyle(getStyle(token, showContextActionHints));
+                    var text = Component.literal(line).withStyle(getStyle(token, showContextActionHints, language));
                     lineComponent = lineComponent.append(text);
                 }
             }
@@ -62,16 +76,45 @@ public class ProgramSyntaxHighlightingHelper {
         return textComponents;
     }
 
-    private static Style getStyle(Token token, boolean showContextActionHints) {
+    private static Lexer createLexer(String programString, TextEditScreenContentLanguage language) {
+        return switch (language) {
+            case SFML -> {
+                SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(programString));
+                lexer.INCLUDE_UNUSED = true;
+                yield lexer;
+            }
+            case TOML -> new TomlLexer(CharStreams.fromString(programString));
+            case PLAINTEXT -> throw new IllegalArgumentException("PLAINTEXT should be handled separately");
+        };
+    }
+
+    private static List<MutableComponent> getPlaintextComponents(String programString) {
+        List<MutableComponent> textComponents = new ArrayList<>();
+        String[] lines = programString.split("\n", -1);
+        for (String line : lines) {
+            textComponents.add(Component.literal(line));
+        }
+        return textComponents;
+    }
+
+    private static Style getStyle(Token token, boolean showContextActionHints, TextEditScreenContentLanguage language) {
         Style style = Style.EMPTY;
-        style = style.withColor(getColour(token));
-        if (showContextActionHints && ProgramTokenContextActions.hasContextAction(token)) {
+        style = style.withColor(getColour(token, language));
+        if (showContextActionHints && language == TextEditScreenContentLanguage.SFML && ProgramTokenContextActions.hasContextAction(token)) {
             style = style.withUnderlined(true);
         }
         return style;
     }
 
-    private static ChatFormatting getColour(Token token) {
+    private static ChatFormatting getColour(Token token, TextEditScreenContentLanguage language) {
+        return switch (language) {
+            case SFML -> getSfmlColour(token);
+            case TOML -> getTomlColour(token);
+            case PLAINTEXT -> ChatFormatting.WHITE;
+        };
+    }
+
+    private static ChatFormatting getSfmlColour(Token token) {
         //noinspection EnhancedSwitchMigration
         switch (token.getType()) {
             case SFMLLexer.SIDE:
@@ -155,6 +198,49 @@ public class ProgramSyntaxHighlightingHelper {
             case SFMLLexer.BLOCK:
             case SFMLLexer.LABEL:
                 return ChatFormatting.YELLOW;
+            default:
+                return ChatFormatting.WHITE;
+        }
+    }
+
+    private static ChatFormatting getTomlColour(Token token) {
+        //noinspection EnhancedSwitchMigration
+        switch (token.getType()) {
+            case TomlLexer.COMMENT:
+                return ChatFormatting.GRAY;
+            case TomlLexer.BASIC_STRING:
+            case TomlLexer.ML_BASIC_STRING:
+            case TomlLexer.LITERAL_STRING:
+            case TomlLexer.ML_LITERAL_STRING:
+                return ChatFormatting.GREEN;
+            case TomlLexer.UNQUOTED_KEY:
+                return ChatFormatting.AQUA;
+            case TomlLexer.DEC_INT:
+            case TomlLexer.HEX_INT:
+            case TomlLexer.OCT_INT:
+            case TomlLexer.BIN_INT:
+            case TomlLexer.FLOAT:
+            case TomlLexer.INF:
+            case TomlLexer.NAN:
+                return ChatFormatting.GOLD;
+            case TomlLexer.BOOLEAN:
+                return ChatFormatting.BLUE;
+            case TomlLexer.OFFSET_DATE_TIME:
+            case TomlLexer.LOCAL_DATE_TIME:
+            case TomlLexer.LOCAL_DATE:
+            case TomlLexer.LOCAL_TIME:
+                return ChatFormatting.LIGHT_PURPLE;
+            case TomlLexer.L_BRACKET:
+            case TomlLexer.DOUBLE_L_BRACKET:
+            case TomlLexer.R_BRACKET:
+            case TomlLexer.DOUBLE_R_BRACKET:
+            case TomlLexer.L_BRACE:
+            case TomlLexer.R_BRACE:
+                return ChatFormatting.YELLOW;
+            case TomlLexer.EQUALS:
+            case TomlLexer.DOT:
+            case TomlLexer.COMMA:
+                return ChatFormatting.WHITE;
             default:
                 return ChatFormatting.WHITE;
         }

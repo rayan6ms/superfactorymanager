@@ -37,7 +37,7 @@ public interface SFMPacketDaddy<T extends SFMPacket> {
         context.enqueueAndFinish(() -> {
             try {
                 handle(msg, context);
-            } catch (Throwable t) {
+            } catch (Exception t) {
                 SFM.LOGGER.warn("Encountered exception while handling packet", t);
                 throw t;
             }

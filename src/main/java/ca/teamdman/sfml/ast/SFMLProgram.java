@@ -5,7 +5,7 @@ import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.*;
 import ca.teamdman.sfm.common.timing.SFMInstant;
-import ca.teamdman.sfml.program_builder.ProgramBuilder;
+import ca.teamdman.sfml.program_builder.SFMLProgramBuilder;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.MenuProvider;
@@ -25,9 +25,9 @@ import java.util.function.Consumer;
 import static ca.teamdman.sfm.common.blockentity.ManagerBlockEntity.TICK_TIME_HISTORY_SIZE;
 import static ca.teamdman.sfm.common.net.ServerboundManagerSetLogLevelPacket.MAX_LOG_LEVEL_NAME_LENGTH;
 
-/// Use {@link ProgramBuilder} to get a {@link Program} from a {@link String}
-public record Program(
-        ASTBuilder astBuilder,
+/// Use {@link SFMLProgramBuilder} to get a {@link SFMLProgram} from a {@link String}
+public record SFMLProgram(
+        SfmlAstBuilder astBuilder,
 
         String name,
 

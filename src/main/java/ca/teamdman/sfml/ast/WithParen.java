@@ -4,7 +4,7 @@ import ca.teamdman.sfm.common.resourcetype.ResourceType;
 
 import java.util.List;
 
-public record WithParen(WithClause inner) implements ASTNode, WithClause, ToStringPretty {
+public record WithParen(WithClause inner) implements SfmlAstNode, WithClause, ToStringPretty {
     @Override
     public <STACK> boolean matchesStack(
             ResourceType<STACK, ?, ?> resourceType,

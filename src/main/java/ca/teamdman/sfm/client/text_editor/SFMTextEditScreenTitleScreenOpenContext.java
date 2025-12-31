@@ -10,4 +10,10 @@ public record SFMTextEditScreenTitleScreenOpenContext(
         Consumer<String> saveWriter,
         net.minecraft.client.gui.screens.TitleScreen titleScreen
 ) implements ISFMTextEditScreenOpenContext {
+    @Override
+    public TextEditScreenContentLanguage contentLanguage() {
+
+        return TextEditScreenContentLanguage.SFML;
+    }
+
 }

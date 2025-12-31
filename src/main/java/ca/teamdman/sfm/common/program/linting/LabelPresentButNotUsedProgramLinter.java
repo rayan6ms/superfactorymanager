@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.program.linting;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.SFMLProgram;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -13,7 +13,7 @@ import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNI
 public class LabelPresentButNotUsedProgramLinter implements IProgramLinter {
     @Override
     public void gatherWarnings(
-            Program program,
+            SFMLProgram program,
             LabelPositionHolder labelPositionHolder,
             @Nullable ManagerBlockEntity managerBlockEntity,
             ProblemTracker tracker
@@ -33,7 +33,7 @@ public class LabelPresentButNotUsedProgramLinter implements IProgramLinter {
 
     @Override
     public void fixWarnings(
-            Program program,
+            SFMLProgram program,
             LabelPositionHolder labels,
             ManagerBlockEntity manager,
             Level level,

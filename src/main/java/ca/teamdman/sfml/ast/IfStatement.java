@@ -12,7 +12,7 @@ public record IfStatement(
         BoolExpr condition,
         Block trueBlock,
         Block falseBlock
-) implements ASTNode, Statement, ToStringCondensed {
+) implements SfmlAstNode, Statement, ToStringCondensed {
     @Override
     public void tick(ProgramContext context) {
         Predicate<ProgramContext> condition = this.condition;
@@ -51,7 +51,7 @@ public record IfStatement(
     }
 
     @Override
-    public List<ASTNode> getChildNodes() {
+    public List<SfmlAstNode> getChildNodes() {
         return List.of(condition, trueBlock, falseBlock);
     }
 

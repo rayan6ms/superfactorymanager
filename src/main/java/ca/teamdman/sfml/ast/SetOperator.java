@@ -8,7 +8,7 @@ import java.util.function.BiPredicate;
  * Helper to determine if the overall count is satisfied
  * The condition is evaluated BEFORE {@link SetOperator} is applied, so the set operator is a fancy way to turn all those boolean results into a single boolean.
  */
-public enum SetOperator implements ASTNode, BiPredicate<Boolean, List<Boolean>>, ToStringPretty {
+public enum SetOperator implements SfmlAstNode, BiPredicate<Boolean, List<Boolean>>, ToStringPretty {
     OVERALL((overall, __) -> overall),
     SOME((__, set) -> set.stream().anyMatch(Boolean::booleanValue)),
     EVERY((__, set) -> set.stream().allMatch(Boolean::booleanValue)),
@@ -41,7 +41,7 @@ public enum SetOperator implements ASTNode, BiPredicate<Boolean, List<Boolean>>,
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of();
     }

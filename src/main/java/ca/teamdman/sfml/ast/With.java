@@ -34,17 +34,17 @@ public record With(
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of(mode, condition);
     }
 
-    public enum WithMode implements ASTNode {
+    public enum WithMode implements SfmlAstNode {
         WITH,
         WITHOUT;
 
         @Override
-        public List<? extends ASTNode> getChildNodes() {
+        public List<? extends SfmlAstNode> getChildNodes() {
 
             return List.of();
         }

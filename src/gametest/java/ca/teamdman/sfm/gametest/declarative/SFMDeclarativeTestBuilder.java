@@ -7,9 +7,9 @@ import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
-import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.BoolExpr;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.SFMLProgram;
+import ca.teamdman.sfml.ast.SfmlAstBuilder;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
 import net.minecraft.world.item.ItemStack;
@@ -112,7 +112,7 @@ public class SFMDeclarativeTestBuilder {
         if (conditions.isEmpty()) return;
         List<BoolExpr> expressions = conditions.stream().map(BoolExpr::from).toList();
         ProgramContext programContext = ProgramContext.of(
-                new Program(new ASTBuilder(), "temp lol", List.of(), Set.of(), Set.of()),
+                new SFMLProgram(new SfmlAstBuilder(), "temp lol", List.of(), Set.of(), Set.of()),
                 manager,
                 ExecuteProgramBehaviour::new
         );

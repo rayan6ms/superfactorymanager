@@ -28,7 +28,7 @@ public class TitleScreenOpenTextEditorOnLaunchHandler {
                     s -> {},
                     titleScreen
             );
-            ISFMTextEditScreen screen = SFMScreenChangeHelpers.createProgramEditScreen(ctx);
+            ISFMTextEditScreen screen = SFMScreenChangeHelpers.createPreferredTextEditScreen(ctx);
             event.setNewScreen(screen.asScreen());
         }
     }

@@ -2,7 +2,7 @@ package ca.teamdman.sfml.ast;
 
 import java.util.List;
 
-public enum DurationUnit implements ASTNode {
+public enum DurationUnit implements SfmlAstNode {
     TICKS,
     SECONDS;
 
@@ -15,7 +15,7 @@ public enum DurationUnit implements ASTNode {
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of();
     }

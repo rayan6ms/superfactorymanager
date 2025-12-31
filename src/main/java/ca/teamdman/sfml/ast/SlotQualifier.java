@@ -6,7 +6,7 @@ public record SlotQualifier(
         boolean each,
 
         NumberSet numberSet
-) implements ASTNode {
+) implements SfmlAstNode {
     public static final SlotQualifier DEFAULT = new SlotQualifier(false, NumberSet.MAX_RANGE);
 
     public boolean isDefault() {

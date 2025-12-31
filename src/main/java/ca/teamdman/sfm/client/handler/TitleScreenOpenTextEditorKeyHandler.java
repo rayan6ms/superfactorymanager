@@ -31,7 +31,7 @@ public class TitleScreenOpenTextEditorKeyHandler {
                     },
                     titleScreen
             );
-            SFMScreenChangeHelpers.showProgramEditScreen(openContext);
+            SFMScreenChangeHelpers.showPreferredTextEditScreen(openContext);
         }
     }
 }

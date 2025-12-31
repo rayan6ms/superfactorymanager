@@ -2,7 +2,7 @@ package ca.teamdman.sfml.ast;
 
 import java.util.List;
 
-public record Number(long value) implements ASTNode {
+public record Number(long value) implements SfmlAstNode {
     @Override
     public String toString() {
         return String.valueOf(value);
@@ -13,7 +13,7 @@ public record Number(long value) implements ASTNode {
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of();
     }

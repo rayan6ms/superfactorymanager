@@ -24,7 +24,7 @@ public record BoolRedstone(ComparisonOperator operator, Number number) implement
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of(operator, number);
     }

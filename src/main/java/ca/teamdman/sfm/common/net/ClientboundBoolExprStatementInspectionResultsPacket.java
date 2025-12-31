@@ -1,6 +1,8 @@
 package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
+import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenOpenContext;
+import ca.teamdman.sfm.client.text_editor.TextEditScreenContentLanguage;
 import net.minecraft.network.FriendlyByteBuf;
 
 public record ClientboundBoolExprStatementInspectionResultsPacket(
@@ -38,7 +40,11 @@ public record ClientboundBoolExprStatementInspectionResultsPacket(
                 ClientboundBoolExprStatementInspectionResultsPacket msg,
                 SFMPacketHandlingContext context
         ) {
-            SFMScreenChangeHelpers.showProgramEditScreen(msg.results);
+
+            SFMScreenChangeHelpers.showPreferredTextEditScreen(new SFMTextEditScreenOpenContext(
+                    msg.results,
+                    TextEditScreenContentLanguage.PLAINTEXT
+            ));
         }
     }
 }

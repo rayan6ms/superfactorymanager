@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.BiPredicate;
 
-public enum ComparisonOperator implements ASTNode, BiPredicate<Long, Long>, ToStringPretty {
+public enum ComparisonOperator implements SfmlAstNode, BiPredicate<Long, Long>, ToStringPretty {
     GREATER((a, b) -> a > b),
     LESSER((a, b) -> a < b),
     EQUALS(Long::equals),
@@ -45,7 +45,7 @@ public enum ComparisonOperator implements ASTNode, BiPredicate<Long, Long>, ToSt
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of();
     }

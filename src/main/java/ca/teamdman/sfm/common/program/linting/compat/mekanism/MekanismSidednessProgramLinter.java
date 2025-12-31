@@ -35,7 +35,7 @@ public class MekanismSidednessProgramLinter implements IProgramLinter {
 
     @Override
     public void gatherWarnings(
-            Program program,
+            SFMLProgram program,
             LabelPositionHolder labels,
             @Nullable ManagerBlockEntity manager,
             ProblemTracker tracker
@@ -58,7 +58,7 @@ public class MekanismSidednessProgramLinter implements IProgramLinter {
 
     @Override
     public void fixWarnings(
-            Program program,
+            SFMLProgram program,
             LabelPositionHolder labels,
             ManagerBlockEntity manager,
             Level level,
@@ -78,7 +78,7 @@ public class MekanismSidednessProgramLinter implements IProgramLinter {
     }
 
     private static ProblemTracker.AddProblemResult gatherWarningsForIOStatement(
-            Program program,
+            SFMLProgram program,
             LabelPositionHolder labelPositionHolder,
             IOStatement ioStatement,
             Level level,

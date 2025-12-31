@@ -1080,6 +1080,10 @@ public final class LocalizationKeys {
             "gui.sfm.program_editor_config.preferred_editor.v2",
             "V2"
     );
+    public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V3 = new LocalizationEntry(
+            "gui.sfm.program_editor_config.preferred_editor.v3",
+            "V3 (Grammar Explorer)"
+    );
 
 
     public static List<LocalizationEntry> getEntries() {

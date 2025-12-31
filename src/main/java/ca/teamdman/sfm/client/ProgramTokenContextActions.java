@@ -4,6 +4,8 @@ import ca.teamdman.langs.SFMLLexer;
 import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
+import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenOpenContext;
+import ca.teamdman.sfm.client.text_editor.TextEditScreenContentLanguage;
 import ca.teamdman.sfm.common.net.*;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfml.ast.*;
@@ -26,7 +28,7 @@ public class ProgramTokenContextActions {
         var lexer = new SFMLLexer(CharStreams.fromString(programString));
         var tokens = new CommonTokenStream(lexer);
         var parser = new SFMLParser(tokens);
-        var builder = new ASTBuilder();
+        var builder = new SfmlAstBuilder();
         try {
             builder.visitProgram(parser.program());
             SFM.LOGGER.info("Gathering context actions for cursor position {}", cursorPosition);
@@ -41,15 +43,18 @@ public class ProgramTokenContextActions {
                     .filter(Optional::isPresent)
                     .map(Optional::get)
                     .findFirst();
-        } catch (Throwable t) {
-            return Optional.of(() -> SFMScreenChangeHelpers.showProgramEditScreen("-- Encountered error, program parse failed:\n--"
-                                                                                  + t.getMessage()));
+        } catch (Exception e) {
+            return Optional.of(() -> SFMScreenChangeHelpers.showPreferredTextEditScreen(new SFMTextEditScreenOpenContext(
+                    "-- Encountered error, program parse failed:\n--"
+                                                                                            + e.getMessage(),
+                    TextEditScreenContentLanguage.PLAINTEXT
+            )));
         }
     }
 
-    public static Stream<Pair<ASTNode, ParserRuleContext>> getElementsAroundCursor(
+    public static Stream<Pair<SfmlAstNode, ParserRuleContext>> getElementsAroundCursor(
             int cursorPosition,
-            ASTBuilder builder
+            SfmlAstBuilder builder
     ) {
         return Stream.concat(
                 builder
@@ -63,8 +68,8 @@ public class ProgramTokenContextActions {
 
     public static Optional<Runnable> getContextAction(
             String programString,
-            ASTBuilder builder,
-            ASTNode node,
+            SfmlAstBuilder builder,
+            SfmlAstNode node,
             ParserRuleContext parserRuleContext,
             int cursorPosition
     ) {
@@ -77,20 +82,24 @@ public class ProgramTokenContextActions {
                         .stream()
                         .map(ResourceIdentifier::toStringCondensed)
                         .collect(Collectors.joining(",\n"));
-                SFMScreenChangeHelpers.showProgramEditScreen(expansion);
+
+                SFMScreenChangeHelpers.showPreferredTextEditScreen(new SFMTextEditScreenOpenContext(
+                        expansion,
+                        TextEditScreenContentLanguage.PLAINTEXT
+                ));
             });
         } else if (node instanceof Label label) {
             SFM.LOGGER.info("Found context action for label node");
             return Optional.of(() -> SFMPackets.sendToServer(new ServerboundLabelInspectionRequestPacket(
                     label.value()
             )));
-        } else if (node instanceof InputStatement) {
+        } else if (node instanceof InputStatement inputStatement) {
             if (cursorPosition > parserRuleContext.getStart().getStartIndex() + "INPUT".length()) {
                 SFM.LOGGER.info("Found context action for input node, but the cursor isn't at the start of the node");
                 return Optional.empty();
             }
             SFM.LOGGER.info("Found context action for input node");
-            int nodeIndex = builder.getIndexForNode(node);
+            int nodeIndex = builder.getIndexForNode(inputStatement);
             return Optional.of(() -> SFMPackets.sendToServer(new ServerboundInputInspectionRequestPacket(
                     programString,
                     nodeIndex

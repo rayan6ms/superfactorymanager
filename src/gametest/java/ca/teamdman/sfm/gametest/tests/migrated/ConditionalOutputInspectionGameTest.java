@@ -9,7 +9,7 @@ import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import ca.teamdman.sfml.ast.OutputStatement;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.SFMLProgram;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Blocks;
@@ -75,7 +75,7 @@ public class ConditionalOutputInspectionGameTest extends SFMGameTestDefinition {
         assertManagerRunning(manager);
 
         // compile a new program for inspection
-        Program program = compile(code);
+        SFMLProgram program = compile(code);
 
 
         OutputStatement outputStatement = (OutputStatement) program

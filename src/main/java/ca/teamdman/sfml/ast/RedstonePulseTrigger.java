@@ -14,7 +14,7 @@ public record RedstonePulseTrigger(
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of(block);
     }

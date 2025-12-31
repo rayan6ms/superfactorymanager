@@ -19,7 +19,7 @@ import java.util.regex.PatternSyntaxException;
 
 // resourceTypeName resourceNamespace, resourceTypeName name, resource resourceNamespace, resource name
 // sfm:item:minecraft:stone
-public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode, ToStringCondensed {
+public class ResourceIdentifier<STACK, ITEM, CAP> implements SfmlAstNode, ToStringCondensed {
 
     public static final ResourceIdentifier<?, ?, ?> MATCH_ALL = new ResourceIdentifier<>(
             ".*",
@@ -292,7 +292,7 @@ public class ResourceIdentifier<STACK, ITEM, CAP> implements ASTNode, ToStringCo
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of();
     }

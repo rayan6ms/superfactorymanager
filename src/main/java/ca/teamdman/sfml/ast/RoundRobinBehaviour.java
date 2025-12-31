@@ -10,7 +10,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 
-public enum RoundRobinBehaviour implements ASTNode {
+public enum RoundRobinBehaviour implements SfmlAstNode {
     /// Any position satisfying any {@link LabelExpression} in the list of expressions.
     UNMODIFIED,
     /// Exactly one position that satisfies any {@link LabelExpression} in the list of expressions.
@@ -19,7 +19,7 @@ public enum RoundRobinBehaviour implements ASTNode {
     BY_LABEL;
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of();
     }

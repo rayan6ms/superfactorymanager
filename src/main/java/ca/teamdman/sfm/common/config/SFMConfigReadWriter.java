@@ -55,8 +55,8 @@ public class SFMConfigReadWriter {
             // Here is where SFM would distribute the new config to players.
             // For now, we don't care if the client doesn't have the latest server config.
             return ConfigSyncResult.SUCCESS;
-        } catch (Throwable t) {
-            SFM.LOGGER.error("Failed to update and sync server config", t);
+        } catch (Exception e) {
+            SFM.LOGGER.error("Failed to update and sync server config", e);
             return ConfigSyncResult.INTERNAL_FAILURE;
         }
     }
@@ -76,8 +76,28 @@ public class SFMConfigReadWriter {
             // Here is where SFM would distribute the new config to players.
             // For now, we don't care if the client doesn't have the latest server config.
             return ConfigSyncResult.SUCCESS;
-        } catch (Throwable t) {
-            SFM.LOGGER.error("Failed to update and sync client config", t);
+        } catch (Exception e) {
+            SFM.LOGGER.error("Failed to update and sync client config", e);
+            return ConfigSyncResult.INTERNAL_FAILURE;
+        }
+    }
+    public static ConfigSyncResult updateTextEditorConfig(String newConfigToml) {
+        try {
+            SFM.LOGGER.debug("Received text editor config for update and sync:\n{}", newConfigToml);
+            CommentedConfig config = parseConfigToml(newConfigToml, SFMConfig.CLIENT_TEXT_EDITOR_CONFIG_SPEC);
+            if (config == null) {
+                SFM.LOGGER.error("Received invalid config");
+                return ConfigSyncResult.INVALID_CONFIG;
+            }
+            if (!writeTextEditorConfig(config)) {
+                SFM.LOGGER.error("Failed to write text editor config");
+                return ConfigSyncResult.INTERNAL_FAILURE;
+            }
+            // Here is where SFM would distribute the new config to players.
+            // For now, we don't care if the text editor doesn't have the latest server config.
+            return ConfigSyncResult.SUCCESS;
+        } catch (Exception e) {
+            SFM.LOGGER.error("Failed to update and sync text editor config", e);
             return ConfigSyncResult.INTERNAL_FAILURE;
         }
     }
@@ -200,6 +220,42 @@ public class SFMConfigReadWriter {
 
         // Get the config path
         Path configPath = SFMConfigTracker.getPathForConfig(SFMConfig.CLIENT_CONFIG_SPEC);
+        if (configPath == null) {
+            SFM.LOGGER.warn("Failed to get client config path");
+            return false;
+        }
+
+        // Get the mod config obj
+        ModConfig modConfig = SFMConfigTracker.getClientModConfig();
+        if (modConfig == null) {
+            SFM.LOGGER.warn("Failed to get client mod config");
+            return false;
+        }
+
+        // We do not have to close the config before changing.
+        // If you were to do so, it would break the file watching because the unload method unwatches the whole dir.
+        // This causes "Failed to remove config {} from tracker!" warnings vvv
+        // java.lang.NullPointerException: Cannot read field "watchedFileCount" because "watchedDir" is null
+        // So, we do nothing to close the old config
+        // modConfig.getHandler().unload(configBasePath, modConfig);
+
+        // Write the new config
+        TomlFormat.instance().createWriter().write(config, configPath, WritingMode.REPLACE);
+
+        // Load the new config
+        return updateActiveConfigAndFireReloadedEvent(modConfig, configBasePath, configPath, config);
+    }
+
+    private static boolean writeTextEditorConfig(CommentedConfig config) {
+        // Get the config base path
+        Path configBasePath = getConfigBasePath();
+        if (configBasePath == null) {
+            SFM.LOGGER.warn("Failed to get client config base path");
+            return false;
+        }
+
+        // Get the config path
+        Path configPath = SFMConfigTracker.getPathForConfig(SFMConfig.CLIENT_TEXT_EDITOR_CONFIG_SPEC);
         if (configPath == null) {
             SFM.LOGGER.warn("Failed to get client config path");
             return false;

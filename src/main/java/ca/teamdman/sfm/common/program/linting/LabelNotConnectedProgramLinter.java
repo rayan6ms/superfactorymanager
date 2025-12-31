@@ -5,7 +5,7 @@ import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.SFMLProgram;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -19,7 +19,7 @@ import static ca.teamdman.sfm.common.localization.LocalizationKeys.*;
 public class LabelNotConnectedProgramLinter implements IProgramLinter {
     @Override
     public void gatherWarnings(
-            Program program,
+            SFMLProgram program,
             LabelPositionHolder labels,
             @Nullable ManagerBlockEntity manager,
             ProblemTracker tracker
@@ -68,7 +68,7 @@ public class LabelNotConnectedProgramLinter implements IProgramLinter {
 
     @Override
     public void fixWarnings(
-            Program program,
+            SFMLProgram program,
             LabelPositionHolder labels,
             ManagerBlockEntity manager,
             Level level,

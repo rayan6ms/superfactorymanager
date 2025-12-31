@@ -1,7 +1,7 @@
 package ca.teamdman.sfml.ast;
 
 import ca.teamdman.sfm.common.program.ProgramContext;
-import ca.teamdman.sfml.program_builder.ProgramBuilder;
+import ca.teamdman.sfml.program_builder.SFMLProgramBuilder;
 import net.minecraft.core.BlockPos;
 import org.apache.commons.lang3.mutable.Mutable;
 import org.apache.commons.lang3.mutable.MutableObject;
@@ -9,7 +9,7 @@ import org.apache.commons.lang3.mutable.MutableObject;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 
-public interface BoolExpr extends Predicate<ProgramContext>, ASTNode, ToStringPretty {
+public interface BoolExpr extends Predicate<ProgramContext>, SfmlAstNode, ToStringPretty {
     default void collectPositions(
             ProgramContext context,
             Consumer<BlockPos> posConsumer
@@ -26,7 +26,7 @@ public interface BoolExpr extends Predicate<ProgramContext>, ASTNode, ToStringPr
         // trailing newline allows comments in expr
         String programString = "EVERY 20 TICKS DO IF\n" + expr + "\nTHEN END END";
 
-        new ProgramBuilder(programString).build()
+        new SFMLProgramBuilder(programString).build()
                 .caseSuccess((program, metadata) -> {
                     BoolExpr condition = (
                             (IfStatement) program
@@ -38,10 +38,10 @@ public interface BoolExpr extends Predicate<ProgramContext>, ASTNode, ToStringPr
                     ).condition();
                     rtn.setValue(condition);
                 })
-                .caseFailure(result -> {
+                .caseFailure((metadata) -> {
                     StringBuilder msg = new StringBuilder("Failed to compile program: ").append(programString);
                     msg.append('\n');
-                    result.metadata().errors().forEach(e -> msg.append(e.toString()).append('\n'));
+                    metadata.errors().forEach(e -> msg.append(e.toString()).append('\n'));
                     throw new IllegalStateException(msg.toString());
                 });
         return rtn.getValue();

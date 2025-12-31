@@ -2,7 +2,8 @@ package ca.teamdman.sfm.common.item;
 
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
-import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenDiskOpenContext;
+import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenOpenContext;
+import ca.teamdman.sfm.client.text_editor.TextEditScreenContentLanguage;
 import ca.teamdman.sfm.client.text_styling.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
@@ -14,8 +15,8 @@ import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.common.util.SFMTranslationUtils;
-import ca.teamdman.sfml.ast.Program;
-import ca.teamdman.sfml.program_builder.ProgramBuilder;
+import ca.teamdman.sfml.ast.SFMLProgram;
+import ca.teamdman.sfml.program_builder.SFMLProgramBuilder;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -68,7 +69,7 @@ public class DiskItem extends Item {
         }
     }
 
-    public static @Nullable Program compileAndUpdateErrorsAndWarnings(
+    public static @Nullable SFMLProgram compileAndUpdateErrorsAndWarnings(
             ItemStack stack,
             @Nullable ManagerBlockEntity manager,
             boolean updateWarnings
@@ -76,10 +77,10 @@ public class DiskItem extends Item {
         if (manager != null) {
             manager.logger.info(x -> x.accept(LocalizationKeys.PROGRAM_COMPILE_FROM_DISK_BEGIN.get()));
         }
-        AtomicReference<Program> rtn = new AtomicReference<>(null);
+        AtomicReference<SFMLProgram> rtn = new AtomicReference<>(null);
         String programString = getProgramString(stack);
 
-        new ProgramBuilder(programString).build()
+        new SFMLProgramBuilder(programString).build()
                 .caseSuccess((successProgram, metadata) -> {
                     if (updateWarnings) {
                         Collection<TranslatableContents> warnings = ProgramLinter.gatherWarnings(
@@ -106,9 +107,9 @@ public class DiskItem extends Item {
                     // Track result
                     rtn.set(successProgram);
                 })
-                .caseFailure(result -> {
+                .caseFailure((metadata) -> {
                     List<TranslatableContents> warnings = Collections.emptyList();
-                    List<TranslatableContents> errors = result.metadata().errors();
+                    List<TranslatableContents> errors = metadata.errors();
 
                     // Log to disk
                     if (manager != null) {
@@ -215,9 +216,10 @@ public class DiskItem extends Item {
     ) {
         var stack = pPlayer.getItemInHand(pUsedHand);
         if (pLevel.isClientSide) {
-            SFMScreenChangeHelpers.showProgramEditScreen(new SFMTextEditScreenDiskOpenContext(
+            SFMScreenChangeHelpers.showPreferredTextEditScreen(new SFMTextEditScreenOpenContext(
                     getProgramString(stack),
                     LabelPositionHolder.from(stack),
+                    TextEditScreenContentLanguage.SFML,
                     newProgramString -> SFMPackets.sendToServer(new ServerboundDiskItemSetProgramPacket(
                             newProgramString,
                             pUsedHand

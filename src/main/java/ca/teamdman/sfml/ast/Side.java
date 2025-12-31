@@ -7,7 +7,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
-public enum Side implements ASTNode {
+public enum Side implements SfmlAstNode {
     TOP,
     BOTTOM,
     NORTH,
@@ -63,7 +63,7 @@ public enum Side implements ASTNode {
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of();
     }

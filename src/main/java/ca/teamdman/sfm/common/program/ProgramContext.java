@@ -8,7 +8,7 @@ import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfml.ast.InputStatement;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.SFMLProgram;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.mutable.MutableBoolean;
 import org.apache.commons.lang3.mutable.MutableInt;
@@ -19,13 +19,13 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Stream;
 
-/// A common group of objects used in the execution of a {@link Program}.
+/// A common group of objects used in the execution of a {@link SFMLProgram}.
 ///
 /// The {@link #inputs} list must be mutable; caution against using {@link Stream#toList()} which uses {@link java.util.Collections#unmodifiableList(List)}.
 public record ProgramContext(
         TranslatableLogger logger,
 
-        Program program,
+        SFMLProgram program,
 
         LabelPositionHolder labelPositionHolder,
 
@@ -58,7 +58,7 @@ public record ProgramContext(
     }
 
     public static ProgramContext of(
-            Program program,
+            SFMLProgram program,
             ManagerBlockEntity manager,
             ProgramBehaviour executionBehaviour
     ) {
@@ -86,7 +86,7 @@ public record ProgramContext(
     }
 
     public static ProgramContext createSimulationContext(
-            Program program,
+            SFMLProgram program,
             LabelPositionHolder labelPositionHolder,
             int redstonePulses,
             SimulateExploreAllPathsProgramBehaviour behaviour

@@ -9,7 +9,7 @@ public record ResourceLimit(
         ResourceIdSet resourceIds,
         Limit limit,
         With with
-) implements ASTNode {
+) implements SfmlAstNode {
     public static final ResourceLimit TAKE_ALL_LEAVE_NONE = new ResourceLimit(
             ResourceIdSet.MATCH_ALL,
             Limit.MAX_QUANTITY_NO_RETENTION,
@@ -88,7 +88,7 @@ public record ResourceLimit(
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of(resourceIds, limit, with);
     }

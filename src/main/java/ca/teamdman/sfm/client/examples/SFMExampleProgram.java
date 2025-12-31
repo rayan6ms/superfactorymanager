@@ -2,8 +2,8 @@ package ca.teamdman.sfm.client.examples;
 
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
-import ca.teamdman.sfml.program_builder.ProgramBuildResult;
-import ca.teamdman.sfml.program_builder.ProgramBuilder;
+import ca.teamdman.sfml.program_builder.SFMLProgramBuildResult;
+import ca.teamdman.sfml.program_builder.SFMLProgramBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.resources.Resource;
@@ -85,7 +85,7 @@ public record SFMExampleProgram(
         if (programString == null) return null;
 
         // Build the program
-        ProgramBuildResult result = new ProgramBuilder(programString).build();
+        SFMLProgramBuildResult result = new SFMLProgramBuilder(programString).build();
         String displayName = result.maybeProgram() == null
                              ? String.format("(compile failed) %s", path.toString())
                              : result.maybeProgram().name();

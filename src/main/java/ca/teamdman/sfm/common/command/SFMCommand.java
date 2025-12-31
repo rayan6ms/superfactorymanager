@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.command;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
+import ca.teamdman.sfm.common.net.ClientboundResetTextEditorPreferencesPacket;
 import ca.teamdman.sfm.common.net.ClientboundShowChangelogPacket;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.watertanknetwork.WaterNetworkManager;
@@ -98,6 +99,14 @@ public class SFMCommand {
                                                               ConfigCommandVariantInput.CLIENT
                                                       ))
                                       )
+                                      .then(
+                                              Commands.literal(ConfigCommandVariantInput.TEXT.name())
+                                                      .requires(source -> source.hasPermission(Commands.LEVEL_ALL))
+                                                      .executes(new ConfigCommand(
+                                                              ConfigCommandBehaviourInput.EDIT,
+                                                              ConfigCommandVariantInput.TEXT
+                                                      ))
+                                      )
                         )
         );
         command.then(Commands.literal("changelog")
@@ -113,6 +122,22 @@ public class SFMCommand {
                                      SFMPackets.sendToPlayer(
                                              player,
                                              new ClientboundShowChangelogPacket()
+                                     );
+                                 }
+                                 return SINGLE_SUCCESS;
+                             }));
+        command.then(Commands.literal("reset_text_editor_preferences")
+                             .requires(source -> source.hasPermission(Commands.LEVEL_ALL))
+                             .executes(ctx -> {
+                                 ServerPlayer player = ctx.getSource().getPlayer();
+                                 if (player != null) {
+                                     SFM.LOGGER.info(
+                                             "Resetting text editor preferences to V1 for player {}",
+                                             player.getName().getString()
+                                     );
+                                     SFMPackets.sendToPlayer(
+                                             player,
+                                             new ClientboundResetTextEditorPreferencesPacket()
                                      );
                                  }
                                  return SINGLE_SUCCESS;

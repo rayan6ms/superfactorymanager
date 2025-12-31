@@ -13,7 +13,7 @@ public record ResourceAccess(
         SideQualifier sides,
 
         SlotQualifier slots
-) implements ASTNode {
+) implements SfmlAstNode {
     @Override
     public String toString() {
 
@@ -37,9 +37,9 @@ public record ResourceAccess(
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
-        ArrayList<ASTNode> rtn = new ArrayList<>(labelExpressions.size() + 3);
+        ArrayList<SfmlAstNode> rtn = new ArrayList<>(labelExpressions.size() + 3);
         rtn.addAll(labelExpressions);
         rtn.add(roundRobin);
         rtn.add(sides);

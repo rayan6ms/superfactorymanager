@@ -6,7 +6,7 @@ import ca.teamdman.sfm.common.logging.TranslatableLogEvent;
 import ca.teamdman.sfm.common.net.ServerboundManagerSetLogLevelPacket;
 import ca.teamdman.sfm.common.registry.SFMMenus;
 import ca.teamdman.sfm.common.timing.SFMDurationNetworkUtils;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.SFMLProgram;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.Container;
@@ -89,7 +89,7 @@ public class ManagerContainerMenu extends AbstractContainerMenu {
                 inventory,
                 new SimpleContainer(1),
                 buf.readBlockPos(),
-                buf.readUtf(Program.MAX_PROGRAM_LENGTH),
+                buf.readUtf(SFMLProgram.MAX_PROGRAM_LENGTH),
                 buf.readUtf(ServerboundManagerSetLogLevelPacket.MAX_LOG_LEVEL_NAME_LENGTH),
                 buf.readEnum(ManagerBlockEntity.State.class),
                 readDurationArray(buf.readLongArray(null, ManagerBlockEntity.TICK_TIME_HISTORY_SIZE)),
@@ -120,7 +120,7 @@ public class ManagerContainerMenu extends AbstractContainerMenu {
             FriendlyByteBuf buf
     ) {
         buf.writeBlockPos(manager.getBlockPos());
-        buf.writeUtf(manager.getProgramStringOrEmptyIfNull(), Program.MAX_PROGRAM_LENGTH);
+        buf.writeUtf(manager.getProgramStringOrEmptyIfNull(), SFMLProgram.MAX_PROGRAM_LENGTH);
         buf.writeUtf(
                 manager.logger.getLogLevel().name(),
                 ServerboundManagerSetLogLevelPacket.MAX_LOG_LEVEL_NAME_LENGTH

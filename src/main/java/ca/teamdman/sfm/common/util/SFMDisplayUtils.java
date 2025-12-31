@@ -3,15 +3,16 @@ package ca.teamdman.sfm.common.util;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditorIntellisenseLevel;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfml.ast.ASTNode;
-import ca.teamdman.sfml.ast.Program;
+import ca.teamdman.sfml.ast.IAstNode;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
 import ca.teamdman.sfml.intellisense.IntellisenseContext;
 import ca.teamdman.sfml.intellisense.SFMLIntellisense;
-import ca.teamdman.sfml.program_builder.ProgramBuildResult;
+import ca.teamdman.sfml.program_builder.IAstBuilder;
+import ca.teamdman.sfml.program_builder.IProgramBuildResult;
 import com.mojang.datafixers.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.List;
 
@@ -39,7 +40,7 @@ public class SFMDisplayUtils {
     }
 
     public static String getCursorTokenDisplay(
-            ProgramBuildResult buildResult,
+            IProgramBuildResult<?, ?, ?> buildResult,
             int cursorPos
     ) {
         var tokens = buildResult.metadata().tokens().getTokens();
@@ -66,16 +67,15 @@ public class SFMDisplayUtils {
     }
 
     public static String getTokenHierarchyDisplay(
-            Program program,
+            @UnknownNullability IAstBuilder<?> astBuilder,
             int cursorPos
     ) {
         StringBuilder rtn = new StringBuilder();
-        List<Pair<ASTNode, ParserRuleContext>> nodesUnderCursor = program.astBuilder().getNodesUnderCursor(cursorPos);
-
+        List<Pair<IAstNode<?>, ParserRuleContext>> nodesUnderCursor = (List<Pair<IAstNode<?>, ParserRuleContext>>) (List) astBuilder.getNodesUnderCursor(cursorPos);
         var iter = nodesUnderCursor.listIterator(nodesUnderCursor.size());
         while (iter.hasPrevious()) {
-            Pair<ASTNode, ParserRuleContext> pair = iter.previous();
-            ASTNode node = pair.getFirst();
+            Pair<IAstNode<?>, ParserRuleContext> pair = iter.previous();
+            IAstNode<?> node = pair.getFirst();
             rtn.append(node.getClass().getSimpleName());
             if (iter.hasPrevious()) {
                 rtn.append(" -> ");
@@ -85,7 +85,7 @@ public class SFMDisplayUtils {
     }
 
     public static String getSuggestionsDisplay(
-            ProgramBuildResult programBuildResult,
+            IProgramBuildResult<?, ?, ?> programBuildResult,
             int cursorPos
     ) {
         StringBuilder rtn = new StringBuilder();

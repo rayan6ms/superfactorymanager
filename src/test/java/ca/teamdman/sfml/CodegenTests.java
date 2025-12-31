@@ -42,12 +42,12 @@ public class CodegenTests {
         var lexer = new SFMLLexer(CharStreams.fromString(input));
         var tokens = new CommonTokenStream(lexer);
         var parser = new SFMLParser(tokens);
-        var builder = new ASTBuilder();
+        var builder = new SfmlAstBuilder();
         var errors = new ArrayList<String>();
         lexer.removeErrorListeners();
-        lexer.addErrorListener(new Program.ListErrorListener(errors));
+        lexer.addErrorListener(new SFMLProgram.ListErrorListener(errors));
         parser.removeErrorListeners();
-        parser.addErrorListener(new Program.ListErrorListener(errors));
+        parser.addErrorListener(new SFMLProgram.ListErrorListener(errors));
         var context = parser.program();
         if (errors.isEmpty()) { // don't build if syntax errors present
             try {
@@ -79,8 +79,8 @@ public class CodegenTests {
                 SideQualifier.NULL,
                 SlotQualifier.DEFAULT
         );
-        var program = new Program(
-                new ASTBuilder(),
+        var program = new SFMLProgram(
+                new SfmlAstBuilder(),
                 "hello world",
                 List.of(new TimerTrigger(
                         new Interval(new Number(20), DurationUnit.TICKS, Interval.IntervalAlignment.LOCAL, new Number(0), DurationUnit.TICKS),

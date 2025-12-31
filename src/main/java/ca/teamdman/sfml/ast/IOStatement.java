@@ -8,7 +8,7 @@ public interface IOStatement extends Statement, ToStringPretty {
     boolean each();
 
     @Override
-    default List<? extends ASTNode> getChildNodes() {
+    default List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of(resourceLimits(), resourceAccess());
     }

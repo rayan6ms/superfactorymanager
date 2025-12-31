@@ -8,7 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.Predicate;
 
-public class TagMatcher implements Predicate<Object>, ASTNode {
+public class TagMatcher implements Predicate<Object>, SfmlAstNode {
     public final String namespacePattern;
     public final List<String> pathElementPatterns;
     private final Predicate<String> namespacePredicate;
@@ -63,7 +63,7 @@ public class TagMatcher implements Predicate<Object>, ASTNode {
     }
 
     @Override
-    public List<? extends ASTNode> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of();
     }

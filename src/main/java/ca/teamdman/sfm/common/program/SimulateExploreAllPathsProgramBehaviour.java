@@ -64,7 +64,7 @@ public class SimulateExploreAllPathsProgramBehaviour implements ProgramBehaviour
         return currentPath.history.get(currentPath.history.size() - 1);
     }
 
-    public @Nullable ExecutionPathElement getPathElementForNode(ASTNode node) {
+    public @Nullable ExecutionPathElement getPathElementForNode(SfmlAstNode node) {
 
         var iterator = currentPath.history.listIterator(currentPath.history.size());
         while (iterator.hasPrevious()) {
@@ -152,7 +152,7 @@ public class SimulateExploreAllPathsProgramBehaviour implements ProgramBehaviour
 
     public void onProgramFinished(
             ProgramContext context,
-            Program program
+            SFMLProgram program
     ) {
 
     }

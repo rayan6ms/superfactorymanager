@@ -2,7 +2,7 @@ package ca.teamdman.sfml.ast;
 
 import java.util.List;
 
-public record RoundRobin(RoundRobinBehaviour behaviour) implements ASTNode {
+public record RoundRobin(RoundRobinBehaviour behaviour) implements SfmlAstNode {
 
     @Override
     public String toString() {
