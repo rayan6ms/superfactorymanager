@@ -18,10 +18,6 @@ import java.util.List;
 
 public class ProgramSyntaxHighlightingHelper {
 
-    public static List<MutableComponent> withSyntaxHighlighting(String programString, boolean showContextActionHints) {
-        return withSyntaxHighlighting(programString, showContextActionHints, TextEditScreenContentLanguage.SFML);
-    }
-
     public static List<MutableComponent> withSyntaxHighlighting(
             String programString,
             boolean showContextActionHints,

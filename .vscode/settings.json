@@ -4,7 +4,7 @@
     // "java.gradle.buildServer.enabled": "on",
     "java.gradle.buildServer.enabled": "off",
     "java.configuration.updateBuildConfiguration": "automatic",
-    "java.compile.nullAnalysis.mode": "automatic",
+    // "java.compile.nullAnalysis.mode": "automatic",
     "java.import.gradle.enabled": true,
     "java.import.gradle.wrapper.enabled": true,
     "java.import.gradle.offline.enabled": false,
@@ -29,7 +29,10 @@
     },
     
     "search.exclude": {
-        // "**/build": true,
+        "**/build": true,
+        // un-exclude a specific version; https://github.com/microsoft/vscode/issues/869#issuecomment-161205895
+        "!build/tmp/expandedArchives/forge-1.19.2-43.4.0_mapped_parchment_2022.11.27-1.19.2-sources.jar_50e0a883e562228deabdb46a1ce4d20a": true,
+
         "**/bin": true,
         "**/.gradle": true,
         "**/runData": true,
@@ -49,6 +52,7 @@
     
     // Editor settings for Java
     "editor.formatOnSave": false,
+    "java.compile.nullAnalysis.mode": "disabled",
     // "java.jdt.ls.vmargs": "-XX:+UseParallelGC -XX:GCTimeRatio=4 -XX:AdaptiveSizePolicyWeight=90 -Dsun.zip.disableMemoryMapping=true -Xmx8G -Xms100m -Xlog:disable",
     // "[java]": {
     //     "editor.formatOnSave": true,

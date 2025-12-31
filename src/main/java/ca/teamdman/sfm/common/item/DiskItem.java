@@ -250,7 +250,11 @@ public class DiskItem extends Item {
         var program = getProgramString(stack);
         if (SFMItemUtils.isClientAndMoreInfoKeyPressed() && !program.isEmpty()) {
             lines.add(SFMItemUtils.getRainbow(getName(stack).getString().length()));
-            lines.addAll(ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(program, false));
+            lines.addAll(ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(
+                    program,
+                    false,
+                    TextEditScreenContentLanguage.SFML
+            ));
         } else {
             lines.addAll(LabelPositionHolder.from(stack).asHoverText());
             getErrors(stack)

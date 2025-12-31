@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
 import ca.teamdman.sfm.client.screen.*;
 import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
+import ca.teamdman.sfm.client.text_editor.TextEditScreenContentLanguage;
 import ca.teamdman.sfm.client.text_styling.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.client.widget.PickList;
 import ca.teamdman.sfm.client.widget.PickListItem;
@@ -712,10 +713,12 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
          */
         private void rebuild(boolean showContextActionHints) {
 
+            TextEditScreenContentLanguage language = openContext.contentLanguage();
             lastProgram = this.textField.value();
             content = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(
                     lastProgram,
-                    showContextActionHints
+                    showContextActionHints,
+                    language
             );
 
             rebuildDisplayCache();

@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.client.screen;
 
 import ca.teamdman.sfm.client.ClientTranslationHelpers;
+import ca.teamdman.sfm.client.text_editor.TextEditScreenContentLanguage;
 import ca.teamdman.sfm.client.text_styling.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.common.logging.TranslatableLogEvent;
 import net.minecraft.ChatFormatting;
@@ -47,7 +48,8 @@ public class LogsTextStylingHelper {
                         // output processed code
                         var codeLines = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(
                                 codeBlock.toString(),
-                                false
+                                false,
+                                TextEditScreenContentLanguage.SFML
                         );
                         processedLogs.addAll(codeLines);
                         codeBlock = new StringBuilder();

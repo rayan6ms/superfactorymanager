@@ -1,6 +1,7 @@
 package ca.teamdman.sfml;
 
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
+import ca.teamdman.sfm.client.text_editor.TextEditScreenContentLanguage;
 import ca.teamdman.sfm.client.text_styling.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunSetActiveLabelPacket;
@@ -489,7 +490,11 @@ public class SFMLTests {
         assertCompileErrorsPresent(rawInput);
         var lines = rawInput.split("\n", -1);
 
-        var colouredLines = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(rawInput, false);
+        var colouredLines = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(
+                rawInput,
+                false,
+                TextEditScreenContentLanguage.SFML
+        );
         String colouredInput = colouredLines.stream().map(Component::getString).collect(Collectors.joining("\n"));
 
         assertEquals(rawInput, colouredInput);
@@ -519,7 +524,11 @@ public class SFMLTests {
         assertNoCompileErrors(rawInput);
         var lines = rawInput.split("\n", -1);
 
-        var colouredLines = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(rawInput, false);
+        var colouredLines = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(
+                rawInput,
+                false,
+                TextEditScreenContentLanguage.SFML
+        );
         String colouredInput = colouredLines.stream().map(Component::getString).collect(Collectors.joining("\n"));
 
         assertEquals(rawInput, colouredInput);
@@ -547,7 +556,11 @@ public class SFMLTests {
 
         var lines = rawInput.split("\n", -1);
 
-        var colouredLines = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(rawInput, false);
+        var colouredLines = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(
+                rawInput,
+                false,
+                TextEditScreenContentLanguage.SFML
+        );
         String colouredInput = colouredLines.stream().map(Component::getString).collect(Collectors.joining("\n"));
 
         assertEquals(rawInput, colouredInput);
@@ -575,7 +588,11 @@ public class SFMLTests {
 
         var lines = rawInput.split("\n", -1);
 
-        var colouredLines = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(rawInput, false);
+        var colouredLines = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(
+                rawInput,
+                false,
+                TextEditScreenContentLanguage.SFML
+        );
         String colouredInput = colouredLines.stream().map(Component::getString).collect(Collectors.joining("\n"));
 
         assertEquals(rawInput, colouredInput);
@@ -608,7 +625,11 @@ public class SFMLTests {
                     .collect(Collectors.joining("\n"));
             var lines = rawInput.split("\n", -1);
 
-            var colouredLines = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(rawInput, false);
+            var colouredLines = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(
+                    rawInput,
+                    false,
+                    TextEditScreenContentLanguage.SFML
+            );
             String colouredInput = colouredLines.stream().map(Component::getString).collect(Collectors.joining("\n"));
 
             assertEquals(rawInput, colouredInput);
@@ -640,7 +661,11 @@ public class SFMLTests {
 
         var lines = rawInput.split("\n", -1);
 
-        var colouredLines = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(rawInput, false);
+        var colouredLines = ProgramSyntaxHighlightingHelper.withSyntaxHighlighting(
+                rawInput,
+                false,
+                TextEditScreenContentLanguage.SFML
+        );
         String colouredInput = colouredLines.stream().map(Component::getString).collect(Collectors.joining("\n"));
 
         assertEquals(rawInput, colouredInput);
