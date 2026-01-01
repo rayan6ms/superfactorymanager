@@ -22,7 +22,7 @@ public interface IProgramBuildResult<PROGRAM, METADATA extends IProgramMetadata<
     METADATA metadata();
 
 
-    default boolean isBuildSuccessful() {
+    default boolean isSuccess() {
 
         return maybeProgram() != null && metadata().errors().isEmpty();
     }
@@ -31,7 +31,7 @@ public interface IProgramBuildResult<PROGRAM, METADATA extends IProgramMetadata<
             BiConsumer<PROGRAM, METADATA> callback
     ) {
 
-        if (isBuildSuccessful()) {
+        if (isSuccess()) {
             callback.accept(this.maybeProgram(), this.metadata());
         }
         //noinspection unchecked
@@ -42,7 +42,7 @@ public interface IProgramBuildResult<PROGRAM, METADATA extends IProgramMetadata<
             Consumer<PROGRAM> callback
     ) {
 
-        if (isBuildSuccessful()) {
+        if (isSuccess()) {
             callback.accept(this.maybeProgram());
         }
         //noinspection unchecked
@@ -53,7 +53,7 @@ public interface IProgramBuildResult<PROGRAM, METADATA extends IProgramMetadata<
             BiConsumer<@Nullable PROGRAM, METADATA> callback
     ) {
 
-        if (!isBuildSuccessful()) {
+        if (!isSuccess()) {
             callback.accept(this.maybeProgram(), this.metadata());
         }
         //noinspection unchecked
@@ -64,7 +64,7 @@ public interface IProgramBuildResult<PROGRAM, METADATA extends IProgramMetadata<
             Consumer<METADATA> callback
     ) {
 
-        if (!isBuildSuccessful()) {
+        if (!isSuccess()) {
             callback.accept(this.metadata());
         }
         //noinspection unchecked
@@ -75,7 +75,7 @@ public interface IProgramBuildResult<PROGRAM, METADATA extends IProgramMetadata<
             Runnable callback
     ) {
 
-        if (!isBuildSuccessful()) {
+        if (!isSuccess()) {
             callback.run();
         }
         //noinspection unchecked

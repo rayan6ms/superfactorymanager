@@ -79,7 +79,7 @@ public class ProgramBuilder<AST_NODE extends IAstNode<?>, LEXER extends Lexer, P
 
         // initial parse
         CONTEXT context = contextFn.apply(parser);
-        buildErrors.stream().map(LocalizationKeys.PROGRAM_ERROR_LITERAL::get).forEach(errors::add);
+        buildErrors.stream().map(LocalizationKeys.PROGRAM_BUILD_ERROR_LITERAL::get).forEach(errors::add);
 
         // build program from AST only when there are no errors from previous phases
         @Nullable PROGRAM maybeProgram = null;
@@ -87,9 +87,9 @@ public class ProgramBuilder<AST_NODE extends IAstNode<?>, LEXER extends Lexer, P
             try {
                 maybeProgram = astFn.apply(astBuilder, context);
             } catch (ResourceLocationException | IllegalArgumentException | AssertionError e) {
-                errors.add(LocalizationKeys.PROGRAM_ERROR_LITERAL.get(e.getMessage()));
+                errors.add(LocalizationKeys.PROGRAM_BUILD_ERROR_LITERAL.get(e.getMessage()));
             } catch (Exception e) {
-                errors.add(LocalizationKeys.PROGRAM_ERROR_COMPILE_FAILED.get());
+                errors.add(LocalizationKeys.PROGRAM_BUILD_ERROR_LITERAL.get(e.getMessage()));
                 SFM.LOGGER.warn(
                         "Encountered unhandled error while compiling program\n```\n{}\n```",
                         programString,
@@ -98,10 +98,10 @@ public class ProgramBuilder<AST_NODE extends IAstNode<?>, LEXER extends Lexer, P
                 var message = e.getMessage();
                 if (message != null) {
                     errors.add(SFMTranslationUtils.getTranslatableContents(
-                            e.getClass().getSimpleName() + ": " + message
+                            e.getClass().getCanonicalName() + ": " + message
                     ));
                 } else {
-                    errors.add(SFMTranslationUtils.getTranslatableContents(e.getClass().getSimpleName()));
+                    errors.add(SFMTranslationUtils.getTranslatableContents(e.getClass().getCanonicalName()));
                 }
             }
         }

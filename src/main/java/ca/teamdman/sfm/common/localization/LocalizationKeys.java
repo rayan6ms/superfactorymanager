@@ -476,25 +476,33 @@ public final class LocalizationKeys {
             "program.sfm.warnings.round_robin_smelly_count",
             "Round robin by label should be used with more than one label, statement %s"
     );
-    public static final LocalizationEntry PROGRAM_ERROR_COMPILE_FAILED = new LocalizationEntry(
-            "program.sfm.error.compile_failed",
-            "Failed to compile."
-    );
-    public static final LocalizationEntry PROGRAM_ERROR_LITERAL = new LocalizationEntry(
+    public static final LocalizationEntry PROGRAM_BUILD_ERROR_LITERAL = new LocalizationEntry(
             "program.sfm.error.literal",
-            "%s"
+            "Program build error: %s"
     );
-    public static final LocalizationEntry PROGRAM_COMPILE_FAILED_WITH_ERRORS = new LocalizationEntry(
+    public static final LocalizationEntry PROGRAM_BUILD_FAILURE_WITH_ERROR_COUNT_AND_ELAPSED_DURATION = new LocalizationEntry(
             "program.sfm.error.compile_failed_with_errors",
-            "Failed to compile with %d errors."
+            "Program build failed with %d errors in %s."
     );
-    public static final LocalizationEntry PROGRAM_COMPILE_SUCCEEDED_WITH_WARNINGS = new LocalizationEntry(
+    public static final LocalizationEntry PROGRAM_BUILD_SUCCESS_WITH_WARNING_COUNT_AND_ELAPSED_DURATION = new LocalizationEntry(
             "program.sfm.error.compile_success_with_warnings",
-            "Successfully compiled \"%s\" with %d warnings."
+            "Successfully compiled \"%s\" with %d warnings in %s."
     );
-    public static final LocalizationEntry PROGRAM_COMPILE_FROM_DISK_BEGIN = new LocalizationEntry(
+    public static final LocalizationEntry PROGRAM_BUILD_BEGIN = new LocalizationEntry(
             "program.sfm.compile_begin",
-            "Compiling program from disk."
+            "Building program from disk."
+    );
+    public static final LocalizationEntry PROGRAM_LINTING_BEGIN = new LocalizationEntry(
+            "program.sfm.linting.begin",
+            "Running program linters to gather warnings."
+    );
+    public static final LocalizationEntry PROGRAM_LINTING_LINTER_REPORT = new LocalizationEntry(
+            "program.sfm.linting.linter_report",
+            "Linter %s found %d problems in %s."
+    );
+    public static final LocalizationEntry PROGRAM_LINTING_FINISHED_WITH_PROBLEM_COUNT_AND_ELAPSED_DURATION = new LocalizationEntry(
+            "program.sfm.linting.end",
+            "Program linting found %d problems in %s."
     );
     public static final LocalizationEntry PROGRAM_TICK_TIME_MS = new LocalizationEntry(
             "program.sfm.tick.time",

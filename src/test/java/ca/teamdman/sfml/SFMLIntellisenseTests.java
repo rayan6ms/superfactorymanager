@@ -490,7 +490,7 @@ public class SFMLIntellisenseTests {
         // 1) Build the snippet into a IProgramBuildResult
 
         SFMLProgramBuildResult buildResult = new SFMLProgramBuilder(PROGRAM_SNIPPET).build();
-        assertTrue(buildResult.isBuildSuccessful(), "Snippet must parse successfully");
+        assertTrue(buildResult.isSuccess(), "Snippet must parse successfully");
 
         // 2) Find a cursor position somewhere in IRON_INGOT
         int resourceCaret = PROGRAM_SNIPPET.indexOf("iron_ingot") + 4;
@@ -533,7 +533,7 @@ public class SFMLIntellisenseTests {
         // Use the same snippet, but put the cursor in the label area
 
         SFMLProgramBuildResult buildResult = new SFMLProgramBuilder(PROGRAM_SNIPPET).build();
-        assertTrue(buildResult.isBuildSuccessful(), "Snippet must parse successfully");
+        assertTrue(buildResult.isSuccess(), "Snippet must parse successfully");
 
         // Cursor in "Minecart"
         int labelCaret = PROGRAM_SNIPPET.indexOf("my_chest") + 3;

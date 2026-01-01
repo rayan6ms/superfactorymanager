@@ -43,7 +43,7 @@ public class TomlProgramBuilder {
 
         // initial parse
         TomlParser.DocumentContext context = parser.document();
-        buildErrors.stream().map(LocalizationKeys.PROGRAM_ERROR_LITERAL::get).forEach(errors::add);
+        buildErrors.stream().map(LocalizationKeys.PROGRAM_BUILD_ERROR_LITERAL::get).forEach(errors::add);
 
 
         // build program from AST only when there are no errors from previous phases
@@ -53,9 +53,9 @@ public class TomlProgramBuilder {
                 program = builder.visitDocument(context);
                 // Make sure all referenced resources are valid during compilation instead of waiting for the program to tick
             } catch (ResourceLocationException | IllegalArgumentException | AssertionError e) {
-                errors.add(LocalizationKeys.PROGRAM_ERROR_LITERAL.get(e.getMessage()));
+                errors.add(LocalizationKeys.PROGRAM_BUILD_ERROR_LITERAL.get(e.getMessage()));
             } catch (Exception e) {
-                errors.add(LocalizationKeys.PROGRAM_ERROR_COMPILE_FAILED.get());
+                errors.add(LocalizationKeys.PROGRAM_BUILD_ERROR_LITERAL.get(e.getMessage()));
                 SFM.LOGGER.warn(
                         "Encountered unhandled error while compiling program\n```\n{}\n```",
                         programString,
@@ -67,7 +67,7 @@ public class TomlProgramBuilder {
                             e.getClass().getSimpleName() + ": " + message
                     ));
                 } else {
-                    errors.add(SFMTranslationUtils.getTranslatableContents(e.getClass().getSimpleName()));
+                    errors.add(SFMTranslationUtils.getTranslatableContents(e.getClass().getCanonicalName()));
                 }
             }
         }

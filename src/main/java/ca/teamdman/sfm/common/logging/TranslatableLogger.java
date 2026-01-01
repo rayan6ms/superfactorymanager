@@ -145,6 +145,7 @@ public class TranslatableLogger {
         }
     }
 
+    // TODO v5: add a Consumer<TranslatableContents> overload
     public void debug(Consumer<Consumer<TranslatableContents>> logger) {
 
         if (this.logLevel.isLessSpecificThan(Level.DEBUG)) {

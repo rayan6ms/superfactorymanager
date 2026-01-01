@@ -8,15 +8,20 @@ import ca.teamdman.sfm.client.text_styling.ProgramSyntaxHighlightingHelper;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.net.ServerboundDiskItemSetProgramPacket;
 import ca.teamdman.sfm.common.program.linting.ProgramLinter;
 import ca.teamdman.sfm.common.registry.SFMCreativeTabs;
 import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.timing.SFMInstant;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.common.util.SFMTranslationUtils;
 import ca.teamdman.sfml.ast.SFMLProgram;
+import ca.teamdman.sfml.program_builder.SFMLProgramBuildResult;
 import ca.teamdman.sfml.program_builder.SFMLProgramBuilder;
+import ca.teamdman.sfml.program_builder.SFMLProgramMetadata;
 import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
@@ -34,18 +39,21 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class DiskItem extends Item {
     public DiskItem() {
-        super(new Item.Properties().tab(SFMCreativeTabs.TAB));
+
+        super(new Properties().tab(SFMCreativeTabs.TAB));
     }
 
     public static String getProgramString(ItemStack stack) {
+
         return stack
                 .getOrCreateTag()
                 .getString("sfm:program");
@@ -55,13 +63,17 @@ public class DiskItem extends Item {
             ItemStack stack,
             String program
     ) {
+
         program = program.replaceAll("\r", "");
         stack
                 .getOrCreateTag()
                 .putString("sfm:program", program);
     }
 
+    /// Ensure disks can stack after being used and cleared.
+    @MCVersionDependentBehaviour
     public static void pruneIfDefault(ItemStack stack) {
+
         if (getProgramString(stack).isBlank() && LabelPositionHolder.from(stack).isEmpty()) {
             for (String key : stack.getOrCreateTag().getAllKeys().toArray(String[]::new)) {
                 stack.removeTagKey(key);
@@ -69,63 +81,104 @@ public class DiskItem extends Item {
         }
     }
 
-    public static @Nullable SFMLProgram compileAndUpdateErrorsAndWarnings(
+    /// Build the {@link SFMLProgram} contained in the given {@link DiskItem}.
+    /// @param manager used for logging and running {@link ProgramLinter}s.
+    public static @Nullable SFMLProgram rebuildSfmlProgram(
             ItemStack stack,
             @Nullable ManagerBlockEntity manager,
-            boolean updateWarnings
+            boolean shouldRebuildWarnings
     ) {
-        if (manager != null) {
-            manager.logger.info(x -> x.accept(LocalizationKeys.PROGRAM_COMPILE_FROM_DISK_BEGIN.get()));
+        // Identify logger if present
+        final TranslatableLogger logger;
+        if (manager == null) {
+            logger = null;
+        } else {
+            logger = manager.logger;
         }
-        AtomicReference<SFMLProgram> rtn = new AtomicReference<>(null);
+
+        if (logger != null) {
+            // Log beginning
+            logger.info(x -> x.accept(LocalizationKeys.PROGRAM_BUILD_BEGIN.get()));
+        }
+
+        // Get the program source code
         String programString = getProgramString(stack);
 
-        new SFMLProgramBuilder(programString).build()
-                .caseSuccess((successProgram, metadata) -> {
-                    if (updateWarnings) {
-                        Collection<TranslatableContents> warnings = ProgramLinter.gatherWarnings(
-                                successProgram,
-                                LabelPositionHolder.from(stack),
-                                manager
-                        );
+        // Start stopwatch
+        SFMInstant start = SFMInstant.now();
 
-                        // Log to disk
-                        if (manager != null) {
-                            manager.logger.info(x -> x.accept(LocalizationKeys.PROGRAM_COMPILE_SUCCEEDED_WITH_WARNINGS.get(
-                                    successProgram.name(),
-                                    warnings.size()
-                            )));
-                            manager.logger.warn(warnings::forEach);
-                        }
-                        setWarnings(stack, warnings);
-                    }
+        // Build the program
+        SFMLProgramBuildResult buildResult = new SFMLProgramBuilder(programString).build();
+        SFMLProgramMetadata metadata = buildResult.metadata();
 
-                    // Update disk properties
-                    setProgramName(stack, successProgram.name());
-                    setErrors(stack, Collections.emptyList());
+        if (buildResult.isSuccess()) {
+            // Build was successful
+            SFMLProgram successProgram = buildResult.unwrapProgram();
 
-                    // Track result
-                    rtn.set(successProgram);
-                })
-                .caseFailure((metadata) -> {
-                    List<TranslatableContents> warnings = Collections.emptyList();
-                    List<TranslatableContents> errors = metadata.errors();
+            // Update warnings
+            final Collection<TranslatableContents> warnings;
+            if (shouldRebuildWarnings) {
+                warnings = ProgramLinter.gatherWarnings(
+                        successProgram,
+                        LabelPositionHolder.from(stack),
+                        manager
+                );
+                setWarnings(stack, warnings);
+            } else {
+                warnings = new ArrayList<>();
+            }
 
-                    // Log to disk
-                    if (manager != null) {
-                        manager.logger.error(x -> x.accept(LocalizationKeys.PROGRAM_COMPILE_FAILED_WITH_ERRORS.get(
-                                errors.size())));
-                        manager.logger.error(errors::forEach);
-                    }
+            // Stop stopwatch
+            Duration elapsed = start.elapsed();
 
-                    // Update disk properties
-                    setWarnings(stack, warnings);
-                    setErrors(stack, errors);
-                });
-        return rtn.get();
+            if (logger != null) {
+                // Log build success
+                logger.info(x -> x.accept(LocalizationKeys.PROGRAM_BUILD_SUCCESS_WITH_WARNING_COUNT_AND_ELAPSED_DURATION.get(
+                        successProgram.name(),
+                        warnings.size(),
+                        elapsed
+                )));
+
+                // Log each warning
+                logger.warn(warnings::forEach);
+            }
+
+            // Update disk properties
+            setProgramName(stack, successProgram.name());
+            setErrors(stack, Collections.emptyList());
+
+        } else {
+            // Build was unsuccessful
+            List<TranslatableContents> warnings = Collections.emptyList();
+            List<TranslatableContents> errors = metadata.errors();
+
+            // Stop stopwatch
+            Duration elapsed = start.elapsed();
+
+            if (logger != null) {
+                // Log to disk
+                logger.error(x -> x.accept(LocalizationKeys.PROGRAM_BUILD_FAILURE_WITH_ERROR_COUNT_AND_ELAPSED_DURATION.get(
+                        errors.size(),
+                        elapsed
+                )));
+
+                // Log each error
+                logger.error(errors::forEach);
+            }
+
+            // Update disk properties
+            setWarnings(stack, warnings);
+            setErrors(stack, errors);
+        }
+
+        // Clear
+        DiskItem.pruneIfDefault(stack);
+
+        return buildResult.maybeProgram();
     }
 
     public static List<TranslatableContents> getErrors(ItemStack stack) {
+
         return stack
                 .getOrCreateTag()
                 .getList("sfm:errors", Tag.TAG_COMPOUND)
@@ -139,6 +192,7 @@ public class DiskItem extends Item {
             ItemStack stack,
             List<TranslatableContents> errors
     ) {
+
         stack
                 .getOrCreateTag()
                 .put(
@@ -151,6 +205,7 @@ public class DiskItem extends Item {
     }
 
     public static List<TranslatableContents> getWarnings(ItemStack stack) {
+
         return stack
                 .getOrCreateTag()
                 .getList("sfm:warnings", Tag.TAG_COMPOUND)
@@ -164,6 +219,7 @@ public class DiskItem extends Item {
     public static void rebuildWarnings(
             ManagerBlockEntity manager
     ) {
+
         var disk = manager.getDisk();
         if (disk != null) {
             var program = manager.getProgram();
@@ -180,6 +236,7 @@ public class DiskItem extends Item {
             ItemStack stack,
             Collection<TranslatableContents> warnings
     ) {
+
         stack
                 .getOrCreateTag()
                 .put(
@@ -192,6 +249,7 @@ public class DiskItem extends Item {
     }
 
     public static String getProgramName(ItemStack stack) {
+
         return stack
                 .getOrCreateTag()
                 .getString("sfm:name");
@@ -201,6 +259,7 @@ public class DiskItem extends Item {
             ItemStack stack,
             String name
     ) {
+
         if (stack.getItem() instanceof DiskItem) {
             stack
                     .getOrCreateTag()
@@ -214,6 +273,7 @@ public class DiskItem extends Item {
             Player pPlayer,
             InteractionHand pUsedHand
     ) {
+
         var stack = pPlayer.getItemInHand(pUsedHand);
         if (pLevel.isClientSide) {
             SFMScreenChangeHelpers.showPreferredTextEditScreen(new SFMTextEditScreenOpenContext(
@@ -231,6 +291,7 @@ public class DiskItem extends Item {
 
     @Override
     public Component getName(ItemStack stack) {
+
         if (SFMEnvironmentUtils.isClient()) {
             if (SFMKeyMappings.isKeyDown(SFMKeyMappings.MORE_INFO_TOOLTIP_KEY))
                 return super.getName(stack);
@@ -247,6 +308,7 @@ public class DiskItem extends Item {
             List<Component> lines,
             TooltipFlag detail
     ) {
+
         var program = getProgramString(stack);
         if (SFMItemUtils.isClientAndMoreInfoKeyPressed() && !program.isEmpty()) {
             lines.add(SFMItemUtils.getRainbow(getName(stack).getString().length()));

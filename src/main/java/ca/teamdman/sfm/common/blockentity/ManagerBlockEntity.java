@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.blockentity;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.client.screen.ManagerScreen;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.config.SFMConfigTracker;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
@@ -67,8 +68,8 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
 
     private int tickIndex = 0;
 
-    /// When using a manager to frequently swap between two disks, we don't care about warnings as much.
-    /// Warnings are still rebuilt when opening manager regardless of this value.
+    /// When using automation to frequently swap between different {@link DiskItem}, we don't care about warnings.
+    /// Warnings are still rebuilt when opening the {@link ManagerScreen} regardless of this value.
     private int automationAvoidRebuildingWarningsCooldown = 0;
 
     /// Callbacks for testing, used to assert postconditions
@@ -347,11 +348,12 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
             this.program = null;
         } else {
             this.incrementRebuildWarningsCooldown();
-            this.program = DiskItem.compileAndUpdateErrorsAndWarnings(
+            this.program = DiskItem.rebuildSfmlProgram(
                     disk,
                     this,
                     this.shouldRebuildWarnings()
             );
+
         }
         this.configRevision = SFMConfig.SERVER_CONFIG.getRevision();
         sendUpdatePacket();
