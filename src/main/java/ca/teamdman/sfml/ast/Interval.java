@@ -41,10 +41,11 @@ public record Interval(
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append(interval).append(" ").append(intervalUnit);
+        sb.append(interval);
         if (alignment == IntervalAlignment.GLOBAL) {
             sb.append(" GLOBAL");
         }
+        sb.append(" ").append(intervalUnit);
         if (offset.value() != 0) {
             sb.append(" OFFSET BY ").append(offset);
             if (offsetUnit != intervalUnit) {
