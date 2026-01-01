@@ -19,14 +19,18 @@ program : name? outerExpression* EOF;
 
 outerExpression : trigger | logExpression;
 
-logExpression   : LOG logLevel string       #LogStatement
-                | PRINT string              #PrintStatement
-                | INFO string               #InfoStatement
-                | DEBUG string              #DebugStatement
-                | (WARN | WARNING) string   #WarnStatement
-                | ERROR string              #ErrorStatement
-                | TRACE string              #TraceStatement
+logExpression   : LOG logLevel displayable       #LogStatement
+                | PRINT displayable              #PrintStatement
+                | INFO displayable               #InfoStatement
+                | DEBUG displayable              #DebugStatement
+                | (WARN | WARNING) displayable   #WarnStatement
+                | ERROR displayable              #ErrorStatement
+                | TRACE displayable              #TraceStatement
                 ;
+
+displayable : string            # DisplayableString
+            | numberExpression  # DisplayableNumberExpression
+            ;
 
 logLevel        : INFO | DEBUG | WARN | WARNING | ERROR | TRACE ;
 

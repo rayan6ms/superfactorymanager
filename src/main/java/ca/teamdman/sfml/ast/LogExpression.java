@@ -10,7 +10,7 @@ import java.util.List;
 public record LogExpression(
         SfmlLogLevel logLevel,
 
-        StringHolder message
+        Displayable message
 ) implements Tickable {
     @Override
     public List<? extends SfmlAstNode> getChildNodes() {
@@ -27,7 +27,7 @@ public record LogExpression(
     public void tick(TranslatableLogger logger) {
 
         Level level = logLevel.level();
-        String msg = message.value();
+        String msg = message.display();
         if (level == Level.INFO) {
             logger.info(LocalizationKeys.LOG_PROGRAM_LOG_EXPRESSION.get(msg));
         } else if (level == Level.DEBUG) {
@@ -44,7 +44,7 @@ public record LogExpression(
     @Override
     public String toString() {
 
-        return "LOG " + logLevel + " \"" + message.value() + "\"";
+        return "LOG " + logLevel + " " + message;
     }
 
 }

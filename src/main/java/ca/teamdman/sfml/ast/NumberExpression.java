@@ -8,9 +8,20 @@ import java.util.Objects;
  * and the original expression AST for pretty printing purposes.
  *
  */
-public final class NumberExpression implements SfmlAstNode, ToStringPretty {
+@SuppressWarnings("ClassCanBeRecord") // Records do not support transient fields
+public final class NumberExpression implements SfmlAstNode, ToStringPretty, Displayable {
+
+    @Override
+    public String display() {
+
+        return number.toString();
+    }
+
+    /// The const-computed result of this expression.
+    /// Transient fields are omitted from {@link #getChildNodes()}.
     private transient final Number number;
 
+    /// An expression that resolves to a number.
     private final INumberExpression expression;
 
     /**
