@@ -76,8 +76,8 @@ public class SFMLTestHelpers {
         CompileErrors compileErrors = getCompileErrors(program);
         compileErrors.printStackStraces();
         assertEquals(
-                compileErrors,
-                CompileErrors.NONE
+                CompileErrors.NONE,
+                compileErrors
         );
     }
 
@@ -89,21 +89,22 @@ public class SFMLTestHelpers {
         CompileErrors compileErrors = getCompileErrors(program);
         compileErrors.printStackStraces();
         assertEquals(
-                compileErrors,
-                expected
+                expected,
+                compileErrors
         );
     }
 
+    /// Note that this only asserts the class of the exception matches, not that the message or details of the exception do.
     public static void assertCompileErrorsPresent(
             String program,
-            Throwable... visitProblems
+            Exception... visitProblems
     ) {
 
         CompileErrors compileErrors = getCompileErrors(program);
         compileErrors.printStackStraces();
         assertEquals(
-                compileErrors,
-                new CompileErrors(visitProblems)
+                new CompileErrors(visitProblems),
+                compileErrors
         );
     }
 
@@ -112,8 +113,8 @@ public class SFMLTestHelpers {
     ) {
 
         assertNotEquals(
-                getCompileErrors(program),
-                CompileErrors.NONE
+                CompileErrors.NONE,
+                getCompileErrors(program)
         );
     }
 
