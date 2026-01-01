@@ -347,13 +347,22 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
         if (disk == null) {
             this.program = null;
         } else {
+            // Update cooldown for if warnings should be computed
             this.incrementRebuildWarningsCooldown();
+
+            // Update the log level so that the logging on how long the program build takes is captured
+            org.apache.logging.log4j.Level oldLogLevel = logger.getLogLevel();
+            logger.setLogLevel(org.apache.logging.log4j.Level.DEBUG);
+
+            // Perform the rebuild
             this.program = DiskItem.rebuildSfmlProgram(
                     disk,
                     this,
                     this.shouldRebuildWarnings()
             );
 
+            // Restore old log level
+            logger.setLogLevel(oldLogLevel);
         }
         this.configRevision = SFMConfig.SERVER_CONFIG.getRevision();
         sendUpdatePacket();
