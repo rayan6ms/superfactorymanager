@@ -19,13 +19,13 @@ public class SFMLTimerTriggerTests {
     }
 
     @Test
-    public void every_10000000000_ticks_do_end() {
+    public void every_1_000_000_000_000_000_000_000_000_ticks_do_end() {
         assertCompileErrorsPresent(
                 """
-                            every 10000000000 ticks do
+                            every 1_000_000_000_000_000_000_000_000 ticks do -- too big for a long
                             end
                         """,
-                new NumberFormatException("For input string: \"10000000000\"")
+                new NumberFormatException()
         );
     }
 
@@ -33,6 +33,14 @@ public class SFMLTimerTriggerTests {
     public void every_tick_ticks_do_end() {
         var input = """
                     every tick do
+                    end
+                """;
+        assertNoCompileErrors(input);
+    }
+    @Test
+    public void every_second_ticks_do_end() {
+        var input = """
+                    every second do
                     end
                 """;
         assertNoCompileErrors(input);
@@ -62,7 +70,7 @@ public class SFMLTimerTriggerTests {
                                 input from a
                             end
                         """,
-                new IllegalArgumentException("Minimum trigger interval is 20 ticks.")
+                new IllegalArgumentException()
         );
     }
 
@@ -78,77 +86,78 @@ public class SFMLTimerTriggerTests {
     }
 
     @Test
-    public void every_20g_ticks_do_end() {
-        assertNoCompileErrors("EVERY 20g TICKS DO END");
-    }
-
-    @Test
-    public void every_20G_ticks_do_end() {
-        assertNoCompileErrors("EVERY 20G TICKS DO END");
-    }
-
-    @Test
-    public void every_20_g_ticks_do_end() {
-        assertNoCompileErrors("EVERY 20 g TICKS DO END");
-    }
-
-    @Test
-    public void every_20_G_ticks_do_end() {
-        assertNoCompileErrors("EVERY 20 G TICKS DO END");
-    }
-
-    @Test
-    public void every_20_global_ticks_do_end() {
-        assertNoCompileErrors("EVERY 20 GLOBAL TICKS DO END");
-    }
-
-    @Test
     public void label_conflicts() {
         var input = """
                     EVERY 20 TICKS DO
-                        INPUT FROM first
+                        INPUT FROM firstcgh
                         OUTPUT TO second, seconds, global, a,b,c,d,e,f,g,h,i,j,k,l,m,n,o,p,q,r,s,t,u,v,w,x,y,z
                     END
                 """;
         assertNoCompileErrors(input);
     }
+
+
     @Test
-    public void bulk() {
+    public void bulk_timer_triggers() {
+        // This is also checked in timer_triggers.sfml
+        // Because the contract between examples and unit tests isn't clear, we will keep the duplication.
         var input = """
-                EVERY TICK DO END
                 EVERY TICKS DO END
-                EVERY SECOND DO END
+                EVERY TICK DO END
                 EVERY SECONDS DO END
+                EVERY SECOND DO END
+                EVERY GLOBAL TICKS DO END
+                EVERY GLOBAL TICK DO END
+                EVERY GLOBAL SECONDS DO END
+                EVERY GLOBAL SECOND DO END
+                EVERY 20 TICKS OFFSET BY 1 TICKS DO END
+                EVERY 20 TICKS OFFSET BY 1 TICK DO END
+                EVERY 20 TICKS OFFSET BY 1 SECONDS DO END
+                EVERY 20 TICKS OFFSET BY 1 SECOND DO END
+                EVERY 20 TICKS OFFSET BY 1 DO END
                 EVERY 20 TICKS DO END
+                EVERY 20 TICK OFFSET BY 1 TICKS DO END
+                EVERY 20 TICK OFFSET BY 1 TICK DO END
+                EVERY 20 TICK OFFSET BY 1 SECONDS DO END
+                EVERY 20 TICK OFFSET BY 1 SECOND DO END
+                EVERY 20 TICK OFFSET BY 1 DO END
                 EVERY 20 TICK DO END
+                EVERY 20 SECONDS OFFSET BY 1 TICKS DO END
+                EVERY 20 SECONDS OFFSET BY 1 TICK DO END
+                EVERY 20 SECONDS OFFSET BY 1 SECONDS DO END
+                EVERY 20 SECONDS OFFSET BY 1 SECOND DO END
+                EVERY 20 SECONDS OFFSET BY 1 DO END
                 EVERY 20 SECONDS DO END
+                EVERY 20 SECOND OFFSET BY 1 TICKS DO END
+                EVERY 20 SECOND OFFSET BY 1 TICK DO END
+                EVERY 20 SECOND OFFSET BY 1 SECONDS DO END
+                EVERY 20 SECOND OFFSET BY 1 SECOND DO END
+                EVERY 20 SECOND OFFSET BY 1 DO END
                 EVERY 20 SECOND DO END
+                EVERY 20 GLOBAL TICKS OFFSET BY 1 TICKS DO END
+                EVERY 20 GLOBAL TICKS OFFSET BY 1 TICK DO END
+                EVERY 20 GLOBAL TICKS OFFSET BY 1 SECONDS DO END
+                EVERY 20 GLOBAL TICKS OFFSET BY 1 SECOND DO END
+                EVERY 20 GLOBAL TICKS OFFSET BY 1 DO END
                 EVERY 20 GLOBAL TICKS DO END
+                EVERY 20 GLOBAL TICK OFFSET BY 1 TICKS DO END
+                EVERY 20 GLOBAL TICK OFFSET BY 1 TICK DO END
+                EVERY 20 GLOBAL TICK OFFSET BY 1 SECONDS DO END
+                EVERY 20 GLOBAL TICK OFFSET BY 1 SECOND DO END
+                EVERY 20 GLOBAL TICK OFFSET BY 1 DO END
+                EVERY 20 GLOBAL TICK DO END
+                EVERY 20 GLOBAL SECONDS OFFSET BY 1 TICKS DO END
+                EVERY 20 GLOBAL SECONDS OFFSET BY 1 TICK DO END
+                EVERY 20 GLOBAL SECONDS OFFSET BY 1 SECONDS DO END
+                EVERY 20 GLOBAL SECONDS OFFSET BY 1 SECOND DO END
+                EVERY 20 GLOBAL SECONDS OFFSET BY 1 DO END
                 EVERY 20 GLOBAL SECONDS DO END
-                EVERY 20G TICKS DO END
-                EVERY 20G TICK DO END
-                EVERY 20G SECONDS DO END
-                EVERY 20G SECOND DO END
-                EVERY 20G+1 TICKS DO END
-                EVERY 20G+1 TICK DO END
-                EVERY 20G+1 SECONDS DO END
-                EVERY 20G+1 SECOND DO END
-                EVERY 20+1 TICKS DO END
-                EVERY 20+1 TICK DO END
-                EVERY 20+1 SECONDS DO END
-                EVERY 20+1 SECOND DO END
-                EVERY 20G + 1 TICKS DO END
-                EVERY 20G + 1 TICK DO END
-                EVERY 20G + 1 SECONDS DO END
-                EVERY 20G + 1 SECOND DO END
-                EVERY 20G PLUS 1 TICKS DO END
-                EVERY 20G PLUS 1 TICK DO END
-                EVERY 20G PLUS 1 SECONDS DO END
-                EVERY 20G PLUS 1 SECOND DO END
-                EVERY 20 PLUS 1 TICKS DO END
-                EVERY 20 PLUS 1 TICK DO END
-                EVERY 20 PLUS 1 SECONDS DO END
-                EVERY 20 PLUS 1 SECOND DO END
+                EVERY 20 GLOBAL SECOND OFFSET BY 1 TICKS DO END
+                EVERY 20 GLOBAL SECOND OFFSET BY 1 TICK DO END
+                EVERY 20 GLOBAL SECOND OFFSET BY 1 SECONDS DO END
+                EVERY 20 GLOBAL SECOND OFFSET BY 1 SECOND DO END
+                EVERY 20 GLOBAL SECOND OFFSET BY 1 DO END
+                EVERY 20 GLOBAL SECOND DO END
                 """;
         assertNoCompileErrors(input);
     }

@@ -276,7 +276,7 @@ TICKS   : T I C K S ;
 TICK    : T I C K ;
 SECONDS : S E C O N D S ;
 SECOND  : S E C O N D ;
-GLOBAL  : (G L O B A L) | G;
+GLOBAL  : G L O B A L;
 OFFSET : O F F S E T ;
 
 // REDSTONE TRIGGER

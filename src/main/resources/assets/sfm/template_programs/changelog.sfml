@@ -11,6 +11,12 @@ NAME "Changelog"
 -- Add numeric expressions
 PRINT 2+2
 -- Add program linter performance logging
+-- Update timer trigger global and offset syntax rules, see timer_triggers.sfml example
+---- Removed shorthand syntax since it did not clearly communicate what was going on and it conflicted with new math logic
+-- Before:
+--   EVERY 20G+1 DO END -- ugly, unclear, looks like math but isn't
+-- After:
+     EVERY 20 GLOBAL TICKS OFFSET BY 1 DO END
 
 ---- 4.28.0 ----
 -- Fix #430 where fancy cable improperly visually connects to blocks it should not
@@ -225,11 +231,12 @@ END
 -- Remove unused keyword tokens: WORLD, PROGRAM, MOVE
 -- Add random initialization of manager internal clock on load from world
 -- Add support for specifying global alignment and offset for timer intervals
-EVERY 20 GLOBAL TICKS DO END
-EVERY 20 GLOBAL PLUS 5 TICKS DO END
-EVERY 20G PLUS 5 TICKS DO END
-EVERY 20G + 5 TICKS DO END
-EVERY 20G+5 TICKS DO END
+---- This syntax has changed in later versions.
+---- EVERY 20 GLOBAL TICKS DO END
+---- EVERY 20 GLOBAL PLUS 5 TICKS DO END
+---- EVERY 20G PLUS 5 TICKS DO END
+---- EVERY 20G + 5 TICKS DO END
+---- EVERY 20G+5 TICKS DO END
 -- Add timer_triggers.sfml example
 -- Fix manager asking for confirmation when pasting over empty disks
 -- Fix missing truncation on ctrl+space actions for label and output tokens
