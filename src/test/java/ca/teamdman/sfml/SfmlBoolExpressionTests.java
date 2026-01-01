@@ -97,7 +97,7 @@ public class SfmlBoolExpressionTests {
 
     private static @NotNull BoolExpr parseBoolExpr(String programString) {
         return new SFMLProgramBuilder(programString)
-                .<BoolExpr>build(SFMLParser::boolexpr).unwrapProgram();
+                .<BoolExpr>build(SFMLParser::boolExpr).unwrapProgram();
     }
 
     private static void assertBoolExpr(boolean expected, String expr) {

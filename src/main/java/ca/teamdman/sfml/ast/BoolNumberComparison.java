@@ -4,7 +4,7 @@ import ca.teamdman.sfm.common.program.ProgramContext;
 
 import java.util.List;
 
-public record BoolComparison(NumberExpression left, ComparisonOperator op, NumberExpression right) implements BoolExpr {
+public record BoolNumberComparison(NumberExpression left, ComparisonOperator op, NumberExpression right) implements BoolExpr {
     @Override
     public boolean test(ProgramContext programContext) {
         long leftValue = left.value();

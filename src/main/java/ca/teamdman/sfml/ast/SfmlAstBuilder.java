@@ -493,7 +493,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     public IfStatement visitIfStatement(SFMLParser.IfStatementContext ctx) {
 
         var conditions = ctx
-                .boolexpr()
+                .boolExpr()
                 .stream()
                 .map(this::visit)
                 .map(BoolExpr.class::cast)
@@ -607,7 +607,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     @Override
     public BoolExpr visitBooleanParen(SFMLParser.BooleanParenContext ctx) {
 
-        BoolExpr rtn = new BoolParen((BoolExpr) visit(ctx.boolexpr()));
+        BoolExpr rtn = new BoolParen((BoolExpr) visit(ctx.boolExpr()));
         trackNode(rtn, ctx);
         return rtn;
     }
@@ -615,7 +615,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     @Override
     public BoolExpr visitBooleanNegation(SFMLParser.BooleanNegationContext ctx) {
 
-        BoolExpr rtn = new BoolNegation((BoolExpr) visit(ctx.boolexpr()));
+        BoolExpr rtn = new BoolNegation((BoolExpr) visit(ctx.boolExpr()));
         trackNode(rtn, ctx);
         return rtn;
     }
@@ -623,8 +623,8 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     @Override
     public BoolExpr visitBooleanConjunction(SFMLParser.BooleanConjunctionContext ctx) {
 
-        var left = (BoolExpr) visit(ctx.boolexpr(0));
-        var right = (BoolExpr) visit(ctx.boolexpr(1));
+        var left = (BoolExpr) visit(ctx.boolExpr(0));
+        var right = (BoolExpr) visit(ctx.boolExpr(1));
         BoolExpr rtn = new BoolConjunction(left, right);
         trackNode(rtn, ctx);
         return rtn;
@@ -633,8 +633,8 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     @Override
     public BoolExpr visitBooleanDisjunction(SFMLParser.BooleanDisjunctionContext ctx) {
 
-        var left = (BoolExpr) visit(ctx.boolexpr(0));
-        var right = (BoolExpr) visit(ctx.boolexpr(1));
+        var left = (BoolExpr) visit(ctx.boolExpr(0));
+        var right = (BoolExpr) visit(ctx.boolExpr(1));
         BoolExpr rtn = new BoolDisjunction(left, right);
         trackNode(rtn, ctx);
         return rtn;
@@ -646,7 +646,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
         var left = (NumberExpression) visit(ctx.numberExpression(0));
         var op = visitComparisonOp(ctx.comparisonOp());
         var right = (NumberExpression) visit(ctx.numberExpression(1));
-        BoolExpr rtn = new BoolComparison(left, op, right);
+        BoolExpr rtn = new BoolNumberComparison(left, op, right);
         trackNode(rtn, ctx);
         return rtn;
     }

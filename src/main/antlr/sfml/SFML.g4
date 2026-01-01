@@ -99,13 +99,13 @@ tagMatcher  : identifier COLON identifier (SLASH identifier)*
             | identifier (SLASH identifier)*
             ;
 
-ifStatement     : IF boolexpr THEN block (ELSE IF boolexpr THEN block)* (ELSE block)? END;
-boolexpr        : TRUE                              #BooleanTrue
+ifStatement     : IF boolExpr THEN block (ELSE IF boolExpr THEN block)* (ELSE block)? END;
+boolExpr        : TRUE                              #BooleanTrue
                 | FALSE                             #BooleanFalse
-                | LPAREN boolexpr RPAREN            #BooleanParen
-                | NOT boolexpr                      #BooleanNegation
-                | boolexpr AND boolexpr             #BooleanConjunction
-                | boolexpr OR boolexpr              #BooleanDisjunction
+                | LPAREN boolExpr RPAREN            #BooleanParen
+                | NOT boolExpr                      #BooleanNegation
+                | boolExpr AND boolExpr             #BooleanConjunction
+                | boolExpr OR boolExpr              #BooleanDisjunction
                 | numberExpression comparisonOp numberExpression  #BooleanComparison
                 | setOp? resourceAccess HAS comparisonOp numberExpression resourceIdDisjunction? with? (EXCEPT resourceIdList)?  #BooleanHas
                 | REDSTONE (comparisonOp numberExpression)?   #BooleanRedstone

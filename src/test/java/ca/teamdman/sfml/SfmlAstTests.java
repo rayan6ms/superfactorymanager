@@ -32,7 +32,7 @@ public class SfmlAstTests {
 
         String programString = "chest HAS eq 1 diamond";
         BoolExpr expr = new SFMLProgramBuilder(programString).build(
-                SFMLParser::boolexpr,
+                SFMLParser::boolExpr,
                 SfmlAstBuilder::visitBooleanHas,
                 SFMLParser.BooleanHasContext.class
         ).unwrapProgram();
