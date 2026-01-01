@@ -210,32 +210,6 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
         return rtn;
     }
 
-    @Override
-    public SfmlAstNode visitNumberExpressionIdentifierMultiplication(SFMLParser.NumberExpressionIdentifierMultiplicationContext ctx) {
-
-        // This handles the case where *70 is lexed as IDENTIFIER due to greedy lexer
-        // The grammar rule is: numberExpression IDENTIFIER
-        // So we parse the left side and treat the IDENTIFIER as *<number>
-        NumberExpression left = (NumberExpression) visit(ctx.numberExpression());
-        String identifierText = ctx.IDENTIFIER().getText();
-
-        // The identifier should start with * followed by digits (e.g., *70)
-        if (!identifierText.startsWith("*")) {
-            throw new IllegalArgumentException("Expected identifier starting with * but got: " + identifierText);
-        }
-
-        // Strip the leading asterisk before parsing as number
-        long rightValue = parseNumberLiteral(identifierText.substring(1));
-        NumberExpression right = new NumberExpression(new Number(rightValue), new NumberLiteral(rightValue));
-
-        // Treat this as multiplication
-        NumberMultiplication expr = new NumberMultiplication(left, right);
-        Number value = new Number(left.value() * rightValue);
-        NumberExpression rtn = new NumberExpression(value, expr);
-        trackNode(rtn, ctx);
-        return rtn;
-    }
-
     /**
      * Parse a number literal, supporting underscores as digit separators (e.g., 1_000_000).
      */
@@ -326,7 +300,13 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     @Override
     public Interval visitInterval(SFMLParser.IntervalContext ctx) {
 
-        NumberExpression interval = (NumberExpression) visit(ctx.numberExpression(0));
+        SFMLParser.NumberExpressionContext intervalCtx = ctx.numberExpression(0);
+        NumberExpression interval;
+        if (intervalCtx == null) {
+            interval = NumberExpression.fromLiteral(1);
+        } else {
+            interval = (NumberExpression) visit(intervalCtx);
+        }
         DurationUnit intervalUnit = visitDurationUnit(ctx.durationUnit(0));
 
         SFMLParser.NumberExpressionContext offsetCtx = ctx.numberExpression(1);
@@ -896,10 +876,17 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     public NumberRange visitNumberRange(SFMLParser.NumberRangeContext ctx) {
 
         NumberExpression start = (NumberExpression) visit(ctx.numberExpression(0));
-        NumberExpression end = (NumberExpression) visit(ctx.numberExpression(1));
+        NumberExpression end;
+        SFMLParser.NumberExpressionContext endCtx = ctx.numberExpression(1);
+        if (endCtx == null) {
+            end = start;
+        } else {
+            end = (NumberExpression) visit(endCtx);
+        }
+
         NumberRange numberRange = new NumberRange(
                 start,
-                Objects.requireNonNullElse(end, start)
+                end
         );
         trackNode(numberRange, ctx);
         return numberRange;
@@ -1009,6 +996,18 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     }
 
     @Override
+    public SfmlAstNode visitDisplayableString(SFMLParser.DisplayableStringContext ctx) {
+
+        return super.visitDisplayableString(ctx);
+    }
+
+    @Override
+    public SfmlAstNode visitDisplayableNumberExpression(SFMLParser.DisplayableNumberExpressionContext ctx) {
+
+        return super.visitDisplayableNumberExpression(ctx);
+    }
+
+    @Override
     public SfmlLogLevel visitLogLevel(SFMLParser.LogLevelContext ctx) {
         Level level;
         String text = ctx.getText().toUpperCase(Locale.ROOT);
@@ -1025,7 +1024,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     @Override
     public LogExpression visitLogStatement(SFMLParser.LogStatementContext ctx) {
         SfmlLogLevel logLevel = visitLogLevel(ctx.logLevel());
-        StringHolder message = visitString(ctx.string());
+        Displayable message = (Displayable) visit(ctx.displayable());
         LogExpression logExpression = new LogExpression(logLevel, message);
         trackNode(logExpression, ctx);
         return logExpression;
@@ -1034,7 +1033,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     @Override
     public LogExpression visitPrintStatement(SFMLParser.PrintStatementContext ctx) {
         SfmlLogLevel logLevel = new SfmlLogLevel(Level.INFO);
-        StringHolder message = visitString(ctx.string());
+        Displayable message = (Displayable) visit(ctx.displayable());
         LogExpression logExpression = new LogExpression(logLevel, message);
         trackNode(logExpression, ctx);
         return logExpression;
@@ -1043,7 +1042,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     @Override
     public LogExpression visitInfoStatement(SFMLParser.InfoStatementContext ctx) {
         SfmlLogLevel logLevel = new SfmlLogLevel(Level.INFO);
-        StringHolder message = visitString(ctx.string());
+        Displayable message = (Displayable) visit(ctx.displayable());
         LogExpression logExpression = new LogExpression(logLevel, message);
         trackNode(logExpression, ctx);
         return logExpression;
@@ -1052,7 +1051,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     @Override
     public LogExpression visitDebugStatement(SFMLParser.DebugStatementContext ctx) {
         SfmlLogLevel logLevel = new SfmlLogLevel(Level.DEBUG);
-        StringHolder message = visitString(ctx.string());
+        Displayable message = (Displayable) visit(ctx.displayable());
         LogExpression logExpression = new LogExpression(logLevel, message);
         trackNode(logExpression, ctx);
         return logExpression;
@@ -1061,7 +1060,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     @Override
     public LogExpression visitWarnStatement(SFMLParser.WarnStatementContext ctx) {
         SfmlLogLevel logLevel = new SfmlLogLevel(Level.WARN);
-        StringHolder message = visitString(ctx.string());
+        Displayable message = (Displayable) visit(ctx.displayable());
         LogExpression logExpression = new LogExpression(logLevel, message);
         trackNode(logExpression, ctx);
         return logExpression;
@@ -1070,7 +1069,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     @Override
     public LogExpression visitErrorStatement(SFMLParser.ErrorStatementContext ctx) {
         SfmlLogLevel logLevel = new SfmlLogLevel(Level.ERROR);
-        StringHolder message = visitString(ctx.string());
+        Displayable message = (Displayable) visit(ctx.displayable());
         LogExpression logExpression = new LogExpression(logLevel, message);
         trackNode(logExpression, ctx);
         return logExpression;
@@ -1079,7 +1078,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     @Override
     public LogExpression visitTraceStatement(SFMLParser.TraceStatementContext ctx) {
         SfmlLogLevel logLevel = new SfmlLogLevel(Level.TRACE);
-        StringHolder message = visitString(ctx.string());
+        Displayable message = (Displayable) visit(ctx.displayable());
         LogExpression logExpression = new LogExpression(logLevel, message);
         trackNode(logExpression, ctx);
         return logExpression;

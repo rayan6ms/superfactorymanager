@@ -43,7 +43,6 @@ numberExpression  : NUMBER                                      # NumberExpressi
                   | LPAREN numberExpression RPAREN              # NumberExpressionParen
                   | numberExpression CARET numberExpression     # NumberExpressionExponential
                   | numberExpression ASTERISK numberExpression  # NumberExpressionMultiplication
-                  | numberExpression IDENTIFIER                 # NumberExpressionIdentifierMultiplication // fallback for *70 being lexed as identifier
                   | numberExpression SLASH numberExpression     # NumberExpressionDivision
                   | numberExpression PLUS numberExpression      # NumberExpressionAddition
                   | numberExpression DASH numberExpression      # NumberExpressionSubtraction
@@ -181,7 +180,23 @@ numberRange     : NOT? numberExpression (DASH numberExpression)? ;  // NEEDS TES
 
 emptyslots      : EMPTY (SLOTS | SLOT) IN ;
 
-identifier : (IDENTIFIER | REDSTONE | GLOBAL | SECOND | SECONDS | TOP | BOTTOM | LEFT | RIGHT | FRONT | BACK | LOG) ;
+identifier : (
+    IDENTIFIER
+    | REDSTONE
+    | GLOBAL
+    | SECOND
+    | SECONDS
+    | TOP
+    | BOTTOM
+    | LEFT
+    | RIGHT
+    | FRONT
+    | BACK
+    | LOG
+    | BLOCK
+    | LABEL
+    | ASTERISK
+)+ ;
 
 // GENERAL
 string: STRING ;
@@ -314,7 +329,10 @@ RPAREN  : ')';
 ASTERISK: '*';
 
 NUMBER                  : [0-9][0-9_]* ;
-IDENTIFIER              : [a-zA-Z_*][a-zA-Z0-9_*]* | ASTERISK; // Note that the * in the square brackets is a literal
+
+IDENTIFIER              : [a-zA-Z_][a-zA-Z0-9_]*;
+// Note that a * in the square brackets means a literal
+// We have moved this to be the ASTERISK token instead of including it here; the `identifier` rule has been updated.
 
 STRING : '"' (~'"'|'\\"')* '"' ;
 
