@@ -8,6 +8,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 public class SFMLChildrenTests {
@@ -19,6 +20,10 @@ public class SFMLChildrenTests {
         List<? extends IAstNode> exposedChildren = node.getChildNodes();
         // there must not exist a field that is ? extends SfmlAstNode that is not present in exposedChildren
         for (Field field : fields) {
+            if (Modifier.isStatic(field.getModifiers())) {
+                continue;
+            }
+
             field.setAccessible(true);
             Class<?> fieldType = field.getType();
             if (SfmlAstNode.class.isAssignableFrom(fieldType)) {
@@ -33,8 +38,13 @@ public class SFMLChildrenTests {
                         throw new RuntimeException(e);
                     }
                 }
-                if (!found) {
-                    throw new RuntimeException("Field " + field + " not found in exposed children of " + node);
+
+                // Transient fields should be EXCLUDED from children, not included
+                boolean shouldInclude = !Modifier.isTransient(field.getModifiers());
+                if (!found && shouldInclude) {
+                    throw new RuntimeException("Field " + field + " not found in exposed children of " + node.getClass().getCanonicalName());
+                } else if (found && !shouldInclude) {
+                    throw new RuntimeException("Field " + field + " found in exposed children of " + node.getClass().getCanonicalName() + " but should not be");
                 }
             }
         }

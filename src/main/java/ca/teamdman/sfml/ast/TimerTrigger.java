@@ -32,7 +32,7 @@ public record TimerTrigger(
 
     @Override
     public List<SfmlAstNode> getChildNodes() {
-        return List.of(block);
+        return List.of(interval, block);
     }
 
     public boolean usesOnlyForgeEnergyResourceIO() {

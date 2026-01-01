@@ -1,23 +1,36 @@
 package ca.teamdman.sfml.ast;
 
 import java.util.List;
+import java.util.Objects;
 
 /**
  * A number expression that holds both the eagerly evaluated numeric value
  * and the original expression AST for pretty printing purposes.
  *
- * @param number     The eagerly evaluated numeric value
- * @param expression The original expression AST node
  */
-public record NumberExpression(
-        Number number,
-        INumberExpression expression
-) implements SfmlAstNode, ToStringPretty {
-    
+public final class NumberExpression implements SfmlAstNode, ToStringPretty {
+    private transient final Number number;
+
+    private final INumberExpression expression;
+
+    /**
+     * @param number     The eagerly evaluated numeric value
+     * @param expression The original expression AST node
+     */
+    public NumberExpression(
+            Number number,
+            INumberExpression expression
+    ) {
+
+        this.number = number;
+        this.expression = expression;
+    }
+
     /**
      * Get the evaluated long value
      */
     public long value() {
+
         return number.value();
     }
 
@@ -35,17 +48,47 @@ public record NumberExpression(
      * Create a NumberExpression from a literal value
      */
     public static NumberExpression fromLiteral(long value) {
+
         NumberLiteral literal = new NumberLiteral(value);
         return new NumberExpression(new Number(value), literal);
     }
 
     @Override
     public String toString() {
+
         return expression.toString();
     }
 
     @Override
     public List<? extends SfmlAstNode> getChildNodes() {
+
         return List.of(expression);
     }
+
+    public Number number() {
+
+        return number;
+    }
+
+    public INumberExpression expression() {
+
+        return expression;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (obj == this) return true;
+        if (obj == null || obj.getClass() != this.getClass()) return false;
+        var that = (NumberExpression) obj;
+        return Objects.equals(this.number, that.number) &&
+               Objects.equals(this.expression, that.expression);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return Objects.hash(number, expression);
+    }
+
 }
