@@ -351,6 +351,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
             this.incrementRebuildWarningsCooldown();
 
             // Update the log level so that the logging on how long the program build takes is captured
+            // TODO v5: This should be a custom config per-manager; manager config.toml?
             org.apache.logging.log4j.Level oldLogLevel = logger.getLogLevel();
             logger.setLogLevel(org.apache.logging.log4j.Level.DEBUG);
 

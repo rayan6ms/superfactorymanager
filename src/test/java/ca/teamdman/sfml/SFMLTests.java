@@ -744,10 +744,14 @@ public class SFMLTests {
         //noinspection DataFlowIssue
         for (var entry : examplesDir.listFiles()) {
             if (!FileNameUtils.getExtension(entry.getPath()).equals("sfm")) continue;
-            System.out.println("Reading " + entry);
+            System.out.println("Checking " + entry);
             var content = Files.readString(entry.toPath());
+            System.out.printf("```\n%s\n```\n", content);
             assertNoCompileErrors(content);
             found++;
+
+            System.out.println();
+            System.out.println();
         }
         assertNotEquals(0, found);
     }
