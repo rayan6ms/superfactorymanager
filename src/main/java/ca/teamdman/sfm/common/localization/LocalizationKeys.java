@@ -544,6 +544,10 @@ public final class LocalizationKeys {
             "log.sfm.program.tick",
             "PROGRAM TICK BEGIN"
     );
+    public static final LocalizationEntry LOG_PROGRAM_LOG_EXPRESSION = new LocalizationEntry(
+            "log.sfm.program.log_expression",
+            "%s"
+    );
     public static final LocalizationEntry LOG_PROGRAM_CONTEXT = new LocalizationEntry(
             "log.sfm.program.context",
             "Initial program context: %s"

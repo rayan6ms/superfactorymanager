@@ -33,6 +33,8 @@ public record SFMLProgram(
 
         List<Trigger> triggers,
 
+        List<LogExpression> topLevelLogExpressions,
+
         Set<String> referencedLabels,
 
         Set<ResourceIdentifier<?, ?, ?>> referencedResources
@@ -75,8 +77,12 @@ public record SFMLProgram(
     }
 
     @Override
-    public List<Trigger> getChildNodes() {
-        return triggers;
+    public List<? extends SfmlAstNode> getChildNodes() {
+
+        List<SfmlAstNode> children = new java.util.ArrayList<>();
+        children.addAll(topLevelLogExpressions);
+        children.addAll(triggers);
+        return children;
     }
 
     @Override
@@ -175,6 +181,9 @@ public record SFMLProgram(
 
         var rtn = new StringBuilder();
         rtn.append("NAME \"").append(name).append("\"\n");
+        for (LogExpression logExpr : topLevelLogExpressions) {
+            rtn.append(logExpr).append("\n");
+        }
         for (Trigger trigger : triggers) {
             rtn.append(trigger).append("\n");
         }

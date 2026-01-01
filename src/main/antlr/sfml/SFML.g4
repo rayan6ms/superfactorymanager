@@ -15,7 +15,20 @@ package ca.teamdman.langs;
     public boolean INCLUDE_UNUSED = false; // we want syntax highlighting to not break on unexpected tokens
 }
 
-program : name? trigger* EOF;
+program : name? outerExpression* EOF;
+
+outerExpression : trigger | logExpression;
+
+logExpression   : LOG logLevel string       #LogStatement
+                | PRINT string              #PrintStatement
+                | INFO string               #InfoStatement
+                | DEBUG string              #DebugStatement
+                | (WARN | WARNING) string   #WarnStatement
+                | ERROR string              #ErrorStatement
+                | TRACE string              #TraceStatement
+                ;
+
+logLevel        : INFO | DEBUG | WARN | WARNING | ERROR | TRACE ;
 
 name: NAME string ;
 
@@ -42,6 +55,7 @@ statement       : inputStatement
                 | outputStatement
                 | ifStatement
                 | forgetStatement
+                | logExpression
                 ;
 
 inputStatement  : INPUT inputResourceLimits? resourceExclusion? FROM EACH? resourceAccess
@@ -167,7 +181,7 @@ numberRange     : NOT? numberExpression (DASH numberExpression)? ;  // NEEDS TES
 
 emptyslots      : EMPTY (SLOTS | SLOT) IN ;
 
-identifier : (IDENTIFIER | REDSTONE | GLOBAL | SECOND | SECONDS | TOP | BOTTOM | LEFT | RIGHT | FRONT | BACK) ;
+identifier : (IDENTIFIER | REDSTONE | GLOBAL | SECOND | SECONDS | TOP | BOTTOM | LEFT | RIGHT | FRONT | BACK | LOG) ;
 
 // GENERAL
 string: STRING ;
@@ -273,6 +287,16 @@ PULSE           : P U L S E;
 DO              : D O ;
 END             : E N D ;
 NAME            : N A M E ;
+
+// LOGGING
+LOG             : L O G ;
+PRINT           : P R I N T ;
+INFO            : I N F O ;
+DEBUG           : D E B U G ;
+WARN            : W A R N ;
+WARNING         : W A R N I N G ;
+ERROR           : E R R O R ;
+TRACE           : T R A C E ;
 
 // GENERAL SYMBOLS
 // used by triggers and as a set operator

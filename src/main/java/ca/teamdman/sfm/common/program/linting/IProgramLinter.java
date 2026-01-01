@@ -24,11 +24,5 @@ public interface IProgramLinter {
             Level level,
             ItemStack disk
     );
-    /*
-    todo:
 
-        // update warnings on the disk itself
-        var updatedWarnings = gatherWarnings(program, labels, manager, tracker);
-        DiskItem.setWarnings(disk, updatedWarnings);
-     */
 }

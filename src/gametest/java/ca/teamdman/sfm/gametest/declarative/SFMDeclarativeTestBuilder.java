@@ -112,7 +112,7 @@ public class SFMDeclarativeTestBuilder {
         if (conditions.isEmpty()) return;
         List<BoolExpr> expressions = conditions.stream().map(BoolExpr::from).toList();
         ProgramContext programContext = ProgramContext.of(
-                new SFMLProgram(new SfmlAstBuilder(), "temp lol", List.of(), Set.of(), Set.of()),
+                new SFMLProgram(new SfmlAstBuilder(), "temp lol", List.of(), List.of(), Set.of(), Set.of()),
                 manager,
                 ExecuteProgramBehaviour::new
         );

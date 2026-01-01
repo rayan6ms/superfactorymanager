@@ -109,6 +109,7 @@ public class CodegenTests {
                                 // if false
                         )))
                 )),
+                List.of(), // topLevelLogExpressions
                 Collections.emptySet(),
                 Collections.emptySet()
         );

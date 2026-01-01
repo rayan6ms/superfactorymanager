@@ -7,6 +7,7 @@ import ca.teamdman.sfm.common.config.SFMConfig;
 import com.mojang.datafixers.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
+import org.apache.logging.log4j.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.lang.ref.WeakReference;
@@ -116,17 +117,26 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
             throw new AssertionError("Program execution is disabled via config");
         }
         var name = visitName(ctx.name());
-        var triggers = ctx
-                .trigger()
-                .stream()
-                .map(this::visit)
-                .map(Trigger.class::cast)
-                .collect(Collectors.toList());
+        
+        List<Trigger> triggers = new ArrayList<>();
+        List<LogExpression> topLevelLogExpressions = new ArrayList<>();
+        
+        for (var outerExpr : ctx.outerExpression()) {
+            var node = visit(outerExpr);
+            if (node instanceof Trigger trigger) {
+                triggers.add(trigger);
+            } else if (node instanceof LogExpression logExpr) {
+                topLevelLogExpressions.add(logExpr);
+            } else {
+                throw new IllegalStateException("Unexpected outer expression type: " + node.getClass().getCanonicalName());
+            }
+        }
+        
         var labels = usedLabels
                 .stream()
                 .map(Label::value)
                 .collect(Collectors.toSet());
-        SFMLProgram program = new SFMLProgram(this, name.value(), triggers, labels, usedResources);
+        SFMLProgram program = new SFMLProgram(this, name.value(), triggers, topLevelLogExpressions, labels, usedResources);
         trackNode(program, ctx);
         return program;
     }
@@ -996,6 +1006,83 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
         Block block = new Block(statements);
         trackNode(block, ctx);
         return block;
+    }
+
+    @Override
+    public SfmlLogLevel visitLogLevel(SFMLParser.LogLevelContext ctx) {
+        Level level;
+        String text = ctx.getText().toUpperCase(Locale.ROOT);
+        if (text.equals("WARNING")) {
+            level = Level.WARN;
+        } else {
+            level = Level.getLevel(text);
+        }
+        SfmlLogLevel logLevel = new SfmlLogLevel(level);
+        trackNode(logLevel, ctx);
+        return logLevel;
+    }
+
+    @Override
+    public LogExpression visitLogStatement(SFMLParser.LogStatementContext ctx) {
+        SfmlLogLevel logLevel = visitLogLevel(ctx.logLevel());
+        StringHolder message = visitString(ctx.string());
+        LogExpression logExpression = new LogExpression(logLevel, message);
+        trackNode(logExpression, ctx);
+        return logExpression;
+    }
+
+    @Override
+    public LogExpression visitPrintStatement(SFMLParser.PrintStatementContext ctx) {
+        SfmlLogLevel logLevel = new SfmlLogLevel(Level.INFO);
+        StringHolder message = visitString(ctx.string());
+        LogExpression logExpression = new LogExpression(logLevel, message);
+        trackNode(logExpression, ctx);
+        return logExpression;
+    }
+
+    @Override
+    public LogExpression visitInfoStatement(SFMLParser.InfoStatementContext ctx) {
+        SfmlLogLevel logLevel = new SfmlLogLevel(Level.INFO);
+        StringHolder message = visitString(ctx.string());
+        LogExpression logExpression = new LogExpression(logLevel, message);
+        trackNode(logExpression, ctx);
+        return logExpression;
+    }
+
+    @Override
+    public LogExpression visitDebugStatement(SFMLParser.DebugStatementContext ctx) {
+        SfmlLogLevel logLevel = new SfmlLogLevel(Level.DEBUG);
+        StringHolder message = visitString(ctx.string());
+        LogExpression logExpression = new LogExpression(logLevel, message);
+        trackNode(logExpression, ctx);
+        return logExpression;
+    }
+
+    @Override
+    public LogExpression visitWarnStatement(SFMLParser.WarnStatementContext ctx) {
+        SfmlLogLevel logLevel = new SfmlLogLevel(Level.WARN);
+        StringHolder message = visitString(ctx.string());
+        LogExpression logExpression = new LogExpression(logLevel, message);
+        trackNode(logExpression, ctx);
+        return logExpression;
+    }
+
+    @Override
+    public LogExpression visitErrorStatement(SFMLParser.ErrorStatementContext ctx) {
+        SfmlLogLevel logLevel = new SfmlLogLevel(Level.ERROR);
+        StringHolder message = visitString(ctx.string());
+        LogExpression logExpression = new LogExpression(logLevel, message);
+        trackNode(logExpression, ctx);
+        return logExpression;
+    }
+
+    @Override
+    public LogExpression visitTraceStatement(SFMLParser.TraceStatementContext ctx) {
+        SfmlLogLevel logLevel = new SfmlLogLevel(Level.TRACE);
+        StringHolder message = visitString(ctx.string());
+        LogExpression logExpression = new LogExpression(logLevel, message);
+        trackNode(logExpression, ctx);
+        return logExpression;
     }
 
 }
