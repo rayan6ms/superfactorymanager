@@ -46,7 +46,6 @@ public record ServerboundBoolExprStatementInspectionRequestPacket(
 
             context.compileAndThen(
                     msg.programString,
-                    false,
                     (program, player, managerBlockEntity) ->
                             program.astBuilder()
                                     .getNodeAtIndex(msg.inputNodeIndex)

@@ -3,11 +3,14 @@ package ca.teamdman.sfml.ast;
 import java.util.List;
 
 public record NumberRange(
-        Number start,
+        NumberExpression start,
 
-        Number end
+        NumberExpression end
 ) implements SfmlAstNode {
-    public static final NumberRange MAX_RANGE = new NumberRange(new Number(Long.MIN_VALUE), new Number(Long.MAX_VALUE));
+    public static final NumberRange MAX_RANGE = new NumberRange(
+            NumberExpression.fromLiteral(Long.MIN_VALUE),
+            NumberExpression.fromLiteral(Long.MAX_VALUE)
+    );
 
     /**
      * Inclusive
@@ -25,7 +28,7 @@ public record NumberRange(
     }
 
     @Override
-    public List<Number> getChildNodes() {
+    public List<? extends SfmlAstNode> getChildNodes() {
 
         return List.of(start, end);
     }

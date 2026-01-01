@@ -1,6 +1,6 @@
 package ca.teamdman.toml.toml_builder;
 
-import ca.teamdman.sfml.program_builder.IProgramBuildResult;
+import ca.teamdman.antlr.IProgramBuildResult;
 import ca.teamdman.toml.ast.TomlAstNode;
 import org.jetbrains.annotations.Nullable;
 

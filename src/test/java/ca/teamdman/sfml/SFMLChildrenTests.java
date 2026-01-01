@@ -1,6 +1,6 @@
 package ca.teamdman.sfml;
 
-import ca.teamdman.sfml.ast.IAstNode;
+import ca.teamdman.antlr.IAstNode;
 import ca.teamdman.sfml.ast.SFMLProgram;
 import ca.teamdman.sfml.ast.SfmlAstNode;
 import ca.teamdman.sfml.program_builder.SFMLProgramBuilder;

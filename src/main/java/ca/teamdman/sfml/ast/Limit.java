@@ -9,12 +9,12 @@ public record Limit(
         ResourceQuantity retention
 ) implements SfmlAstNode {
     public static final Limit MAX_QUANTITY_NO_RETENTION = new Limit(
-            new ResourceQuantity(NO_EXPAND, new Number(Long.MAX_VALUE)),
-            new ResourceQuantity(NO_EXPAND, new Number(0))
+            new ResourceQuantity(NO_EXPAND, NumberExpression.fromLiteral(Long.MAX_VALUE)),
+            new ResourceQuantity(NO_EXPAND, NumberExpression.fromLiteral(0))
     );
     public static final Limit MAX_QUANTITY_MAX_RETENTION = new Limit(
-            new ResourceQuantity(NO_EXPAND, new Number(Long.MAX_VALUE)),
-            new ResourceQuantity(NO_EXPAND, new Number(Long.MAX_VALUE))
+            new ResourceQuantity(NO_EXPAND, NumberExpression.fromLiteral(Long.MAX_VALUE)),
+            new ResourceQuantity(NO_EXPAND, NumberExpression.fromLiteral(Long.MAX_VALUE))
     );
 
     public static final Limit UNSET = new Limit(

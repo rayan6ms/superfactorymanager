@@ -1,9 +1,9 @@
 package ca.teamdman.sfml.ast;
 
+import ca.teamdman.antlr.IAstBuilder;
 import ca.teamdman.langs.SFMLBaseVisitor;
 import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfm.common.config.SFMConfig;
-import ca.teamdman.sfml.program_builder.IAstBuilder;
 import com.mojang.datafixers.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -38,7 +38,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     }
 
     @Override
-    public SfmlAstNode visitResource(SFMLParser.ResourceContext ctx) {
+    public ResourceIdentifier<?,?,?> visitResource(SFMLParser.ResourceContext ctx) {
 
         var str = ctx
                 .children
@@ -156,10 +156,10 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     public SfmlAstNode visitBooleanRedstone(SFMLParser.BooleanRedstoneContext ctx) {
 
         ComparisonOperator comp = ComparisonOperator.GREATER_OR_EQUAL;
-        Number num = new Number(0);
+        NumberExpression num = NumberExpression.fromLiteral(0);
         if (ctx.comparisonOp() != null && ctx.numberExpression() != null) {
             comp = visitComparisonOp(ctx.comparisonOp());
-            num = (Number) visit(ctx.numberExpression());
+            num = (NumberExpression) visit(ctx.numberExpression());
         }
         if (num.value() > Integer.MAX_VALUE) {
             throw new IllegalArgumentException("Redstone signal strength cannot be greater than " + Integer.MAX_VALUE);
@@ -179,94 +179,153 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     }
 
     @Override
-    public Number visitNumberExpressionMultiplication(SFMLParser.NumberExpressionMultiplicationContext ctx) {
+    public NumberExpression visitNumberExpressionMultiplication(SFMLParser.NumberExpressionMultiplicationContext ctx) {
 
-        Number left = (Number) visit(ctx.numberExpression(0));
-        Number right = (Number) visit(ctx.numberExpression(1));
-        Number rtn = new Number(left.value() * right.value());
+        NumberExpression left = (NumberExpression) visit(ctx.numberExpression(0));
+        NumberExpression right = (NumberExpression) visit(ctx.numberExpression(1));
+        NumberMultiplication expr = new NumberMultiplication(left, right);
+        Number value = new Number(left.value() * right.value());
+        NumberExpression rtn = new NumberExpression(value, expr);
         trackNode(rtn, ctx);
         return rtn;
     }
 
     @Override
-    public Number visitNumberExpressionLiteral(SFMLParser.NumberExpressionLiteralContext ctx) {
+    public NumberExpression visitNumberExpressionLiteral(SFMLParser.NumberExpressionLiteralContext ctx) {
 
-        Number number = new Number(Long.parseLong(ctx.getText()));
-        trackNode(number, ctx);
-        return number;
-    }
-
-    @Override
-    public Number visitNumberExpressionAddition(SFMLParser.NumberExpressionAdditionContext ctx) {
-
-        Number left = (Number) visit(ctx.numberExpression(0));
-        Number right = (Number) visit(ctx.numberExpression(1));
-        Number rtn = new Number(left.value() + right.value());
+        long value = parseNumberLiteral(ctx.getText());
+        NumberLiteral expr = new NumberLiteral(value);
+        NumberExpression rtn = new NumberExpression(new Number(value), expr);
         trackNode(rtn, ctx);
         return rtn;
     }
 
     @Override
-    public Number visitNumberExpressionSubtraction(SFMLParser.NumberExpressionSubtractionContext ctx) {
+    public SfmlAstNode visitNumberExpressionIdentifierMultiplication(SFMLParser.NumberExpressionIdentifierMultiplicationContext ctx) {
 
-        Number left = (Number) visit(ctx.numberExpression(0));
-        Number right = (Number) visit(ctx.numberExpression(1));
-        Number rtn = new Number(left.value() - right.value());
+        // This handles the case where *70 is lexed as IDENTIFIER due to greedy lexer
+        // The grammar rule is: numberExpression IDENTIFIER
+        // So we parse the left side and treat the IDENTIFIER as *<number>
+        NumberExpression left = (NumberExpression) visit(ctx.numberExpression());
+        String identifierText = ctx.IDENTIFIER().getText();
+
+        // The identifier should start with * followed by digits (e.g., *70)
+        if (!identifierText.startsWith("*")) {
+            throw new IllegalArgumentException("Expected identifier starting with * but got: " + identifierText);
+        }
+
+        // Strip the leading asterisk before parsing as number
+        long rightValue = parseNumberLiteral(identifierText.substring(1));
+        NumberExpression right = new NumberExpression(new Number(rightValue), new NumberLiteral(rightValue));
+
+        // Treat this as multiplication
+        NumberMultiplication expr = new NumberMultiplication(left, right);
+        Number value = new Number(left.value() * rightValue);
+        NumberExpression rtn = new NumberExpression(value, expr);
+        trackNode(rtn, ctx);
+        return rtn;
+    }
+
+    /**
+     * Parse a number literal, supporting underscores as digit separators (e.g., 1_000_000).
+     */
+    private long parseNumberLiteral(String text) {
+
+        // Remove underscores for readability support (e.g., 1_000_000)
+        String normalized = text.replace("_", "");
+        if (normalized.isEmpty() || !normalized.chars().allMatch(Character::isDigit)) {
+            throw new IllegalArgumentException("Invalid number literal: " + text);
+        }
+        return Long.parseLong(normalized);
+    }
+
+    @Override
+    public NumberExpression visitNumberExpressionAddition(SFMLParser.NumberExpressionAdditionContext ctx) {
+
+        NumberExpression left = (NumberExpression) visit(ctx.numberExpression(0));
+        NumberExpression right = (NumberExpression) visit(ctx.numberExpression(1));
+        NumberAddition expr = new NumberAddition(left, right);
+        Number value = new Number(left.value() + right.value());
+        NumberExpression rtn = new NumberExpression(value, expr);
         trackNode(rtn, ctx);
         return rtn;
     }
 
     @Override
-    public Number visitNumberExpressionModulus(SFMLParser.NumberExpressionModulusContext ctx) {
+    public NumberExpression visitNumberExpressionSubtraction(SFMLParser.NumberExpressionSubtractionContext ctx) {
 
-        Number left = (Number) visit(ctx.numberExpression(0));
-        Number right = (Number) visit(ctx.numberExpression(1));
-        Number rtn = new Number(left.value() % right.value());
+        NumberExpression left = (NumberExpression) visit(ctx.numberExpression(0));
+        NumberExpression right = (NumberExpression) visit(ctx.numberExpression(1));
+        NumberSubtraction expr = new NumberSubtraction(left, right);
+        Number value = new Number(left.value() - right.value());
+        NumberExpression rtn = new NumberExpression(value, expr);
         trackNode(rtn, ctx);
         return rtn;
     }
 
     @Override
-    public Number visitNumberExpressionExponential(SFMLParser.NumberExpressionExponentialContext ctx) {
+    public NumberExpression visitNumberExpressionModulus(SFMLParser.NumberExpressionModulusContext ctx) {
 
-        Number left = (Number) visit(ctx.numberExpression(0));
-        Number right = (Number) visit(ctx.numberExpression(1));
-        Number rtn = new Number((long) Math.pow(left.value(), right.value()));
+        NumberExpression left = (NumberExpression) visit(ctx.numberExpression(0));
+        NumberExpression right = (NumberExpression) visit(ctx.numberExpression(1));
+        NumberModulus expr = new NumberModulus(left, right);
+        Number value = new Number(left.value() % right.value());
+        NumberExpression rtn = new NumberExpression(value, expr);
         trackNode(rtn, ctx);
         return rtn;
     }
 
     @Override
-    public Number visitNumberExpressionDivision(SFMLParser.NumberExpressionDivisionContext ctx) {
+    public NumberExpression visitNumberExpressionExponential(SFMLParser.NumberExpressionExponentialContext ctx) {
 
-        Number left = (Number) visit(ctx.numberExpression(0));
-        Number right = (Number) visit(ctx.numberExpression(1));
+        NumberExpression left = (NumberExpression) visit(ctx.numberExpression(0));
+        NumberExpression right = (NumberExpression) visit(ctx.numberExpression(1));
+        NumberExponential expr = new NumberExponential(left, right);
+        Number value = new Number((long) Math.pow(left.value(), right.value()));
+        NumberExpression rtn = new NumberExpression(value, expr);
+        trackNode(rtn, ctx);
+        return rtn;
+    }
+
+    @Override
+    public NumberExpression visitNumberExpressionDivision(SFMLParser.NumberExpressionDivisionContext ctx) {
+
+        NumberExpression left = (NumberExpression) visit(ctx.numberExpression(0));
+        NumberExpression right = (NumberExpression) visit(ctx.numberExpression(1));
         if (right.value() == 0) {
             throw new IllegalArgumentException("Division by zero at "
                                                + IAstBuilder.getLineColumnForContext(ctx.numberExpression(1)));
         }
-        Number rtn = new Number(left.value() / right.value());
+        NumberDivision expr = new NumberDivision(left, right);
+        Number value = new Number(left.value() / right.value());
+        NumberExpression rtn = new NumberExpression(value, expr);
         trackNode(rtn, ctx);
         return rtn;
     }
 
     @Override
-    public Number visitNumberExpressionParen(SFMLParser.NumberExpressionParenContext ctx) {
+    public NumberExpression visitNumberExpressionParen(SFMLParser.NumberExpressionParenContext ctx) {
 
-        Number number = (Number) visit(ctx.numberExpression());
-        trackNode(number, ctx);
-        return number;
+        NumberExpression inner = (NumberExpression) visit(ctx.numberExpression());
+        NumberParen expr = new NumberParen(inner);
+        NumberExpression rtn = new NumberExpression(inner.number(), expr);
+        trackNode(rtn, ctx);
+        return rtn;
     }
 
     @Override
     public Interval visitInterval(SFMLParser.IntervalContext ctx) {
 
-        Number interval = (Number) visit(ctx.numberExpression(0));
+        NumberExpression interval = (NumberExpression) visit(ctx.numberExpression(0));
         DurationUnit intervalUnit = visitDurationUnit(ctx.durationUnit(0));
 
-        @Nullable Number offset = (Number) visit(ctx.numberExpression(1));
-        if (offset == null) {
-            offset = new Number(0);
+        SFMLParser.NumberExpressionContext offsetCtx = ctx.numberExpression(1);
+
+        @Nullable NumberExpression offset;
+        if (offsetCtx == null) {
+            offset = NumberExpression.fromLiteral(0);
+        } else {
+            offset = (NumberExpression) visit(offsetCtx);
         }
 
         DurationUnit offsetUnit;
@@ -351,10 +410,14 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
 
         RoundRobin roundRobin = visitRoundrobin(ctx.roundrobin());
 
-        SideQualifier sides = Objects.requireNonNullElse(
-                (SideQualifier) visit(ctx.sideQualifier()),
-                SideQualifier.NULL
-        );
+        SFMLParser.SideQualifierContext sideCtx = ctx.sideQualifier();
+
+        SideQualifier sides;
+        if (sideCtx == null) {
+            sides = SideQualifier.NULL;
+        } else {
+            sides = (SideQualifier) visit(sideCtx);
+        }
 
         SlotQualifier slots = visitSlotQualifier(ctx.slotQualifier());
 
@@ -476,7 +539,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
         var setOperator = visitSetOp(ctx.setOp());
         var resourceAccess = visitResourceAccess(ctx.resourceAccess());
         ComparisonOperator comparisonOperator = visitComparisonOp(ctx.comparisonOp());
-        Number num = (Number) visit(ctx.numberExpression());
+        NumberExpression num = (NumberExpression) visit(ctx.numberExpression());
         ResourceIdSet resourceIdSet;
         if (ctx.resourceIdDisjunction() == null) {
             resourceIdSet = ResourceIdSet.MATCH_ALL;
@@ -573,6 +636,17 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
         var left = (BoolExpr) visit(ctx.boolexpr(0));
         var right = (BoolExpr) visit(ctx.boolexpr(1));
         BoolExpr rtn = new BoolDisjunction(left, right);
+        trackNode(rtn, ctx);
+        return rtn;
+    }
+
+    @Override
+    public BoolExpr visitBooleanComparison(SFMLParser.BooleanComparisonContext ctx) {
+
+        var left = (NumberExpression) visit(ctx.numberExpression(0));
+        var op = visitComparisonOp(ctx.comparisonOp());
+        var right = (NumberExpression) visit(ctx.numberExpression(1));
+        BoolExpr rtn = new BoolComparison(left, op, right);
         trackNode(rtn, ctx);
         return rtn;
     }
@@ -811,8 +885,8 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
     @Override
     public NumberRange visitNumberRange(SFMLParser.NumberRangeContext ctx) {
 
-        Number start = (Number) visit(ctx.numberExpression(0));
-        Number end = (Number) visit(ctx.numberExpression(1));
+        NumberExpression start = (NumberExpression) visit(ctx.numberExpression(0));
+        NumberExpression end = (NumberExpression) visit(ctx.numberExpression(1));
         NumberRange numberRange = new NumberRange(
                 start,
                 Objects.requireNonNullElse(end, start)
@@ -863,7 +937,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
         ResourceQuantity quantity = new ResourceQuantity(
                 ctx.EACH() != null
                 ? ResourceQuantity.IdExpansionBehaviour.EXPAND
-                : ResourceQuantity.IdExpansionBehaviour.NO_EXPAND, (Number) visit(ctx.numberExpression())
+                : ResourceQuantity.IdExpansionBehaviour.NO_EXPAND, (NumberExpression) visit(ctx.numberExpression())
         );
         trackNode(quantity, ctx);
         return quantity;
@@ -876,7 +950,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
         ResourceQuantity quantity = new ResourceQuantity(
                 ctx.EACH() != null
                 ? ResourceQuantity.IdExpansionBehaviour.EXPAND
-                : ResourceQuantity.IdExpansionBehaviour.NO_EXPAND, (Number) visit(ctx.numberExpression())
+                : ResourceQuantity.IdExpansionBehaviour.NO_EXPAND, (NumberExpression) visit(ctx.numberExpression())
         );
         trackNode(quantity, ctx);
         return quantity;

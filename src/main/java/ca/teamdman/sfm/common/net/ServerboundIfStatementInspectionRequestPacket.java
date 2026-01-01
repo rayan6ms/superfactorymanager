@@ -46,7 +46,6 @@ public record ServerboundIfStatementInspectionRequestPacket(
 
             context.compileAndThen(
                     msg.programString,
-                    false,
                     (program, player, managerBlockEntity) -> program.astBuilder()
                             .getNodeAtIndex(msg.inputNodeIndex)
                             .filter(IfStatement.class::isInstance)

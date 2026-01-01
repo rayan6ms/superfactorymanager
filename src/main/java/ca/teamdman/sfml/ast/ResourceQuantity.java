@@ -5,12 +5,12 @@ import java.util.List;
 public record ResourceQuantity(
         IdExpansionBehaviour idExpansionBehaviour,
 
-        Number number
+        NumberExpression number
 ) implements SfmlAstNode {
     @SuppressWarnings("DataFlowIssue")
     public static final ResourceQuantity UNSET = new ResourceQuantity(IdExpansionBehaviour.NO_EXPAND, null);
     public static final ResourceQuantity MAX_QUANTITY = new ResourceQuantity(
-            IdExpansionBehaviour.NO_EXPAND, new Number(Long.MAX_VALUE)
+            IdExpansionBehaviour.NO_EXPAND, NumberExpression.fromLiteral(Long.MAX_VALUE)
     );
 
     public ResourceQuantity add(ResourceQuantity quantity) {

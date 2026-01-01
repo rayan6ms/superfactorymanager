@@ -666,7 +666,7 @@ public class SFMTextEditScreenV1 extends Screen implements ISFMTextEditScreen {
             SFMTextEditScreenV1.this.suggestedActions.setItems(suggestions);
 
             // Update the intellisense picklist query used to sort the suggestions
-            String cursorWord = buildResult.getWordAtCursorPosition(cursorPosition);
+            String cursorWord = buildResult.metadata().getWordAtCursorPosition(cursorPosition);
             SFMTextEditScreenV1.this.suggestedActions.setQuery(Component.literal(cursorWord));
 
             boolean shouldPrint = false;

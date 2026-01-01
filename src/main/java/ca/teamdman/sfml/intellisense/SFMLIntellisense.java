@@ -1,11 +1,11 @@
 package ca.teamdman.sfml.intellisense;
 
+import ca.teamdman.antlr.ext_antlr4c3.CodeCompletionCore;
 import ca.teamdman.langs.SFMLLexer;
 import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
-import ca.teamdman.sfml.ext_antlr4c3.CodeCompletionCore;
 import org.antlr.v4.runtime.Parser;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.Vocabulary;
@@ -44,7 +44,10 @@ public class SFMLIntellisense {
         CodeCompletionCore core = new CodeCompletionCore(parser, preferredRules, ignoredTokens);
 
         // Identify caret position
-        @Nullable Token caretToken = context.programBuildResult().getTokenAtCursorPosition(context.cursorPosition());
+        @Nullable Token caretToken = context
+                .programBuildResult()
+                .metadata()
+                .getTokenAtCursorPosition(context.cursorPosition());
         if (caretToken == null) return new ArrayList<>();
         int caretTokenIndex = caretToken.getTokenIndex();
 

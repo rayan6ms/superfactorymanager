@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.config.SFMConfigReadWriter;
+import ca.teamdman.sfml.program_builder.SFMLProgramBuilder;
 import net.minecraft.commands.Commands;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
@@ -50,6 +51,9 @@ public record ServerboundServerConfigUpdatePacket(
                 return;
             }
             SFMConfigReadWriter.ConfigSyncResult result = SFMConfigReadWriter.updateAndSyncServerConfig(msg.newConfig);
+            if (result==SFMConfigReadWriter.ConfigSyncResult.SUCCESS) {
+                SFMLProgramBuilder.bustCache();
+            }
             player.sendSystemMessage(result.component());
         }
 

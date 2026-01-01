@@ -26,14 +26,15 @@ trigger : EVERY interval DO block END           #TimerTrigger
 interval: numberExpression? GLOBAL? durationUnit (OFFSET BY numberExpression durationUnit?)?;
 durationUnit: (TICKS | TICK | SECONDS | SECOND);
 
-numberExpression  : NUMBER                                      # NumberExpressionLiteral         // NEEDS TEST
-                  | LPAREN numberExpression RPAREN              # NumberExpressionParen           // NEEDS TEST
-                  | numberExpression CARET numberExpression     # NumberExpressionExponential     // NEEDS TEST
-                  | numberExpression ASTERISK numberExpression  # NumberExpressionMultiplication  // NEEDS TEST
-                  | numberExpression SLASH numberExpression     # NumberExpressionDivision        // NEEDS TEST
-                  | numberExpression PLUS numberExpression      # NumberExpressionAddition        // NEEDS TEST
-                  | numberExpression DASH numberExpression      # NumberExpressionSubtraction     // NEEDS TEST
-                  | numberExpression PERCENT numberExpression   # NumberExpressionModulus         // NEEDS TEST
+numberExpression  : NUMBER                                      # NumberExpressionLiteral
+                  | LPAREN numberExpression RPAREN              # NumberExpressionParen
+                  | numberExpression CARET numberExpression     # NumberExpressionExponential
+                  | numberExpression ASTERISK numberExpression  # NumberExpressionMultiplication
+                  | numberExpression IDENTIFIER                 # NumberExpressionIdentifierMultiplication // fallback for *70 being lexed as identifier
+                  | numberExpression SLASH numberExpression     # NumberExpressionDivision
+                  | numberExpression PLUS numberExpression      # NumberExpressionAddition
+                  | numberExpression DASH numberExpression      # NumberExpressionSubtraction
+                  | numberExpression PERCENT numberExpression   # NumberExpressionModulus
                   ;
 
 block           : statement*;
@@ -105,6 +106,7 @@ boolexpr        : TRUE                              #BooleanTrue
                 | NOT boolexpr                      #BooleanNegation
                 | boolexpr AND boolexpr             #BooleanConjunction
                 | boolexpr OR boolexpr              #BooleanDisjunction
+                | numberExpression comparisonOp numberExpression  #BooleanComparison
                 | setOp? resourceAccess HAS comparisonOp numberExpression resourceIdDisjunction? with? (EXCEPT resourceIdList)?  #BooleanHas
                 | REDSTONE (comparisonOp numberExpression)?   #BooleanRedstone
                 ;
@@ -112,11 +114,13 @@ boolexpr        : TRUE                              #BooleanTrue
 comparisonOp    : GT
                 | LT
                 | EQ
+                | NE
                 | LE
                 | GE
                 | GT_SYMBOL
                 | LT_SYMBOL
                 | EQ_SYMBOL
+                | NE_SYMBOL
                 | LE_SYMBOL
                 | GE_SYMBOL
                 ;
@@ -199,6 +203,8 @@ LT        : L T ;
 LT_SYMBOL : '<' ;
 EQ        : E Q ;
 EQ_SYMBOL : '=' ;
+NE        : N E ;
+NE_SYMBOL : '!=' | '<>' ;
 LE        : L E ;
 LE_SYMBOL : '<=' ;
 GE        : G E ;
@@ -283,7 +289,7 @@ LPAREN  : '(';
 RPAREN  : ')';
 ASTERISK: '*';
 
-NUMBER                  : [0-9]+ ;
+NUMBER                  : [0-9][0-9_]* ;
 IDENTIFIER              : [a-zA-Z_*][a-zA-Z0-9_*]* | ASTERISK; // Note that the * in the square brackets is a literal
 
 STRING : '"' (~'"'|'\\"')* '"' ;

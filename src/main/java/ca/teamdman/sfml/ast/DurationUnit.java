@@ -6,7 +6,7 @@ public enum DurationUnit implements SfmlAstNode {
     TICKS,
     SECONDS;
 
-    public int toTicks(Number number) {
+    public int toTicks(NumberExpression number) {
 
         return (int) switch (this) {
             case TICKS -> number.value();

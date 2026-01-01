@@ -7,13 +7,13 @@ import java.util.List;
 import java.util.Objects;
 
 public record Interval(
-        Number interval,
+        NumberExpression interval,
 
         DurationUnit intervalUnit,
 
         IntervalAlignment alignment,
 
-        Number offset,
+        NumberExpression offset,
 
         DurationUnit offsetUnit
 ) implements SfmlAstNode {

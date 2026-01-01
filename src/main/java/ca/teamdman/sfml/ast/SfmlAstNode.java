@@ -1,5 +1,7 @@
 package ca.teamdman.sfml.ast;
 
+import ca.teamdman.antlr.IAstNode;
+
 import java.util.stream.Stream;
 
 public interface SfmlAstNode extends IAstNode<SfmlAstNode> {

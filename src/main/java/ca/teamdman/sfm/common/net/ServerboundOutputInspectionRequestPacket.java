@@ -11,7 +11,6 @@ import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.SFMASTUtils;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfml.ast.*;
-import ca.teamdman.sfml.ast.Number;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -160,7 +159,7 @@ public record ServerboundOutputInspectionRequestPacket(
                                                         found
                                                                 .limit()
                                                                 .quantity()
-                                                                .add(resourceLimit.limit().quantity()),
+                                                                .add(resourceLimit.limit().quantity()), // TODO v5: double check export inspector, might print 5+5 instead of 10
                                                         ResourceQuantity.MAX_QUANTITY
                                                 ));
                                                 condensedResourceLimitList.set(i, newLimit);
@@ -212,7 +211,7 @@ public record ServerboundOutputInspectionRequestPacket(
                                     iter.set(resourceLimit.withLimit(new Limit(
                                             new ResourceQuantity(
                                                     resourceLimit.limit().quantity().idExpansionBehaviour(),
-                                                    new Number(Long.min(
+                                                    NumberExpression.fromLiteral(Long.min(
                                                             accept,
                                                             resourceLimit
                                                                     .limit()
@@ -271,7 +270,7 @@ public record ServerboundOutputInspectionRequestPacket(
         long remainingObligation = limitedInputSlot.tracker.getRemainingRetentionObligation(resourceType, stack);
         amount -= Long.min(amount, remainingObligation);
         Limit amountLimit = new Limit(
-                new ResourceQuantity(ResourceQuantity.IdExpansionBehaviour.NO_EXPAND, new Number(amount)),
+                new ResourceQuantity(ResourceQuantity.IdExpansionBehaviour.NO_EXPAND, NumberExpression.fromLiteral(amount)),
                 ResourceQuantity.MAX_QUANTITY
         );
         ResourceLocation stackId = resourceType.getRegistryKeyForStack(stack);
@@ -320,7 +319,6 @@ public record ServerboundOutputInspectionRequestPacket(
 
             context.compileAndThen(
                     msg.programString,
-                    true,
                     (program, player, managerBlockEntity) -> program.astBuilder()
                             .getNodeAtIndex(msg.outputNodeIndex)
                             .filter(OutputStatement.class::isInstance)

@@ -1,5 +1,8 @@
 package ca.teamdman.sfml.program_builder;
 
+import ca.teamdman.antlr.ProgramBuildResult;
+import ca.teamdman.antlr.ProgramBuilder;
+import ca.teamdman.antlr.ext_antlr4c3.ProgramMetadata;
 import ca.teamdman.langs.SFMLLexer;
 import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfm.SFM;
@@ -8,32 +11,33 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
-import ca.teamdman.sfm.common.util.SFMTranslationUtils;
 import ca.teamdman.sfml.ast.ResourceIdentifier;
 import ca.teamdman.sfml.ast.SFMLProgram;
 import ca.teamdman.sfml.ast.SfmlAstBuilder;
+import ca.teamdman.sfml.ast.SfmlAstNode;
 import net.minecraft.ResourceLocationException;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.resources.ResourceLocation;
-import org.antlr.v4.runtime.CharStreams;
-import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.WeakHashMap;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
-/// Helper for building programs and acquiring a {@link SFMLProgramBuildResult}
+/// Helper for turning SFML source code into an {@link SFMLProgram} object wrapped in a {@link SFMLProgramBuildResult}.
+/// This class handles caching.
+/// The cached value MUST NOT BE MODIFIED!
+/// Despite using records in a lot of places, programs still have some spots of interior mutability that should not be mutated.
 public class SFMLProgramBuilder {
     /// Reduce duplication of effort compiling the same program over and over again
-    private static final WeakHashMap<String, SFMLProgramBuildResult> cache = new WeakHashMap<>();
+    private static final WeakHashMap<String, SFMLProgramBuildResult> CACHE = new WeakHashMap<>();
 
     /// The Super Factory Manager Language source code
     private final String programString;
 
-    /// Indicates that the resulting program may be mutated in naughty ways that we don't want interfering with our cache.
-    private boolean useCache = true;
 
     public SFMLProgramBuilder(@Nullable String programString) {
 
@@ -43,92 +47,118 @@ public class SFMLProgramBuilder {
         this.programString = programString;
     }
 
-    /// MUST be set to {@code false} if the resulting {@link SFMLProgram} will be mutated.
-    public SFMLProgramBuilder useCache(boolean useCache) {
+    /// When the server config changes, the cache should be emptied.
+    /// Timer trigger minimum interval may have changed.
+    public static void bustCache() {
 
-        this.useCache = useCache;
-        return this;
+        CACHE.clear();
     }
 
     public SFMLProgramBuildResult build(
     ) {
-
-        if (useCache) {
-            @Nullable SFMLProgramBuildResult cached = cache.get(programString);
-            if (cached != null) {
-                if (cached.metadata().errors().isEmpty()) {
-                    return cached;
-                } else {
-                    SFM.LOGGER.warn(
-                            "Program cache hit, but the program build result contained errors. Will rebuild program."
-                    );
-                }
-            }
-        }
-        SFMLLexer lexer = new SFMLLexer(CharStreams.fromString(programString));
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        SFMLParser parser = new SFMLParser(tokens);
-        SfmlAstBuilder builder = new SfmlAstBuilder();
-
-        // set up error capturing
-        lexer.removeErrorListeners();
-        parser.removeErrorListeners();
-        List<TranslatableContents> errors = new ArrayList<>();
-        List<String> buildErrors = new ArrayList<>();
-        ListErrorListener listener = new ListErrorListener(buildErrors);
-        lexer.addErrorListener(listener);
-        parser.addErrorListener(listener);
-
-        // initial parse
-        SFMLParser.ProgramContext context = parser.program();
-        buildErrors.stream().map(LocalizationKeys.PROGRAM_ERROR_LITERAL::get).forEach(errors::add);
-
-
-        // build program from AST only when there are no errors from previous phases
-        @Nullable SFMLProgram program = null;
-        if (errors.isEmpty()) {
-            try {
-                program = builder.visitProgram(context);
-                // Make sure all referenced resources are valid during compilation instead of waiting for the program to tick
-                checkResourceTypes(program, errors);
-            } catch (ResourceLocationException | IllegalArgumentException | AssertionError e) {
-                errors.add(LocalizationKeys.PROGRAM_ERROR_LITERAL.get(e.getMessage()));
-            } catch (Exception e) {
-                errors.add(LocalizationKeys.PROGRAM_ERROR_COMPILE_FAILED.get());
+        // Use cached value if available
+        @Nullable SFMLProgramBuildResult cached = CACHE.get(programString);
+        if (cached != null) {
+            if (cached.metadata().errors().isEmpty()) {
+                return cached;
+            } else {
                 SFM.LOGGER.warn(
-                        "Encountered unhandled error while compiling program\n```\n{}\n```",
-                        programString,
-                        e
+                        "Program cache hit, but the program build result contained errors. Will rebuild program."
                 );
-                var message = e.getMessage();
-                if (message != null) {
-                    errors.add(SFMTranslationUtils.getTranslatableContents(
-                            e.getClass().getSimpleName() + ": " + message
-                    ));
-                } else {
-                    errors.add(SFMTranslationUtils.getTranslatableContents(e.getClass().getSimpleName()));
-                }
             }
         }
 
-        SFMLProgramMetadata metadata = new SFMLProgramMetadata(
-                programString,
-                lexer,
-                tokens,
-                parser,
-                builder,
-                errors
+        // Build the program
+        ProgramBuilder<SfmlAstNode, SFMLLexer, SFMLParser, SfmlAstBuilder> programBuilder = new ProgramBuilder<>(
+                SFMLLexer::new,
+                SFMLParser::new,
+                SfmlAstBuilder::new,
+                programString
         );
-        SFMLProgramBuildResult programBuildResult = new SFMLProgramBuildResult(program, metadata);
+        ProgramBuildResult<SfmlAstNode, SFMLProgram, SFMLLexer, SFMLParser, SfmlAstBuilder, ProgramMetadata<SfmlAstNode, SFMLLexer, SFMLParser, SfmlAstBuilder>> result
+                = programBuilder.build(SFMLParser::program, SfmlAstBuilder::visitProgram);
+
+        // Perform SFML-specific checks
+        result.caseSuccess(program -> checkResourceTypes(program, result.metadata().errors()));
+
+        // Convert the result to SFML-specific types
+        SFMLProgramMetadata metadata = new SFMLProgramMetadata(result.metadata());
+        SFMLProgramBuildResult programBuildResult = new SFMLProgramBuildResult(result.maybeProgram(), metadata);
 
         // We don't cache results with errors because the server config can change, and it affects the outcome.
-        if (useCache && buildErrors.isEmpty()) {
-            cache.put(programString, programBuildResult);
+        if (metadata.errors().isEmpty()) {
+            CACHE.put(programString, programBuildResult);
         }
 
         return programBuildResult;
     }
 
+    public <PROGRAM, CONTEXT> ProgramBuildResult<SfmlAstNode, PROGRAM, SFMLLexer, SFMLParser, SfmlAstBuilder, ProgramMetadata<SfmlAstNode, SFMLLexer, SFMLParser, SfmlAstBuilder>> build(
+            Function<SFMLParser, CONTEXT> contextFn,
+            BiFunction<SfmlAstBuilder, CONTEXT, PROGRAM> astFn
+    ) {
+        // Build the program
+        ProgramBuilder<SfmlAstNode, SFMLLexer, SFMLParser, SfmlAstBuilder> programBuilder = new ProgramBuilder<>(
+                SFMLLexer::new,
+                SFMLParser::new,
+                SfmlAstBuilder::new,
+                programString
+        );
+
+        return programBuilder.build(contextFn, astFn);
+    }
+
+    public <PROGRAM, CONTEXT1, CONTEXT2> ProgramBuildResult<SfmlAstNode, PROGRAM, SFMLLexer, SFMLParser, SfmlAstBuilder, ProgramMetadata<SfmlAstNode, SFMLLexer, SFMLParser, SfmlAstBuilder>> build(
+            Function<SFMLParser, CONTEXT1> contextFn,
+            BiFunction<SfmlAstBuilder, CONTEXT2, PROGRAM> astFn,
+            Class<? extends CONTEXT2> contextClass
+    ) {
+        ProgramBuilder<SfmlAstNode, SFMLLexer, SFMLParser, SfmlAstBuilder> programBuilder = new ProgramBuilder<>(
+                SFMLLexer::new,
+                SFMLParser::new,
+                SfmlAstBuilder::new,
+                programString
+        );
+
+        return programBuilder.build(contextFn, (builder, context) -> {
+            CONTEXT2 castedContext = contextClass.cast(context);
+            return astFn.apply(builder, castedContext);
+        });
+    }
+
+    public <PROGRAM, CONTEXT extends ParseTree> ProgramBuildResult<SfmlAstNode, PROGRAM, SFMLLexer, SFMLParser, SfmlAstBuilder, ProgramMetadata<SfmlAstNode, SFMLLexer, SFMLParser, SfmlAstBuilder>> build(
+            Function<SFMLParser, CONTEXT> contextFn,
+            Class<PROGRAM> outClass
+    ) {
+        ProgramBuilder<SfmlAstNode, SFMLLexer, SFMLParser, SfmlAstBuilder> programBuilder = new ProgramBuilder<>(
+                SFMLLexer::new,
+                SFMLParser::new,
+                SfmlAstBuilder::new,
+                programString
+        );
+
+        return programBuilder.build(contextFn, (builder, context) -> {
+            SfmlAstNode node = builder.visit(context);
+            return outClass.cast(node);
+        });
+    }
+
+    public <PROGRAM> ProgramBuildResult<SfmlAstNode, PROGRAM, SFMLLexer, SFMLParser, SfmlAstBuilder, ProgramMetadata<SfmlAstNode, SFMLLexer, SFMLParser, SfmlAstBuilder>> build(
+            Function<SFMLParser, ParseTree> contextFn
+    ) {
+        ProgramBuilder<SfmlAstNode, SFMLLexer, SFMLParser, SfmlAstBuilder> programBuilder = new ProgramBuilder<>(
+                SFMLLexer::new,
+                SFMLParser::new,
+                SfmlAstBuilder::new,
+                programString
+        );
+
+        return programBuilder.build(contextFn, (builder, context) -> {
+            SfmlAstNode node = builder.visit(context);
+            //noinspection unchecked
+            return (PROGRAM) node;
+        });
+    }
 
     private static void checkResourceTypes(
             SFMLProgram program,

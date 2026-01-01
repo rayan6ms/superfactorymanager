@@ -30,7 +30,6 @@ public class SFMGameTestMethodHelpers {
         AtomicReference<SFMLProgram> rtn = new AtomicReference<>();
 
         new SFMLProgramBuilder(code)
-                .useCache(false)
                 .build()
                 .caseSuccess((program, metadata) -> rtn.set(program))
                 .caseFailure((metadata) -> {

@@ -3,7 +3,6 @@ package ca.teamdman.sfml;
 import ca.teamdman.langs.SFMLLexer;
 import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfml.ast.*;
-import ca.teamdman.sfml.ast.Number;
 import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.junit.jupiter.api.Test;
@@ -83,13 +82,13 @@ public class CodegenTests {
                 new SfmlAstBuilder(),
                 "hello world",
                 List.of(new TimerTrigger(
-                        new Interval(new Number(20), DurationUnit.TICKS, Interval.IntervalAlignment.LOCAL, new Number(0), DurationUnit.TICKS),
+                        new Interval(NumberExpression.fromLiteral(20), DurationUnit.TICKS, Interval.IntervalAlignment.LOCAL, NumberExpression.fromLiteral(0), DurationUnit.TICKS),
                         new Block(List.of(new IfStatement(
                                 new BoolHas(
                                         SetOperator.OVERALL,
                                         aLabel,
                                         ComparisonOperator.GREATER_OR_EQUAL,
-                                        new Number(10),
+                                        NumberExpression.fromLiteral(10),
                                         new ResourceIdSet(List.of(ResourceIdentifier.fromString("sfm:item:.*:.*"))),
                                         With.ALWAYS_TRUE,
                                         ResourceIdSet.EMPTY

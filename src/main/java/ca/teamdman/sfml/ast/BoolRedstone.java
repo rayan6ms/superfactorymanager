@@ -6,7 +6,7 @@ import net.minecraft.world.level.Level;
 
 import java.util.List;
 
-public record BoolRedstone(ComparisonOperator operator, Number number) implements BoolExpr {
+public record BoolRedstone(ComparisonOperator operator, NumberExpression number) implements BoolExpr {
     @Override
     public boolean test(ProgramContext programContext) {
 

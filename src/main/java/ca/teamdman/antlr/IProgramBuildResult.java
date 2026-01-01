@@ -1,14 +1,23 @@
-package ca.teamdman.sfml.program_builder;
+package ca.teamdman.antlr;
 
-import org.antlr.v4.runtime.Token;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
-public interface IProgramBuildResult<PROGRAM, METADATA extends IProgramMetadata<?, ?, ?>, SELF extends IProgramBuildResult<PROGRAM, METADATA, SELF>> {
+/// The potentially unsuccessful result of transforming a {@link String} into a {@link PROGRAM} {@link IAstNode}.
+@SuppressWarnings("UnusedReturnValue")
+public interface IProgramBuildResult<PROGRAM, METADATA extends IProgramMetadata<?, ?, ?, ?>, SELF extends IProgramBuildResult<PROGRAM, METADATA, SELF>> {
 
+    /// If the compilation failed, this may be {@code null}.
     PROGRAM maybeProgram();
+
+    /// Useful for testing, asserts that program is not null
+    default @NotNull PROGRAM unwrapProgram() {
+        return Objects.requireNonNull(maybeProgram());
+    }
 
     METADATA metadata();
 
@@ -29,8 +38,19 @@ public interface IProgramBuildResult<PROGRAM, METADATA extends IProgramMetadata<
         return (SELF) this;
     }
 
+    default SELF caseSuccess(
+            Consumer<PROGRAM> callback
+    ) {
+
+        if (isBuildSuccessful()) {
+            callback.accept(this.maybeProgram());
+        }
+        //noinspection unchecked
+        return (SELF) this;
+    }
+
     default SELF caseFailure(
-            BiConsumer<PROGRAM, METADATA> callback
+            BiConsumer<@Nullable PROGRAM, METADATA> callback
     ) {
 
         if (!isBuildSuccessful()) {
@@ -50,6 +70,7 @@ public interface IProgramBuildResult<PROGRAM, METADATA extends IProgramMetadata<
         //noinspection unchecked
         return (SELF) this;
     }
+
     default SELF caseFailure(
             Runnable callback
     ) {
@@ -59,33 +80,6 @@ public interface IProgramBuildResult<PROGRAM, METADATA extends IProgramMetadata<
         }
         //noinspection unchecked
         return (SELF) this;
-    }
-
-    default @Nullable Token getTokenAtCursorPosition(int cursorPos) {
-
-        for (Token token : metadata().tokens().getTokens()) {
-            if (token.getStartIndex() <= cursorPos && token.getStopIndex() + 1 >= cursorPos) {
-                return token;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * @param cursorPos The cursor position
-     * @return The sequence of non-whitespace characters to the left of the cursor
-     */
-    default String getWordAtCursorPosition(int cursorPos) {
-
-        StringBuilder word = new StringBuilder();
-        for (int i = cursorPos - 1; i >= 0; i--) {
-            char c = this.metadata().programString().charAt(i);
-            if (Character.isWhitespace(c)) {
-                break;
-            }
-            word.insert(0, c);
-        }
-        return word.toString();
     }
 
 }

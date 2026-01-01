@@ -1,8 +1,9 @@
 package ca.teamdman.toml.toml_builder;
 
+import ca.teamdman.antlr.IProgramMetadata;
 import ca.teamdman.langs.TomlLexer;
 import ca.teamdman.langs.TomlParser;
-import ca.teamdman.sfml.program_builder.IProgramMetadata;
+import ca.teamdman.toml.ast.TomlAstNode;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import org.antlr.v4.runtime.CommonTokenStream;
 
@@ -20,5 +21,5 @@ public record TomlProgramMetadata(
         TomlAstBuilder astBuilder,
 
         List<TranslatableContents> errors
-) implements IProgramMetadata<TomlLexer, TomlParser, TomlAstBuilder> {
+) implements IProgramMetadata<TomlAstNode, TomlLexer, TomlParser, TomlAstBuilder> {
 }

@@ -10,8 +10,6 @@ import java.util.List;
 public record SideQualifier(List<Side> sides) implements SfmlAstNode {
     public static final SideQualifier NULL = new SideQualifier(List.of(Side.NULL));
 
-    public static final SideQualifier DEFAULT = NULL;
-
     public static final SideQualifier ALL = new SideQualifier(List.of(
             Side.TOP, Side.BOTTOM, Side.NORTH, Side.SOUTH, Side.EAST, Side.WEST, Side.NULL
     ));

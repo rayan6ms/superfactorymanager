@@ -2,26 +2,29 @@ package ca.teamdman.sfml.ast;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.function.BiPredicate;
 
-public enum ComparisonOperator implements SfmlAstNode, BiPredicate<Long, Long>, ToStringPretty {
+public enum ComparisonOperator implements SfmlAstNode, ToStringPretty, BiLongPredicate {
     GREATER((a, b) -> a > b),
     LESSER((a, b) -> a < b),
-    EQUALS(Long::equals),
+    EQUALS((a, b) -> a == b),
+    NOT_EQUAL((a, b) -> a != b),
     LESSER_OR_EQUAL((a, b) -> a <= b),
     GREATER_OR_EQUAL((a, b) -> a >= b);
 
-    private final BiPredicate<Long, Long> PRED;
+    private final BiLongPredicate predicate;
 
-    ComparisonOperator(BiPredicate<Long, Long> pred) {
-        this.PRED = pred;
+    ComparisonOperator(BiLongPredicate predicate) {
+
+        this.predicate = predicate;
     }
 
     public static ComparisonOperator from(String text) {
+
         return switch (text.toUpperCase(Locale.ROOT)) {
             case "GT", ">" -> GREATER;
             case "LT", "<" -> LESSER;
             case "EQ", "=" -> EQUALS;
+            case "NE", "!=", "<>" -> NOT_EQUAL;
             case "LE", "<=" -> LESSER_OR_EQUAL;
             case "GE", ">=" -> GREATER_OR_EQUAL;
             default -> throw new IllegalArgumentException("Invalid comparison operator: " + text);
@@ -30,18 +33,24 @@ public enum ComparisonOperator implements SfmlAstNode, BiPredicate<Long, Long>, 
 
     @Override
     public String toString() {
+
         return switch (this) {
             case GREATER -> ">";
             case LESSER -> "<";
             case EQUALS -> "=";
+            case NOT_EQUAL -> "!=";
             case LESSER_OR_EQUAL -> "<=";
             case GREATER_OR_EQUAL -> ">=";
         };
     }
 
     @Override
-    public boolean test(Long a, Long b) {
-        return PRED.test(a, b);
+    public boolean test(
+            long a,
+            long b
+    ) {
+
+        return predicate.test(a, b);
     }
 
     @Override
@@ -49,4 +58,5 @@ public enum ComparisonOperator implements SfmlAstNode, BiPredicate<Long, Long>, 
 
         return List.of();
     }
+
 }

@@ -1,8 +1,8 @@
 package ca.teamdman.toml.toml_builder;
 
+import ca.teamdman.antlr.IAstBuilder;
 import ca.teamdman.langs.TomlParser;
 import ca.teamdman.langs.TomlParserBaseVisitor;
-import ca.teamdman.sfml.program_builder.IAstBuilder;
 import ca.teamdman.toml.ast.TomlAstNode;
 import com.mojang.datafixers.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;

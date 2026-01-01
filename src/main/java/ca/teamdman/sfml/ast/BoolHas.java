@@ -17,7 +17,7 @@ public record BoolHas(
 
         ComparisonOperator comparisonOperator,
 
-        Number quantity,
+        NumberExpression quantity,
 
         ResourceIdSet resourceIdSet,
 

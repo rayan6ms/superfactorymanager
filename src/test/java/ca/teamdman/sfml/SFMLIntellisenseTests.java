@@ -1,17 +1,17 @@
 package ca.teamdman.sfml;
 
+import ca.teamdman.antlr.IAstNode;
+import ca.teamdman.antlr.IProgramBuildResult;
+import ca.teamdman.antlr.ext_antlr4c3.CodeCompletionCore;
 import ca.teamdman.langs.SFMLLexer;
 import ca.teamdman.langs.SFMLParser;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditorIntellisenseLevel;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.SFMDisplayUtils;
-import ca.teamdman.sfml.ast.IAstNode;
 import ca.teamdman.sfml.ast.SFMLProgram;
-import ca.teamdman.sfml.ext_antlr4c3.CodeCompletionCore;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
 import ca.teamdman.sfml.intellisense.IntellisenseContext;
 import ca.teamdman.sfml.intellisense.SFMLIntellisense;
-import ca.teamdman.sfml.program_builder.IProgramBuildResult;
 import ca.teamdman.sfml.program_builder.SFMLProgramBuildResult;
 import ca.teamdman.sfml.program_builder.SFMLProgramBuilder;
 import com.mojang.datafixers.util.Pair;
@@ -382,7 +382,9 @@ public class SFMLIntellisenseTests {
                 Set.of(SFMLLexer.WS, SFMLLexer.EOF)
         );
         String needle = "stone";
-        Token caretToken = buildResult.getTokenAtCursorPosition(programString.indexOf(needle) + needle.length() / 2);
+        Token caretToken = buildResult
+                .metadata()
+                .getTokenAtCursorPosition(programString.indexOf(needle) + needle.length() / 2);
         assert caretToken != null;
         int caretTokenIndex = caretToken.getTokenIndex();
         System.out.printf("%s\n", SFMDisplayUtils.getCursorTokenDisplay(buildResult, caretToken.getStartIndex() + 1));
@@ -441,7 +443,9 @@ public class SFMLIntellisenseTests {
                 Set.of(SFMLLexer.WS, SFMLLexer.EOF)
         );
         String needle = "chest";
-        Token caretToken = buildResult.getTokenAtCursorPosition(programString.indexOf(needle) + needle.length() / 2);
+        Token caretToken = buildResult
+                .metadata()
+                .getTokenAtCursorPosition(programString.indexOf(needle) + needle.length() / 2);
         assert caretToken != null;
         int caretTokenIndex = caretToken.getTokenIndex();
         System.out.printf("%s\n", SFMDisplayUtils.getCursorTokenDisplay(buildResult, caretToken.getStartIndex() + 1));
@@ -492,7 +496,7 @@ public class SFMLIntellisenseTests {
         int resourceCaret = PROGRAM_SNIPPET.indexOf("iron_ingot") + 4;
 
         // 3) Find the Token covering that caret position
-        Token caretToken = buildResult.getTokenAtCursorPosition(resourceCaret);
+        Token caretToken = buildResult.metadata().getTokenAtCursorPosition(resourceCaret);
         assertNotNull(caretToken, "Should find a token around IRON_INGOT");
         int caretTokenIndex = caretToken.getTokenIndex();
 
@@ -534,7 +538,7 @@ public class SFMLIntellisenseTests {
         // Cursor in "Minecart"
         int labelCaret = PROGRAM_SNIPPET.indexOf("my_chest") + 3;
 
-        Token caretToken = buildResult.getTokenAtCursorPosition(labelCaret);
+        Token caretToken = buildResult.metadata().getTokenAtCursorPosition(labelCaret);
         assertNotNull(caretToken, "Should find a token around Minecart");
         int caretTokenIndex = caretToken.getTokenIndex();
 

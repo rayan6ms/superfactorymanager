@@ -4,7 +4,6 @@ import ca.teamdman.sfm.common.program.LimitedInputSlot;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfml.ast.*;
-import ca.teamdman.sfml.ast.Number;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.resources.ResourceLocation;
@@ -70,7 +69,7 @@ public class SFMASTUtils {
                 new SlotQualifier(
                         false,
                         new NumberSet(
-                                new NumberRange[]{new NumberRange(new Number(slot), new Number(slot))},
+                                new NumberRange[]{new NumberRange(NumberExpression.fromLiteral(slot), NumberExpression.fromLiteral(slot))},
                                 new NumberRange[]{}
                         )
                 )
@@ -78,10 +77,10 @@ public class SFMASTUtils {
         Limit limit = new Limit(
                 new ResourceQuantity(
                         ResourceQuantity.IdExpansionBehaviour.NO_EXPAND,
-                        new ca.teamdman.sfml.ast.Number(resourceType.getAmount(stack))
+                        NumberExpression.fromLiteral(resourceType.getAmount(stack))
                 ),
                 new ResourceQuantity(
-                        ResourceQuantity.IdExpansionBehaviour.NO_EXPAND, new Number(0)
+                        ResourceQuantity.IdExpansionBehaviour.NO_EXPAND, NumberExpression.fromLiteral(0)
                 )
         );
         ResourceLocation stackId = resourceType.getRegistryKeyForStack(stack);

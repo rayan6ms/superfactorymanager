@@ -1,14 +1,14 @@
 package ca.teamdman.sfm.common.util;
 
+import ca.teamdman.antlr.IAstBuilder;
+import ca.teamdman.antlr.IAstNode;
+import ca.teamdman.antlr.IProgramBuildResult;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditorIntellisenseLevel;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfml.ast.IAstNode;
 import ca.teamdman.sfml.intellisense.IntellisenseAction;
 import ca.teamdman.sfml.intellisense.IntellisenseContext;
 import ca.teamdman.sfml.intellisense.SFMLIntellisense;
-import ca.teamdman.sfml.program_builder.IAstBuilder;
-import ca.teamdman.sfml.program_builder.IProgramBuildResult;
 import com.mojang.datafixers.util.Pair;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
@@ -48,7 +48,7 @@ public class SFMDisplayUtils {
                 .stream()
                 .filter(token -> token.getStartIndex() - 10 <= cursorPos && token.getStopIndex() + 10 >= cursorPos)
                 .toList();
-        var activeToken = buildResult.getTokenAtCursorPosition(cursorPos);
+        var activeToken = buildResult.metadata().getTokenAtCursorPosition(cursorPos);
         if (activeToken == null) {
             return "[ COULDN'T FIND CURSOR TOKEN ]";
         }
