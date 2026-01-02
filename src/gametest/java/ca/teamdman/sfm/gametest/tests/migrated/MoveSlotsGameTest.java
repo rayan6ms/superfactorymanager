@@ -56,7 +56,7 @@ public class MoveSlotsGameTest extends SFMGameTestDefinition {
         manager.setProgram("""
                                        EVERY 20 TICKS DO
                                            INPUT FROM a TOP SIDE SLOTS 0,1,3-4,5
-                                           OUTPUT TO a SLOTS 2
+                                           OUTPUT TO a SLOTS 2 -- note this isn't moving to b, which is fine cause slot 2 isn't one of the input slots we are checking
                                        END
                                    """.stripTrailing().stripIndent());
 
@@ -67,15 +67,15 @@ public class MoveSlotsGameTest extends SFMGameTestDefinition {
                 .save(Objects.requireNonNull(manager.getDisk()));
 
         helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
-            assertTrue(leftChest.getStackInSlot(0).isEmpty(), "slot 0 did not leave");
-            assertTrue(leftChest.getStackInSlot(1).isEmpty(), "slot 1 did not leave");
-            assertTrue(leftChest.getStackInSlot(3).isEmpty(), "slot 3 did not leave");
-            assertTrue(leftChest.getStackInSlot(4).isEmpty(), "slot 4 did not leave");
-            assertTrue(leftChest.getStackInSlot(5).isEmpty(), "slot 5 did not leave");
-            assertTrue(leftChest.getStackInSlot(2).getCount() == 25, "Items did not transfer to slot 2");
+            assertTrue(leftChest.getStackInSlot(0).isEmpty(), "slot 0 should leave");
+            assertTrue(leftChest.getStackInSlot(1).isEmpty(), "slot 1 should leave");
+            assertTrue(leftChest.getStackInSlot(3).isEmpty(), "slot 3 should leave");
+            assertTrue(leftChest.getStackInSlot(4).isEmpty(), "slot 4 should leave");
+            assertTrue(leftChest.getStackInSlot(5).isEmpty(), "slot 5 should leave");
+            assertTrue(leftChest.getStackInSlot(2).getCount() == 25, "Items should transfer to slot 2");
             assertTrue(IntStream
                                .range(0, rightChest.getSlots())
-                               .allMatch(slot -> rightChest.getStackInSlot(slot).isEmpty()), "Chest b is not empty");
+                               .allMatch(slot -> rightChest.getStackInSlot(slot).isEmpty()), "Chest b should be empty");
 
         });
     }
