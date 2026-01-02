@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.registry;
 
 
+import ca.teamdman.sfm.common.event_bus.SFMAutomaticEventSubscriber;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import net.minecraft.client.Minecraft;
@@ -25,7 +26,13 @@ import java.util.stream.StreamSupport;
 public final class SFMRegistryWrapper<T> implements Iterable<T> {
     private final ResourceKey<? extends Registry<T>> registryKey;
 
+    /// TODO: invalidate on server join because registries are tied to levels
+    /// We need to update {@link SFMAutomaticEventSubscriber} to add support for non-static contexts.
+    /// For example, the SFMRegistryWrapper constructor should be able to call a simple method to register a method on {@code this}
+    /// https://discord.com/channels/105003061147086848/375860824457084931/1456447754921312400
     private @Nullable IForgeRegistry<T> maybeInner;
+
+    /// TODO v5: also invalidate this, see above
     private @Nullable Registry<T> maybeInnerVanilla;
 
     public SFMRegistryWrapper(
