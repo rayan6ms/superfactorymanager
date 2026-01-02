@@ -75,7 +75,7 @@ public record NumberSet(
     public static NumberSet of(int... i) {
         NumberRange[] ranges = new NumberRange[i.length];
         for (int j = 0; j < i.length; j++) {
-            ranges[j] = new NumberRange(
+            ranges[j] = NumberRange.ofInclusive(
                     NumberExpression.fromLiteral(i[j]),
                     NumberExpression.fromLiteral(i[j])
             );

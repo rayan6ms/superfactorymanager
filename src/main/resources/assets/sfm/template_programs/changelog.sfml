@@ -17,6 +17,12 @@ PRINT 2+2
 --   EVERY 20G+1 DO END -- ugly, unclear, looks like math but isn't
 -- After:
      EVERY 20 GLOBAL TICKS OFFSET BY 1 DO END
+-- Update slots syntax to use rust range notation instead of a "-" dash which is now used by math parsing
+EVERY 20 TICKS DO
+  INPUT FROM chest SLOTS 1,2 TO 7,10
+  -- previously
+--INPUT FROM chest SLOTS 1,2-7,10
+END
 
 ---- 4.28.0 ----
 -- Fix #430 where fancy cable improperly visually connects to blocks it should not

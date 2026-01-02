@@ -56,6 +56,17 @@ public final class NumberExpression implements SfmlAstNode, ToStringPretty, Disp
     }
 
     /**
+     * Subtract one number expression from another, creating a new NumberExpression with the result.
+     * The resulting expression type is NumberSubtraction to preserve the operation structure.
+     */
+    public NumberExpression subtract(NumberExpression other) {
+
+        NumberSubtraction expr = new NumberSubtraction(this, other);
+        Number resultValue = new Number(this.value() - other.value());
+        return new NumberExpression(resultValue, expr);
+    }
+
+    /**
      * Create a NumberExpression from a literal value
      */
     public static NumberExpression fromLiteral(long value) {

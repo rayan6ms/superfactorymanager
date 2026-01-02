@@ -302,9 +302,8 @@ public class SfmNumberSetTests {
         }
 
         @Test
-        public void parseRangeWithParens() {
-            // Use parens to disambiguate range from subtraction
-            NumberSet parsed = parseSet("(1)-(5)");
+        public void parseInclusiveRange() {
+            NumberSet parsed = parseSet("1 TO 5");
             assertEquals(1, parsed.ranges().length);
             assertEquals(1, parsed.ranges()[0].start().value());
             assertEquals(5, parsed.ranges()[0].end().value());
@@ -312,8 +311,7 @@ public class SfmNumberSetTests {
 
         @Test
         public void parseMixedValuesAndRanges() {
-            // 1,2,3,(4)-(6) - use parens for range
-            NumberSet parsed = parseSet("1,2,3,(4)-(6)");
+            NumberSet parsed = parseSet("1,2,3,4 TO 6");
             // Should compact to 1-6
             assertEquals(1, parsed.ranges().length);
             assertEquals(1, parsed.ranges()[0].start().value());
@@ -322,7 +320,7 @@ public class SfmNumberSetTests {
 
         @Test
         public void parseDisjointRanges() {
-            NumberSet parsed = parseSet("(1)-(3),(10)-(15)");
+            NumberSet parsed = parseSet("1 TO 3,10 TO 15");
             assertEquals(2, parsed.ranges().length);
         }
     }
@@ -339,7 +337,7 @@ public class SfmNumberSetTests {
         @Test
         public void toStringRange() {
             NumberSet set = NumberSet.of(range(1, 5));
-            assertEquals("1-5", set.toString());
+            assertEquals("1 TO 5", set.toString());
         }
 
         @Test
@@ -348,7 +346,7 @@ public class SfmNumberSetTests {
                     new NumberRange[]{range(1, 3), range(10, 15)},
                     new NumberRange[]{}
             );
-            assertEquals("1-3,10-15", set.toString());
+            assertEquals("1 TO 3,10 TO 15", set.toString());
         }
 
         @Test
@@ -357,7 +355,7 @@ public class SfmNumberSetTests {
                     new NumberRange[]{range(1, 10)},
                     new NumberRange[]{range(5)}
             );
-            assertEquals("1-10,NOT 5", set.toString());
+            assertEquals("1 TO 10,NOT 5", set.toString());
         }
     }
 

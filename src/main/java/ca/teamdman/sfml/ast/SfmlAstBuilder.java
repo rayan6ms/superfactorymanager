@@ -884,7 +884,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
             end = (NumberExpression) visit(endCtx);
         }
 
-        NumberRange numberRange = new NumberRange(
+        NumberRange numberRange = NumberRange.ofInclusive(
                 start,
                 end
         );

@@ -179,7 +179,7 @@ side            : TOP
 
 slotQualifier   : EACH? (SLOTS | SLOT) numberSet;                   // NEEDS TEST
 numberSet       : numberRange (COMMA numberRange)*;
-numberRange     : NOT? numberExpression (DASH numberExpression)? ;  // NEEDS TEST
+numberRange     : NOT? numberExpression (TO numberExpression)? ;  // NEEDS TEST
 
 
 emptyslots      : EMPTY (SLOTS | SLOT) IN ;
