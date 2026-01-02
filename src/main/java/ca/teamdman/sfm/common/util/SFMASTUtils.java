@@ -66,13 +66,7 @@ public class SFMASTUtils {
         ResourceAccess resourceAccess = new ResourceAccess(
                 List.of(new LabelExpressionSingle(new Label(label))),
                 new RoundRobin(RoundRobinBehaviour.UNMODIFIED), new SideQualifier(List.of(Side.fromDirection(direction))),
-                new SlotQualifier(
-                        false,
-                        new NumberSet(
-                                new NumberRange[]{new NumberRange(NumberExpression.fromLiteral(slot), NumberExpression.fromLiteral(slot))},
-                                new NumberRange[]{}
-                        )
-                )
+                new SlotQualifier(false, NumberSet.of(slot))
         );
         Limit limit = new Limit(
                 new ResourceQuantity(

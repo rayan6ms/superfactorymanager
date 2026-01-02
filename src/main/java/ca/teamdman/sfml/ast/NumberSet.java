@@ -51,5 +51,36 @@ public record NumberSet(
         rtn.addAll(Arrays.asList(exclusions));
         return rtn;
     }
+    
+    /// Given something like 1,2,3,4-6 transform to 1-6
+    public NumberSet compact() {
+        return new NumberSet(NumberRange.compactRanges(ranges), NumberRange.compactRanges(exclusions));
+    }
+
+    public static NumberSet of(NumberRange[] ranges, NumberRange[] exclusions) {
+        return new NumberSet(
+                NumberRange.compactRanges(ranges),
+                NumberRange.compactRanges(exclusions)
+        );
+    }
+
+    public static NumberSet of(NumberRange[] ranges) {
+        return of(ranges, new NumberRange[]{});
+    }
+
+    public static NumberSet of(NumberRange range) {
+        return of(new NumberRange[]{range}, new NumberRange[]{});
+    }
+
+    public static NumberSet of(int... i) {
+        NumberRange[] ranges = new NumberRange[i.length];
+        for (int j = 0; j < i.length; j++) {
+            ranges[j] = new NumberRange(
+                    NumberExpression.fromLiteral(i[j]),
+                    NumberExpression.fromLiteral(i[j])
+            );
+        }
+        return of(ranges, new NumberRange[]{});
+    }
 
 }

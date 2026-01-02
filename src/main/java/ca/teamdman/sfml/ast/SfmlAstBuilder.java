@@ -864,7 +864,7 @@ public class SfmlAstBuilder extends SFMLBaseVisitor<SfmlAstNode> implements IAst
                 exclude.add(range);
             }
         }
-        NumberSet numberSet = new NumberSet(
+        NumberSet numberSet = NumberSet.of(
                 include.toArray(NumberRange[]::new),
                 exclude.toArray(NumberRange[]::new)
         );
