@@ -53,7 +53,7 @@ public class LimitedInputSlot<STACK, ITEM, CAP> implements LimitedSlot<STACK, IT
             return true;
         }
 
-        STACK stack = this.peekMaxExtractPotential();
+        STACK stack = this.peekStackInSlot();
         if (type.isEmpty(stack)) {
             done = true;
             return true;
@@ -82,32 +82,21 @@ public class LimitedInputSlot<STACK, ITEM, CAP> implements LimitedSlot<STACK, IT
 
     /// The content of the slot, this may exceed the max stack size.
     ///
-    /// This MUST NOT be used when determining if the slot is done because it has nothing left to extract;
-    /// some slots are insert-only and may report as having a stack in the slot;
-    /// use {@link #peekMaxExtractPotential()} instead in such cases.
+    /// For example, a dank storage dock can have 256 items in a slot, but if we queried extraction, it would say 64.
     ///
-    /// Note that this is still used in {@link ca.teamdman.sfml.ast.OutputStatement#moveTo(ProgramContext, LimitedInputSlot, LimitedOutputSlot)}
-    /// because that method is responsible for determining retention obligations and must be able to see the full contents
-    /// of the
+    /// Some slots are insert-only and may report as having a stack in the slot but return nothing during extraction.
+    ///
+    /// Note well the difference between these two:
+    /// ```java
+    /// type.getStackInSlot(handler, slot);                // can be greater than max-stack-size
+    /// type.extract(handler, slot, Long.MAX_VALUE, true); // can be zero when the above is non-zero
+    /// ```
     public STACK peekStackInSlot() {
-
         if (stackInSlotCache == null) {
-            // We use getStackInSlot because it can return values greater than max-stack-size
-            // For example, a dank storage dock can have 256 items in a slot but if we queried extraction it would say 64
             stackInSlotCache = type.getStackInSlot(handler, slot);
-//            extractSimulateCache = type.extract(handler, slot, Long.MAX_VALUE, true);
         }
         return stackInSlotCache;
     }
-
-    /// The maximum single-operation transfer-out result, likely clamped to max stack size.
-    ///
-    /// This MUST NOT be used when calculating retention.
-    public STACK peekMaxExtractPotential() {
-
-        return type.extract(handler, slot, Long.MAX_VALUE, true);
-    }
-
 
     @SuppressWarnings("DuplicatedCode")
     public void init(

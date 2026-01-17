@@ -204,6 +204,13 @@ public class OutputStatement implements IOStatement {
                 .getLogger()
                 .debug(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_EXTRACTED.get(extracted, source)));
 
+        if (resourceType.isEmpty(extracted)) {
+            // this slot is insert-only; it reports a stack in the slot but refuses extraction
+            context.getLogger().trace(x -> x.accept(LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_EXTRACTED_NOTHING.get()));
+            source.setDone();
+            return;
+        }
+
         // insert item for real
         STACK extractedRemainder = destination.insert(extracted, false);
 
