@@ -39,6 +39,7 @@ public class LimitedOutputSlot<STACK, ITEM, CAP> implements LimitedSlot<STACK, I
         this.init(handler, label, pos, direction, slot, tracker, stackCache, type);
     }
 
+    @SuppressWarnings("RedundantIfStatement")
     public boolean isDone() {
 
         if (slot > type.getSlots(handler) - 1) {
