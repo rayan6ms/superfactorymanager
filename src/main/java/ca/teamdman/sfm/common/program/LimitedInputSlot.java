@@ -40,20 +40,24 @@ public class LimitedInputSlot<STACK, ITEM, CAP> implements LimitedSlot<STACK, IT
     @SuppressWarnings("RedundantIfStatement")
     public boolean isDone() {
         if (done) return true;
-        // we don't bother setting this.done because if this returns true it should be the last time this is called
+        // we set this.done = true because this slot is cached for later OUTPUT statements
 
         if (slot > type.getSlots(handler) - 1) {
             // composter block changes how many slots it has between insertions
+            done = true;
             return true;
         }
-        STACK stack = peekExtractPotential();
+        STACK stack = this.peekExtract();
         if (type.isEmpty(stack)) {
+            done = true;
             return true;
         }
         if (!tracker.matchesStack(stack)) {
+            done = true;
             return true;
         }
         if (tracker.isDone(type, stack)) {
+            done = true;
             return true;
         }
         return false;
@@ -66,6 +70,10 @@ public class LimitedInputSlot<STACK, ITEM, CAP> implements LimitedSlot<STACK, IT
     public STACK extract(long amount) {
         extractSimulateCache = null;
         return type.extract(handler, slot, amount, false);
+    }
+
+    public STACK peekExtract() {
+        return type.extract(handler, slot, Long.MAX_VALUE, true);
     }
 
     /**
