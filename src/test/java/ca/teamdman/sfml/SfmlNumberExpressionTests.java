@@ -206,4 +206,37 @@ public class SfmlNumberExpressionTests {
         System.out.println(line);
         node.getChildNodes().forEach(child -> print(child, indent+1));
     }
+
+    /*
+    GitHub Lines
+APP
+ — 6:52 PM
+numberExpression  : NUMBER                                      # NumberExpressionLiteral
+                  | LPAREN numberExpression RPAREN              # NumberExpressionParen
+                  | numberExpression CARET numberExpression     # NumberExpressionExponential
+                  | numberExpression ASTERISK numberExpression  # NumberExpressionMultiplication
+                  | numberExpression SLASH numberExpression     # NumberExpressionDivision
+                  | numberExpression PLUS numberExpression      # NumberExpressionAddition
+                  | numberExpression DASH numberExpression      # NumberExpressionSubtraction
+                  | numberExpression PERCENT numberExpression   # NumberExpressionModulus
+Mei
+
+OP
+ — 6:53 PM
+Wait, that on its own gives precedence to multiplication over addition? Huh
+Teamy — 6:54 PM
+if my unit tests are to be believed, yes
+Mei
+
+OP
+ — 6:54 PM
+Would have expected it to default to left-associative, that's wild
+Ah, it's not quite exactly bodmas, ANTLR gives higher precedence to the options listed first
+So multiplication is given precedence over division with that, whereas they're left-associative with each other usually. That only matters if the operations return integers and for floating point imprecision
+Teamy — 7:00 PM
+ah hm
+sounds like a problem for future-me
+since the branches are still ordered could do numberExpression (ASTERISK | SLASH ) numberExpression # numberExpressionMulOrDiv and resolve it that way
+    https://discord.com/channels/967118679370264627/1457113516430327819/1457161728969412754
+    */
 }
