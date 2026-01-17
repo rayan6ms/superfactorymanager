@@ -7,21 +7,24 @@ import net.minecraft.core.Direction;
 import org.jetbrains.annotations.Nullable;
 
 public class LimitedInputSlot<STACK, ITEM, CAP> implements LimitedSlot<STACK, ITEM, CAP> {
-    @SuppressWarnings("NotNullFieldNotInitialized") // done in init method in constructor
     public ResourceType<STACK, ITEM, CAP> type;
-    @SuppressWarnings("NotNullFieldNotInitialized") // done in init method in constructor
+
     public CAP handler;
-    @SuppressWarnings("NotNullFieldNotInitialized") // done in init method in constructor
+
     public BlockPos pos;
-    @SuppressWarnings("NotNullFieldNotInitialized") // done in init method in constructor
+
     public Label label;
-    @SuppressWarnings("NotNullFieldNotInitialized") // done in init method in constructor
+
     public Direction direction;
+
     public int slot;
+
     public boolean freed;
-    @SuppressWarnings("NotNullFieldNotInitialized") // done in init method in constructor
+
     public IInputResourceTracker tracker;
-    private @Nullable STACK extractSimulateCache = null;
+
+    private @Nullable STACK stackInSlotCache = null;
+
     private boolean done = false;
 
     public LimitedInputSlot(
@@ -34,20 +37,23 @@ public class LimitedInputSlot<STACK, ITEM, CAP> implements LimitedSlot<STACK, IT
             STACK stackCache,
             ResourceType<STACK, ITEM, CAP> type
     ) {
+
         this.init(handler, label, pos, direction, slot, tracker, stackCache, type);
     }
 
-    @SuppressWarnings("RedundantIfStatement")
     public boolean isDone() {
+
         if (done) return true;
-        // we set this.done = true because this slot is cached for later OUTPUT statements
+
+        // Below, we set `this.done = true` because this slot is cached for use in later OUTPUT statements
 
         if (slot > type.getSlots(handler) - 1) {
-            // composter block changes how many slots it has between insertions
+            // The composter block can change how many slots it has between insertions
             done = true;
             return true;
         }
-        STACK stack = this.peekExtract();
+
+        STACK stack = this.peekMaxExtractPotential();
         if (type.isEmpty(stack)) {
             done = true;
             return true;
@@ -64,33 +70,44 @@ public class LimitedInputSlot<STACK, ITEM, CAP> implements LimitedSlot<STACK, IT
     }
 
     public void setDone() {
+
         this.done = true;
     }
 
     public STACK extract(long amount) {
-        extractSimulateCache = null;
+
+        stackInSlotCache = null;
         return type.extract(handler, slot, amount, false);
     }
 
-    public STACK peekExtract() {
+    /// The content of the slot, this may exceed the max stack size.
+    ///
+    /// This MUST NOT be used when determining if the slot is done because it has nothing left to extract;
+    /// some slots are insert-only and may report as having a stack in the slot;
+    /// use {@link #peekMaxExtractPotential()} instead in such cases.
+    ///
+    /// Note that this is still used in {@link ca.teamdman.sfml.ast.OutputStatement#moveTo(ProgramContext, LimitedInputSlot, LimitedOutputSlot)}
+    /// because that method is responsible for determining retention obligations and must be able to see the full contents
+    /// of the
+    public STACK peekStackInSlot() {
+
+        if (stackInSlotCache == null) {
+            // We use getStackInSlot because it can return values greater than max-stack-size
+            // For example, a dank storage dock can have 256 items in a slot but if we queried extraction it would say 64
+            stackInSlotCache = type.getStackInSlot(handler, slot);
+//            extractSimulateCache = type.extract(handler, slot, Long.MAX_VALUE, true);
+        }
+        return stackInSlotCache;
+    }
+
+    /// The maximum single-operation transfer-out result, likely clamped to max stack size.
+    ///
+    /// This MUST NOT be used when calculating retention.
+    public STACK peekMaxExtractPotential() {
+
         return type.extract(handler, slot, Long.MAX_VALUE, true);
     }
 
-    /**
-     * Checks how much could possibly be extracted from this slot.
-     * We need to simulate since there are some types of slots we can't undo an extract from.
-     * You can't put something back in the output slot of a furnace.
-     * This value is cached for performance.
-     */
-    public STACK peekExtractPotential() {
-        if (extractSimulateCache == null) {
-            // We use getStackInSlot because it can return values greater than max-stack-size
-            // For example, a dank storage dock can have 256 items in a slot but if we queried extraction it would say 64
-            extractSimulateCache = type.getStackInSlot(handler, slot);
-//            extractSimulateCache = type.extract(handler, slot, Long.MAX_VALUE, true);
-        }
-        return extractSimulateCache;
-    }
 
     @SuppressWarnings("DuplicatedCode")
     public void init(
@@ -103,8 +120,9 @@ public class LimitedInputSlot<STACK, ITEM, CAP> implements LimitedSlot<STACK, IT
             STACK stackCache,
             ResourceType<STACK, ITEM, CAP> type
     ) {
+
         this.done = false;
-        this.extractSimulateCache = stackCache;
+        this.stackInSlotCache = stackCache;
         this.handler = handler;
         this.tracker = tracker;
         this.slot = slot;
@@ -117,6 +135,7 @@ public class LimitedInputSlot<STACK, ITEM, CAP> implements LimitedSlot<STACK, IT
 
     @Override
     public String toString() {
+
         return "LimitedInputSlot{"
                + "label=" + label
                + ", pos=" + pos
@@ -130,31 +149,38 @@ public class LimitedInputSlot<STACK, ITEM, CAP> implements LimitedSlot<STACK, IT
 
     @Override
     public ResourceType<STACK, ITEM, CAP> getType() {
+
         return type;
     }
 
     @Override
     public CAP getHandler() {
+
         return handler;
     }
 
     @Override
     public BlockPos getPos() {
+
         return pos;
     }
 
     @Override
     public Label getLabel() {
+
         return label;
     }
 
     @Override
     public Direction getDirection() {
+
         return direction;
     }
 
     @Override
     public int getSlot() {
+
         return slot;
     }
+
 }
