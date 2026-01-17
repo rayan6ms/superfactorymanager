@@ -8,9 +8,7 @@ import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
-import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleTransportStorage;
-import com.buuz135.industrial.utils.BlockUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -19,7 +17,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 
 /**
- * Migrated from SFMIndustrialForegoingCompatGameTests.industrialforegoing_blackhole_empty
+ * Migrated from SFMIndustrialForegoingCompatGameTests.industrialforegoing_blackhole_some
  */
 @SuppressWarnings({
         "RedundantSuppression",
@@ -29,7 +27,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
         "ArraysAsListWithZeroOrOneArgument"
 })
 @SFMGameTest
-public class IndustrialforegoingBlackholeEmptyGameTest extends SFMGameTestDefinition {
+public class IndustrialForegoingBlackholeSomeGameTest extends SFMGameTestDefinition {
 
     @Override
     public String template() {
@@ -66,12 +64,16 @@ public class IndustrialforegoingBlackholeEmptyGameTest extends SFMGameTestDefini
                 .add("b", helper.absolutePos(rightPos))
                 .save(manager.getDisk());
 
-        int fullCount = BlockUtils.getStackAmountByRarity(ModuleCore.SUPREME_RARITY);
-        assertTrue(fullCount > 0, "expected full count to be greater than 0");
+        // we need to insert a normal stack last for the rendering to work in IF
+        assertTrue(left.insertItem(0, new ItemStack(Items.COAL, 5000 - 64), false).isEmpty(), "couldn't prep left");
         assertTrue(left.insertItem(0, new ItemStack(Items.COAL, 64), false).isEmpty(), "couldn't prep left");
+        assertTrue(right.insertItem(0, new ItemStack(Items.COAL, 5000 - 64), false).isEmpty(), "couldn't prep left");
+        assertTrue(right.insertItem(0, new ItemStack(Items.COAL, 64), false).isEmpty(), "couldn't prep right");
+
         helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
-            assertTrue(left.getStackInSlot(0).isEmpty(), "Contents did not depart properly");
-            assertTrue(right.getStackInSlot(0).getCount() == 64, "Contents did not arrive");
+            assertTrue(left.getStackInSlot(0).getCount() == 5_000 - 64, "Contents did not depart properly");
+            assertTrue(right.getStackInSlot(0).getCount() == 5_000 + 64, "Contents did not arrive");
+
         });
     }
 }

@@ -8,7 +8,9 @@ import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
+import com.buuz135.industrial.module.ModuleCore;
 import com.buuz135.industrial.module.ModuleTransportStorage;
+import com.buuz135.industrial.utils.BlockUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
@@ -17,7 +19,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 
 /**
- * Migrated from SFMIndustrialForegoingCompatGameTests.industrialforegoing_blackhole_some
+ * Migrated from SFMIndustrialForegoingCompatGameTests.industrialforegoing_blackhole_full
  */
 @SuppressWarnings({
         "RedundantSuppression",
@@ -27,7 +29,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
         "ArraysAsListWithZeroOrOneArgument"
 })
 @SFMGameTest
-public class IndustrialforegoingBlackholeSomeGameTest extends SFMGameTestDefinition {
+public class IndustrialForegoingBlackholeFullGameTest extends SFMGameTestDefinition {
 
     @Override
     public String template() {
@@ -64,16 +66,22 @@ public class IndustrialforegoingBlackholeSomeGameTest extends SFMGameTestDefinit
                 .add("b", helper.absolutePos(rightPos))
                 .save(manager.getDisk());
 
-        // we need to insert a normal stack last for the rendering to work in IF
-        assertTrue(left.insertItem(0, new ItemStack(Items.COAL, 5000 - 64), false).isEmpty(), "couldn't prep left");
+        int fullCount = BlockUtils.getStackAmountByRarity(ModuleCore.SUPREME_RARITY);
+        assertTrue(fullCount > 0, "expected full count to be greater than 0");
         assertTrue(left.insertItem(0, new ItemStack(Items.COAL, 64), false).isEmpty(), "couldn't prep left");
-        assertTrue(right.insertItem(0, new ItemStack(Items.COAL, 5000 - 64), false).isEmpty(), "couldn't prep left");
-        assertTrue(right.insertItem(0, new ItemStack(Items.COAL, 64), false).isEmpty(), "couldn't prep right");
+        assertTrue(left.insertItem(0, new ItemStack(Items.COAL, 1), false).isEmpty(), "couldn't prep left");
+        assertTrue(
+                right.insertItem(0, new ItemStack(Items.COAL, fullCount - 2), false).isEmpty(),
+                "couldn't prep right"
+        );
+        assertTrue(right.insertItem(0, new ItemStack(Items.COAL, 1), false).isEmpty(), "couldn't prep right");
 
         helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
-            assertTrue(left.getStackInSlot(0).getCount() == 5_000 - 64, "Contents did not depart properly");
-            assertTrue(right.getStackInSlot(0).getCount() == 5_000 + 64, "Contents did not arrive");
-
+            // black hole units have voiding=true by default
+            // the final insertion operation that causes the thing to fill will cause the items that don't fit to be voided
+            // this test should cause a stack of 64 to be used to insert even though only 1 is needed to finish filling
+            assertTrue(left.getStackInSlot(0).getCount() == 1, "Contents did not depart properly");
+            assertTrue(right.getStackInSlot(0).getCount() == fullCount, "Contents did not arrive");
         });
     }
 }

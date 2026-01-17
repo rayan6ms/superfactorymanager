@@ -19,7 +19,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 
 /**
- * Migrated from SFMIndustrialForegoingCompatGameTests.industrialforegoing_blackhole_full
+ * Migrated from SFMIndustrialForegoingCompatGameTests.industrialforegoing_blackhole_empty
  */
 @SuppressWarnings({
         "RedundantSuppression",
@@ -29,7 +29,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
         "ArraysAsListWithZeroOrOneArgument"
 })
 @SFMGameTest
-public class IndustrialforegoingBlackholeFullGameTest extends SFMGameTestDefinition {
+public class IndustrialForegoingBlackholeEmptyGameTest extends SFMGameTestDefinition {
 
     @Override
     public String template() {
@@ -69,19 +69,9 @@ public class IndustrialforegoingBlackholeFullGameTest extends SFMGameTestDefinit
         int fullCount = BlockUtils.getStackAmountByRarity(ModuleCore.SUPREME_RARITY);
         assertTrue(fullCount > 0, "expected full count to be greater than 0");
         assertTrue(left.insertItem(0, new ItemStack(Items.COAL, 64), false).isEmpty(), "couldn't prep left");
-        assertTrue(left.insertItem(0, new ItemStack(Items.COAL, 1), false).isEmpty(), "couldn't prep left");
-        assertTrue(
-                right.insertItem(0, new ItemStack(Items.COAL, fullCount - 2), false).isEmpty(),
-                "couldn't prep right"
-        );
-        assertTrue(right.insertItem(0, new ItemStack(Items.COAL, 1), false).isEmpty(), "couldn't prep right");
-
         helper.succeedIfManagerDidThingWithoutLagging(manager, () -> {
-            // black hole units have voiding=true by default
-            // the final insertion operation that causes the thing to fill will cause the items that don't fit to be voided
-            // this test should cause a stack of 64 to be used to insert even though only 1 is needed to finish filling
-            assertTrue(left.getStackInSlot(0).getCount() == 1, "Contents did not depart properly");
-            assertTrue(right.getStackInSlot(0).getCount() == fullCount, "Contents did not arrive");
+            assertTrue(left.getStackInSlot(0).isEmpty(), "Contents did not depart properly");
+            assertTrue(right.getStackInSlot(0).getCount() == 64, "Contents did not arrive");
         });
     }
 }
