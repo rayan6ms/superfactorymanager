@@ -3,7 +3,9 @@
     "sfm:cable",
     "sfm:cable_facade",
     "sfm:fancy_cable",
+    "sfm:fancy_cable_facade",
     "sfm:manager",
+    "sfm:tunnelled_manager",
     "sfm:printing_press"
   ]
 }
