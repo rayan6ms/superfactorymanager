@@ -12,10 +12,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-//@EventBusSubscriber(bus = EventBusSubscriber.Bus.MOD)
 public class SFMGameTestDiscovery {
-
-//    @SubscribeEvent
     @SFMSubscribeEvent
     public static void onRegisterGameTests(RegisterGameTestsEvent event) {
         // Discover our tests

@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.common.watertanknetwork;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.block.WaterTankBlock;
 import ca.teamdman.sfm.common.blockentity.WaterTankBlockEntity;
+import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -15,13 +15,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.ChunkAccess;
 import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = SFM.MOD_ID)
 public class WaterNetworkManager {
     private static final Map<Level, Long2ObjectMap<WaterNetwork>> NETWORKS = new Object2ObjectOpenHashMap<>();
 
@@ -146,7 +143,7 @@ public class WaterNetworkManager {
         NETWORKS.clear();
     }
 
-    @SubscribeEvent
+    @SFMSubscribeEvent
     public static void onChunkUnload(ChunkEvent.Unload event) {
         if (event.getLevel().isClientSide()) return;
         if (!(event.getLevel() instanceof ServerLevel level)) return;
@@ -154,7 +151,7 @@ public class WaterNetworkManager {
         purgeChunk(level, chunk);
     }
 
-    @SubscribeEvent
+    @SFMSubscribeEvent
     public static void onLevelUnload(LevelEvent.Unload event) {
         if (!(event.getLevel() instanceof ServerLevel level)) return;
         NETWORKS.remove(level);

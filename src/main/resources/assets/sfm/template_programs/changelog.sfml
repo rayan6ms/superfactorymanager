@@ -11,6 +11,7 @@ NAME "Changelog"
 -- Fix #445 where UP and DOWN directions cannot be rotated to determine relative left/right/front/back faces.
 -- Introduce tunnelled cables
 -- Introduce tough cables
+-- Switch to new @SFMSubscribeEvent annotation to reduce @MCVersionDependentBehaviour
 -- TODO: add tooltips to tough and tunnelled cables and tunnelled manager block
 -- TODO: update tunnelled cable and tough cable recipes
 -- TODO: make tough cables default obsidian blast resistance

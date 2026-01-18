@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.command;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
+import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.net.ClientboundShowChangelogPacket;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.watertanknetwork.WaterNetworkManager;
@@ -12,16 +13,13 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.server.command.EnumArgument;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
 @SuppressWarnings({"LoggingSimilarMessage", "DuplicatedCode"})
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = SFM.MOD_ID)
 public class SFMCommand {
-    @SubscribeEvent
+    @SFMSubscribeEvent
     public static void onRegisterCommand(final RegisterCommandsEvent event) {
         var command = Commands.literal("sfm");
         command.then(Commands.literal("bust_cable_network_cache")

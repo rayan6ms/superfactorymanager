@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.client.registry;
 
-import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.render.CableFacadeBlockModelWrapper;
 import ca.teamdman.sfm.client.render.FancyCableFacadeBlockModelWrapper;
+import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
@@ -16,15 +16,12 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.model.BakedModelWrapper;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 import java.util.Map;
 import java.util.function.Function;
 
-@Mod.EventBusSubscriber(modid = SFM.MOD_ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class SFMBlockModelWrappers {
-    @SubscribeEvent
+    @SFMSubscribeEvent(value = Dist.CLIENT)
     public static void onModelBakeEvent(@MCVersionDependentBehaviour ModelEvent.BakingCompleted event) {
 
         record FacadeModelRelationship(

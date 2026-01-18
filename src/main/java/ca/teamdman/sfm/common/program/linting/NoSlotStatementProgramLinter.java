@@ -7,7 +7,10 @@ import ca.teamdman.sfm.common.localization.LocalizationEntry;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.program.SimulateExploreAllPathsProgramBehaviour;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import ca.teamdman.sfml.ast.*;
+import ca.teamdman.sfml.ast.IOStatement;
+import ca.teamdman.sfml.ast.InputStatement;
+import ca.teamdman.sfml.ast.LabelAccess;
+import ca.teamdman.sfml.ast.Program;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
@@ -15,8 +18,6 @@ import org.jetbrains.annotations.Nullable;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import static ca.teamdman.sfm.common.localization.LocalizationKeys.*;
-import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNING_NO_VIABLE_INPUT_SLOTS;
-import static ca.teamdman.sfm.common.localization.LocalizationKeys.PROGRAM_WARNING_NO_VIABLE_OUTPUT_SLOTS;
 
 public class NoSlotStatementProgramLinter implements IProgramLinter {
     // Check for input and output statements that gather no valid slots
