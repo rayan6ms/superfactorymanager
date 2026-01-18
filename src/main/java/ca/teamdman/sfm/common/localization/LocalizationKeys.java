@@ -968,6 +968,46 @@ public final class LocalizationKeys {
             () -> "Fancy Inventory Cable Facade"
     );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TOUGH_CABLE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TOUGH_CABLE_BLOCK.get().getDescriptionId(),
+            () -> "Tough Inventory Cable"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TOUGH_CABLE_FACADE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TOUGH_CABLE_FACADE_BLOCK.get().getDescriptionId(),
+            () -> "Tough Inventory Cable Facade"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TOUGH_FANCY_CABLE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TOUGH_FANCY_CABLE_BLOCK.get().getDescriptionId(),
+            () -> "Tough Fancy Inventory Cable"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TOUGH_FANCY_CABLE_FACADE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TOUGH_FANCY_CABLE_FACADE_BLOCK.get().getDescriptionId(),
+            () -> "Tough Fancy Inventory Cable Facade"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TUNNELLED_CABLE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TUNNELLED_CABLE_BLOCK.get().getDescriptionId(),
+            () -> "Tunnelled Inventory Cable"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TUNNELLED_CABLE_FACADE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TUNNELLED_CABLE_FACADE_BLOCK.get().getDescriptionId(),
+            () -> "Tunnelled Inventory Cable Facade"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TUNNELLED_FANCY_CABLE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TUNNELLED_FANCY_CABLE_BLOCK.get().getDescriptionId(),
+            () -> "Tunnelled Fancy Inventory Cable"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TUNNELLED_FANCY_CABLE_FACADE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TUNNELLED_FANCY_CABLE_FACADE_BLOCK.get().getDescriptionId(),
+            () -> "Tunnelled Fancy Inventory Cable Facade"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry TUNNELLED_MANAGER_BLOCK = new LocalizationEntry(
             () -> SFMBlocks.TUNNELLED_MANAGER_BLOCK.get().getDescriptionId(),
             () -> "Tunnelled Factory Manager"
