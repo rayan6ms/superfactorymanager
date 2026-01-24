@@ -1,9 +1,9 @@
 package ca.teamdman.sfm.common.facade;
 
 import ca.teamdman.sfm.common.block.IFacadableBlock;
+import ca.teamdman.sfm.common.block_network.CableNetwork;
 import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
-import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
 import ca.teamdman.sfm.common.net.ServerboundFacadePacket;
 import ca.teamdman.sfm.common.util.InPlaceBlockPlaceContext;
 import ca.teamdman.sfm.common.util.SFMStreamUtils;

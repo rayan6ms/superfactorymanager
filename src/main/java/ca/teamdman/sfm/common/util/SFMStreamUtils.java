@@ -67,6 +67,14 @@ public class SFMStreamUtils {
         return Arrays.stream(SFMDirections.DIRECTIONS_WITHOUT_NULL).map(d -> pos.offset(d.getNormal()));
     }
 
+    public static <T, R> Stream<R> getRecursiveStream(
+            RecursiveBuilder<T, R> operator,
+            Deque<T> toVisit
+    ) {
+        Set<T> visitDebounce = new HashSet<>();
+        return getRecursiveStream(operator, visitDebounce, toVisit);
+    }
+
     public interface RecursiveBuilder<T, R> {
         void accept(
                 T current,

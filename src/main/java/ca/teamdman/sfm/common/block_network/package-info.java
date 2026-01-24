@@ -2,7 +2,7 @@
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
-package ca.teamdman.sfm.common.cablenetwork;
+package ca.teamdman.sfm.common.block_network;
 
 import net.minecraft.FieldsAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;

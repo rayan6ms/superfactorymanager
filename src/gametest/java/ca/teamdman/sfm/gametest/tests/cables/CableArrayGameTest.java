@@ -1,7 +1,8 @@
 package ca.teamdman.sfm.gametest.tests.cables;
 
+import ca.teamdman.sfm.common.block_network.CableNetwork;
+import ca.teamdman.sfm.common.block_network.CableNetworkManager;
 import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
-import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
 import ca.teamdman.sfm.common.facade.FacadeData;
 import ca.teamdman.sfm.common.facade.FacadeTextureMode;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
@@ -77,7 +78,7 @@ public class CableArrayGameTest extends SFMGameTestDefinition {
         // All placed blocks should be cables; assert that first
         for (BlockPos p : cablePositions) {
             assertTrue(
-                    ca.teamdman.sfm.common.cablenetwork.CableNetwork.isCable(helper.getLevel(), p),
+                    CableNetwork.isCable(helper.getLevel(), p),
                     "Placed block at " + p + " should be a cable"
             );
         }

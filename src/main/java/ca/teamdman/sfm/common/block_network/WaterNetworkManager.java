@@ -1,0 +1,112 @@
+package ca.teamdman.sfm.common.block_network;
+
+import ca.teamdman.sfm.common.blockentity.WaterTankBlockEntity;
+import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
+import net.minecraft.core.BlockPos;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.event.level.ChunkEvent;
+import net.minecraftforge.event.level.LevelEvent;
+import org.jetbrains.annotations.Nullable;
+
+public class WaterNetworkManager {
+    private static final BlockNetworkManager<WaterTankBlockEntity> NETWORK_MANAGER = new BlockNetworkManager<>(
+            (level, blockPos) -> {
+                BlockEntity blockEntity = level.getBlockEntity(blockPos);
+                if (blockEntity instanceof WaterTankBlockEntity waterTankBlockEntity) {
+                    return waterTankBlockEntity;
+                } else {
+                    return null;
+                }
+            }
+    );
+
+    public static void onLoad(WaterTankBlockEntity blockEntity) {
+
+        Level level = blockEntity.getLevel();
+        if (level == null || level.isClientSide()) return;
+        onWaterTankBlockActiveStateChanged(level, blockEntity.getBlockPos());
+    }
+
+    public static void onWaterTankBlockActiveStateChanged(
+            Level level,
+            BlockPos blockPos
+    ) {
+
+        // Only proceed on the server
+        if (level.isClientSide()) return;
+
+        // Update the water tank activeness
+        if (level.getBlockEntity(blockPos) instanceof WaterTankBlockEntity waterTankBlockEntity) {
+            waterTankBlockEntity.updateActiveFromBlockState();
+        }
+
+        // Update water tank capacities on the network
+        updateWaterTankCapacities(level, blockPos);
+    }
+
+    public static void onWaterTankBlockRemoved(
+            Level level,
+            BlockPos blockPos
+    ) {
+
+        // Only proceed on the server
+        if (level.isClientSide()) return;
+
+        // Remove the member
+        NETWORK_MANAGER.onMemberRemovedFromLevel(level, blockPos);
+
+        // Update water tank capacities on the network
+        updateWaterTankCapacities(level, blockPos);
+
+    }
+
+    /// Get the network for the given block position and update the capacities
+    /// of the water tanks in that network.
+    public static void updateWaterTankCapacities(
+            Level level,
+            BlockPos blockPos
+    ) {
+
+        // Get the network
+        @Nullable BlockNetwork<WaterTankBlockEntity> network
+                = NETWORK_MANAGER.getOrRegisterNetworkFromMemberPosition(level, blockPos);
+        if (network == null) return;
+
+        // Determine how many members of the network are active
+        int networkActiveWaterTankCount = 0;
+        for (WaterTankBlockEntity member : network.members().values()) {
+            if (member.isActive()) {
+                networkActiveWaterTankCount += 1;
+            }
+        }
+
+        // Update the network member water tank capacities
+        for (WaterTankBlockEntity member : network.members().values()) {
+            member.updateTankCapacity(networkActiveWaterTankCount);
+        }
+
+    }
+
+    @SFMSubscribeEvent
+    public static void onChunkUnload(ChunkEvent.Unload event) {
+
+        if (event.getLevel().isClientSide()) return;
+        if (!(event.getLevel() instanceof ServerLevel level)) return;
+        NETWORK_MANAGER.clearChunk(level, event.getChunk().getPos());
+    }
+
+    @SFMSubscribeEvent
+    public static void onLevelUnload(LevelEvent.Unload event) {
+
+        if (!(event.getLevel() instanceof ServerLevel level)) return;
+        NETWORK_MANAGER.clearLevel(level);
+    }
+
+    public static void clear() {
+        NETWORK_MANAGER.clear();
+
+    }
+
+}

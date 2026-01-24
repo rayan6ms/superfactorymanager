@@ -1,9 +1,9 @@
 package ca.teamdman.sfm.common.block;
 
+import ca.teamdman.sfm.common.block_network.WaterNetworkManager;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.util.SFMDirections;
-import ca.teamdman.sfm.common.watertanknetwork.WaterNetworkManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -51,7 +51,7 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
             BlockState pOldState,
             boolean pIsMoving
     ) {
-        WaterNetworkManager.onActiveStateChanged(pLevel, pPos, pState);
+        WaterNetworkManager.onWaterTankBlockActiveStateChanged(pLevel, pPos);
     }
 
     @Override
@@ -64,7 +64,7 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
             boolean pIsMoving
     ) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        WaterNetworkManager.onActiveStateChanged(pLevel, pPos, pNewState);
+        WaterNetworkManager.onWaterTankBlockRemoved(pLevel, pPos);
     }
 
     @Override
@@ -140,6 +140,7 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
                     newState,
                     Block.UPDATE_ALL
             );
+            WaterNetworkManager.onWaterTankBlockActiveStateChanged(level, pos);
         }
     }
 
