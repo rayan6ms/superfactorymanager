@@ -408,7 +408,7 @@ public class BlockNetworkManager<T> {
             // Remove the chunk pos from the chunk pos lookup
             ChunkPosMap<List<BlockNetwork<T>>> networksByChunkPos = networksByLevelChunk.get(level);
             if (networksByChunkPos != null) {
-                List<BlockNetwork<T>> listOfNetworksInChunk = networksByChunkPos.get(memberBlockPosLong);
+                Set<BlockNetwork<LEVEL, T>> listOfNetworksInChunk = networksByChunkPos.get(memberChunkPos);
                 if (listOfNetworksInChunk != null) {
                     listOfNetworksInChunk.remove(network);
                     if (listOfNetworksInChunk.isEmpty()) {
