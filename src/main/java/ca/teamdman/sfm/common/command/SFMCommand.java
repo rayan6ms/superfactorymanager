@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.block_network.CableNetworkManager;
 import ca.teamdman.sfm.common.block_network.WaterNetworkManager;
 import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
+import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ClientboundShowChangelogPacket;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import net.minecraft.commands.Commands;
@@ -30,6 +31,10 @@ public class SFMCommand {
                                          ctx.getSource().getTextName()
                                  );
                                  CableNetworkManager.clear();
+                                 ctx.getSource().sendSuccess(
+                                         LocalizationKeys.COMMAND_BUST_CABLE_NETWORK_CACHE_SUCCESS.getComponent(),
+                                         true
+                                 );
                                  return SINGLE_SUCCESS;
                              }));
         command.then(Commands.literal("bust_water_network_cache")
@@ -40,6 +45,10 @@ public class SFMCommand {
                                          ctx.getSource().getTextName()
                                  );
                                  WaterNetworkManager.clear();
+                                 ctx.getSource().sendSuccess(
+                                         LocalizationKeys.COMMAND_BUST_WATER_NETWORK_CACHE_SUCCESS.getComponent(),
+                                         true
+                                 );
                                  return SINGLE_SUCCESS;
                              }));
         command.then(Commands.literal("show_bad_cable_cache_entries")

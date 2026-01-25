@@ -128,6 +128,14 @@ public final class LocalizationKeys {
             "gui.sfm.facade_confirm_apply.message",
             "%d different facade states across %d blocks that will be overwritten."
     );
+    public static final LocalizationEntry COMMAND_BUST_WATER_NETWORK_CACHE_SUCCESS = new LocalizationEntry(
+            "sfm.command.bust_water_network_cache.success",
+            "Successfully busted water network cache."
+    );
+    public static final LocalizationEntry COMMAND_BUST_CABLE_NETWORK_CACHE_SUCCESS = new LocalizationEntry(
+            "sfm.command.bust_cable_network_cache.success",
+            "Successfully busted cable network cache."
+    );
     public static final LocalizationEntry CONFIRM_FUNNY_YES_1 = new LocalizationEntry(
             "gui.sfm.confirm.funny.yes.1",
             "Yeah, sure, why not."
