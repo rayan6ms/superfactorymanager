@@ -7,11 +7,11 @@ import ca.teamdman.sfm.common.net.ServerboundLabelGunCycleViewModePacket;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunSetActiveLabelPacket;
 import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.util.SFMDist;
 import ca.teamdman.sfm.common.util.SFMHandUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 
 
@@ -24,7 +24,7 @@ public class LabelGunKeyMappingHandler {
     }
 
     @SuppressWarnings("DuplicatedCode")
-    @SFMSubscribeEvent(value = Dist.CLIENT)
+    @SFMSubscribeEvent(value = SFMDist.CLIENT)
     public static void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
         Minecraft minecraft = Minecraft.getInstance();

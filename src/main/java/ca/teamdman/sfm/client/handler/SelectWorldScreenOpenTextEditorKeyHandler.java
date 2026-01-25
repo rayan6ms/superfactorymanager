@@ -6,17 +6,17 @@ import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenDiskOpenContext;
 import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
+import ca.teamdman.sfm.common.util.SFMDist;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.worldselection.SelectWorldScreen;
 import net.minecraft.client.gui.screens.worldselection.WorldSelectionList;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 
 import java.util.Date;
 import java.util.stream.Collectors;
 
 public class SelectWorldScreenOpenTextEditorKeyHandler {
-    @SFMSubscribeEvent(value = Dist.CLIENT)
+    @SFMSubscribeEvent(value = SFMDist.CLIENT)
     public static void onKey(InputEvent.Key event) {
         if (
                 SFMKeyMappings.isKeyDown(SFMKeyMappings.TITLE_SCREEN_OPEN_TEXT_EDITOR_KEY)

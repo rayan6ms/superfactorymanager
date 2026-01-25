@@ -3,12 +3,12 @@ package ca.teamdman.sfm.client.registry;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.util.SFMDist;
 import com.mojang.blaze3d.platform.InputConstants;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.Component;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.client.settings.KeyConflictContext;
 import net.minecraftforge.client.settings.KeyModifier;
@@ -180,7 +180,7 @@ public class SFMKeyMappings {
         return getKeyDisplay(key.get());
     }
 
-    @SFMSubscribeEvent(value = Dist.CLIENT)
+    @SFMSubscribeEvent(value = SFMDist.CLIENT)
     public static void registerBindings(RegisterKeyMappingsEvent event) {
         for (KeyMapping key : getSFMKeyMappings()) {
             event.register(key);

@@ -3,7 +3,7 @@ package ca.teamdman.sfm.client.registry;
 import ca.teamdman.sfm.client.overlay.LabelGunReminderOverlay;
 import ca.teamdman.sfm.client.overlay.NetworkToolReminderOverlay;
 import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
-import net.minecraftforge.api.distmarker.Dist;
+import ca.teamdman.sfm.common.util.SFMDist;
 import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.common.util.Lazy;
@@ -12,7 +12,7 @@ public class SFMOverlays {
     public static final Lazy<LabelGunReminderOverlay> LABEL_GUN_REMINDER_OVERLAY = Lazy.of(LabelGunReminderOverlay::new);
     public static final Lazy<NetworkToolReminderOverlay> NETWORK_TOOL_REMINDER_OVERLAY = Lazy.of(NetworkToolReminderOverlay::new);
 
-    @SFMSubscribeEvent(value = Dist.CLIENT)
+    @SFMSubscribeEvent(value = SFMDist.CLIENT)
     public static void onRegisterOverlays(RegisterGuiOverlaysEvent event) {
         event.registerAbove(
                 VanillaGuiOverlay.HOTBAR.id(),

@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.event_bus;
 
 import ca.teamdman.sfm.SFM;
-import net.minecraftforge.api.distmarker.Dist;
+import ca.teamdman.sfm.common.util.SFMDist;
 import net.minecraftforge.eventbus.api.EventPriority;
 
 import java.lang.annotation.Retention;
@@ -16,7 +16,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Target(value = METHOD)
 public @interface SFMSubscribeEvent {
 
-    Dist[] value() default {Dist.CLIENT, Dist.DEDICATED_SERVER};
+    SFMDist[] value() default {SFMDist.CLIENT, SFMDist.DEDICATED_SERVER};
 
     EventPriority priority() default EventPriority.NORMAL;
 

@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfm.common.util.SFMDist;
 import com.google.common.collect.ImmutableList;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.BakedModel;
@@ -13,7 +14,6 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelEvent;
 import net.minecraftforge.client.model.BakedModelWrapper;
 
@@ -21,7 +21,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class SFMBlockModelWrappers {
-    @SFMSubscribeEvent(value = Dist.CLIENT)
+    @SFMSubscribeEvent(value = SFMDist.CLIENT)
     public static void onModelBakeEvent(@MCVersionDependentBehaviour ModelEvent.BakingCompleted event) {
 
         record FacadeModelRelationship(

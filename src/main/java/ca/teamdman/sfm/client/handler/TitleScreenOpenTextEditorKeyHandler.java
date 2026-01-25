@@ -6,13 +6,13 @@ import ca.teamdman.sfm.client.text_editor.ISFMTextEditScreenOpenContext;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditScreenTitleScreenOpenContext;
 import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
+import ca.teamdman.sfm.common.util.SFMDist;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.TitleScreen;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 
 public class TitleScreenOpenTextEditorKeyHandler {
-    @SFMSubscribeEvent(value = Dist.CLIENT)
+    @SFMSubscribeEvent(value = SFMDist.CLIENT)
     public static void onKey(InputEvent.Key event) {
         if (
                 SFMKeyMappings.isKeyDown(SFMKeyMappings.TITLE_SCREEN_OPEN_TEXT_EDITOR_KEY)

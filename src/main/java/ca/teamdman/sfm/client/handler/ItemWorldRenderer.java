@@ -7,6 +7,7 @@ import ca.teamdman.sfm.common.item.NetworkToolItem;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.HelpsWithMinecraftVersionIndependence;
 import ca.teamdman.sfm.common.util.SFMDirections;
+import ca.teamdman.sfm.common.util.SFMDist;
 import com.google.common.collect.HashMultimap;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -27,7 +28,6 @@ import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderLevelStageEvent;
 import org.jetbrains.annotations.Nullable;
 
@@ -76,7 +76,7 @@ public class ItemWorldRenderer {
     private static final int cableColor = FastColor.ARGB32.color(100, 100, 255, 0);
     private static final VBOCache vboCache = new VBOCache();
 
-    @SFMSubscribeEvent(value = Dist.CLIENT)
+    @SFMSubscribeEvent(value = SFMDist.CLIENT)
     public static void renderOverlays(RenderLevelStageEvent event) {
         if (event.getStage() != RenderLevelStageEvent.Stage.AFTER_PARTICLES) return;
         Minecraft minecraft = Minecraft.getInstance();

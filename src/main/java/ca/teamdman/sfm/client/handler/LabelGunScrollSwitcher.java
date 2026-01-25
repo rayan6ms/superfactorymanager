@@ -5,13 +5,13 @@ import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunSetActiveLabelPacket;
 import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.util.SFMDist;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.InputEvent;
 
 public class LabelGunScrollSwitcher {
-    @SFMSubscribeEvent(value = Dist.CLIENT)
+    @SFMSubscribeEvent(value = SFMDist.CLIENT)
     public static void onScroll(InputEvent.MouseScrollingEvent event) {
         var player = Minecraft.getInstance().player;
         if (player == null) return;

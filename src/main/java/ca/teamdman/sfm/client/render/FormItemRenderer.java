@@ -4,6 +4,7 @@ import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfm.common.util.SFMDist;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import com.mojang.blaze3d.vertex.PoseStack;
 import net.minecraft.client.Minecraft;
@@ -14,7 +15,6 @@ import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
-import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.ModelEvent;
 
 public class FormItemRenderer extends BlockEntityWithoutLevelRenderer {
@@ -25,7 +25,7 @@ public class FormItemRenderer extends BlockEntityWithoutLevelRenderer {
         super(Minecraft.getInstance().getBlockEntityRenderDispatcher(), Minecraft.getInstance().getEntityModels());
     }
 
-    @SFMSubscribeEvent(value = Dist.CLIENT)
+    @SFMSubscribeEvent(value = SFMDist.CLIENT)
     public static void registerModels(ModelEvent.RegisterAdditional event) {
         event.register(BASE_MODEL);
     }
