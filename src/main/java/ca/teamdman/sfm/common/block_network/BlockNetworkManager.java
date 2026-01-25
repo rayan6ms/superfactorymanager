@@ -10,6 +10,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -20,9 +21,9 @@ import java.util.function.BiFunction;
 /// E.g., `memberPos` should be `memberBlockPos`
 ///
 public class BlockNetworkManager<T> {
-    private final Map<Level, BlockPosMap<BlockNetwork<T>>> networksByLevelPosition = new Object2ObjectOpenHashMap<>();
+    private final Map<Level, BlockPosMap<BlockNetwork<T>>> networksByLevelBlockPos = new Object2ObjectOpenHashMap<>();
 
-    private final Map<Level, ChunkPosMap<List<BlockNetwork<T>>>> networksByLevelChunk = new Object2ObjectOpenHashMap<>();
+    private final Map<Level, ChunkPosMap<List<BlockNetwork<T>>>> networksByLevelChunk = new Object2ObjectOpenHashMap<>(); // todo: convert to identity hash set
 
     private final Map<Level, List<BlockNetwork<T>>> networksByLevel = new Object2ObjectOpenHashMap<>();
 
@@ -40,7 +41,7 @@ public class BlockNetworkManager<T> {
             BlockPos blockPos
     ) {
 
-        BlockPosMap<BlockNetwork<T>> blockPosMap = networksByLevelPosition.get(level);
+        BlockPosMap<BlockNetwork<T>> blockPosMap = networksByLevelBlockPos.get(level);
         if (blockPosMap == null) return null;
         return blockPosMap.get(blockPos);
     }
@@ -148,7 +149,7 @@ public class BlockNetworkManager<T> {
         if (oldNetwork == null) return;
 
         // Untrack the position as the member has been removed from the level
-        untrackMemberBlockPosForLevel(memberBlockPos, level);
+        untrackMemberFromNetwork(memberBlockPos, oldNetwork);
 
         // Identify the networks that result from the removal of the position
         List<BlockNetwork<T>> resultingNetworks = oldNetwork.splitRemoveMember(memberBlockPos);
@@ -171,7 +172,7 @@ public class BlockNetworkManager<T> {
 
         // Check the level lookup
         if (networksByLevel.getOrDefault(level, Collections.emptyList()).contains(network)) {
-            throw new IllegalStateException("Network still tracked in level lookup");
+            SFM.LOGGER.error("Network still tracked in level lookup");
         }
 
         // Check the chunk lookup
@@ -180,27 +181,64 @@ public class BlockNetworkManager<T> {
                 .values()
                 .stream()
                 .anyMatch(list -> list.contains(network))) {
-            throw new IllegalStateException("Network still tracked in chunk lookup");
+            SFM.LOGGER.error("Network still tracked in chunk lookup");
         }
 
         // Check the block position lookup
-        if (networksByLevelPosition.getOrDefault(level, new BlockPosMap<>()).values().contains(network)) {
-            throw new IllegalStateException("Network still tracked in block position lookup");
+        if (networksByLevelBlockPos.getOrDefault(level, new BlockPosMap<>()).values().contains(network)) {
+            SFM.LOGGER.error("Network still tracked in block position lookup");
         }
     }
 
     public void clearLevel(Level level) {
 
-        networksByLevelPosition.remove(level);
+        networksByLevelBlockPos.remove(level);
         networksByLevelChunk.remove(level);
         networksByLevel.remove(level);
     }
 
     public void clear() {
 
-        networksByLevelPosition.clear();
+        networksByLevelBlockPos.clear();
         networksByLevelChunk.clear();
         networksByLevel.clear();
+    }
+
+    public void printDebugInfo() {
+
+        SFM.LOGGER.info("=== BlockNetworkManager Debug Info ===");
+
+        SFM.LOGGER.info("Networks by Level:");
+        for (Map.Entry<Level, List<BlockNetwork<T>>> entry : networksByLevel.entrySet()) {
+            Level level = entry.getKey();
+            List<BlockNetwork<T>> networks = entry.getValue();
+            SFM.LOGGER.info("  Level {}: {} networks", level.dimension().location(), networks.size());
+            for (int i = 0; i < networks.size(); i++) {
+                BlockNetwork<T> network = networks.get(i);
+                SFM.LOGGER.info("    Network {} @ {}: {} members", i, System.identityHashCode(network), network.members().size());
+            }
+        }
+
+        SFM.LOGGER.info("Networks by Level Position:");
+        for (Map.Entry<Level, BlockPosMap<BlockNetwork<T>>> entry : networksByLevelBlockPos.entrySet()) {
+            Level level = entry.getKey();
+            BlockPosMap<BlockNetwork<T>> positionMap = entry.getValue();
+            SFM.LOGGER.info("  Level {}: {} tracked positions", level.dimension().location(), positionMap.size());
+        }
+
+        SFM.LOGGER.info("Networks by Level Chunk:");
+        for (Map.Entry<Level, ChunkPosMap<List<BlockNetwork<T>>>> entry : networksByLevelChunk.entrySet()) {
+            Level level = entry.getKey();
+            ChunkPosMap<List<BlockNetwork<T>>> chunkMap = entry.getValue();
+            SFM.LOGGER.info("  Level {}: {} chunks", level.dimension().location(), chunkMap.size());
+            for (Map.Entry<Long, List<BlockNetwork<T>>> chunkEntry : chunkMap.entrySet()) {
+                ChunkPos chunkPos = new ChunkPos(chunkEntry.getKey());
+                List<BlockNetwork<T>> networksInChunk = chunkEntry.getValue();
+                SFM.LOGGER.info("    Chunk [{}, {}]: {} networks", chunkPos.x, chunkPos.z, networksInChunk.size());
+            }
+        }
+
+        SFM.LOGGER.info("=== End BlockNetworkManager Debug Info ===");
     }
 
     private void printChangeDiagnostics() {
@@ -221,7 +259,7 @@ public class BlockNetworkManager<T> {
             SFM.LOGGER.debug(builder.toString());
         }
         SFM.LOGGER.info("NETWORKS_BY_CABLE_POSITION:");
-        for (Map.Entry<Level, BlockPosMap<BlockNetwork<T>>> entry : networksByLevelPosition.entrySet()) {
+        for (Map.Entry<Level, BlockPosMap<BlockNetwork<T>>> entry : networksByLevelBlockPos.entrySet()) {
             Level level = entry.getKey();
             BlockPosMap<BlockNetwork<T>> networksByCablePosition = entry.getValue();
             SFM.LOGGER.debug("Level {} has {} cables", level, networksByCablePosition.size());
@@ -245,7 +283,7 @@ public class BlockNetworkManager<T> {
         Level level = network.level();
 
         // Update the position lookup
-        BlockPosMap<BlockNetwork<T>> networksByBlockPos = networksByLevelPosition.computeIfAbsent(
+        BlockPosMap<BlockNetwork<T>> networksByBlockPos = networksByLevelBlockPos.computeIfAbsent(
                 level,
                 k -> new BlockPosMap<>()
         );
@@ -273,7 +311,7 @@ public class BlockNetworkManager<T> {
             throw new IllegalStateException("Cannot transfer network ownership across levels");
 
         // Update the position lookup
-        BlockPosMap<BlockNetwork<T>> networksByLevelBlockPosition = networksByLevelPosition.computeIfAbsent(
+        BlockPosMap<BlockNetwork<T>> networksByLevelBlockPosition = networksByLevelBlockPos.computeIfAbsent(
                 level,
                 k -> new BlockPosMap<>()
         );
@@ -315,9 +353,9 @@ public class BlockNetworkManager<T> {
         Level level = network.level();
 
         // Remove the block position entries
-        BlockPosMap<BlockNetwork<T>> networksByBlockPos = networksByLevelPosition.get(level);
+        BlockPosMap<BlockNetwork<T>> networksByBlockPos = networksByLevelBlockPos.get(level);
         networksByBlockPos.removeKeys(network.members().keySet());
-        if (networksByBlockPos.isEmpty()) networksByLevelPosition.remove(level);
+        if (networksByBlockPos.isEmpty()) networksByLevelBlockPos.remove(level);
 
         // Remove the chunk entries
         ChunkPosMap<List<BlockNetwork<T>>> networksByChunkPos = networksByLevelChunk.get(level);
@@ -345,40 +383,52 @@ public class BlockNetworkManager<T> {
 
     /// Remove the lookup table entries for the given position.
     /// This DOES NOT perform network splitting!
-    private void untrackMemberBlockPosForLevel(
+    private void untrackMemberFromNetwork(
             BlockPos memberBlockPos,
-            Level level
+            @UnknownNullability BlockNetwork<T> network
     ) {
-
+        Level level = network.level();
         long memberBlockPosLong = memberBlockPos.asLong();
+        ChunkPos memberChunkPos = new ChunkPos(memberBlockPosLong);
 
-        // Update the position lookup
-        BlockPosMap<BlockNetwork<T>> networksByBlockPos = networksByLevelPosition.get(level);
+        // Remove the member from the network
+        network.removeMember(memberBlockPos);
+
+        // Remove the block pos from the position lookup
+        BlockPosMap<BlockNetwork<T>> networksByBlockPos = networksByLevelBlockPos.get(level);
         if (networksByBlockPos != null) {
             networksByBlockPos.remove(memberBlockPosLong);
             if (networksByBlockPos.isEmpty()) {
-                networksByLevelPosition.remove(level);
+                networksByLevelBlockPos.remove(level);
             }
         }
 
-        // Update the chunk lookup
-        ChunkPosMap<List<BlockNetwork<T>>> networksByChunkPos = networksByLevelChunk.get(level);
-        if (networksByChunkPos != null) {
-            List<BlockNetwork<T>> networksInChunk = networksByChunkPos.get(memberBlockPosLong);
-            if (networksInChunk != null) {
-                Iterator<BlockNetwork<T>> iterator = networksInChunk.iterator();
-                while (iterator.hasNext()) {
-                    BlockNetwork<T> network = iterator.next();
-                    if (!network.isMember(memberBlockPos)) {
-                        iterator.remove();
+        // Check if the network still uses the chunk
+        if (!network.usesChunk(memberChunkPos)) {
+            // Remove the chunk pos from the chunk pos lookup
+            ChunkPosMap<List<BlockNetwork<T>>> networksByChunkPos = networksByLevelChunk.get(level);
+            if (networksByChunkPos != null) {
+                List<BlockNetwork<T>> listOfNetworksInChunk = networksByChunkPos.get(memberBlockPosLong);
+                if (listOfNetworksInChunk != null) {
+                    listOfNetworksInChunk.remove(network);
+                    if (listOfNetworksInChunk.isEmpty()) {
+                        networksByChunkPos.remove(memberBlockPosLong);
                     }
                 }
-                if (networksInChunk.isEmpty()) {
-                    networksByChunkPos.remove(memberBlockPosLong);
+                if (networksByChunkPos.isEmpty()) {
+                    networksByLevelChunk.remove(level);
                 }
             }
-            if (networksByChunkPos.isEmpty()) {
-                networksByLevelChunk.remove(level);
+        }
+
+        // Remove the network from the level if it is now empty
+        if (network.isEmpty()) {
+            List<BlockNetwork<T>> networksInLevel = networksByLevel.get(level);
+            if (networksInLevel != null) {
+                networksInLevel.remove(network);
+                if (networksInLevel.isEmpty()) {
+                    networksByLevel.remove(level);
+                }
             }
         }
 

@@ -68,15 +68,15 @@ public class WaterTankBlockEntity extends BlockEntity {
     }
 
     /// The capacity of the tank is determined by the count of members in the [BlockNetwork]
-    public void updateTankCapacity(int connectedCount) {
+    public void updateTankCapacity(int activeMemberCount) {
 
         int newCapacity;
-        if (connectedCount == 0) {
+        if (activeMemberCount == 0) {
             // Make the tank empty
             newCapacity = 0;
         } else {
             // Update the capacity using $ 2^(n-1) $
-            newCapacity = (int) Math.pow(2, connectedCount - 1) * 1000;
+            newCapacity = (int) Math.pow(2, activeMemberCount - 1) * 1000;
         }
 
         // Handle integer overflows

@@ -5,6 +5,7 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.objects.ObjectCollection;
+import it.unimi.dsi.fastutil.objects.ObjectSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.chunk.ChunkAccess;
@@ -115,6 +116,11 @@ public class ChunkPosMap<T> {
     public ObjectCollection<T> values() {
 
         return inner.values();
+    }
+
+    public ObjectSet<Long2ObjectMap.Entry<T>> entrySet() {
+
+        return inner.long2ObjectEntrySet();
     }
 
 }

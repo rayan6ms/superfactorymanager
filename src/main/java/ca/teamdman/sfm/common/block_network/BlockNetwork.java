@@ -43,24 +43,39 @@ public class BlockNetwork<T> {
     }
 
     public BlockPosMap<T> members() {
+
         return membersByBlockPosition;
     }
 
     public ChunkPosMap<BlockPosSet> memberBlockPositionsByChunk() {
+
         return memberBlockPositionsByChunk;
+    }
+
+    public boolean isEmpty() {
+
+        return membersByBlockPosition.isEmpty();
+    }
+
+    public boolean usesChunk(ChunkPos chunkPos) {
+
+        return usesChunk(chunkPos.toLong());
+    }
+
+    public boolean usesChunk(long chunkPos) {
+
+        return memberBlockPositionsByChunk.containsKey(chunkPos);
+    }
+
+    public boolean isMember(BlockPos blockPos) {
+
+        return membersByBlockPosition.containsKey(blockPos);
     }
 
     @Nullable T getCandidate(BlockPos pos) {
 
         return this.memberFactory.apply(level, pos);
     }
-
-    void rebuild(BlockPos start) {
-
-        membersByBlockPosition.clear();
-        memberBlockPositionsByChunk.clear();
-    }
-
 
     Stream<Pair<BlockPos, T>> discoverCandidatesFromLevel(
             BlockPos start
@@ -135,23 +150,16 @@ public class BlockNetwork<T> {
         memberBlockPositionsByChunk.computeIfAbsent(memberBlockPos, k -> new BlockPosSet()).add(memberBlockPos);
     }
 
-    public boolean isMember(BlockPos blockPos) {
+    void removeMember(BlockPos blockPos) {
 
-        return membersByBlockPosition.containsKey(blockPos);
-    }
-
-    @SuppressWarnings("UnusedReturnValue")
-    @Nullable T removeMember(BlockPos blockPos) {
-
-        T rtn = membersByBlockPosition.remove(blockPos);
-        if (rtn != null) {
+        boolean wasPresent = membersByBlockPosition.remove(blockPos) != null;
+        if (wasPresent) {
             BlockPosSet chunkMemberBlockPositions = Objects.requireNonNull(memberBlockPositionsByChunk.get(blockPos));
             chunkMemberBlockPositions.remove(blockPos);
             if (chunkMemberBlockPositions.isEmpty()) {
                 memberBlockPositionsByChunk.remove(blockPos);
             }
         }
-        return rtn;
     }
 
     /// Discover from the other network into this one.
@@ -220,4 +228,5 @@ public class BlockNetwork<T> {
         }
         return branches;
     }
+
 }
