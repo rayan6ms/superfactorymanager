@@ -2,9 +2,12 @@ package ca.teamdman.sfm.common.util;
 
 import it.unimi.dsi.fastutil.longs.LongArraySet;
 import it.unimi.dsi.fastutil.longs.LongIterator;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 
-public record BlockPosSet(LongArraySet inner) {
+import java.util.Iterator;
+
+public record BlockPosSet(LongSet inner) implements Iterable<BlockPos> {
     public BlockPosSet() {
 
         this(new LongArraySet());
@@ -17,9 +20,10 @@ public record BlockPosSet(LongArraySet inner) {
 
     }
 
-    public void addAll(BlockPosSet otherChunkPositions) {
+    /// @return {@code true} if the collection was modified
+    public boolean addAll(BlockPosSet otherChunkPositions) {
 
-        inner.addAll(otherChunkPositions.inner);
+        return inner.addAll(otherChunkPositions.inner);
 
     }
 
@@ -52,6 +56,61 @@ public record BlockPosSet(LongArraySet inner) {
 
         return inner.remove(blockPos.asLong());
 
+    }
+
+    public boolean contains(BlockPos pos) {
+
+        return inner.contains(pos.asLong());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        if (!(o instanceof BlockPosSet that)) return false;
+
+        return inner.equals(that.inner);
+    }
+
+    @Override
+    public int hashCode() {
+
+        return inner.hashCode();
+    }
+
+    public boolean add(long blockPosLong) {
+
+        return inner.add(blockPosLong);
+    }
+
+    @Override
+    public Iterator<BlockPos> iterator() {
+
+        return new Iterator<BlockPos>() {
+            final LongIterator inner = BlockPosSet.this.longIterator();
+
+            @Override
+            public boolean hasNext() {
+
+                return inner.hasNext();
+            }
+
+            @Override
+            public BlockPos next() {
+
+                return BlockPos.of(inner.nextLong());
+            }
+
+            @Override
+            public void remove() {
+
+                inner.remove();
+            }
+
+            public int skip(int n) {
+
+                return inner.skip(n);
+            }
+        };
     }
 
 }

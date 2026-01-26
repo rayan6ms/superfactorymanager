@@ -42,9 +42,10 @@ public class ChunkPosMap<T> {
         return get(chunkPos.toLong());
     }
 
-    public @Nullable T get(long key) {
+    /// CORRECTNESS: make sure this is not a {@link BlockPos#asLong()}
+    public @Nullable T get(long chunkPosLong) {
 
-        return inner.get(key);
+        return inner.get(chunkPosLong);
     }
 
     public @Nullable T get(BlockPos blockPos) {
@@ -63,9 +64,10 @@ public class ChunkPosMap<T> {
         return remove(chunkPos.toLong());
     }
 
-    public @Nullable T remove(long key) {
+    /// @param chunkPosLong Correctness: MUST come from {@link ChunkPos#asLong}, not to be confused with a {@link BlockPos#asLong()}
+    public @Nullable T remove(long chunkPosLong) {
 
-        return inner.remove(key);
+        return inner.remove(chunkPosLong);
     }
 
     public LongSet keySet() {
@@ -83,29 +85,29 @@ public class ChunkPosMap<T> {
         return inner.containsKey(key);
     }
 
+    /// @param chunkPosLong Correctness: must be from {@link ChunkPos#asLong}, not to be confused with a {@link BlockPos#asLong()}
     public T computeIfAbsent(
-            long key,
+            long chunkPosLong,
             Long2ObjectFunction<? extends T> mappingFunction
     ) {
 
-        return inner.computeIfAbsent(key, mappingFunction);
+        return inner.computeIfAbsent(chunkPosLong, mappingFunction);
     }
 
     public T computeIfAbsent(
-            ChunkPos key,
+            BlockPos memberBlockPos,
             Long2ObjectFunction<? extends T> mappingFunction
     ) {
 
-        return inner.computeIfAbsent(key.toLong(), mappingFunction);
+        return computeIfAbsent(ChunkPos.asLong(memberBlockPos), mappingFunction);
     }
 
-
     public T computeIfAbsent(
-            BlockPos blockPos,
+            ChunkPos chunkPos,
             Long2ObjectFunction<? extends T> mappingFunction
     ) {
 
-        return inner.computeIfAbsent(ChunkPos.asLong(blockPos), mappingFunction);
+        return inner.computeIfAbsent(chunkPos.toLong(), mappingFunction);
     }
 
     public @Nullable T remove(BlockPos blockPos) {

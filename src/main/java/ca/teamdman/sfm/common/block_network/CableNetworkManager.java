@@ -235,17 +235,17 @@ public class CableNetworkManager {
         levelToCableNetworkMap.getOrDefault(network.getLevel(), Collections.emptyList()).remove(network);
 
         // Unregister network from cable position lookup
-        BlockPosMap<CableNetwork> posMap = levelToBlockPosToCableNetworkMap
+        BlockPosMap<CableNetwork> memberBlockPosMap = levelToBlockPosToCableNetworkMap
                 .computeIfAbsent(network.getLevel(), k -> new BlockPosMap<>());
-        network.getCablePositionsRaw().forEach(posMap::remove);
+        network.getCablePositionsRaw().forEach(memberBlockPosMap::remove);
         onNetworkLookupChanged();
     }
 
     private static void addNetwork(CableNetwork network) {
-        // Register network to level lookup
+        // Register the network to the level lookup
         levelToCableNetworkMap.computeIfAbsent(network.getLevel(), k -> new ArrayList<>()).add(network);
 
-        // Register network to cable position lookup
+        // Register the network to the cable position lookup
         BlockPosMap<CableNetwork> posMap = levelToBlockPosToCableNetworkMap
                 .computeIfAbsent(network.getLevel(), k -> new BlockPosMap<>());
         network.getCablePositionsRaw().forEach(cablePos -> posMap.put(cablePos, network));

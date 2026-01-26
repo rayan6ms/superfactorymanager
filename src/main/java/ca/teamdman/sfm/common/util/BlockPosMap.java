@@ -10,6 +10,7 @@ public record BlockPosMap<T>(
         Long2ObjectOpenHashMap<T> inner
 ) {
     public BlockPosMap() {
+
         this(new Long2ObjectOpenHashMap<>());
     }
 
@@ -39,23 +40,36 @@ public record BlockPosMap<T>(
         return inner.computeIfAbsent(key, mappingFunction);
     }
 
-    public @Nullable T get(long key) {
+    /// Correctness: make sure this is not a {@link net.minecraft.world.level.ChunkPos#asLong}
+    public @Nullable T get(long blockPosLong) {
 
-        return inner.get(key);
-    }
-    public @Nullable T get(BlockPos key) {
-
-        return inner.get(key.asLong());
+        return inner.get(blockPosLong);
     }
 
-    public @Nullable T remove(long key) {
+    public @Nullable T get(BlockPos blockPos) {
 
-        return inner.remove(key);
+        return inner.get(blockPos.asLong());
     }
 
-    public LongSet keySet() {
+    /// Correctness: make sure this is not a {@link net.minecraft.world.level.ChunkPos#asLong}
+    public @Nullable T remove(long blockPosLong) {
+
+        return inner.remove(blockPosLong);
+    }
+
+    public @Nullable T remove(BlockPos blockPos) {
+
+        return inner.remove(blockPos.asLong());
+    }
+
+    public LongSet keysAsLongSet() {
 
         return inner.keySet();
+    }
+
+    public BlockPosSet keysAsBlockPosSet() {
+
+        return new BlockPosSet(inner.keySet());
     }
 
     public int size() {
@@ -79,14 +93,16 @@ public record BlockPosMap<T>(
     }
 
     public void putAll(BlockPosMap<T> pos2TankMap) {
+
         inner.putAll(pos2TankMap.inner);
 
     }
 
-    public void removeKeys(BlockPosSet keys) {
-        LongIterator longIterator = keys.longIterator();
-        while (longIterator.hasNext()) {
-            this.remove(longIterator.nextLong());
+    public void removeBlockPositions(BlockPosSet blockPosSet) {
+
+        LongIterator blockPosLongIter = blockPosSet.longIterator();
+        while (blockPosLongIter.hasNext()) {
+            this.remove(blockPosLongIter.nextLong());
         }
     }
 
@@ -98,18 +114,14 @@ public record BlockPosMap<T>(
         return inner.put(blockPos.asLong(), member);
     }
 
-    public @Nullable T remove(BlockPos blockPos) {
-
-        return inner.remove(blockPos.asLong());
-    }
-
     public boolean containsKey(BlockPos blockPos) {
 
         return inner.containsKey(blockPos.asLong());
     }
 
-    public boolean removeKeys(LongSet blockPosSet) {
-        return inner.keySet().removeAll(blockPosSet);
+    public boolean removeBlockPositions(LongSet blockPosLongSet) {
+
+        return inner.keySet().removeAll(blockPosLongSet);
 
     }
 

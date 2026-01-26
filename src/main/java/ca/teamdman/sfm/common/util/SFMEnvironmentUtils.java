@@ -13,7 +13,7 @@ public class SFMEnvironmentUtils {
 
     public static boolean isInIDE() {
 
-        return !FMLEnvironment.production;
+        return !FMLEnvironment.production || !isGameLoaded();
     }
 
     public static boolean isClient() {

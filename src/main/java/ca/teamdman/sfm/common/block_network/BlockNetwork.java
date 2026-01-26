@@ -2,10 +2,11 @@ package ca.teamdman.sfm.common.block_network;
 
 import ca.teamdman.sfm.common.util.*;
 import com.mojang.datafixers.util.Pair;
+import it.unimi.dsi.fastutil.longs.Long2ObjectFunction;
+import it.unimi.dsi.fastutil.longs.LongIterator;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.ChunkPos;
-import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -17,18 +18,20 @@ import java.util.stream.Stream;
 /// A block network is a contiguous chain of blocks touching in the world.
 /// Block networks are tracked by a {@link BlockNetworkManager}.
 /// Methods are intentionally package-private since the block network manager needs to be kept in sync.
-public class BlockNetwork<T> {
-    private final Level level;
+///
+/// The {@link LEVEL} generic is used to enable unit testing without instantiating full Minecraft level objects.
+public class BlockNetwork<LEVEL, T> {
+    private final LEVEL level;
 
     private final BlockPosMap<T> membersByBlockPosition;
 
     private final ChunkPosMap<BlockPosSet> memberBlockPositionsByChunk;
 
-    private final BiFunction<Level, BlockPos, T> memberFactory;
+    private final BiFunction<LEVEL, BlockPos, T> memberFactory;
 
     public BlockNetwork(
-            Level level,
-            BiFunction<Level, BlockPos, @Nullable T> memberFactory
+            LEVEL level,
+            BiFunction<LEVEL, BlockPos, @Nullable T> memberFactory
     ) {
 
         this.level = level;
@@ -37,7 +40,7 @@ public class BlockNetwork<T> {
         this.memberFactory = memberFactory;
     }
 
-    public Level level() {
+    public LEVEL level() {
 
         return level;
     }
@@ -70,6 +73,16 @@ public class BlockNetwork<T> {
     public boolean isMember(BlockPos blockPos) {
 
         return membersByBlockPosition.containsKey(blockPos);
+    }
+
+    public int size() {
+
+        return membersByBlockPosition.size();
+    }
+
+    public boolean containsBlockPos(BlockPos memberBlockPos) {
+
+        return membersByBlockPosition.containsKey(memberBlockPos);
     }
 
     @Nullable T getCandidate(BlockPos pos) {
@@ -124,7 +137,7 @@ public class BlockNetwork<T> {
 
         BlockPosSet positionsInChunk = memberBlockPositionsByChunk.get(chunkPos);
         if (positionsInChunk != null) {
-            membersByBlockPosition.removeKeys(positionsInChunk);
+            membersByBlockPosition.removeBlockPositions(positionsInChunk);
             memberBlockPositionsByChunk.remove(chunkPos);
         }
     }
@@ -147,7 +160,13 @@ public class BlockNetwork<T> {
     ) {
 
         membersByBlockPosition.put(memberBlockPos, member);
-        memberBlockPositionsByChunk.computeIfAbsent(memberBlockPos, k -> new BlockPosSet()).add(memberBlockPos);
+
+        memberBlockPositionsByChunk
+                .computeIfAbsent(
+                        memberBlockPos,
+                        (Long2ObjectFunction<? extends BlockPosSet>) k -> new BlockPosSet()
+                )
+                .add(memberBlockPos);
     }
 
     void removeMember(BlockPos blockPos) {
@@ -164,7 +183,7 @@ public class BlockNetwork<T> {
 
     /// Discover from the other network into this one.
     private void populateFromPosition(
-            BlockNetwork<T> other,
+            BlockNetwork<LEVEL, T> other,
             BlockPos startPos
     ) {
 
@@ -175,28 +194,29 @@ public class BlockNetwork<T> {
         });
     }
 
-    void addAllFromOtherNetwork(BlockNetwork<T> other) {
+    void addAllFromOtherNetwork(BlockNetwork<LEVEL, T> other) {
 
         membersByBlockPosition.putAll(other.membersByBlockPosition);
-        for (long chunkPos : other.memberBlockPositionsByChunk.keySet()) {
+        for (LongIterator iterator = other.memberBlockPositionsByChunk.keySet().iterator(); iterator.hasNext(); ) {
+            long chunkPosLong = iterator.nextLong();
             BlockPosSet thisChunkPositions = this.memberBlockPositionsByChunk.computeIfAbsent(
-                    chunkPos,
+                    chunkPosLong,
                     k -> new BlockPosSet()
             );
-            BlockPosSet otherChunkPositions = other.memberBlockPositionsByChunk.get(chunkPos);
+            BlockPosSet otherChunkPositions = other.memberBlockPositionsByChunk.get(chunkPosLong);
             assert otherChunkPositions != null;
             thisChunkPositions.addAll(otherChunkPositions);
         }
     }
 
     /// Determine the networks that would result from this network having the given position removed.
-    List<BlockNetwork<T>> splitRemoveMember(BlockPos blockPos) {
+    List<BlockNetwork<LEVEL, T>> splitRemoveMember(BlockPos blockPos) {
 
         // Remove the position from the network
         removeMember(blockPos);
 
         // Prepare the list of resulting branch networks
-        List<BlockNetwork<T>> branches = new ArrayList<>();
+        List<BlockNetwork<LEVEL, T>> branches = new ArrayList<>();
 
         // For each neighbour of the removed position, identify branch uniqueness
         for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
@@ -209,7 +229,7 @@ public class BlockNetwork<T> {
 
             // Skip if the neighbour position is a member of one of the branches we have already discovered
             boolean alreadySeen = false;
-            for (BlockNetwork<T> branch : branches) {
+            for (BlockNetwork<LEVEL, T> branch : branches) {
                 if (branch.isMember(neighbourPos)) {
                     alreadySeen = true;
                     break;
@@ -218,7 +238,7 @@ public class BlockNetwork<T> {
             if (alreadySeen) continue;
 
             // Create the new water network to hold the branch
-            BlockNetwork<T> branch = new BlockNetwork<>(level, memberFactory);
+            BlockNetwork<LEVEL, T> branch = new BlockNetwork<>(level, memberFactory);
 
             // Populate the branch from this network
             branch.populateFromPosition(this, neighbourPos);

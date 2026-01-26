@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.block_network.WaterNetworkManager;
+import ca.teamdman.sfm.common.blockentity.WaterTankBlockEntity;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.util.SFMDirections;
@@ -51,7 +52,8 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
             BlockState pOldState,
             boolean pIsMoving
     ) {
-        WaterNetworkManager.onWaterTankBlockActiveStateChanged(pLevel, pPos);
+        /// Do nothing because the {@link WaterTankBlockEntity#onLoad()} method handles this logic
+//        WaterNetworkManager.onWaterTankBlockActiveStateChanged(pLevel, pPos);
     }
 
     @Override

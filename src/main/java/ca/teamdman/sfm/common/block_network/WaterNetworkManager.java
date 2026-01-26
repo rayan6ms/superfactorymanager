@@ -12,7 +12,7 @@ import net.minecraftforge.event.level.LevelEvent;
 import org.jetbrains.annotations.Nullable;
 
 public class WaterNetworkManager {
-    private static final BlockNetworkManager<WaterTankBlockEntity> NETWORK_MANAGER = new BlockNetworkManager<>(
+    private static final BlockNetworkManager<Level, WaterTankBlockEntity> NETWORK_MANAGER = new BlockNetworkManager<>(
             (level, blockPos) -> {
                 BlockEntity blockEntity = level.getBlockEntity(blockPos);
                 if (blockEntity instanceof WaterTankBlockEntity waterTankBlockEntity) {
@@ -71,6 +71,7 @@ public class WaterNetworkManager {
     }
 
     public static void printNetworks() {
+
         boolean enabled = true;
         if (!enabled) return;
 
@@ -85,8 +86,10 @@ public class WaterNetworkManager {
     ) {
 
         // Get the network
-        @Nullable BlockNetwork<WaterTankBlockEntity> network
-                = NETWORK_MANAGER.getOrRegisterNetworkFromMemberPosition(level, blockPos);
+        @Nullable BlockNetwork<Level, WaterTankBlockEntity> network = NETWORK_MANAGER.onMemberAddedToLevel(
+                level,
+                blockPos
+        );
         if (network == null) return;
 
         // Determine how many members of the network are active
@@ -120,6 +123,7 @@ public class WaterNetworkManager {
     }
 
     public static void clear() {
+
         NETWORK_MANAGER.clear();
 
     }

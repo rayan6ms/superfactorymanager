@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.net.ServerboundFacadePacket;
 import ca.teamdman.sfm.common.util.InPlaceBlockPlaceContext;
+import ca.teamdman.sfm.common.util.SFMBlockPosUtils;
 import ca.teamdman.sfm.common.util.SFMStreamUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.player.Player;
@@ -150,7 +151,7 @@ public class FacadePlanner {
                     yield SFMStreamUtils.<BlockPos, BlockPos>getRecursiveStream(
                             (current, next, results) -> {
                                 results.accept(current);
-                                SFMStreamUtils.get3DNeighboursIncludingKittyCorner(current)
+                                SFMBlockPosUtils.get3DNeighboursIncludingKittyCorner(current)
                                         .filter(neighbour -> {
                                             if (!cablePositions.contains(neighbour)) {
                                                 return false;
@@ -174,7 +175,7 @@ public class FacadePlanner {
                     yield SFMStreamUtils.<BlockPos, BlockPos>getRecursiveStream(
                             (current, next, results) -> {
                                 results.accept(current);
-                                SFMStreamUtils.get3DNeighboursIncludingKittyCorner(current)
+                                SFMBlockPosUtils.get3DNeighboursIncludingKittyCorner(current)
                                         .filter(neighbour -> {
                                             if (!cablePositions.contains(neighbour)) {
                                                 return false;
