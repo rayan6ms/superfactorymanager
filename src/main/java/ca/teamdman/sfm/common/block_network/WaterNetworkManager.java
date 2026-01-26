@@ -81,7 +81,7 @@ public class WaterNetworkManager {
 
     public static void printNetworks() {
 
-        boolean enabled = true;
+        boolean enabled = false;
         if (!enabled) return;
 
         NETWORK_MANAGER.printDebugInfo();
