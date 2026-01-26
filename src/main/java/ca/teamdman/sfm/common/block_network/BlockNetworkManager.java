@@ -158,14 +158,14 @@ public class BlockNetworkManager<LEVEL, T> {
     }
 
     /// MUST be called to keep the networks in sync
-    public void onMemberRemovedFromLevel(
+    public List<BlockNetwork<LEVEL, T>> onMemberRemovedFromLevel(
             LEVEL level,
             BlockPos memberBlockPos
     ) {
 
         // Identify the network associated with the member position
         BlockNetwork<LEVEL, T> oldNetwork = getNetwork(level, memberBlockPos);
-        if (oldNetwork == null) return;
+        if (oldNetwork == null) return List.of();
 
         // Untrack the position as the member has been removed from the level
         untrackMemberFromNetwork(memberBlockPos, oldNetwork);
@@ -184,6 +184,8 @@ public class BlockNetworkManager<LEVEL, T> {
             assertInvariants();
             assertNetworkForgotten(oldNetwork);
         }
+
+        return resultingNetworks;
     }
 
 

@@ -9,7 +9,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.event.level.LevelEvent;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 public class WaterNetworkManager {
     private static final BlockNetworkManager<Level, WaterTankBlockEntity> NETWORK_MANAGER = new BlockNetworkManager<>(
@@ -44,7 +47,7 @@ public class WaterNetworkManager {
         }
 
         // Update water tank capacities on the network
-        updateWaterTankCapacities(level, blockPos);
+        updateWaterTankCapacitiesForNetworkOfMember(level, blockPos);
 
         if (SFMEnvironmentUtils.isInIDE()) {
             printNetworks();
@@ -60,10 +63,16 @@ public class WaterNetworkManager {
         if (level.isClientSide()) return;
 
         // Remove the member
-        NETWORK_MANAGER.onMemberRemovedFromLevel(level, blockPos);
+        List<BlockNetwork<Level, WaterTankBlockEntity>> newNetworks = NETWORK_MANAGER.onMemberRemovedFromLevel(
+                level,
+                blockPos
+        );
 
-        // Update water tank capacities on the network
-        updateWaterTankCapacities(level, blockPos);
+        // Update water tank capacities of the networks that remain after removal
+        for (BlockNetwork<Level, WaterTankBlockEntity> network : newNetworks) {
+            updateWaterTankCapacitiesForNetwork(network);
+        }
+
 
         if (SFMEnvironmentUtils.isInIDE()) {
             printNetworks();
@@ -80,7 +89,7 @@ public class WaterNetworkManager {
 
     /// Get the network for the given block position and update the capacities
     /// of the water tanks in that network.
-    public static void updateWaterTankCapacities(
+    public static void updateWaterTankCapacitiesForNetworkOfMember(
             Level level,
             BlockPos blockPos
     ) {
@@ -92,6 +101,11 @@ public class WaterNetworkManager {
         );
         if (network == null) return;
 
+        updateWaterTankCapacitiesForNetwork(network);
+
+    }
+
+    private static void updateWaterTankCapacitiesForNetwork(@NotNull BlockNetwork<Level, WaterTankBlockEntity> network) {
         // Determine how many members of the network are active
         int activeMemberCount = 0;
         for (WaterTankBlockEntity member : network.members().values()) {
@@ -104,7 +118,6 @@ public class WaterNetworkManager {
         for (WaterTankBlockEntity member : network.members().values()) {
             member.updateTankCapacity(activeMemberCount);
         }
-
     }
 
     @SFMSubscribeEvent
