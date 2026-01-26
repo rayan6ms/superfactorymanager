@@ -16,7 +16,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.HashSet;
@@ -98,7 +97,7 @@ public class FacadePlanner {
         );
     }
 
-    private static @NotNull Set<BlockPos> getPositions(
+    private static Set<BlockPos> getPositions(
             Level level,
             ServerboundFacadePacket msg,
             BlockPos hitPos,

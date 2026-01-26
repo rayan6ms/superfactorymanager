@@ -106,6 +106,7 @@ public record BlockPosSet(LongSet inner) implements Iterable<BlockPos> {
                 inner.remove();
             }
 
+            @SuppressWarnings("unused")
             public int skip(int n) {
 
                 return inner.skip(n);

@@ -22,7 +22,9 @@ public @interface SFMSubscribeEvent {
 
     boolean receiveCanceled() default false;
 
-    @SuppressWarnings("SpellCheckingInspection")
+    // This is unused and idk what the modid param in the built-in event bus subscriber does so I'll leave until
+    // I understand enough to safely remove it.
+    @SuppressWarnings({"unused", "SpellCheckingInspection"})
     String modid() default SFM.MOD_ID;
 
 }

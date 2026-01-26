@@ -534,39 +534,6 @@ public class BlockNetworkManager<LEVEL, T> {
         networksInLevel.add(newNetwork);
     }
 
-    private void untrackNetwork(BlockNetwork<LEVEL, T> network) {
-
-        LEVEL level = network.level();
-
-        // Remove the block position entries
-        BlockPosMap<BlockNetwork<LEVEL, T>> networksByBlockPos = networksByLevelBlockPos.get(level);
-        networksByBlockPos.removeBlockPositions(network.members().keysAsLongSet());
-        if (networksByBlockPos.isEmpty()) networksByLevelBlockPos.remove(level);
-
-        // Remove the chunk entries
-        ChunkPosMap<Set<BlockNetwork<LEVEL, T>>> networksByChunkPos = networksByLevelChunk.get(level);
-        ChunkPosMap<BlockPosSet> networkChunkPositions = network.memberBlockPositionsByChunk();
-
-        for (LongIterator chunkPosLongIter = networkChunkPositions.keySet().iterator(); chunkPosLongIter.hasNext(); ) {
-            long chunkPosLong = chunkPosLongIter.nextLong();
-            Set<BlockNetwork<LEVEL, T>> networksInChunk = networksByChunkPos.get(chunkPosLong);
-            if (networksInChunk != null) {
-                networksInChunk.remove(network);
-                if (networksInChunk.isEmpty()) {
-                    networksByChunkPos.remove(chunkPosLong);
-                }
-            }
-        }
-
-        // Remove the level entries
-        Set<BlockNetwork<LEVEL, T>> levelNetworks = networksByLevel.get(level);
-        if (levelNetworks != null) {
-            levelNetworks.remove(network);
-            if (levelNetworks.isEmpty()) networksByLevel.remove(level);
-        }
-
-    }
-
 
     /// Remove the lookup table entries for the given position.
     /// This DOES NOT perform network splitting!

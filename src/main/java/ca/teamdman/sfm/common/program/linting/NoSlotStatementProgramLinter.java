@@ -74,8 +74,9 @@ public class NoSlotStatementProgramLinter implements IProgramLinter {
                     inputStatement.labelAccess(),
                     (label, pos, direction, cap) -> {
                         anyCapability.set(true);
+                        //noinspection rawtypes,unchecked
                         searchForValidSlots(
-                                (ResourceType<Object, Object, Object>) resourceType,
+                                (ResourceType) resourceType,
                                 inputStatement.labelAccess(),
                                 cap,
                                 ioDirection,

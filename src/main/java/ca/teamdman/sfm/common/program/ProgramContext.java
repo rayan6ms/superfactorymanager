@@ -131,7 +131,7 @@ public class ProgramContext {
             int redstonePulses,
             SimulateExploreAllPathsProgramBehaviour behaviour
     ) {
-        //noinspection DataFlowIssue,ConstantValue // simulation mode must be able to run without world access
+        //noinspection DataFlowIssue // simulation mode must be able to run without world access
         return new ProgramContext(
                 program,
                 manager,

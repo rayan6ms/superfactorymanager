@@ -14,7 +14,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
  * Tests a plus-shaped water tank network with water, verifying that removing
  * the center tank splits the network into 4 separate networks, each with their
  * own capacity based on active member count.
- * 
+ * <p>
  * Structure:
  * <pre>
  *     W

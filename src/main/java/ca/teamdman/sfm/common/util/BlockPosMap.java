@@ -1,6 +1,9 @@
 package ca.teamdman.sfm.common.util;
 
-import it.unimi.dsi.fastutil.longs.*;
+import it.unimi.dsi.fastutil.longs.Long2ObjectFunction;
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
+import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import it.unimi.dsi.fastutil.objects.ObjectCollection;
 import net.minecraft.core.BlockPos;
 import org.jetbrains.annotations.Nullable;
@@ -98,12 +101,9 @@ public record BlockPosMap<T>(
 
     }
 
-    public void removeBlockPositions(BlockPosSet blockPosSet) {
+    public boolean removeBlockPositions(BlockPosSet blockPosSet) {
 
-        LongIterator blockPosLongIter = blockPosSet.longIterator();
-        while (blockPosLongIter.hasNext()) {
-            this.remove(blockPosLongIter.nextLong());
-        }
+        return removeBlockPositions(blockPosSet.inner());
     }
 
     public @Nullable T put(

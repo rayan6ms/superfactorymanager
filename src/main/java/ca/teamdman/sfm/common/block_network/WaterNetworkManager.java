@@ -9,7 +9,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.event.level.LevelEvent;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -105,7 +104,7 @@ public class WaterNetworkManager {
 
     }
 
-    private static void updateWaterTankCapacitiesForNetwork(@NotNull BlockNetwork<Level, WaterTankBlockEntity> network) {
+    private static void updateWaterTankCapacitiesForNetwork(BlockNetwork<Level, WaterTankBlockEntity> network) {
         // Determine how many members of the network are active
         int activeMemberCount = 0;
         for (WaterTankBlockEntity member : network.members().values()) {

@@ -142,13 +142,6 @@ public class BlockNetwork<LEVEL, T> {
         }
     }
 
-    void tryAddMember(BlockPos blockPos) {
-
-        @Nullable T member = getCandidate(blockPos);
-        if (member == null) return;
-        addMember(blockPos, member);
-    }
-
     void addMember(Pair<BlockPos, T> pair) {
 
         addMember(pair.getFirst(), pair.getSecond());

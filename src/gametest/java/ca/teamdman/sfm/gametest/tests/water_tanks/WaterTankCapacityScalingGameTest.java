@@ -12,7 +12,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /**
  * Tests that water tank capacity scales correctly with active member count.
- * 
+ * <p>
  * Capacity formula: 2^(activeMemberCount - 1) * 1000
  * - 0 active: 0 capacity
  * - 1 active: 1000 capacity
@@ -20,7 +20,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
  * - 3 active: 4000 capacity
  * - 4 active: 8000 capacity
  * - 5 active: 16000 capacity
- * 
+ * <p>
  * This test places 5 water tanks in a row and progressively activates them
  * by adding water sources, verifying capacity at each step.
  */

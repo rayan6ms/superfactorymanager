@@ -12,7 +12,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /**
  * Tests that water tanks correctly detect active state when surrounded by water sources.
- * 
+ * <p>
  * Structure (7x2x5):
  * <pre>
  * xxxxxxx
@@ -25,7 +25,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
  * - x = stone (containment)
  * - a = water source
  * - b = water tank
- * 
+ * <p>
  * Tests:
  * 1. All 5 tanks should be active when surrounded by water
  * 2. Removing water sources should deactivate tanks
@@ -75,13 +75,9 @@ public class WaterTankRowWithWaterGameTest extends SFMGameTestDefinition {
         }
 
         // Place water sources in the rows above and below the tanks (z=1 and z=3)
-        BlockPos[] waterPositionsAbove = new BlockPos[5];
-        BlockPos[] waterPositionsBelow = new BlockPos[5];
         for (int x = 1; x <= 5; x++) {
             BlockPos above = new BlockPos(x, 2, 1);
             BlockPos below = new BlockPos(x, 2, 3);
-            waterPositionsAbove[x - 1] = above;
-            waterPositionsBelow[x - 1] = below;
             helper.setBlock(above, Blocks.WATER);
             helper.setBlock(below, Blocks.WATER);
         }

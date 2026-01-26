@@ -12,7 +12,7 @@ import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /**
  * Tests water tank network formation, splitting, and merging behavior.
- * 
+ * <p>
  * This test verifies:
  * 1. Water tanks form a single network when touching
  * 2. Breaking a tank splits the network appropriately
