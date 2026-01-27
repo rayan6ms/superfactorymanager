@@ -57,7 +57,7 @@ public class TunnelledBlockCapabilityGameTestGenerator extends SFMGameTestGenera
     public void generateTests(Consumer<SFMGameTestDefinition> testConsumer) {
 
         for (TunnelledBlockVariant variant : TUNNELLED_BLOCKS) {
-            for (Direction direction : Direction.values()) {
+            for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
                 testConsumer.accept(new TunnelledBlockCapabilityTest(variant, direction));
             }
         }
