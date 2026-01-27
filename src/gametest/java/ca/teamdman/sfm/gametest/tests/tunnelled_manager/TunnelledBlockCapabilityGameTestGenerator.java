@@ -1,6 +1,7 @@
 package ca.teamdman.sfm.gametest.tests.tunnelled_manager;
 
 import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.util.SFMDirections;
 import ca.teamdman.sfm.gametest.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;

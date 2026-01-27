@@ -14,15 +14,21 @@ import org.jetbrains.annotations.Nullable;
 import java.util.List;
 
 public class WaterNetworkManager {
-    private static final BlockNetworkManager<Level, WaterTankBlockEntity> NETWORK_MANAGER = new BlockNetworkManager<>(
-            (level, blockPos) -> {
-                BlockEntity blockEntity = level.getBlockEntity(blockPos);
-                if (blockEntity instanceof WaterTankBlockEntity waterTankBlockEntity) {
-                    return waterTankBlockEntity;
-                } else {
-                    return null;
-                }
-            }
+    private static final BlockNetworkMemberFilterMapper<Level, WaterTankBlockEntity> WATER_TANK_MEMBER_FILTER = (level, blockPos) -> {
+        BlockEntity blockEntity = level.getBlockEntity(blockPos);
+        if (blockEntity instanceof WaterTankBlockEntity waterTankBlockEntity) {
+            return waterTankBlockEntity;
+        } else {
+            return null;
+        }
+    };
+
+    private static final BlockNetworkConstructor<Level, WaterTankBlockEntity, BlockNetwork<Level, WaterTankBlockEntity>> WATER_TANK_NETWORK_CONSTRUCTOR =
+            BlockNetwork::new;
+
+    private static final BlockNetworkManager<Level, WaterTankBlockEntity, BlockNetwork<Level, WaterTankBlockEntity>> NETWORK_MANAGER = new BlockNetworkManager<>(
+            WATER_TANK_MEMBER_FILTER,
+            WATER_TANK_NETWORK_CONSTRUCTOR
     );
 
     public static void onLoad(WaterTankBlockEntity blockEntity) {
