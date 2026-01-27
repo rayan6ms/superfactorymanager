@@ -2,7 +2,6 @@ package ca.teamdman.sfm.common.block_network;
 
 import ca.teamdman.sfm.common.blockentity.WaterTankBlockEntity;
 import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
-import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
@@ -53,10 +52,6 @@ public class WaterNetworkManager {
 
         // Update water tank capacities on the network
         updateWaterTankCapacitiesForNetworkOfMember(level, blockPos);
-
-        if (SFMEnvironmentUtils.isInIDE()) {
-            printNetworks();
-        }
     }
 
     public static void onWaterTankBlockRemoved(
@@ -77,19 +72,6 @@ public class WaterNetworkManager {
         for (BlockNetwork<Level, WaterTankBlockEntity> network : newNetworks) {
             updateWaterTankCapacitiesForNetwork(network);
         }
-
-
-        if (SFMEnvironmentUtils.isInIDE()) {
-            printNetworks();
-        }
-    }
-
-    public static void printNetworks() {
-
-        boolean enabled = false;
-        if (!enabled) return;
-
-        NETWORK_MANAGER.printDebugInfo();
     }
 
     /// Get the network for the given block position and update the capacities

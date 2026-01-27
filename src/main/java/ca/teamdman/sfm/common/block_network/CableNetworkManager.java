@@ -2,7 +2,6 @@ package ca.teamdman.sfm.common.block_network;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
-import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfm.common.util.Unit;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
@@ -39,16 +38,6 @@ public class CableNetworkManager {
             CableNetwork::new
     );
 
-    /**
-     * For diagnostics, called when a lookup map has changed
-     */
-    private static void onNetworkLookupChanged() {
-        boolean logNetworkChanges = false;
-        if (!logNetworkChanges) return;
-        if (!SFMEnvironmentUtils.isInIDE()) return;
-        NETWORK_MANAGER.printDebugInfo();
-    }
-
     public static Optional<CableNetwork> getOrRegisterNetworkFromManagerPosition(ManagerBlockEntity tile) {
         Level level = tile.getLevel();
         assert level != null;
@@ -71,13 +60,11 @@ public class CableNetworkManager {
     public static void onCablePlaced(Level level, BlockPos pos) {
         if (level.isClientSide()) return;
         NETWORK_MANAGER.onMemberAddedToLevel(level, pos);
-        onNetworkLookupChanged();
     }
 
     public static void onCableRemoved(Level level, BlockPos cablePos) {
         if (level.isClientSide()) return;
         NETWORK_MANAGER.onMemberRemovedFromLevel(level, cablePos);
-        onNetworkLookupChanged();
     }
 
     public static void purgeCableNetworkForManager(ManagerBlockEntity manager) {
@@ -97,7 +84,6 @@ public class CableNetworkManager {
         if (level.isClientSide()) return Optional.empty();
 
         CableNetwork network = NETWORK_MANAGER.onMemberAddedToLevel(level, pos);
-        onNetworkLookupChanged();
         return Optional.ofNullable(network);
     }
 
@@ -113,7 +99,6 @@ public class CableNetworkManager {
 
     public static void clear() {
         NETWORK_MANAGER.clear();
-        onNetworkLookupChanged();
     }
 
     @SFMSubscribeEvent

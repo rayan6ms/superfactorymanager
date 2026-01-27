@@ -44,6 +44,16 @@ public class BlockNetworkManager<LEVEL, T, NETWORK extends BlockNetwork<LEVEL, T
         this.networkConstructor = networkConstructor;
     }
 
+    /// Called when the network structure changes.
+    /// Override to add custom behavior like additional logging.
+    /// Default implementation prints diagnostics and asserts invariants in IDE.
+    protected void onChange() {
+        printChangeDiagnostics();
+        if (SFMEnvironmentUtils.isInIDE()) {
+            assertInvariants();
+        }
+    }
+
     public @Nullable NETWORK getNetwork(
             LEVEL level,
             BlockPos blockPos
@@ -73,6 +83,7 @@ public class BlockNetworkManager<LEVEL, T, NETWORK extends BlockNetwork<LEVEL, T
         for (NETWORK network : networksForChunk) {
             network.purgeChunk(chunkPos);
         }
+        onChange();
     }
 
     public @Nullable NETWORK getOrRegisterNetworkFromMemberPosition(
@@ -150,7 +161,7 @@ public class BlockNetworkManager<LEVEL, T, NETWORK extends BlockNetwork<LEVEL, T
             });
         }
 
-        printChangeDiagnostics();
+        onChange();
         return resultNetwork;
     }
 
@@ -160,14 +171,10 @@ public class BlockNetworkManager<LEVEL, T, NETWORK extends BlockNetwork<LEVEL, T
             BlockPos memberBlockPos
     ) {
 
-        NETWORK rtn = getOrRegisterNetworkFromMemberPosition(
+        return getOrRegisterNetworkFromMemberPosition(
                 level,
                 memberBlockPos
         );
-        if (SFMEnvironmentUtils.isInIDE()) {
-            assertInvariants();
-        }
-        return rtn;
     }
 
     /// MUST be called to keep the networks in sync
@@ -188,9 +195,9 @@ public class BlockNetworkManager<LEVEL, T, NETWORK extends BlockNetwork<LEVEL, T
         if (oldNetwork.size() > SPLIT_SIZE_THRESHOLD) {
             untrackNetwork(oldNetwork);
             if (SFMEnvironmentUtils.isInIDE()) {
-                assertInvariants();
                 assertNetworkForgotten(oldNetwork);
             }
+            onChange();
             return List.of();
         }
 
@@ -206,10 +213,10 @@ public class BlockNetworkManager<LEVEL, T, NETWORK extends BlockNetwork<LEVEL, T
         // The old network should no longer be tracked as all lookup table entries
         // have been clobbered by the split after untracking the removed member position
         if (SFMEnvironmentUtils.isInIDE()) {
-            assertInvariants();
             assertNetworkForgotten(oldNetwork);
         }
 
+        onChange();
         return resultingNetworks;
     }
 
@@ -345,6 +352,7 @@ public class BlockNetworkManager<LEVEL, T, NETWORK extends BlockNetwork<LEVEL, T
         networksByLevelBlockPos.remove(level);
         networksByLevelChunk.remove(level);
         networksByLevel.remove(level);
+        onChange();
     }
 
     public void clear() {
@@ -352,6 +360,7 @@ public class BlockNetworkManager<LEVEL, T, NETWORK extends BlockNetwork<LEVEL, T
         networksByLevelBlockPos.clear();
         networksByLevelChunk.clear();
         networksByLevel.clear();
+        onChange();
     }
 
     public void printDebugInfo() {
@@ -485,6 +494,7 @@ public class BlockNetworkManager<LEVEL, T, NETWORK extends BlockNetwork<LEVEL, T
                 networksByLevel.remove(level);
             }
         }
+        onChange();
     }
 
     private void printChangeDiagnostics() {
