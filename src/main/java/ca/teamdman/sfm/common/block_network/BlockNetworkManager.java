@@ -220,7 +220,7 @@ public class BlockNetworkManager<LEVEL, T, NETWORK extends BlockNetwork<LEVEL, T
     }
 
 
-    public void assertNetworkForgotten(BlockNetwork<LEVEL, T> network) {
+    public void assertNetworkForgotten(NETWORK network) {
 
         LEVEL level = network.level();
 
@@ -239,7 +239,7 @@ public class BlockNetworkManager<LEVEL, T, NETWORK extends BlockNetwork<LEVEL, T
         }
 
         // Check the block position lookup
-        if (networksByLevelBlockPos.getOrDefault(level, new BlockPosMap<>()).values().contains(network)) {
+        if (networksByLevelBlockPos.getOrDefault(level, new BlockPosMap<>()).containsValue(network)) {
             throw new IllegalStateException("Network still tracked in block position lookup");
         }
     }

@@ -146,6 +146,7 @@ public final class BlockPosSet extends LongOpenHashSet {
         return new BlockPosIterator(BlockPosSet.this.longIterator());
     }
 
+    @SuppressWarnings("UnusedReturnValue")
     public boolean removeIfPosition(Predicate<BlockPos> blockPosPredicate) {
 
         boolean removed = false;
