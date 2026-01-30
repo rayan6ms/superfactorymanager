@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.block.IFacadableBlock;
 import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.util.BlockPosSet;
 import ca.teamdman.sfm.common.util.ConfirmationParams;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -19,11 +20,11 @@ import static ca.teamdman.sfm.common.facade.FacadeTransparency.FACADE_TRANSPAREN
 
 public record ChangeWorldBlockFacadePlan(
         IFacadableBlock worldBlock,
-        Set<BlockPos> positions
+        BlockPosSet positions
 ) implements IFacadePlan {
     @Override
     public void apply(Level level) {
-        this.positions().forEach(pos -> {
+        this.positions().blockPosIterator().forEach(pos -> {
             if (level.getBlockEntity(pos) instanceof IFacadeBlockEntity oldFacadeBlockEntity) {
                 // this position already has a facade
 

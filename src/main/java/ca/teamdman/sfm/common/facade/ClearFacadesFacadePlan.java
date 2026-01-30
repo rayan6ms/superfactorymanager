@@ -3,6 +3,7 @@ package ca.teamdman.sfm.common.facade;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.block.IFacadableBlock;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.util.BlockPosSet;
 import ca.teamdman.sfm.common.util.ConfirmationParams;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
@@ -13,11 +14,11 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Set;
 
 public record ClearFacadesFacadePlan(
-        Set<BlockPos> positions
+        BlockPosSet positions
 ) implements IFacadePlan {
     @Override
     public void apply(Level level) {
-        this.positions().forEach(pos -> {
+        this.positions().blockPosIterator().forEach(pos -> {
             Block existingBlock = level.getBlockState(pos).getBlock();
             if (existingBlock instanceof IFacadableBlock facadableBlock) {
                 BlockState nextBlockState = facadableBlock
