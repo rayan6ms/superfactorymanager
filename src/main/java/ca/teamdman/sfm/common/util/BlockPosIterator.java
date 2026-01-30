@@ -4,7 +4,6 @@ import it.unimi.dsi.fastutil.longs.LongIterator;
 import net.minecraft.core.BlockPos;
 
 import java.util.Iterator;
-import java.util.Optional;
 import java.util.function.LongConsumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;

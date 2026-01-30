@@ -5,15 +5,12 @@ import ca.teamdman.sfm.common.util.CompressedBlockPosSet;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import io.netty.buffer.Unpooled;
 import it.unimi.dsi.fastutil.longs.LongIterator;
-import it.unimi.dsi.fastutil.longs.LongLinkedOpenHashSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.*;
 import net.minecraft.network.FriendlyByteBuf;
 import org.junit.jupiter.api.Test;
 
 import java.io.*;
-import java.util.HashSet;
-import java.util.Set;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
