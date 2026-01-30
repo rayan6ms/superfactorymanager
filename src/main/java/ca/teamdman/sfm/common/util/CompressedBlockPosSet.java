@@ -15,10 +15,6 @@ import java.util.ArrayList;
 public class CompressedBlockPosSet {
     private final ArrayList<Volume> boundingVolumes = new ArrayList<>();
 
-    /**
-     * @param positions owned list of positions, this will be modified.
-     * @return this
-     */
     public static CompressedBlockPosSet from(BlockPosSet positions) {
 
         // Create the return object
