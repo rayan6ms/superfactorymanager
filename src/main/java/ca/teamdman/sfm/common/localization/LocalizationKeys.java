@@ -128,6 +128,14 @@ public final class LocalizationKeys {
             "gui.sfm.facade_confirm_apply.message",
             "%d different facade states across %d blocks that will be overwritten."
     );
+    public static final LocalizationEntry COMMAND_BUST_WATER_NETWORK_CACHE_SUCCESS = new LocalizationEntry(
+            "sfm.command.bust_water_network_cache.success",
+            "Successfully busted water network cache."
+    );
+    public static final LocalizationEntry COMMAND_BUST_CABLE_NETWORK_CACHE_SUCCESS = new LocalizationEntry(
+            "sfm.command.bust_cable_network_cache.success",
+            "Successfully busted cable network cache."
+    );
     public static final LocalizationEntry CONFIRM_FUNNY_YES_1 = new LocalizationEntry(
             "gui.sfm.confirm.funny.yes.1",
             "Yeah, sure, why not."
@@ -424,6 +432,18 @@ public final class LocalizationKeys {
             "program.sfm.warnings.output_label_not_found_in_inputs",
             "Statement \"%s\" at %s uses resource type \"%s\" which has no matching input statement."
     );
+    public static final LocalizationEntry PROGRAM_WARNING_NO_VIABLE_INPUT_SLOTS = new LocalizationEntry(
+            "program.sfm.warnings.no_viable_input_slots",
+            "No slots support extraction: statement \"%s\" at %s"
+    );
+    public static final LocalizationEntry PROGRAM_WARNING_NO_VIABLE_OUTPUT_SLOTS = new LocalizationEntry(
+            "program.sfm.warnings.no_viable_output_slots",
+            "No slots support insertion: statement \"%s\" at %s"
+    );
+    public static final LocalizationEntry PROGRAM_WARNING_NO_SLOTS = new LocalizationEntry(
+            "program.sfm.warnings.no_slots",
+            "Statement matches no slots: statement \"%s\" at %s"
+    );
     public static final LocalizationEntry PROGRAM_WARNING_UNUSED_INPUT_LABEL = new LocalizationEntry(
             "program.sfm.warnings.unused_input_label",
             "Statement \"%s\" at %s inputs \"%s\" from \"%s\" but no future output statement consume \"%s\"."
@@ -639,6 +659,10 @@ public final class LocalizationKeys {
     public static final LocalizationEntry LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_ZERO_TO_MOVE = new LocalizationEntry(
             "log.sfm.statement.tick.io.move_to.zero_to_move",
             "toMove=0, skipping"
+    );
+    public static final LocalizationEntry LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_EXTRACTED_NOTHING = new LocalizationEntry(
+            "log.sfm.statement.tick.io.move_to.extracted_nothing",
+            "extracted nothing, marking this input slot as done"
     );
     public static final LocalizationEntry LOG_PROGRAM_TICK_IO_STATEMENT_MOVE_TO_EXTRACTED = new LocalizationEntry(
             "log.sfm.statement.tick.io.move_to.extracted",
@@ -952,6 +976,46 @@ public final class LocalizationKeys {
             () -> "Fancy Inventory Cable Facade"
     );
     @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TOUGH_CABLE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TOUGH_CABLE_BLOCK.get().getDescriptionId(),
+            () -> "Tough Inventory Cable"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TOUGH_CABLE_FACADE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TOUGH_CABLE_FACADE_BLOCK.get().getDescriptionId(),
+            () -> "Tough Inventory Cable Facade"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TOUGH_FANCY_CABLE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TOUGH_FANCY_CABLE_BLOCK.get().getDescriptionId(),
+            () -> "Tough Fancy Inventory Cable"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TOUGH_FANCY_CABLE_FACADE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TOUGH_FANCY_CABLE_FACADE_BLOCK.get().getDescriptionId(),
+            () -> "Tough Fancy Inventory Cable Facade"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TUNNELLED_CABLE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TUNNELLED_CABLE_BLOCK.get().getDescriptionId(),
+            () -> "Tunnelled Inventory Cable"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TUNNELLED_CABLE_FACADE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TUNNELLED_CABLE_FACADE_BLOCK.get().getDescriptionId(),
+            () -> "Tunnelled Inventory Cable Facade"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TUNNELLED_FANCY_CABLE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TUNNELLED_FANCY_CABLE_BLOCK.get().getDescriptionId(),
+            () -> "Tunnelled Fancy Inventory Cable"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
+    public static final LocalizationEntry TUNNELLED_FANCY_CABLE_FACADE_BLOCK = new LocalizationEntry(
+            () -> SFMBlocks.TUNNELLED_FANCY_CABLE_FACADE_BLOCK.get().getDescriptionId(),
+            () -> "Tunnelled Fancy Inventory Cable Facade"
+    );
+    @SuppressWarnings("unused") // used by minecraft without us having to directly reference
     public static final LocalizationEntry TUNNELLED_MANAGER_BLOCK = new LocalizationEntry(
             () -> SFMBlocks.TUNNELLED_MANAGER_BLOCK.get().getDescriptionId(),
             () -> "Tunnelled Factory Manager"
@@ -1067,6 +1131,18 @@ public final class LocalizationKeys {
     public static final LocalizationEntry PROGRAM_EDITOR_CONFIG_PREFERRED_EDITOR_V2 = new LocalizationEntry(
             "gui.sfm.program_editor_config.preferred_editor.v2",
             "V2"
+    );
+    public static final LocalizationEntry TOUGH_CABLE_ITEM_TOOLTIP = new LocalizationEntry(
+            () -> SFMBlocks.TOUGH_CABLE_BLOCK.get().getDescriptionId() + ".tooltip",
+            () -> "Resists explosions."
+    );
+    public static final LocalizationEntry TUNNELLED_CABLE_ITEM_TOOLTIP = new LocalizationEntry(
+            () -> SFMBlocks.TUNNELLED_CABLE_BLOCK.get().getDescriptionId() + ".tooltip",
+            () -> "Passes capabilities through to the opposite side."
+    );
+    public static final LocalizationEntry TUNNELLED_MANAGER_ITEM_TOOLTIP = new LocalizationEntry(
+            () -> SFMBlocks.TUNNELLED_MANAGER_BLOCK.get().getDescriptionId() + ".tooltip",
+            () -> "Passes capabilities through to the opposite side."
     );
 
 

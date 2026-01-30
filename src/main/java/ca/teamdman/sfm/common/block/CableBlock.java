@@ -3,14 +3,12 @@ package ca.teamdman.sfm.common.block;
 import ca.teamdman.sfm.client.ClientFacadeWarningHelper;
 import ca.teamdman.sfm.client.handler.NetworkToolKeyMappingHandler;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
-import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
-import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
+import ca.teamdman.sfm.common.block_network.CableNetworkManager;
+import ca.teamdman.sfm.common.block_network.ICableBlock;
 import ca.teamdman.sfm.common.facade.FacadeSpreadLogic;
 import ca.teamdman.sfm.common.net.ServerboundFacadePacket;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.util.NotStored;
-import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -32,7 +30,7 @@ public class CableBlock extends Block implements ICableBlock, IFacadableBlock {
     public void onPlace(
             BlockState state,
             Level world,
-            @Stored BlockPos pos,
+            BlockPos pos,
             BlockState oldState,
             boolean isMoving
     ) {
@@ -49,7 +47,7 @@ public class CableBlock extends Block implements ICableBlock, IFacadableBlock {
     public void onRemove(
             BlockState state,
             Level level,
-            @Stored BlockPos pos,
+            BlockPos pos,
             BlockState newState,
             boolean isMoving
     ) {
@@ -66,7 +64,7 @@ public class CableBlock extends Block implements ICableBlock, IFacadableBlock {
     public InteractionResult use(
             BlockState pState,
             Level pLevel,
-            @Stored BlockPos pPos,
+            BlockPos pPos,
             Player pPlayer,
             InteractionHand pHand,
             BlockHitResult pHit
@@ -104,7 +102,7 @@ public class CableBlock extends Block implements ICableBlock, IFacadableBlock {
     @Override
     public BlockState getStateForPlacementByFacadePlan(
             LevelAccessor level,
-            @NotStored BlockPos pos
+            BlockPos pos
     ) {
         return defaultBlockState();
     }

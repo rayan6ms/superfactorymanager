@@ -11,7 +11,6 @@ import ca.teamdman.sfm.common.program.ExecuteProgramBehaviour;
 import ca.teamdman.sfm.common.program.IProgramHooks;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.BoolExpr;
 import ca.teamdman.sfml.ast.Program;
@@ -67,7 +66,7 @@ public class SFMGameTestHelper extends GameTestHelper {
 
     public <CAP> CAP discoverCapability(
             SFMBlockCapabilityKind<CAP> capKind,
-            @NotStored BlockPos localPos,
+            BlockPos localPos,
             @Nullable Direction direction
     ) {
 
@@ -82,7 +81,7 @@ public class SFMGameTestHelper extends GameTestHelper {
     }
 
     public IFluidHandler getFluidHandler(
-            @NotStored BlockPos pos,
+            BlockPos pos,
             @Nullable Direction direction
     ) {
 
@@ -94,7 +93,7 @@ public class SFMGameTestHelper extends GameTestHelper {
     }
 
     public IItemHandler getItemHandler(
-            @NotStored BlockPos pos,
+            BlockPos pos,
             @Nullable Direction direction
     ) {
 
@@ -125,7 +124,7 @@ public class SFMGameTestHelper extends GameTestHelper {
     }
 
     public IEnergyStorage getEnergyStorage(
-            @NotStored BlockPos pos,
+            BlockPos pos,
             @Nullable Direction direction
     ) {
 
@@ -137,7 +136,7 @@ public class SFMGameTestHelper extends GameTestHelper {
     }
 
     public IItemHandler getItemHandler(
-            @NotStored BlockPos pos
+            BlockPos pos
     ) {
 
         return getItemHandler(pos, null);

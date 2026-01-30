@@ -1,6 +1,5 @@
 package ca.teamdman.sfm.gametest;
 
-import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 
 public class LeftRightManagerTest extends SFMTestBuilder {
@@ -9,12 +8,12 @@ public class LeftRightManagerTest extends SFMTestBuilder {
     }
 
     @Override
-    protected void setupStructure(@Stored BlockPos offset) {
+    protected void setupStructure(BlockPos offset) {
         setupChests(offset);
         setupManager(offset);
     }
 
-    protected void setupChests(@Stored BlockPos offset) {
+    protected void setupChests(BlockPos offset) {
         addChest("left", new BlockPos(2, 2, 0).offset(offset));
         addChest("right", new BlockPos(0, 2, 0).offset(offset));
     }
