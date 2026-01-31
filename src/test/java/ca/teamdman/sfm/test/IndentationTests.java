@@ -1,4 +1,4 @@
-package ca.teamdman.sfm;
+package ca.teamdman.sfm.test;
 
 import ca.teamdman.sfml.manipulation.ProgramStringManipulationUtils;
 import org.junit.jupiter.api.Test;

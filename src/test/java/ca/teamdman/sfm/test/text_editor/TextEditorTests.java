@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.text_editor;
+package ca.teamdman.sfm.test.text_editor;
 //
 //import ca.teamdman.sfm.client.text_editor.TextEditContext;
 //import ca.teamdman.sfm.client.text_editor.action.DeleteSelectionOrCharacterToTheLeftForEachCursorAction;
