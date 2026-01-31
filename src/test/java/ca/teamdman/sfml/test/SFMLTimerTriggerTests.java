@@ -1,10 +1,10 @@
-package ca.teamdman.sfml;
+package ca.teamdman.sfml.test;
 
 import ca.teamdman.sfm.common.config.SFMConfig;
 import org.junit.jupiter.api.Test;
 
-import static ca.teamdman.sfml.SFMLTestHelpers.assertCompileErrorsPresent;
-import static ca.teamdman.sfml.SFMLTestHelpers.assertNoCompileErrors;
+import static ca.teamdman.sfml.test.SFMLTestHelpers.assertCompileErrorsPresent;
+import static ca.teamdman.sfml.test.SFMLTestHelpers.assertNoCompileErrors;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class SFMLTimerTriggerTests {

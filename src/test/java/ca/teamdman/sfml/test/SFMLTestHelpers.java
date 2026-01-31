@@ -1,4 +1,4 @@
-package ca.teamdman.sfml;
+package ca.teamdman.sfml.test;
 
 import ca.teamdman.langs.SFMLLexer;
 import ca.teamdman.langs.SFMLParser;
