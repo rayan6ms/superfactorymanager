@@ -1,4 +1,4 @@
-package ca.teamdman.sfml;
+package ca.teamdman.sfml.test;
 
 import ca.teamdman.sfm.client.ProgramTokenContextActions;
 import ca.teamdman.sfm.client.text_styling.ProgramSyntaxHighlightingHelper;
@@ -23,7 +23,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
-import static ca.teamdman.sfml.SFMLTestHelpers.*;
+import static ca.teamdman.sfml.test.SFMLTestHelpers.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SuppressWarnings("unchecked")
