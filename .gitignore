@@ -27,6 +27,10 @@ out
 build
 .gradle
 
+# Rust
+
+target/
+
 # other
 eclipse
 run
