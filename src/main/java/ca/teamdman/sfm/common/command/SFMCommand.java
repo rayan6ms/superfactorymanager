@@ -2,13 +2,18 @@ package ca.teamdman.sfm.common.command;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.export.ClientExportHelper;
-import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
+import ca.teamdman.sfm.common.block_network.CableNetworkManager;
+import ca.teamdman.sfm.common.block_network.WaterNetworkManager;
+import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
+import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ClientboundShowChangelogPacket;
 import ca.teamdman.sfm.common.registry.SFMPackets;
-import ca.teamdman.sfm.common.watertanknetwork.WaterNetworkManager;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import com.mojang.brigadier.arguments.BoolArgumentType;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
+import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
 import net.minecraft.commands.arguments.blocks.BlockInput;
 import net.minecraft.commands.arguments.blocks.BlockStateArgument;
@@ -17,37 +22,44 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.event.RegisterCommandsEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.loading.FMLEnvironment;
 import net.minecraftforge.server.command.EnumArgument;
+
+import java.util.function.Supplier;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
 
 @SuppressWarnings({"LoggingSimilarMessage", "DuplicatedCode"})
-@Mod.EventBusSubscriber(bus = Mod.EventBusSubscriber.Bus.FORGE, modid = SFM.MOD_ID)
 public class SFMCommand {
-    @SubscribeEvent
+    @MCVersionDependentBehaviour
+    private static void sendSuccess(CommandSourceStack commandSourceStack, Supplier<Component> componentSupplier) {
+        commandSourceStack.sendSuccess(componentSupplier, true);
+    }
+
+    @SFMSubscribeEvent
     public static void onRegisterCommand(final RegisterCommandsEvent event) {
         var command = Commands.literal("sfm");
         command.then(Commands.literal("bust_cable_network_cache")
                              .requires(source -> source.hasPermission(Commands.LEVEL_ALL))
                              .executes(ctx -> {
+                                 CommandSourceStack source = ctx.getSource();
                                  SFM.LOGGER.info(
                                          "Busting cable networks - slash command used by {}",
-                                         ctx.getSource().getTextName()
+                                         source.getTextName()
                                  );
                                  CableNetworkManager.clear();
+                                 sendSuccess(source, LocalizationKeys.COMMAND_BUST_CABLE_NETWORK_CACHE_SUCCESS::getComponent);
                                  return SINGLE_SUCCESS;
                              }));
         command.then(Commands.literal("bust_water_network_cache")
                              .requires(source -> source.hasPermission(Commands.LEVEL_ALL))
                              .executes(ctx -> {
+                                 CommandSourceStack source = ctx.getSource();
                                  SFM.LOGGER.info(
                                          "Busting water networks - slash command used by {}",
-                                         ctx.getSource().getTextName()
+                                         source.getTextName()
                                  );
                                  WaterNetworkManager.clear();
+                                 sendSuccess(source, LocalizationKeys.COMMAND_BUST_WATER_NETWORK_CACHE_SUCCESS::getComponent);
                                  return SINGLE_SUCCESS;
                              }));
         command.then(Commands.literal("show_bad_cable_cache_entries")
@@ -124,7 +136,7 @@ public class SFMCommand {
                                  return SINGLE_SUCCESS;
                              }));
 
-        if (FMLEnvironment.dist.isClient()) {
+        if (SFMEnvironmentUtils.isClient()) {
             command.then(Commands.literal("export_info")
                                  .requires(source -> source.hasPermission(Commands.LEVEL_ALL))
                                  .then(Commands.argument("includeHidden", BoolArgumentType.bool())

@@ -256,7 +256,7 @@ public record ServerboundOutputInspectionRequestPacket(
                     return (ResourceKey<ResourceType<STACK, ITEM, CAP>>) (ResourceKey) x;
                 })
                 .get();
-        STACK stack = limitedInputSlot.peekExtractPotential();
+        STACK stack = limitedInputSlot.peekStackInSlot();
         long amount = limitedInputSlot.type.getAmount(stack);
         amount = Long.min(amount, limitedInputSlot.tracker.getResourceLimit().limit().quantity().number().value());
         long remainingObligation = limitedInputSlot.tracker.getRemainingRetentionObligation(resourceType, stack);

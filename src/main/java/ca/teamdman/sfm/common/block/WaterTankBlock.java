@@ -1,11 +1,10 @@
 package ca.teamdman.sfm.common.block;
 
+import ca.teamdman.sfm.common.block_network.WaterNetworkManager;
+import ca.teamdman.sfm.common.blockentity.WaterTankBlockEntity;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
-import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMDirections;
-import ca.teamdman.sfm.common.util.Stored;
-import ca.teamdman.sfm.common.watertanknetwork.WaterNetworkManager;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -48,11 +47,12 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
     public void onPlace(
             BlockState pState,
             Level pLevel,
-            @NotStored BlockPos pPos,
+            BlockPos pPos,
             BlockState pOldState,
             boolean pIsMoving
     ) {
-        WaterNetworkManager.onActiveStateChanged(pLevel, pPos, pState);
+        /// Do nothing because the {@link WaterTankBlockEntity#onLoad()} method handles this logic
+//        WaterNetworkManager.onWaterTankBlockActiveStateChanged(pLevel, pPos);
     }
 
     @Override
@@ -60,12 +60,12 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
     public void onRemove(
             BlockState pState,
             Level pLevel,
-            @NotStored BlockPos pPos,
+            BlockPos pPos,
             BlockState pNewState,
             boolean pIsMoving
     ) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        WaterNetworkManager.onActiveStateChanged(pLevel, pPos, pNewState);
+        WaterNetworkManager.onWaterTankBlockRemoved(pLevel, pPos);
     }
 
     @Override
@@ -90,7 +90,7 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
 
     @Override
     public @Nullable BlockEntity newBlockEntity(
-            @Stored BlockPos pos,
+            BlockPos pos,
             BlockState state
     ) {
         return SFMBlockEntities.WATER_TANK_BLOCK_ENTITY.get().create(pos, state);
@@ -106,7 +106,7 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
 
     public boolean hasWaterNeighbours(
             LevelAccessor level,
-            @NotStored BlockPos pos
+            BlockPos pos
     ) {
         int neighbourWaterCount = 0;
         BlockPos.MutableBlockPos target = new BlockPos.MutableBlockPos();
@@ -127,9 +127,9 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
     public void neighborChanged(
             BlockState state,
             Level level,
-            @Stored BlockPos pos,
+            BlockPos pos,
             Block blockIn,
-            @Stored BlockPos fromPos,
+            BlockPos fromPos,
             boolean isMoving
     ) {
         if (level.isClientSide) return;
@@ -141,13 +141,14 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
                     newState,
                     Block.UPDATE_ALL
             );
+            WaterNetworkManager.onWaterTankBlockActiveStateChanged(level, pos);
         }
     }
 
     @Override
     public ItemStack pickupBlock(
             LevelAccessor level,
-            @NotStored BlockPos pos,
+            BlockPos pos,
             BlockState state
     ) {
         return state.getValue(IN_WATER) ? new ItemStack(Fluids.WATER.getBucket()) : ItemStack.EMPTY;
@@ -161,7 +162,7 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
     @Override
     public boolean canPlaceLiquid(
             BlockGetter level,
-            @NotStored BlockPos pos,
+            BlockPos pos,
             BlockState state,
             Fluid fluid
     ) {
@@ -171,7 +172,7 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
     @Override
     public boolean placeLiquid(
             LevelAccessor level,
-            @NotStored BlockPos pos,
+            BlockPos pos,
             BlockState state,
             FluidState fluid
     ) {

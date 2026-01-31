@@ -1,7 +1,6 @@
 package ca.teamdman.sfm.common.compat;
 
 import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
-import ca.teamdman.sfm.common.util.NotStored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
@@ -23,7 +22,7 @@ public class SFMModCompat {
 
     public static boolean isMekanismBlock(
             Level level,
-            @NotStored BlockPos pos
+            BlockPos pos
     ) {
         Block block = level.getBlockState(pos).getBlock();
         ResourceLocation blockId = SFMWellKnownRegistries.BLOCKS.getId(block);

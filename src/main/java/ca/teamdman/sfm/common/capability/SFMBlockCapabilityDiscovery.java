@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.common.capability;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.common.cablenetwork.CableNetwork;
-import ca.teamdman.sfm.common.cablenetwork.SFMBlockCapabilityCacheForLevel;
+import ca.teamdman.sfm.common.block_network.CableNetwork;
+import ca.teamdman.sfm.common.block_network.SFMBlockCapabilityCacheForLevel;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.program.LimitedInputSlot;
@@ -10,7 +10,6 @@ import ca.teamdman.sfm.common.program.LimitedOutputSlot;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
-import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import ca.teamdman.sfml.ast.OutputStatement;
 import net.minecraft.core.BlockPos;
@@ -47,7 +46,7 @@ public class SFMBlockCapabilityDiscovery {
     public static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromNetwork(
             CableNetwork cableNetwork,
             SFMBlockCapabilityKind<CAP> capKind,
-            @NotStored BlockPos pos,
+            BlockPos pos,
             @Nullable Direction direction,
             TranslatableLogger logger
     ) {
@@ -123,7 +122,7 @@ public class SFMBlockCapabilityDiscovery {
     public static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromLevel(
             LevelAccessor level,
             SFMBlockCapabilityKind<CAP> capKind,
-            @NotStored BlockPos pos,
+            BlockPos pos,
             @Nullable Direction direction
     ) {
 
@@ -177,7 +176,7 @@ public class SFMBlockCapabilityDiscovery {
 
     private static <CAP> @NotNull SFMBlockCapabilityResult<CAP> discoverCapabilityFromCache(
             SFMBlockCapabilityKind<CAP> capKind,
-            @NotStored BlockPos pos,
+            BlockPos pos,
             @Nullable Direction direction,
             TranslatableLogger logger,
             SFMBlockCapabilityCacheForLevel levelCapabilityCache

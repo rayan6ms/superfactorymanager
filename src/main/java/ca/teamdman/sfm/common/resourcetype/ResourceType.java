@@ -7,7 +7,6 @@ import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.CapabilityConsumer;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
-import ca.teamdman.sfm.common.util.Stored;
 import ca.teamdman.sfml.ast.*;
 import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
@@ -89,6 +88,10 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             boolean simulate
     );
 
+    public boolean canExtract(CAP capability, int slot) {
+        return true;
+    }
+
     public abstract int getSlots(CAP handler);
 
     public abstract long getMaxStackSize(STACK stack);
@@ -107,6 +110,10 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
             STACK stack,
             boolean simulate
     );
+
+    public boolean canInsert(CAP capability, int slot) {
+        return true;
+    }
 
     public abstract boolean isEmpty(STACK stack);
 
@@ -159,7 +166,7 @@ public abstract class ResourceType<STACK, ITEM, CAP> {
     public void forEachDirectionalCapability(
             ProgramContext programContext,
             SideQualifier sides,
-            @Stored BlockPos pos,
+            BlockPos pos,
             BiConsumer<Direction, CAP> consumer
     ) {
 

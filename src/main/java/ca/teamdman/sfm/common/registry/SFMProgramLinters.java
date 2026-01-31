@@ -62,6 +62,12 @@ public class SFMProgramLinters {
             IncompleteIOProgramLinter::new
     );
 
+    public static final SFMRegistryObject<IProgramLinter, NoSlotStatementProgramLinter>
+            NO_SLOT_STATEMENT_PROGRAM_LINTER = REGISTERER.register(
+            "no_slot_statement",
+            NoSlotStatementProgramLinter::new
+    );
+
     static {
         if (SFMModCompat.isMekanismLoaded()) {
 //            SFMMekanismCompat.registerProgramLinters(REGISTERER);
