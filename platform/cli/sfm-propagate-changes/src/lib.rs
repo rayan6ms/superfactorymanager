@@ -2,6 +2,7 @@ pub mod cli;
 pub mod logging;
 pub mod paths;
 pub mod propagate;
+pub mod sfm_path;
 pub mod state;
 
 use crate::cli::Cli;

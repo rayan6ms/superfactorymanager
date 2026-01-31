@@ -159,6 +159,12 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "773648b94d0e5d620f64f280777445740e61fe701025087ec8b57f45c791888b"
 
 [[package]]
+name = "countme"
+version = "3.0.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7704b5fdd17b18ae31c4c1da5a2e0305a2bf17b5249300a9ee9ed7b72114c636"
+
+[[package]]
 name = "directories-next"
 version = "2.0.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -331,7 +337,7 @@ source = "git+https://github.com/facet-rs/facet?branch=main#384aa45a62dbd88eb36d
 dependencies = [
  "facet-core",
  "facet-path",
- "hashbrown",
+ "hashbrown 0.16.1",
  "regex",
  "smallvec 2.0.0-alpha.12",
 ]
@@ -343,6 +349,22 @@ source = "git+https://github.com/facet-rs/facet?branch=main#384aa45a62dbd88eb36d
 dependencies = [
  "facet-core",
  "facet-reflect",
+]
+
+[[package]]
+name = "facet-styx"
+version = "1.0.1"
+source = "git+https://github.com/bearcove/styx#3615c20f79b19066be87bd0301ba6b07ac1a8b71"
+dependencies = [
+ "ariadne",
+ "facet",
+ "facet-core",
+ "facet-format",
+ "facet-reflect",
+ "serde_json",
+ "styx-format",
+ "styx-parse",
+ "styx-tree",
 ]
 
 [[package]]
@@ -408,6 +430,12 @@ checksum = "e629b9b98ef3dd8afe6ca2bd0f89306cec16d43d907889945bc5d6687f2f13c7"
 
 [[package]]
 name = "hashbrown"
+version = "0.14.5"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "e5274423e17b7c9fc20b6e7e208532f9b19825d82dfd615708b70edd83df41f1"
+
+[[package]]
+name = "hashbrown"
 version = "0.16.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "841d1cc9bed7f9236f321df977030373f4a4163ae1a7dbfe1a51a2c1a51d9100"
@@ -462,8 +490,8 @@ dependencies = [
  "allocator-api2",
  "equivalent",
  "foldhash",
- "hashbrown",
- "rustc-hash",
+ "hashbrown 0.16.1",
+ "rustc-hash 2.1.1",
 ]
 
 [[package]]
@@ -485,7 +513,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7714e70437a7dc3ac8eb7e6f8df75fd8eb422675fc7678aff7364301092b1017"
 dependencies = [
  "equivalent",
- "hashbrown",
+ "hashbrown 0.16.1",
 ]
 
 [[package]]
@@ -724,10 +752,28 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7a2d987857b319362043e95f5353c0535c1f58eec5336fdfcf626430af7def58"
 
 [[package]]
+name = "rowan"
+version = "0.16.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "417a3a9f582e349834051b8a10c8d71ca88da4211e4093528e36b9845f6b5f21"
+dependencies = [
+ "countme",
+ "hashbrown 0.14.5",
+ "rustc-hash 1.1.0",
+ "text-size",
+]
+
+[[package]]
 name = "rustc-demangle"
 version = "0.1.27"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b50b8869d9fc858ce7266cce0194bd74df58b9d0e3f6df3a9fc8eb470d95c09d"
+
+[[package]]
+name = "rustc-hash"
+version = "1.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "08d43f7aa6b08d49f382cde6a7982047c3426db949b1424bc4b7ec9ae12c6ce2"
 
 [[package]]
 name = "rustc-hash"
@@ -793,7 +839,7 @@ dependencies = [
  "dunce",
  "eyre",
  "facet",
- "facet-json",
+ "facet-styx",
  "figue",
  "open",
  "tracing",
@@ -843,6 +889,51 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7da8b5736845d9f2fcb837ea5d9e2628564b3b043a70948a3f0b778838c5fb4f"
 
 [[package]]
+name = "styx-cst"
+version = "1.0.1"
+source = "git+https://github.com/bearcove/styx#3615c20f79b19066be87bd0301ba6b07ac1a8b71"
+dependencies = [
+ "rowan",
+ "styx-tokenizer",
+]
+
+[[package]]
+name = "styx-format"
+version = "1.0.1"
+source = "git+https://github.com/bearcove/styx#3615c20f79b19066be87bd0301ba6b07ac1a8b71"
+dependencies = [
+ "styx-cst",
+ "styx-parse",
+ "styx-tree",
+]
+
+[[package]]
+name = "styx-parse"
+version = "1.0.1"
+source = "git+https://github.com/bearcove/styx#3615c20f79b19066be87bd0301ba6b07ac1a8b71"
+dependencies = [
+ "styx-tokenizer",
+ "tracing",
+]
+
+[[package]]
+name = "styx-tokenizer"
+version = "1.0.0"
+source = "git+https://github.com/bearcove/styx#3615c20f79b19066be87bd0301ba6b07ac1a8b71"
+dependencies = [
+ "tracing",
+]
+
+[[package]]
+name = "styx-tree"
+version = "1.0.1"
+source = "git+https://github.com/bearcove/styx#3615c20f79b19066be87bd0301ba6b07ac1a8b71"
+dependencies = [
+ "ariadne",
+ "styx-parse",
+]
+
+[[package]]
 name = "supports-color"
 version = "2.1.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -871,6 +962,12 @@ dependencies = [
  "quote",
  "unicode-ident",
 ]
+
+[[package]]
+name = "text-size"
+version = "1.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "f18aa187839b2bdb1ad2fa35ead8c4c2976b64e4363c386d45ac0f7ee85c9233"
 
 [[package]]
 name = "thiserror"
@@ -1005,7 +1102,7 @@ checksum = "501a7adf1a4bd9951501e5c66621e972ef8874d787628b7f90e64f936ef7ec0a"
 dependencies = [
  "mutants",
  "proc-macro2",
- "rustc-hash",
+ "rustc-hash 2.1.1",
 ]
 
 [[package]]

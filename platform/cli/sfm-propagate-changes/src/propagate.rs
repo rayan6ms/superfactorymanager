@@ -1,4 +1,5 @@
 use crate::cli::repo_root::get_repo_root;
+use crate::sfm_path::SfmPath;
 use crate::state::{State, Status};
 use eyre::{Context, bail};
 use std::path::PathBuf;
@@ -256,14 +257,14 @@ pub fn run() -> eyre::Result<()> {
             );
 
             // Check if still merging
-            if !is_merging(dest_path)? {
+            if !is_merging(&dest_path.0)? {
                 info!("No longer in a merge state. Resetting to idle and starting over.");
                 state.reset()?;
                 return run();
             }
 
             // Check if there are still conflicts
-            if has_merge_conflicts(dest_path)? {
+            if has_merge_conflicts(&dest_path.0)? {
                 bail!(
                     "There are still merge conflicts in {}. Please resolve them and run again.",
                     dest_path.display()
@@ -272,11 +273,11 @@ pub fn run() -> eyre::Result<()> {
 
             // Commit the merge
             let source = Worktree {
-                path: source_path.clone(),
+                path: source_path.0.clone(),
                 branch: source_branch.clone(),
             };
             let dest = Worktree {
-                path: dest_path.clone(),
+                path: dest_path.0.clone(),
                 branch: dest_branch.clone(),
             };
             commit_merge(&source, &dest)?;
@@ -328,9 +329,9 @@ fn run_idle_state(repo_root: &PathBuf, state: &mut State) -> eyre::Result<()> {
             // Merge conflict - save state and bail
             state.status = Status::MergingWithConflict {
                 source_branch: source.branch.clone(),
-                source_path: source.path.clone(),
+                source_path: SfmPath::from(source.path.clone()),
                 dest_branch: dest.branch.clone(),
-                dest_path: dest.path.clone(),
+                dest_path: SfmPath::from(dest.path.clone()),
             };
             state.save()?;
 
