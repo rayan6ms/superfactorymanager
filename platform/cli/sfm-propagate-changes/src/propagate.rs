@@ -4,8 +4,9 @@ use crate::state::State;
 use crate::state::Status;
 use eyre::Context;
 use eyre::bail;
+use std::fmt::Write;
 use std::io::BufRead;
-use std::io::Write;
+use std::io::Write as IoWrite;
 use std::path::PathBuf;
 use std::process::Command;
 use tracing::debug;
@@ -176,10 +177,7 @@ fn filename_from_path(path: &str) -> &str {
 }
 
 /// Find potential renames: staged files with the same filename as a conflicted file
-fn find_potential_renames(
-    conflicted: &[String],
-    staged: &[String],
-) -> Vec<(String, String)> {
+fn find_potential_renames(conflicted: &[String], staged: &[String]) -> Vec<(String, String)> {
     let mut renames = Vec::new();
 
     for conflict in conflicted {
@@ -214,7 +212,7 @@ fn format_file_list(files: &[String], limit: usize) -> String {
     }
 
     if files.len() > limit {
-        result.push_str(&format!("\n  ... and {} more", files.len() - limit));
+        let _ = write!(result, "\n  ... and {} more", files.len() - limit);
     }
 
     result
@@ -237,17 +235,20 @@ fn format_conflict_error(path: &PathBuf, branch: &str) -> eyre::Result<String> {
     if !renames.is_empty() {
         msg.push_str("\n\nPotential renames detected (same filename in different paths):");
         for (conflict, staged_file) in &renames {
-            msg.push_str(&format!("\n  {} <- {}", conflict, staged_file));
+            let _ = write!(msg, "\n  {conflict} <- {staged_file}");
         }
-        msg.push_str("\n\nHint: Git may not have detected these as renames. Check if the staged file");
+        msg.push_str(
+            "\n\nHint: Git may not have detected these as renames. Check if the staged file",
+        );
         msg.push_str("\nis a moved/renamed version of the conflicted file.");
     }
 
-    msg.push_str(&format!(
+    let _ = write!(
+        msg,
         "\n\nPlease resolve the conflicts in {} and run this command again,\n\
          or abort the merge with `git merge --abort`.",
         path.display()
-    ));
+    );
 
     Ok(msg)
 }
