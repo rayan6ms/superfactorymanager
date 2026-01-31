@@ -154,6 +154,104 @@ fn get_conflicted_files(path: &PathBuf) -> eyre::Result<Vec<String>> {
         .collect())
 }
 
+/// Get the list of staged files (changes to be committed) in a worktree
+fn get_staged_files(path: &PathBuf) -> eyre::Result<Vec<String>> {
+    let output = Command::new("git")
+        .args(["diff", "--cached", "--name-only"])
+        .current_dir(path)
+        .output()
+        .wrap_err("Failed to get staged files")?;
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    Ok(stdout
+        .lines()
+        .filter(|s| !s.is_empty())
+        .map(String::from)
+        .collect())
+}
+
+/// Get just the filename from a path
+fn filename_from_path(path: &str) -> &str {
+    path.rsplit(['/', '\\']).next().unwrap_or(path)
+}
+
+/// Find potential renames: staged files with the same filename as a conflicted file
+fn find_potential_renames(
+    conflicted: &[String],
+    staged: &[String],
+) -> Vec<(String, String)> {
+    let mut renames = Vec::new();
+
+    for conflict in conflicted {
+        let conflict_name = filename_from_path(conflict);
+
+        for staged_file in staged {
+            // Skip if it's the same file
+            if staged_file == conflict {
+                continue;
+            }
+
+            let staged_name = filename_from_path(staged_file);
+            if conflict_name == staged_name {
+                renames.push((conflict.clone(), staged_file.clone()));
+            }
+        }
+    }
+
+    renames
+}
+
+/// Format a list of files for display, with a limit and "... and N more" suffix
+fn format_file_list(files: &[String], limit: usize) -> String {
+    let mut result = String::new();
+
+    for (i, file) in files.iter().take(limit).enumerate() {
+        if i > 0 {
+            result.push('\n');
+        }
+        result.push_str("  - ");
+        result.push_str(file);
+    }
+
+    if files.len() > limit {
+        result.push_str(&format!("\n  ... and {} more", files.len() - limit));
+    }
+
+    result
+}
+
+/// Format conflict error message with file list and rename hints
+fn format_conflict_error(path: &PathBuf, branch: &str) -> eyre::Result<String> {
+    let conflicts = get_conflicted_files(path)?;
+    let staged = get_staged_files(path)?;
+    let renames = find_potential_renames(&conflicts, &staged);
+
+    let mut msg = format!(
+        "Worktree {} is in the middle of a merge with {} unresolved conflict(s).\n\n\
+         Unresolved conflicts:\n{}",
+        branch,
+        conflicts.len(),
+        format_file_list(&conflicts, 10)
+    );
+
+    if !renames.is_empty() {
+        msg.push_str("\n\nPotential renames detected (same filename in different paths):");
+        for (conflict, staged_file) in &renames {
+            msg.push_str(&format!("\n  {} <- {}", conflict, staged_file));
+        }
+        msg.push_str("\n\nHint: Git may not have detected these as renames. Check if the staged file");
+        msg.push_str("\nis a moved/renamed version of the conflicted file.");
+    }
+
+    msg.push_str(&format!(
+        "\n\nPlease resolve the conflicts in {} and run this command again,\n\
+         or abort the merge with `git merge --abort`.",
+        path.display()
+    ));
+
+    Ok(msg)
+}
+
 /// Check if a file path matches a generated path pattern
 fn is_generated_path(file_path: &str) -> bool {
     GENERATED_PATH_PATTERNS
@@ -510,13 +608,7 @@ fn run_idle_state(repo_root: &PathBuf, state: &mut State) -> eyre::Result<()> {
                     // If commit failed, we'll fall through to the error below
                 }
 
-                bail!(
-                    "Worktree {} is in the middle of a merge with unresolved conflicts.\n\
-                     Please resolve the conflicts in {} and run this command again,\n\
-                     or abort the merge with `git merge --abort`.",
-                    wt.branch,
-                    wt.path.display()
-                );
+                bail!("{}", format_conflict_error(&wt.path, &wt.branch)?);
             }
 
             // No conflicts, just commit the merge
