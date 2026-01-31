@@ -1,0 +1,18 @@
+[package]
+name = "sfm-propagate-changes"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+chrono = "0.4.43"
+color-eyre = "0.6.5"
+directories-next = "2.0.0"
+dunce = "1.0.5"
+eyre = "0.6.12"
+facet = { git = "https://github.com/facet-rs/facet", branch = "main", version = "0.43" }
+facet-json = { git = "https://github.com/facet-rs/facet", branch = "main", version = "0.43" }
+figue = { git = "https://github.com/bearcove/figue", branch = "main" }
+open = { version = "5.3.3", features = ["shellexecute-on-windows"] }
+tracing = "0.1.44"
+tracing-subscriber = { version = "0.3.22", features = ["env-filter", "json"] }
+
