@@ -33,7 +33,7 @@ pub fn main() -> eyre::Result<()> {
         #[cfg(windows)]
         teamy_windows::string::warn_if_utf8_not_enabled();
     };
-    
+
     // Invoke whatever command was requested
     cli.invoke()
 }

@@ -1,13 +1,14 @@
 //! Path type for serialization with facet/styx.
 //!
 //! `SfmPath` wraps a path and serializes as a String, working around
-//! the lack of native PathBuf support in facet serialization.
-
-use std::convert::Infallible;
-use std::ffi::{OsStr, OsString};
-use std::path::{Path, PathBuf};
+//! the lack of native `PathBuf` support in facet serialization.
 
 use facet::Facet;
+use std::convert::Infallible;
+use std::ffi::OsStr;
+use std::ffi::OsString;
+use std::path::Path;
+use std::path::PathBuf;
 
 /// A path that serializes as a String for facet/styx compatibility.
 #[derive(Debug, Clone, PartialEq, Eq, Hash, Facet)]
@@ -21,6 +22,7 @@ impl SfmPath {
     }
 
     /// Get the inner `PathBuf`.
+    #[must_use]
     pub fn into_inner(self) -> PathBuf {
         self.0
     }
@@ -93,6 +95,7 @@ impl std::fmt::Display for SfmPath {
 // ============================================================================
 
 /// Serialization: `&SfmPath` -> `String`
+#[expect(clippy::infallible_try_from, reason = "Required by facet proxy")]
 impl TryFrom<&SfmPath> for String {
     type Error = Infallible;
     fn try_from(path: &SfmPath) -> Result<Self, Self::Error> {

@@ -47,11 +47,9 @@ impl State {
             return Ok(Self::default());
         }
 
-        let content =
-            std::fs::read_to_string(&state_file).wrap_err("Failed to read state file")?;
+        let content = std::fs::read_to_string(&state_file).wrap_err("Failed to read state file")?;
 
-        let state: State =
-            facet_styx::from_str(&content).wrap_err("Failed to parse state file")?;
+        let state: State = facet_styx::from_str(&content).wrap_err("Failed to parse state file")?;
 
         Ok(state)
     }
@@ -65,8 +63,7 @@ impl State {
         APP_HOME.ensure_dir()?;
 
         let state_file = APP_HOME.file_path(STATE_FILE);
-        let content =
-            facet_styx::to_string(self).wrap_err("Failed to serialize state to Styx")?;
+        let content = facet_styx::to_string(self).wrap_err("Failed to serialize state to Styx")?;
 
         std::fs::write(&state_file, content).wrap_err("Failed to write state file")?;
 

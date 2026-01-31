@@ -1,10 +1,14 @@
 use crate::cli::repo_root::get_repo_root;
 use crate::sfm_path::SfmPath;
-use crate::state::{State, Status};
-use eyre::{Context, bail};
+use crate::state::State;
+use crate::state::Status;
+use eyre::Context;
+use eyre::bail;
 use std::path::PathBuf;
 use std::process::Command;
-use tracing::{debug, info, warn};
+use tracing::debug;
+use tracing::info;
+use tracing::warn;
 
 /// Represents a worktree with its path and branch name
 #[derive(Debug, Clone)]
@@ -178,11 +182,7 @@ fn do_merge(source: &Worktree, dest: &Worktree) -> eyre::Result<bool> {
             return Ok(false);
         }
 
-        bail!(
-            "git merge failed: {}\n{}",
-            stderr,
-            stdout
-        );
+        bail!("git merge failed: {}\n{}", stderr, stdout);
     }
 
     info!("Merge successful");
@@ -191,7 +191,10 @@ fn do_merge(source: &Worktree, dest: &Worktree) -> eyre::Result<bool> {
 
 /// Commit an empty merge (when user resolves conflicts with no changes)
 fn commit_merge(source: &Worktree, dest: &Worktree) -> eyre::Result<()> {
-    let message = format!("Propagate changes: merge {} into {}", source.branch, dest.branch);
+    let message = format!(
+        "Propagate changes: merge {} into {}",
+        source.branch, dest.branch
+    );
 
     // First try a normal commit
     let output = Command::new("git")
@@ -297,7 +300,10 @@ fn run_idle_state(repo_root: &PathBuf, state: &mut State) -> eyre::Result<()> {
     debug!(?worktrees, "Found worktrees");
 
     if worktrees.len() < 2 {
-        info!("Only {} worktree(s) found, nothing to propagate", worktrees.len());
+        info!(
+            "Only {} worktree(s) found, nothing to propagate",
+            worktrees.len()
+        );
         return Ok(());
     }
 

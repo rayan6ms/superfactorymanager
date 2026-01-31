@@ -2,6 +2,13 @@
 name = "sfm-propagate-changes"
 version = "0.1.0"
 edition = "2024"
+authors = ["TeamDman"]
+description = "CLI tool for propagating git changes across Minecraft version worktrees"
+license = "MPL-2.0"
+readme = "README.md"
+repository = "https://github.com/TeamDman/SuperFactoryManager"
+keywords = ["cli", "git", "minecraft", "worktree"]
+categories = ["command-line-utilities", "development-tools"]
 
 [dependencies]
 chrono = "0.4.43"
@@ -49,7 +56,7 @@ as_pointer_underscore = "warn"
 assertions_on_result_states = "warn"
 clone_on_ref_ptr = "warn"
 deref_by_slicing = "warn"
-disallowed_script_idents = "warn"
+disallowed_script_idents = "allow" # facet macros use Unicode identifiers
 empty_drop = "warn"
 empty_enum_variants_with_brackets = "warn"
 empty_structs_with_brackets = "warn"
