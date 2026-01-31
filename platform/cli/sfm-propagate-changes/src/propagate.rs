@@ -4,11 +4,17 @@ use crate::state::State;
 use crate::state::Status;
 use eyre::Context;
 use eyre::bail;
+use std::io::BufRead;
+use std::io::Write;
 use std::path::PathBuf;
 use std::process::Command;
 use tracing::debug;
 use tracing::info;
 use tracing::warn;
+
+/// Patterns for generated files that should always keep "ours" during merge conflicts.
+/// These are files that are auto-generated and should be regenerated after merge.
+const GENERATED_PATH_PATTERNS: &[&str] = &["src/generated/", "platform/minecraft/src/generated/"];
 
 /// Represents a worktree with its path and branch name
 #[derive(Debug, Clone)]
@@ -132,6 +138,154 @@ fn has_merge_conflicts(path: &PathBuf) -> eyre::Result<bool> {
     Ok(!stdout.trim().is_empty())
 }
 
+/// Get the list of conflicted files in a worktree
+fn get_conflicted_files(path: &PathBuf) -> eyre::Result<Vec<String>> {
+    let output = Command::new("git")
+        .args(["diff", "--name-only", "--diff-filter=U"])
+        .current_dir(path)
+        .output()
+        .wrap_err("Failed to get conflicted files")?;
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    Ok(stdout
+        .lines()
+        .filter(|s| !s.is_empty())
+        .map(String::from)
+        .collect())
+}
+
+/// Check if a file path matches a generated path pattern
+fn is_generated_path(file_path: &str) -> bool {
+    GENERATED_PATH_PATTERNS
+        .iter()
+        .any(|pattern| file_path.contains(pattern))
+}
+
+/// Partition conflicted files into generated and non-generated
+fn partition_conflicts(files: &[String]) -> (Vec<&String>, Vec<&String>) {
+    files.iter().partition(|f| is_generated_path(f))
+}
+
+/// Prompt user with Y/n question (defaults to yes)
+fn prompt_yes_no(question: &str) -> eyre::Result<bool> {
+    print!("{question} [Y/n] ");
+    std::io::stdout().flush()?;
+
+    let mut input = String::new();
+    std::io::stdin().lock().read_line(&mut input)?;
+
+    let trimmed = input.trim();
+    // Default to yes if empty, only false if explicitly "n" or "no"
+    Ok(trimmed.is_empty()
+        || !(trimmed.eq_ignore_ascii_case("n") || trimmed.eq_ignore_ascii_case("no")))
+}
+
+/// Resolve generated file conflicts by keeping "ours" (current branch version)
+fn resolve_generated_conflicts(path: &PathBuf, files: &[&String]) -> eyre::Result<()> {
+    for file in files {
+        info!("Resolving generated file conflict (keeping ours): {file}");
+
+        // Try checkout --ours first (for modified files)
+        let checkout_result = Command::new("git")
+            .args(["checkout", "--ours", "--", file])
+            .current_dir(path)
+            .output();
+
+        match checkout_result {
+            Ok(output) if output.status.success() => {
+                // Successfully checked out ours, now add it
+                let add_output = Command::new("git")
+                    .args(["add", file])
+                    .current_dir(path)
+                    .output()
+                    .wrap_err_with(|| format!("Failed to git add {file}"))?;
+
+                if !add_output.status.success() {
+                    warn!(
+                        "Failed to git add {}: {}",
+                        file,
+                        String::from_utf8_lossy(&add_output.stderr)
+                    );
+                }
+            }
+            _ => {
+                // checkout --ours failed, might be a deleted file
+                // Try to remove it (for "deleted by them" or "both deleted" conflicts)
+                let rm_output = Command::new("git")
+                    .args(["rm", "--cached", file])
+                    .current_dir(path)
+                    .output();
+
+                if rm_output.is_ok() && rm_output.as_ref().is_ok_and(|o| o.status.success()) {
+                    debug!("Removed {file} from index");
+                } else {
+                    // Last resort: just add it as-is
+                    let add_output = Command::new("git")
+                        .args(["add", file])
+                        .current_dir(path)
+                        .output()
+                        .wrap_err_with(|| format!("Failed to resolve conflict for {file}"))?;
+
+                    if !add_output.status.success() {
+                        warn!(
+                            "Could not fully resolve {}: {}",
+                            file,
+                            String::from_utf8_lossy(&add_output.stderr)
+                        );
+                    }
+                }
+            }
+        }
+    }
+
+    Ok(())
+}
+
+/// Try to auto-resolve generated file conflicts if user agrees
+fn try_auto_resolve_generated_conflicts(path: &PathBuf) -> eyre::Result<bool> {
+    let conflicts = get_conflicted_files(path)?;
+    if conflicts.is_empty() {
+        return Ok(true); // No conflicts, all resolved
+    }
+
+    let (generated, other) = partition_conflicts(&conflicts);
+
+    if generated.is_empty() {
+        return Ok(false); // No generated conflicts to auto-resolve
+    }
+
+    println!("\nFound {} generated file conflict(s):", generated.len());
+    for file in &generated {
+        println!("  - {file}");
+    }
+
+    if !other.is_empty() {
+        println!("\nOther conflicts remaining: {}", other.len());
+        for file in &other {
+            println!("  - {file}");
+        }
+    }
+
+    println!();
+    if prompt_yes_no("Auto-resolve generated file conflicts by keeping current branch version?")? {
+        resolve_generated_conflicts(path, &generated)?;
+        info!("Resolved {} generated file conflict(s)", generated.len());
+
+        // Check if all conflicts are now resolved
+        if !has_merge_conflicts(path)? {
+            info!("All conflicts resolved!");
+            return Ok(true);
+        }
+
+        println!(
+            "\nRemaining conflicts ({}) require manual resolution.",
+            other.len()
+        );
+    }
+
+    Ok(false)
+}
+
 /// Check if we're in the middle of a merge
 fn is_merging(path: &PathBuf) -> eyre::Result<bool> {
     let merge_head = path.join(".git").join("MERGE_HEAD");
@@ -179,6 +333,14 @@ fn do_merge(source: &Worktree, dest: &Worktree) -> eyre::Result<bool> {
         // Check if it's a merge conflict
         if stderr.contains("CONFLICT") || stdout.contains("CONFLICT") {
             warn!("Merge conflict detected");
+
+            // Try to auto-resolve generated file conflicts
+            if try_auto_resolve_generated_conflicts(&dest.path)? {
+                // All conflicts resolved, commit the merge
+                commit_merge(source, dest)?;
+                return Ok(true);
+            }
+
             return Ok(false);
         }
 
@@ -268,10 +430,15 @@ pub fn run() -> eyre::Result<()> {
 
             // Check if there are still conflicts
             if has_merge_conflicts(&dest_path.0)? {
-                bail!(
-                    "There are still merge conflicts in {}. Please resolve them and run again.",
-                    dest_path.display()
-                );
+                // Try to auto-resolve generated file conflicts
+                if try_auto_resolve_generated_conflicts(&dest_path.0)? {
+                    info!("All conflicts resolved via auto-resolution");
+                } else {
+                    bail!(
+                        "There are still merge conflicts in {}. Please resolve them and run again.",
+                        dest_path.display()
+                    );
+                }
             }
 
             // Commit the merge
@@ -314,14 +481,79 @@ fn run_idle_state(repo_root: &PathBuf, state: &mut State) -> eyre::Result<()> {
         worktrees.iter().map(|w| &w.branch).collect::<Vec<_>>()
     );
 
-    // Check for uncommitted changes
+    // Check if any worktree is currently in a merging state
+    for wt in &worktrees {
+        if is_merging(&wt.path)? {
+            info!(
+                "Detected in-progress merge in {} ({})",
+                wt.branch,
+                wt.path.display()
+            );
+
+            // Try to auto-resolve generated file conflicts
+            if has_merge_conflicts(&wt.path)? {
+                if try_auto_resolve_generated_conflicts(&wt.path)? {
+                    info!("All conflicts resolved via auto-resolution");
+
+                    // Commit the merge
+                    let output = Command::new("git")
+                        .args(["commit", "--no-edit"])
+                        .current_dir(&wt.path)
+                        .output()
+                        .wrap_err("Failed to commit merge")?;
+
+                    if output.status.success() {
+                        info!("Merge committed in {}", wt.branch);
+                        // Continue to check for more merges needed
+                        continue;
+                    }
+                    // If commit failed, we'll fall through to the error below
+                }
+
+                bail!(
+                    "Worktree {} is in the middle of a merge with unresolved conflicts.\n\
+                     Please resolve the conflicts in {} and run this command again,\n\
+                     or abort the merge with `git merge --abort`.",
+                    wt.branch,
+                    wt.path.display()
+                );
+            }
+
+            // No conflicts, just commit the merge
+            let output = Command::new("git")
+                .args(["commit", "--no-edit"])
+                .current_dir(&wt.path)
+                .output()
+                .wrap_err("Failed to commit merge")?;
+
+            if output.status.success() {
+                info!("Merge committed in {}", wt.branch);
+            } else {
+                // Maybe nothing to commit
+                debug!("Commit result: {}", String::from_utf8_lossy(&output.stderr));
+            }
+        }
+    }
+
+    // Check for uncommitted changes (but exclude worktrees in merging state)
     let dirty = check_uncommitted_changes(&worktrees)?;
     if !dirty.is_empty() {
-        let paths: Vec<_> = dirty.iter().map(|w| w.path.display().to_string()).collect();
-        bail!(
-            "The following worktrees have uncommitted changes:\n  {}\n\nPlease commit or stash changes before propagating.",
-            paths.join("\n  ")
-        );
+        // Filter out any that are in merging state (we handled those above)
+        let truly_dirty: Vec<_> = dirty
+            .into_iter()
+            .filter(|wt| !is_merging(&wt.path).unwrap_or(false))
+            .collect();
+
+        if !truly_dirty.is_empty() {
+            let paths: Vec<_> = truly_dirty
+                .iter()
+                .map(|w| w.path.display().to_string())
+                .collect();
+            bail!(
+                "The following worktrees have uncommitted changes:\n  {}\n\nPlease commit or stash changes before propagating.",
+                paths.join("\n  ")
+            );
+        }
     }
 
     // Merge oldest to newest (sliding window of size 2)
