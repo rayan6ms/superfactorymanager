@@ -1,13 +1,11 @@
 package ca.teamdman.sfm.common.block;
 
+import ca.teamdman.sfm.common.block_network.CableNetworkManager;
+import ca.teamdman.sfm.common.block_network.ICableBlock;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
-import ca.teamdman.sfm.common.cablenetwork.CableNetworkManager;
-import ca.teamdman.sfm.common.cablenetwork.ICableBlock;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
-import ca.teamdman.sfm.common.util.NotStored;
-import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -51,9 +49,9 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
     public void neighborChanged(
             BlockState state,
             Level level,
-            @NotStored BlockPos pos,
+            BlockPos pos,
             Block block,
-            @NotStored BlockPos neighbourPos,
+            BlockPos neighbourPos,
             boolean movedByPiston
     ) {
         if (!(level.getBlockEntity(pos) instanceof ManagerBlockEntity mgr)) return;
@@ -72,7 +70,7 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
 
     @Override
     public BlockEntity newBlockEntity(
-            @Stored BlockPos pos,
+            BlockPos pos,
             BlockState state
     ) {
         //noinspection DataFlowIssue
@@ -84,7 +82,7 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
     public InteractionResult use(
             BlockState state,
             Level level,
-            @NotStored BlockPos pos,
+            BlockPos pos,
             Player player,
             InteractionHand hand,
             BlockHitResult hit
@@ -114,7 +112,7 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
     public void onPlace(
             BlockState state,
             Level world,
-            @NotStored BlockPos pos,
+            BlockPos pos,
             BlockState oldState,
             boolean isMoving
     ) {
@@ -126,7 +124,7 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
     public void onRemove(
             BlockState state,
             Level level,
-            @Stored BlockPos pos,
+            BlockPos pos,
             BlockState newState,
             boolean isMoving
     ) {

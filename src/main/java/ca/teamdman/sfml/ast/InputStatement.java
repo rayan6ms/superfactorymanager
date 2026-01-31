@@ -3,7 +3,6 @@ package ca.teamdman.sfml.ast;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.program.*;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
-import ca.teamdman.sfm.common.util.Stored;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import org.jetbrains.annotations.Nullable;
@@ -60,7 +59,6 @@ public final class InputStatement implements IOStatement {
             for (var slot : limitedInputSlotsCache) {
                 slotConsumer.accept(slot);
             }
-            limitedInputSlotsCache.forEach(slotConsumer);
             return;
         }
 
@@ -242,7 +240,7 @@ public final class InputStatement implements IOStatement {
             ProgramContext context,
             ResourceType<STACK, ITEM, CAP> type,
             Label label,
-            @Stored BlockPos pos,
+            BlockPos pos,
             Direction direction,
             CAP capability,
             List<IInputResourceTracker> trackers,

@@ -6,7 +6,6 @@ import ca.teamdman.sfm.common.program.ExecuteProgramBehaviour;
 import ca.teamdman.sfm.common.program.ProgramContext;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.BoolExpr;
@@ -66,7 +65,7 @@ public class SFMDeclarativeTestBuilder {
                 .orElse(new BlockPos(0, 1, 0));
     }
 
-    private void placeBlocks(@NotStored BlockPos managerPos) {
+    private void placeBlocks(BlockPos managerPos) {
         for (SFMTestBlockEntitySpec<?> blockDef : spec.blocks()) {
             placeBlock(blockDef, managerPos);
         }
@@ -74,7 +73,7 @@ public class SFMDeclarativeTestBuilder {
 
     private <T extends BlockEntity> void placeBlock(
             SFMTestBlockEntitySpec<T> def,
-            @NotStored BlockPos managerPos
+            BlockPos managerPos
     ) {
         BlockPos blockPos = managerPos.offset(def.posRelativeToManager());
         helper.setBlock(blockPos, def.block());
@@ -85,7 +84,7 @@ public class SFMDeclarativeTestBuilder {
         }
     }
 
-    private ManagerBlockEntity setupManager(@NotStored BlockPos managerPos) {
+    private ManagerBlockEntity setupManager(BlockPos managerPos) {
         helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
         if (helper.getBlockEntity(managerPos) instanceof ManagerBlockEntity manager) {
             manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
@@ -127,7 +126,7 @@ public class SFMDeclarativeTestBuilder {
     }
 
     private void labelBlocks(
-            @NotStored BlockPos managerPos,
+            BlockPos managerPos,
             ManagerBlockEntity manager
     ) {
         LabelPositionHolder labelHolder = LabelPositionHolder.empty();
