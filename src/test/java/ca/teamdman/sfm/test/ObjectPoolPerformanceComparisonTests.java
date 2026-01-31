@@ -1,4 +1,4 @@
-package ca.teamdman.sfm;
+package ca.teamdman.sfm.test;
 
 import org.junit.jupiter.api.RepeatedTest;
 import org.junit.jupiter.api.TestInstance;

@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.block_network;
+package ca.teamdman.sfm.test.block_network;
 
 import ca.teamdman.sfm.common.block_network.BlockNetwork;
 import ca.teamdman.sfm.common.block_network.BlockNetworkConstructor;

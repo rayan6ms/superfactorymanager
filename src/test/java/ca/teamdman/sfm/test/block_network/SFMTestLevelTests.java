@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.block_network;
+package ca.teamdman.sfm.test.block_network;
 
 import net.minecraft.core.BlockPos;
 import org.junit.jupiter.api.Test;

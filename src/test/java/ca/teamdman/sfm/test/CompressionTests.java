@@ -1,4 +1,4 @@
-package ca.teamdman.sfm;
+package ca.teamdman.sfm.test;
 
 import ca.teamdman.sfm.common.util.BlockPosSet;
 import ca.teamdman.sfm.common.util.CompressedBlockPosSet;

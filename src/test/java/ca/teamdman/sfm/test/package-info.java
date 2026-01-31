@@ -1,10 +1,9 @@
 
 
-
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @FieldsAreNonnullByDefault
-package ca.teamdman.sfm.block_network;
+package ca.teamdman.sfm.test;
 
 import net.minecraft.FieldsAreNonnullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;

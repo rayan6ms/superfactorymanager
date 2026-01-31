@@ -1,4 +1,4 @@
-package ca.teamdman.sfm;
+package ca.teamdman.sfm.test;
 
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import net.minecraft.client.KeyMapping;
