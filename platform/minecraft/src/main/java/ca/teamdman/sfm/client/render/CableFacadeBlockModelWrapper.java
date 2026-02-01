@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.ChunkRenderTypeSet;
 import net.neoforged.neoforge.client.model.BakedModelWrapper;
 import net.neoforged.neoforge.client.model.data.ModelData;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -30,11 +29,11 @@ public class CableFacadeBlockModelWrapper extends BakedModelWrapper<BakedModel> 
     }
 
     @Override
-    public @NotNull ModelData getModelData(
-            @NotNull BlockAndTintGetter level,
-            @NotNull BlockPos pos,
-            @NotNull BlockState state,
-            @NotNull ModelData modelData
+    public ModelData getModelData(
+            BlockAndTintGetter level,
+            BlockPos pos,
+            BlockState state,
+            ModelData modelData
     ) {
         return this.originalModel.getModelData(level, pos, state, modelData);
     }
