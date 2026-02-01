@@ -1,8 +1,7 @@
 package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.common.capability.IRedstoneSignalStorage;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.neoforged.neoforge.common.capabilities.RegisterCapabilitiesEvent;
 

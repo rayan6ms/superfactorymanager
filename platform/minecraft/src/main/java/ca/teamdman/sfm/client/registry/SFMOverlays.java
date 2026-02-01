@@ -2,11 +2,9 @@ package ca.teamdman.sfm.client.registry;
 
 import ca.teamdman.sfm.client.overlay.LabelGunReminderOverlay;
 import ca.teamdman.sfm.client.overlay.NetworkToolReminderOverlay;
+import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
+import ca.teamdman.sfm.common.util.SFMDist;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
-import net.minecraft.resources.ResourceLocation;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.client.event.RegisterGuiOverlaysEvent;
 import net.neoforged.neoforge.client.gui.overlay.VanillaGuiOverlay;
 import net.neoforged.neoforge.common.util.Lazy;
