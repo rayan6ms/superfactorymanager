@@ -3,6 +3,7 @@ package ca.teamdman.sfm.common.block;
 import ca.teamdman.sfm.common.facade.FacadeTransparency;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.LevelReader;
@@ -35,7 +36,7 @@ public class FancyCableFacadeBlock extends FancyCableBlock implements EntityBloc
     @SuppressWarnings("deprecation")
     @Override
     public ItemStack getCloneItemStack(
-            LevelReader pLevel,
+            @MCVersionDependentBehaviour LevelReader pLevel,
             BlockPos pPos,
             BlockState pState
     ) {

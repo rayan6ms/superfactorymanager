@@ -2,9 +2,10 @@ package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
@@ -29,7 +30,7 @@ public class ToughFancyCableFacadeBlock extends FancyCableFacadeBlock implements
 
     @Override
     public ItemStack getCloneItemStack(
-            BlockGetter pLevel,
+            @MCVersionDependentBehaviour LevelReader pLevel,
             BlockPos pPos,
             BlockState pState
     ) {

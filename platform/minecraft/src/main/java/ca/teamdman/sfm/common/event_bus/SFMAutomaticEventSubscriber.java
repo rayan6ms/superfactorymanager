@@ -2,9 +2,7 @@ package ca.teamdman.sfm.common.event_bus;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.util.SFMAnnotationUtils;
-import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.fml.loading.FMLEnvironment;
+import ca.teamdman.sfm.common.util.SFMDist;
 import org.objectweb.asm.Type;
 
 import java.lang.reflect.Method;
