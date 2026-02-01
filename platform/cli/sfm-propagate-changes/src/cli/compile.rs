@@ -2,9 +2,10 @@ use crate::worktree::{get_sorted_worktrees, Worktree};
 use color_eyre::owo_colors::OwoColorize;
 use eyre::{Context, bail};
 use facet::Facet;
-use figue as args;
-use std::process::{Command, Stdio};
+use std::path::PathBuf;
 use std::time::{Duration, Instant};
+use tokio::process::Command;
+use tokio::task::JoinSet;
 use tracing::info;
 
 /// Build status for a single worktree
@@ -12,7 +13,7 @@ use tracing::info;
 enum BuildStatus {
     Success { duration: Duration },
     Failed { duration: Duration },
-    Skipped,
+    NotFound { reason: String },
 }
 
 /// Result of building a worktree
@@ -35,16 +36,21 @@ fn format_duration(duration: Duration) -> String {
 }
 
 /// Run gradle compile for a worktree
-fn compile_worktree(worktree: &Worktree) -> eyre::Result<BuildStatus> {
-    let minecraft_dir = worktree.path.join("platform").join("minecraft");
+async fn compile_worktree(branch: String, path: PathBuf) -> BuildResult {
+    let minecraft_dir = path.join("platform").join("minecraft");
 
     // Check if the minecraft directory exists
     if !minecraft_dir.exists() {
         info!(
             "Skipping {} - platform/minecraft directory not found",
-            worktree.branch
+            branch
         );
-        return Ok(BuildStatus::Skipped);
+        return BuildResult {
+            branch,
+            status: BuildStatus::NotFound {
+                reason: "platform/minecraft directory not found".to_string(),
+            },
+        };
     }
 
     let gradlew = if cfg!(windows) {
@@ -57,41 +63,44 @@ fn compile_worktree(worktree: &Worktree) -> eyre::Result<BuildStatus> {
     if !gradlew.exists() {
         info!(
             "Skipping {} - gradlew not found in {}",
-            worktree.branch,
+            branch,
             minecraft_dir.display()
         );
-        return Ok(BuildStatus::Skipped);
+        return BuildResult {
+            branch,
+            status: BuildStatus::NotFound {
+                reason: format!("gradlew not found in {}", minecraft_dir.display()),
+            },
+        };
     }
 
     println!(
         "{} {} {}",
         "Compiling".cyan().bold(),
-        worktree.branch.yellow().bold(),
+        branch.yellow().bold(),
         format!("({})", minecraft_dir.display()).dimmed()
     );
 
     let start = Instant::now();
 
-    let status = Command::new(&gradlew)
+    let result = Command::new(&gradlew)
         .arg("compileJava")
         .current_dir(&minecraft_dir)
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit())
-        .status()
-        .wrap_err_with(|| {
-            format!(
-                "Failed to run gradlew compileJava in {}",
-                minecraft_dir.display()
-            )
-        })?;
+        .output()
+        .await;
 
     let duration = start.elapsed();
 
-    if status.success() {
-        Ok(BuildStatus::Success { duration })
-    } else {
-        Ok(BuildStatus::Failed { duration })
-    }
+    let status = match result {
+        Ok(output) if output.status.success() => BuildStatus::Success { duration },
+        Ok(_) => BuildStatus::Failed { duration },
+        Err(e) => {
+            info!("Failed to run gradlew for {}: {}", branch, e);
+            BuildStatus::Failed { duration }
+        }
+    };
+
+    BuildResult { branch, status }
 }
 
 /// Print the summary of all builds
@@ -124,12 +133,12 @@ fn print_summary(results: &[BuildResult]) {
                     format!(" ({})", format_duration(*duration)).dimmed().to_string(),
                 )
             }
-            BuildStatus::Skipped => {
+            BuildStatus::NotFound { reason } => {
                 skipped += 1;
                 (
                     "○".yellow().to_string(),
-                    "SKIPPED".yellow().to_string(),
-                    String::new(),
+                    "NOT FOUND".yellow().to_string(),
+                    format!(" ({})", reason).dimmed().to_string(),
                 )
             }
         };
@@ -165,19 +174,24 @@ fn print_summary(results: &[BuildResult]) {
     println!();
 }
 
-/// Compile command - compiles all worktrees
+/// Compile command - compiles all worktrees in parallel
 #[derive(Facet, Debug, Default)]
-pub struct CompileCommand {
-    /// Continue compiling remaining worktrees even if one fails
-    #[facet(args::named)]
-    pub keep_going: bool,
-}
+pub struct CompileCommand {}
 
 impl CompileCommand {
     /// # Errors
     ///
     /// Returns an error if compilation fails.
     pub fn invoke(self) -> eyre::Result<()> {
+        let rt = tokio::runtime::Builder::new_multi_thread()
+            .enable_all()
+            .build()
+            .wrap_err("Failed to create tokio runtime")?;
+
+        rt.block_on(self.invoke_async())
+    }
+
+    async fn invoke_async(self) -> eyre::Result<()> {
         let worktrees = get_sorted_worktrees()?;
 
         if worktrees.is_empty() {
@@ -186,37 +200,39 @@ impl CompileCommand {
         }
 
         info!(
-            "Compiling {} worktree(s): {:?}",
+            "Compiling {} worktree(s) in parallel: {:?}",
             worktrees.len(),
             worktrees.iter().map(|w| &w.branch).collect::<Vec<_>>()
         );
 
-        let mut results: Vec<BuildResult> = Vec::new();
-        let mut had_failure = false;
+        let mut join_set: JoinSet<BuildResult> = JoinSet::new();
 
-        for worktree in &worktrees {
-            if had_failure && !self.keep_going {
-                // Mark remaining as skipped
-                results.push(BuildResult {
-                    branch: worktree.branch.clone(),
-                    status: BuildStatus::Skipped,
-                });
-                continue;
-            }
-
-            let status = compile_worktree(worktree)?;
-
-            if matches!(status, BuildStatus::Failed { .. }) {
-                had_failure = true;
-            }
-
-            results.push(BuildResult {
-                branch: worktree.branch.clone(),
-                status,
-            });
+        // Spawn all compile tasks
+        for worktree in worktrees {
+            let branch = worktree.branch.clone();
+            let path = worktree.path.clone();
+            join_set.spawn(compile_worktree(branch, path));
         }
 
+        // Collect all results
+        let mut results: Vec<BuildResult> = Vec::new();
+        while let Some(result) = join_set.join_next().await {
+            match result {
+                Ok(build_result) => results.push(build_result),
+                Err(e) => {
+                    info!("Task panicked: {}", e);
+                }
+            }
+        }
+
+        // Sort results by branch name for consistent output
+        results.sort_by(|a, b| a.branch.cmp(&b.branch));
+
         print_summary(&results);
+
+        let had_failure = results
+            .iter()
+            .any(|r| matches!(r.status, BuildStatus::Failed { .. }));
 
         if had_failure {
             bail!("One or more compilations failed");
