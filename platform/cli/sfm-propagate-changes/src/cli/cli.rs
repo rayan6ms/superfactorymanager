@@ -99,6 +99,12 @@ pub enum Command {
         #[facet(flatten)]
         command: MergeCommand,
     },
+    /// Compile all worktrees by running gradlew compileJava
+    Compile {
+        /// Compile options
+        #[facet(flatten)]
+        command: super::compile::CompileCommand,
+    },
     /// Home directory related commands
     Home {
         /// Home subcommand
@@ -132,6 +138,7 @@ impl Command {
     pub fn invoke(self) -> eyre::Result<()> {
         match self {
             Command::Merge { command } => command.invoke(),
+            Command::Compile { command } => command.invoke(),
             Command::Home { command } => command.invoke(),
             Command::Cache { command } => command.invoke(),
             Command::RepoRoot { command } => command.invoke(),
