@@ -1,4 +1,5 @@
 pub mod cache;
+pub mod compile;
 mod cli;
 pub mod home;
 pub mod repo_root;
