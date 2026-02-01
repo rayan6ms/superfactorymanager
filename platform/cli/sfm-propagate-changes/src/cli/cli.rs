@@ -28,8 +28,8 @@ pub struct Cli {
     pub log_file: Option<PathBuf>,
 
     /// Subcommand to run
-    #[facet(default, args::subcommand)]
-    pub command: Option<Command>,
+    #[facet(args::subcommand)]
+    pub command: Command,
 
     /// Built-in flags (--help, --version, --completions)
     #[facet(flatten)]
@@ -64,13 +64,28 @@ impl Cli {
     ///
     /// This function will return an error if the command fails.
     pub fn invoke(self) -> eyre::Result<()> {
-        match self.command {
-            Some(command) => command.invoke(),
-            None => {
-                // Default behavior: run propagation
-                propagate::run()
-            }
-        }
+        self.command.invoke()
+    }
+}
+
+/// Options for the merge command
+#[derive(Facet, Debug, Default)]
+pub struct MergeCommand {
+    /// Automatically abort merges that would result in conflicts. Only aborts merges
+    /// that we start ourselves - will not abort pre-existing merge conflicts to avoid
+    /// losing manual progress.
+    #[facet(args::named)]
+    pub auto_abort: bool,
+}
+
+impl MergeCommand {
+    /// # Errors
+    ///
+    /// This function will return an error if the merge fails.
+    pub fn invoke(self) -> eyre::Result<()> {
+        propagate::run(propagate::PropagateOptions {
+            auto_abort: self.auto_abort,
+        })
     }
 }
 
@@ -78,6 +93,12 @@ impl Cli {
 #[derive(Facet, Debug)]
 #[repr(u8)]
 pub enum Command {
+    /// Propagate changes by merging from older to newer version branches
+    Merge {
+        /// Merge options
+        #[facet(flatten)]
+        command: MergeCommand,
+    },
     /// Home directory related commands
     Home {
         /// Home subcommand
@@ -110,6 +131,7 @@ impl Command {
     /// This function will return an error if the subcommand fails.
     pub fn invoke(self) -> eyre::Result<()> {
         match self {
+            Command::Merge { command } => command.invoke(),
             Command::Home { command } => command.invoke(),
             Command::Cache { command } => command.invoke(),
             Command::RepoRoot { command } => command.invoke(),
