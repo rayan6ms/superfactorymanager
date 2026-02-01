@@ -14,8 +14,8 @@ import net.minecraft.client.resources.model.ModelResourceLocation;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.client.event.ModelEvent;
-import net.minecraftforge.client.model.BakedModelWrapper;
+import net.neoforged.neoforge.client.event.ModelEvent;
+import net.neoforged.neoforge.client.model.BakedModelWrapper;
 
 import java.util.Map;
 import java.util.function.Function;

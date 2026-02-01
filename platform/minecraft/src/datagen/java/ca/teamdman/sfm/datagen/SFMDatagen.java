@@ -1,8 +1,6 @@
 package ca.teamdman.sfm.datagen;
 
-import ca.teamdman.sfm.SFM;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
+import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import net.neoforged.neoforge.data.event.GatherDataEvent;
 import net.neoforged.neoforge.data.loading.DatagenModLoader;
 

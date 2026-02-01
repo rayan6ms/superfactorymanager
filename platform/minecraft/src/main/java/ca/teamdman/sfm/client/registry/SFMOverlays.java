@@ -2,6 +2,8 @@ package ca.teamdman.sfm.client.registry;
 
 import ca.teamdman.sfm.client.overlay.LabelGunReminderOverlay;
 import ca.teamdman.sfm.client.overlay.NetworkToolReminderOverlay;
+import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
+import ca.teamdman.sfm.common.util.SFMDist;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.bus.api.SubscribeEvent;

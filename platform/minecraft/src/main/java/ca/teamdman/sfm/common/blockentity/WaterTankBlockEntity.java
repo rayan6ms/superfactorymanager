@@ -3,7 +3,6 @@ package ca.teamdman.sfm.common.blockentity;
 import ca.teamdman.sfm.common.block.WaterTankBlock;
 import ca.teamdman.sfm.common.block_network.BlockNetwork;
 import ca.teamdman.sfm.common.block_network.WaterNetworkManager;
-import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -11,8 +10,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 public class WaterTankBlockEntity extends BlockEntity {
 
@@ -81,7 +78,7 @@ public class WaterTankBlockEntity extends BlockEntity {
         TANK.setCapacity(newCapacity);
 
         // Update the tank contents
-        updateTankContents();
+        updateTank();
     }
 
     /// The [WaterTankBlock] handles updating the block state according to neighbouring water sources.

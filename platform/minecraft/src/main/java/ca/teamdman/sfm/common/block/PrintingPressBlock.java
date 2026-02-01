@@ -2,8 +2,6 @@ package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
-import ca.teamdman.sfm.common.util.NotStored;
-import ca.teamdman.sfm.common.util.Stored;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;

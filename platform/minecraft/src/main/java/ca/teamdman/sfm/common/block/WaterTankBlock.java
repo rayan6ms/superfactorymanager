@@ -5,8 +5,6 @@ import ca.teamdman.sfm.common.blockentity.WaterTankBlockEntity;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import ca.teamdman.sfm.common.util.SFMDirections;
-import ca.teamdman.sfm.common.util.Stored;
-import ca.teamdman.sfm.common.watertanknetwork.WaterNetworkManager;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;

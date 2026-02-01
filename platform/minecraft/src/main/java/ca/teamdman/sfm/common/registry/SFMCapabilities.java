@@ -2,8 +2,8 @@ package ca.teamdman.sfm.common.registry;
 
 import ca.teamdman.sfm.common.capability.IRedstoneSignalStorage;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
-import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
+import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.neoforged.neoforge.capabilities.BlockCapability;
 
 /// 1.19.2 -> RegisterCapabilitiesEvent event listener method

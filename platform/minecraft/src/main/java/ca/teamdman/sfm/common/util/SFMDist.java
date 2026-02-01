@@ -1,7 +1,8 @@
 package ca.teamdman.sfm.common.util;
 
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.fml.loading.FMLEnvironment;
+
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.fml.loading.FMLEnvironment;
 
 /// This exists because the import for {@link Dist} is {@link MCVersionDependentBehaviour}
 public enum SFMDist {

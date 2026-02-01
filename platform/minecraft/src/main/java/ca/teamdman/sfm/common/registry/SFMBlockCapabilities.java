@@ -5,11 +5,13 @@ import ca.teamdman.sfm.common.capability.BufferBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.CauldronBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
+import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BarrelBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -24,12 +26,13 @@ import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.wrapper.InvWrapper;
 import org.jetbrains.annotations.Nullable;
 
-@EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
+import java.util.List;
+
 @MCVersionDependentBehaviour // 1.20.3+
 public class SFMBlockCapabilities {
 
     @SuppressWarnings("Convert2Lambda")
-    @SubscribeEvent
+    @SFMSubscribeEvent
     private static void registerCapabilities(RegisterCapabilitiesEvent event) {
 
         event.registerBlockEntity(
@@ -121,11 +124,23 @@ public class SFMBlockCapabilities {
                 .capabilityKind()
                 .capabilityKind();
 
-        event.registerBlock(
-                resourceTypeBlockCapability,
-                createProvider(resourceTypeBlockCapability),
-                SFMBlocks.TUNNELLED_MANAGER_BLOCK.get()
-        );
+        IBlockCapabilityProvider<CAP, @Nullable Direction> capabilityProxy = createCapabilityProxy(
+                resourceTypeBlockCapability);
+
+        for (SFMRegistryObject<Block, ?> tunnelledBlock : List.of(
+                SFMBlocks.TUNNELLED_MANAGER_BLOCK,
+                SFMBlocks.TUNNELLED_CABLE_BLOCK,
+                SFMBlocks.TUNNELLED_CABLE_FACADE_BLOCK,
+                SFMBlocks.TUNNELLED_FANCY_CABLE_BLOCK,
+                SFMBlocks.TUNNELLED_FANCY_CABLE_FACADE_BLOCK
+        )) {
+
+            event.registerBlock(
+                    resourceTypeBlockCapability,
+                    capabilityProxy,
+                    tunnelledBlock.get()
+            );
+        }
 
         BufferBlockCapabilityProvider bufferCapabilityProvider = new BufferBlockCapabilityProvider();
         @SuppressWarnings({"unchecked", "rawtypes"})
@@ -149,7 +164,7 @@ public class SFMBlockCapabilities {
     }
 
     @SuppressWarnings("Convert2Lambda")
-    private static <T> IBlockCapabilityProvider<T, @Nullable Direction> createProvider(BlockCapability<?, @Nullable Direction> cap) {
+    private static <T> IBlockCapabilityProvider<T, @Nullable Direction> createCapabilityProxy(BlockCapability<?, @Nullable Direction> cap) {
 
         return new IBlockCapabilityProvider<>() {
             @Override
