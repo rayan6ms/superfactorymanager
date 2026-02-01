@@ -2,6 +2,7 @@ use crate::cli::repo_root::get_repo_root;
 use crate::sfm_path::SfmPath;
 use crate::state::State;
 use crate::state::Status;
+use crate::worktree::{get_worktrees, sort_worktrees_by_version, Worktree};
 use eyre::Context;
 use eyre::bail;
 use std::fmt::Write;
@@ -13,91 +14,18 @@ use tracing::debug;
 use tracing::info;
 use tracing::warn;
 
+/// Options for the propagation process
+#[derive(Debug, Clone, Default)]
+pub struct PropagateOptions {
+    /// If true, automatically abort merges that would result in conflicts.
+    /// Only aborts merges that we start ourselves - will not abort pre-existing
+    /// merge conflicts to preserve manual progress.
+    pub auto_abort: bool,
+}
+
 /// Patterns for generated files that should always keep "ours" during merge conflicts.
 /// These are files that are auto-generated and should be regenerated after merge.
 const GENERATED_PATH_PATTERNS: &[&str] = &["src/generated/", "platform/minecraft/src/generated/"];
-
-/// Represents a worktree with its path and branch name
-#[derive(Debug, Clone)]
-pub struct Worktree {
-    pub path: PathBuf,
-    pub branch: String,
-}
-
-/// Parse the output of `git worktree list` to get all worktrees
-fn get_worktrees(repo_root: &PathBuf) -> eyre::Result<Vec<Worktree>> {
-    let output = Command::new("git")
-        .args(["worktree", "list", "--porcelain"])
-        .current_dir(repo_root)
-        .output()
-        .wrap_err("Failed to run git worktree list")?;
-
-    if !output.status.success() {
-        bail!(
-            "git worktree list failed: {}",
-            String::from_utf8_lossy(&output.stderr)
-        );
-    }
-
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let mut worktrees = Vec::new();
-    let mut current_path: Option<PathBuf> = None;
-    let mut current_branch: Option<String> = None;
-
-    for line in stdout.lines() {
-        if let Some(path) = line.strip_prefix("worktree ") {
-            // Save previous worktree if complete
-            if let (Some(path), Some(branch)) = (current_path.take(), current_branch.take()) {
-                worktrees.push(Worktree { path, branch });
-            }
-            current_path = Some(PathBuf::from(path));
-        } else if let Some(branch_ref) = line.strip_prefix("branch refs/heads/") {
-            current_branch = Some(branch_ref.to_string());
-        }
-    }
-
-    // Don't forget the last one
-    if let (Some(path), Some(branch)) = (current_path, current_branch) {
-        worktrees.push(Worktree { path, branch });
-    }
-
-    Ok(worktrees)
-}
-
-/// Parse a Minecraft version string into comparable parts
-/// Returns (major, minor, patch) as numbers for sorting
-fn parse_version(version: &str) -> Option<(u32, u32, u32)> {
-    let parts: Vec<&str> = version.split('.').collect();
-    match parts.len() {
-        2 => {
-            let major = parts[0].parse().ok()?;
-            let minor = parts[1].parse().ok()?;
-            Some((major, minor, 0))
-        }
-        3 => {
-            let major = parts[0].parse().ok()?;
-            let minor = parts[1].parse().ok()?;
-            let patch = parts[2].parse().ok()?;
-            Some((major, minor, patch))
-        }
-        _ => None,
-    }
-}
-
-/// Sort worktrees by their version number (semver-like)
-fn sort_worktrees_by_version(worktrees: &mut [Worktree]) {
-    worktrees.sort_by(|a, b| {
-        let a_version = parse_version(&a.branch);
-        let b_version = parse_version(&b.branch);
-
-        match (a_version, b_version) {
-            (Some(a_v), Some(b_v)) => a_v.cmp(&b_v),
-            (Some(_), None) => std::cmp::Ordering::Less,
-            (None, Some(_)) => std::cmp::Ordering::Greater,
-            (None, None) => a.branch.cmp(&b.branch),
-        }
-    });
-}
 
 /// Check if any worktree has uncommitted changes
 fn check_uncommitted_changes(worktrees: &[Worktree]) -> eyre::Result<Vec<&Worktree>> {
@@ -410,14 +338,108 @@ fn is_merging(path: &PathBuf) -> eyre::Result<bool> {
     Ok(merge_head.exists())
 }
 
+/// Result of checking if a merge would have conflicts
+#[derive(Debug)]
+enum MergePreviewResult {
+    /// Merge would succeed without conflicts
+    Clean,
+    /// Merge would result in conflicts
+    WouldConflict,
+    /// Already up to date, no merge needed
+    AlreadyUpToDate,
+}
+
+/// Check if merging source into dest would result in conflicts without actually merging.
+/// Uses `git merge --no-commit --no-ff` followed by `git merge --abort`.
+fn preview_merge(source: &Worktree, dest: &Worktree) -> eyre::Result<MergePreviewResult> {
+    debug!(
+        "Previewing merge {} into {} (in {})",
+        source.branch,
+        dest.branch,
+        dest.path.display()
+    );
+
+    // Try a merge without committing
+    let output = Command::new("git")
+        .args(["merge", "--no-commit", "--no-ff", &source.branch])
+        .current_dir(&dest.path)
+        .output()
+        .wrap_err_with(|| {
+            format!(
+                "Failed to preview merge {} into {}",
+                source.branch, dest.branch
+            )
+        })?;
+
+    let stderr = String::from_utf8_lossy(&output.stderr);
+    let stdout = String::from_utf8_lossy(&output.stdout);
+
+    // Check if already up to date
+    if stdout.contains("Already up to date") {
+        return Ok(MergePreviewResult::AlreadyUpToDate);
+    }
+
+    let has_conflicts = !output.status.success()
+        && (stderr.contains("CONFLICT") || stdout.contains("CONFLICT"));
+
+    // Always abort the preview merge to restore the original state
+    let abort_output = Command::new("git")
+        .args(["merge", "--abort"])
+        .current_dir(&dest.path)
+        .output();
+
+    if let Err(e) = abort_output {
+        warn!("Failed to abort preview merge: {e}");
+    } else if let Ok(output) = abort_output {
+        if !output.status.success() {
+            // merge --abort can fail if there was nothing to abort (e.g., already up to date)
+            // This is fine, we just log it at debug level
+            debug!(
+                "git merge --abort returned non-zero (may be expected): {}",
+                String::from_utf8_lossy(&output.stderr)
+            );
+        }
+    }
+
+    if has_conflicts {
+        Ok(MergePreviewResult::WouldConflict)
+    } else {
+        Ok(MergePreviewResult::Clean)
+    }
+}
+
 /// Perform a git merge from source into dest
-fn do_merge(source: &Worktree, dest: &Worktree) -> eyre::Result<bool> {
+fn do_merge(source: &Worktree, dest: &Worktree, options: &PropagateOptions) -> eyre::Result<bool> {
     info!(
         "Merging {} into {} (in {})",
         source.branch,
         dest.branch,
         dest.path.display()
     );
+
+    // If auto_abort is enabled, check if merge would conflict before starting
+    if options.auto_abort {
+        match preview_merge(source, dest)? {
+            MergePreviewResult::WouldConflict => {
+                warn!(
+                    "Merge {} into {} would result in conflicts, aborting due to --auto-abort",
+                    source.branch, dest.branch
+                );
+                bail!(
+                    "Merge {} into {} would result in conflicts. Aborted due to --auto-abort flag.",
+                    source.branch,
+                    dest.branch
+                );
+            }
+            MergePreviewResult::AlreadyUpToDate => {
+                info!("Already up to date, no merge needed");
+                return Ok(true);
+            }
+            MergePreviewResult::Clean => {
+                debug!("Preview indicates merge will be clean, proceeding");
+            }
+        }
+    }
 
     let output = Command::new("git")
         .args(["merge", &source.branch, "--no-edit"])
@@ -497,7 +519,7 @@ fn commit_merge(source: &Worktree, dest: &Worktree) -> eyre::Result<()> {
 /// # Errors
 ///
 /// Returns an error if any step of the propagation fails.
-pub fn run() -> eyre::Result<()> {
+pub fn run(options: PropagateOptions) -> eyre::Result<()> {
     let repo_root = get_repo_root()?;
     let mut state = State::load()?;
 
@@ -505,7 +527,7 @@ pub fn run() -> eyre::Result<()> {
 
     match &state.status {
         Status::Idle => {
-            run_idle_state(&repo_root, &mut state)?;
+            run_idle_state(&repo_root, &mut state, &options)?;
         }
         Status::MergingWithConflict {
             source_branch,
@@ -524,11 +546,20 @@ pub fn run() -> eyre::Result<()> {
             if !is_merging(&dest_path.0)? {
                 info!("No longer in a merge state. Resetting to idle and starting over.");
                 state.reset()?;
-                return run();
+                return run(options);
             }
 
             // Check if there are still conflicts
             if has_merge_conflicts(&dest_path.0)? {
+                // If auto_abort is enabled, log that we're NOT aborting a pre-existing merge
+                if options.auto_abort {
+                    info!(
+                        "Pre-existing merge conflict detected in {} (--auto-abort will NOT abort \
+                         pre-existing merges to preserve manual progress)",
+                        dest_branch
+                    );
+                }
+
                 // Try to auto-resolve generated file conflicts
                 if try_auto_resolve_generated_conflicts(&dest_path.0)? {
                     info!("All conflicts resolved via auto-resolution");
@@ -550,14 +581,14 @@ pub fn run() -> eyre::Result<()> {
 
             // Reset state and continue
             state.reset()?;
-            return run();
+            return run(options);
         }
     }
 
     Ok(())
 }
 
-fn run_idle_state(repo_root: &PathBuf, state: &mut State) -> eyre::Result<()> {
+fn run_idle_state(repo_root: &PathBuf, state: &mut State, options: &PropagateOptions) -> eyre::Result<()> {
     // Get all worktrees
     let mut worktrees = get_worktrees(repo_root)?;
     debug!(?worktrees, "Found worktrees");
@@ -585,6 +616,15 @@ fn run_idle_state(repo_root: &PathBuf, state: &mut State) -> eyre::Result<()> {
                 wt.branch,
                 wt.path.display()
             );
+
+            // If auto_abort is enabled, log that we're NOT aborting a pre-existing merge
+            if options.auto_abort {
+                info!(
+                    "Pre-existing merge detected in {} (--auto-abort will NOT abort \
+                     pre-existing merges to preserve manual progress)",
+                    wt.branch
+                );
+            }
 
             // Try to auto-resolve generated file conflicts
             if has_merge_conflicts(&wt.path)? {
@@ -651,7 +691,7 @@ fn run_idle_state(repo_root: &PathBuf, state: &mut State) -> eyre::Result<()> {
         let source = &window[0];
         let dest = &window[1];
 
-        let success = do_merge(source, dest)?;
+        let success = do_merge(source, dest, options)?;
 
         if !success {
             // Merge conflict - save state and bail
