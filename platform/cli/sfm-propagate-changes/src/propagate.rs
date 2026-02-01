@@ -533,10 +533,7 @@ pub fn run() -> eyre::Result<()> {
                 if try_auto_resolve_generated_conflicts(&dest_path.0)? {
                     info!("All conflicts resolved via auto-resolution");
                 } else {
-                    bail!(
-                        "There are still merge conflicts in {}. Please resolve them and run again.",
-                        dest_path.display()
-                    );
+                    bail!("{}", format_conflict_error(&dest_path.0, dest_branch)?);
                 }
             }
 
