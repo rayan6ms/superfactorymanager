@@ -1,0 +1,3 @@
+- audit command
+    - ensure .idea/.name is correct
+    - ensure @MCVersionDependentBehaviour annotations are correct
