@@ -663,13 +663,8 @@ fn run_idle_state(repo_root: &PathBuf, state: &mut State) -> eyre::Result<()> {
             };
             state.save()?;
 
-            bail!(
-                "Merge conflict detected while merging {} into {}.\n\
-                 Please resolve the conflicts in {} and run this command again.",
-                source.branch,
-                dest.branch,
-                dest.path.display()
-            );
+            let error_msg = format_conflict_error(&dest.path, &dest.branch)?;
+            bail!("{}", error_msg);
         }
     }
 
