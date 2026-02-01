@@ -96,6 +96,12 @@ pub enum Command {
         #[facet(args::subcommand)]
         command: super::repo_root::RepoRootCommand,
     },
+    /// Show git status for all worktrees
+    Status {
+        /// Status subcommand
+        #[facet(default, args::subcommand)]
+        command: Option<super::status::StatusCommand>,
+    },
 }
 
 impl Command {
@@ -107,6 +113,7 @@ impl Command {
             Command::Home { command } => command.invoke(),
             Command::Cache { command } => command.invoke(),
             Command::RepoRoot { command } => command.invoke(),
+            Command::Status { command } => command.unwrap_or_default().invoke(),
         }
     }
 }
