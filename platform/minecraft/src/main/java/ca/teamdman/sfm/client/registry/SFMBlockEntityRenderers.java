@@ -1,0 +1,19 @@
+package ca.teamdman.sfm.client.registry;
+
+import ca.teamdman.sfm.client.render.PrintingPressBlockEntityRenderer;
+import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
+import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.EntityRenderersEvent;
+
+public class SFMBlockEntityRenderers {
+    @SFMSubscribeEvent(value = SFMDist.CLIENT)
+    public static void onRegisterRenderers(EntityRenderersEvent.RegisterRenderers event) {
+        event.registerBlockEntityRenderer(
+                SFMBlockEntities.PRINTING_PRESS_BLOCK_ENTITY.get(),
+                PrintingPressBlockEntityRenderer::new
+        );
+    }
+}
