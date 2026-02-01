@@ -19,13 +19,18 @@ out
 *.ipr
 *.iws
 *.iml
-.idea
+**/.idea/**
+!platform/minecraft/.idea/.name
 .idea.bak
 .idea.bak.*
 
 # gradle
 build
 .gradle
+
+# Rust
+
+target/
 
 # other
 eclipse
