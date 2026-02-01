@@ -4,6 +4,7 @@ pub mod paths;
 pub mod propagate;
 pub mod sfm_path;
 pub mod state;
+pub mod worktree;
 
 use crate::cli::Cli;
 

@@ -1,91 +1,10 @@
-use crate::cli::repo_root::get_repo_root;
+use crate::worktree::{get_sorted_worktrees, Worktree};
 use color_eyre::owo_colors::OwoColorize;
 use eyre::{Context, bail};
 use facet::Facet;
 use figue as args;
 use std::path::PathBuf;
 use std::process::Command;
-
-/// Represents a worktree with its path and branch name
-#[derive(Debug, Clone)]
-struct Worktree {
-    path: PathBuf,
-    branch: String,
-}
-
-/// Parse the output of `git worktree list` to get all worktrees
-fn get_worktrees(repo_root: &PathBuf) -> eyre::Result<Vec<Worktree>> {
-    let output = Command::new("git")
-        .args(["worktree", "list", "--porcelain"])
-        .current_dir(repo_root)
-        .output()
-        .wrap_err("Failed to run git worktree list")?;
-
-    if !output.status.success() {
-        bail!(
-            "git worktree list failed: {}",
-            String::from_utf8_lossy(&output.stderr)
-        );
-    }
-
-    let stdout = String::from_utf8_lossy(&output.stdout);
-    let mut worktrees = Vec::new();
-    let mut current_path: Option<PathBuf> = None;
-    let mut current_branch: Option<String> = None;
-
-    for line in stdout.lines() {
-        if let Some(path) = line.strip_prefix("worktree ") {
-            // Save previous worktree if complete
-            if let (Some(path), Some(branch)) = (current_path.take(), current_branch.take()) {
-                worktrees.push(Worktree { path, branch });
-            }
-            current_path = Some(PathBuf::from(path));
-        } else if let Some(branch_ref) = line.strip_prefix("branch refs/heads/") {
-            current_branch = Some(branch_ref.to_string());
-        }
-    }
-
-    // Don't forget the last one
-    if let (Some(path), Some(branch)) = (current_path, current_branch) {
-        worktrees.push(Worktree { path, branch });
-    }
-
-    Ok(worktrees)
-}
-
-/// Parse a Minecraft version string into comparable parts
-fn parse_version(version: &str) -> Option<(u32, u32, u32)> {
-    let parts: Vec<&str> = version.split('.').collect();
-    match parts.len() {
-        2 => {
-            let major = parts[0].parse().ok()?;
-            let minor = parts[1].parse().ok()?;
-            Some((major, minor, 0))
-        }
-        3 => {
-            let major = parts[0].parse().ok()?;
-            let minor = parts[1].parse().ok()?;
-            let patch = parts[2].parse().ok()?;
-            Some((major, minor, patch))
-        }
-        _ => None,
-    }
-}
-
-/// Sort worktrees by their version number (semver-like)
-fn sort_worktrees_by_version(worktrees: &mut [Worktree]) {
-    worktrees.sort_by(|a, b| {
-        let a_version = parse_version(&a.branch);
-        let b_version = parse_version(&b.branch);
-
-        match (a_version, b_version) {
-            (Some(a_v), Some(b_v)) => a_v.cmp(&b_v),
-            (Some(_), None) => std::cmp::Ordering::Less,
-            (None, Some(_)) => std::cmp::Ordering::Greater,
-            (None, None) => a.branch.cmp(&b.branch),
-        }
-    });
-}
 
 /// Get the git status for a worktree
 fn get_worktree_status(worktree: &Worktree, short: bool) -> eyre::Result<WorktreeStatus> {
@@ -342,15 +261,12 @@ impl StatusCommand {
     ///
     /// Returns an error if getting worktree status fails.
     pub fn invoke(self) -> eyre::Result<()> {
-        let repo_root = get_repo_root()?;
-        let mut worktrees = get_worktrees(&repo_root)?;
+        let worktrees = get_sorted_worktrees()?;
 
         if worktrees.is_empty() {
             println!("No worktrees found.");
             return Ok(());
         }
-
-        sort_worktrees_by_version(&mut worktrees);
 
         match self {
             StatusCommand::All { short } => {
@@ -359,7 +275,7 @@ impl StatusCommand {
                     worktrees.len().to_string().cyan().bold()
                 );
                 for wt in &worktrees {
-                    let status = get_worktree_status(wt, short)?;
+                    let status = get_worktree_status(&wt, short)?;
                     status.display();
                 }
             }
@@ -368,7 +284,7 @@ impl StatusCommand {
                 let mut statuses = Vec::new();
 
                 for wt in &worktrees {
-                    let status = get_worktree_status(wt, short)?;
+                    let status = get_worktree_status(&wt, short)?;
                     if !status.is_clean() || status.is_merging {
                         dirty_count += 1;
                         statuses.push(status);
@@ -400,7 +316,7 @@ impl StatusCommand {
 
                 // Print one-line status for each worktree
                 for wt in &worktrees {
-                    let status = get_worktree_status(wt, true)?;
+                    let status = get_worktree_status(&wt, true)?;
 
                     // Determine the status icon
                     let icon = if status.is_merging {
