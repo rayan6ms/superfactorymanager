@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.event_bus;
 
 import ca.teamdman.sfm.SFM;
-import net.neoforged.api.distmarker.Dist;
+import ca.teamdman.sfm.common.util.SFMDist;
 import net.neoforged.bus.api.EventPriority;
 
 import java.lang.annotation.Retention;
@@ -11,7 +11,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /// Used to reduce {@link ca.teamdman.sfm.common.util.MCVersionDependentBehaviour}.
-/// Should be effectively equivalent to {@link net.minecraftforge.eventbus.api.SubscribeEvent}
+/// Should be effectively equivalent to {@link net.neoforged.bus.api.SubscribeEvent}
 @Retention(value = RUNTIME)
 @Target(value = METHOD)
 public @interface SFMSubscribeEvent {

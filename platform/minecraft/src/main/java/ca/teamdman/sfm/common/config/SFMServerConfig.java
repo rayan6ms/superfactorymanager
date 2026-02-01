@@ -1,8 +1,7 @@
 package ca.teamdman.sfm.common.config;
 
 import ca.teamdman.sfm.SFM;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.Mod;
+import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import net.neoforged.fml.event.config.ModConfigEvent;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
