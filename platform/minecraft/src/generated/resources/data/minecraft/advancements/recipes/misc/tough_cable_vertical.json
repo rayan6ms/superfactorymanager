@@ -34,15 +34,14 @@
   },
   "requirements": [
     [
+      "has_the_recipe",
       "has_obsidian",
-      "has_fancy_cable",
-      "has_the_recipe"
+      "has_fancy_cable"
     ]
   ],
   "rewards": {
     "recipes": [
       "minecraft:tough_cable_vertical"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }
