@@ -3,10 +3,10 @@
   "category": "misc",
   "key": {
     "A": {
-      "tag": "forge:fences"
+      "tag": "c:fences"
     },
     "B": {
-      "item": "sfm:cable"
+      "item": "sfm:fancy_cable"
     }
   },
   "pattern": [
@@ -15,6 +15,7 @@
     "A A"
   ],
   "result": {
-    "item": "sfm:tunnelled_cable"
+    "count": 1,
+    "id": "sfm:tunnelled_fancy_cable"
   }
 }

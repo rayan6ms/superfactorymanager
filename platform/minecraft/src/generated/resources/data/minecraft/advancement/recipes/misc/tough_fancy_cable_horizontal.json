@@ -1,13 +1,11 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_cable": {
+    "has_fancy_cable": {
       "conditions": {
         "items": [
           {
-            "items": [
-              "sfm:cable"
-            ]
+            "items": "sfm:fancy_cable"
           }
         ]
       },
@@ -17,9 +15,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:obsidian"
-            ]
+            "items": "minecraft:obsidian"
           }
         ]
       },
@@ -27,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "sfm:tough_cable"
+        "recipe": "minecraft:tough_fancy_cable_horizontal"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -36,12 +32,12 @@
     [
       "has_the_recipe",
       "has_obsidian",
-      "has_cable"
+      "has_fancy_cable"
     ]
   ],
   "rewards": {
     "recipes": [
-      "sfm:tough_cable"
+      "minecraft:tough_fancy_cable_horizontal"
     ]
   }
 }

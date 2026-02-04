@@ -3,18 +3,19 @@
   "category": "misc",
   "key": {
     "A": {
-      "tag": "forge:fences"
+      "item": "minecraft:obsidian"
     },
     "B": {
-      "item": "sfm:cable"
+      "item": "sfm:fancy_cable"
     }
   },
   "pattern": [
-    "AAA",
-    " B ",
-    "AAA"
+    "A A",
+    "ABA",
+    "A A"
   ],
   "result": {
-    "item": "sfm:tunnelled_cable"
+    "count": 1,
+    "id": "sfm:tough_fancy_cable"
   }
 }

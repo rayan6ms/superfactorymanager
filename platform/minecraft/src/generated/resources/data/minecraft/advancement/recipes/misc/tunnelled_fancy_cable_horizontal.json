@@ -5,21 +5,17 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "sfm:fancy_cable"
-            ]
+            "items": "sfm:fancy_cable"
           }
         ]
       },
       "trigger": "minecraft:inventory_changed"
     },
-    "has_obsidian": {
+    "has_fence": {
       "conditions": {
         "items": [
           {
-            "items": [
-              "minecraft:obsidian"
-            ]
+            "items": "#c:fences"
           }
         ]
       },
@@ -27,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:tough_cable_vertical"
+        "recipe": "minecraft:tunnelled_fancy_cable_horizontal"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -35,13 +31,13 @@
   "requirements": [
     [
       "has_the_recipe",
-      "has_obsidian",
+      "has_fence",
       "has_fancy_cable"
     ]
   ],
   "rewards": {
     "recipes": [
-      "minecraft:tough_cable_vertical"
+      "minecraft:tunnelled_fancy_cable_horizontal"
     ]
   }
 }

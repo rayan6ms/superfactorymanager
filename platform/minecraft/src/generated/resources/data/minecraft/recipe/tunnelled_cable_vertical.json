@@ -3,7 +3,7 @@
   "category": "misc",
   "key": {
     "A": {
-      "item": "minecraft:obsidian"
+      "tag": "c:fences"
     },
     "B": {
       "item": "sfm:cable"
@@ -15,6 +15,7 @@
     "A A"
   ],
   "result": {
-    "item": "sfm:tough_cable"
+    "count": 1,
+    "id": "sfm:tunnelled_cable"
   }
 }
