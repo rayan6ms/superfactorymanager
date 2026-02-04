@@ -1,7 +1,8 @@
 //! Common worktree utilities shared across commands.
 
 use crate::cli::repo_root::get_repo_root;
-use eyre::{Context, bail};
+use eyre::Context;
+use eyre::bail;
 use std::path::PathBuf;
 use std::process::Command;
 

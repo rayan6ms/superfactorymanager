@@ -3,7 +3,8 @@ use eyre::bail;
 use facet::Facet;
 use figue::{self as args};
 use std::fs;
-use tracing::{info, warn};
+use tracing::info;
+use tracing::warn;
 
 /// Check command - verifies platform/minecraft/.idea/.name matches sfm-<mcversion>
 #[derive(Facet, Debug, Default)]
@@ -28,7 +29,12 @@ impl CheckCommand {
         let mut failures: Vec<String> = Vec::new();
 
         for wt in worktrees {
-            let path = wt.path.join("platform").join("minecraft").join(".idea").join(".name");
+            let path = wt
+                .path
+                .join("platform")
+                .join("minecraft")
+                .join(".idea")
+                .join(".name");
             let expected = format!("sfm-{}", wt.branch);
 
             match fs::read_to_string(&path) {
@@ -39,24 +45,50 @@ impl CheckCommand {
                             // Attempt to overwrite with expected value
                             if let Some(parent) = path.parent() {
                                 if let Err(e) = fs::create_dir_all(parent) {
-                                    warn!("{}: failed to create parent dir {}: {}", wt.branch, parent.display(), e);
-                                    failures.push(format!("{}: could not create parent dir {} ({})", wt.branch, parent.display(), e));
+                                    warn!(
+                                        "{}: failed to create parent dir {}: {}",
+                                        wt.branch,
+                                        parent.display(),
+                                        e
+                                    );
+                                    failures.push(format!(
+                                        "{}: could not create parent dir {} ({})",
+                                        wt.branch,
+                                        parent.display(),
+                                        e
+                                    ));
                                     continue;
                                 }
                             }
 
                             match fs::write(&path, expected.as_bytes()) {
                                 Ok(_) => {
-                                    info!("{}: fixed .idea/.name (wrote '{}')", wt.branch, expected);
+                                    info!(
+                                        "{}: fixed .idea/.name (wrote '{}')",
+                                        wt.branch, expected
+                                    );
                                 }
                                 Err(e) => {
-                                    warn!("{}: failed to write {}: {}", wt.branch, path.display(), e);
-                                    failures.push(format!("{}: could not write {} ({})", wt.branch, path.display(), e));
+                                    warn!(
+                                        "{}: failed to write {}: {}",
+                                        wt.branch,
+                                        path.display(),
+                                        e
+                                    );
+                                    failures.push(format!(
+                                        "{}: could not write {} ({})",
+                                        wt.branch,
+                                        path.display(),
+                                        e
+                                    ));
                                 }
                             }
                         } else {
                             warn!("{}: expected '{}', found '{}'", wt.branch, expected, found);
-                            failures.push(format!("{}: expected '{}', found '{}'", wt.branch, expected, found));
+                            failures.push(format!(
+                                "{}: expected '{}', found '{}'",
+                                wt.branch, expected, found
+                            ));
                         }
                     } else {
                         info!("{}: .idea/.name OK", wt.branch);
@@ -67,8 +99,18 @@ impl CheckCommand {
                         // Try to create parent directories and write the expected file
                         if let Some(parent) = path.parent() {
                             if let Err(e2) = fs::create_dir_all(parent) {
-                                warn!("{}: failed to create parent dir {}: {}", wt.branch, parent.display(), e2);
-                                failures.push(format!("{}: could not create parent dir {} ({})", wt.branch, parent.display(), e2));
+                                warn!(
+                                    "{}: failed to create parent dir {}: {}",
+                                    wt.branch,
+                                    parent.display(),
+                                    e2
+                                );
+                                failures.push(format!(
+                                    "{}: could not create parent dir {} ({})",
+                                    wt.branch,
+                                    parent.display(),
+                                    e2
+                                ));
                                 continue;
                             }
                         }
@@ -79,12 +121,22 @@ impl CheckCommand {
                             }
                             Err(e2) => {
                                 warn!("{}: failed to write {}: {}", wt.branch, path.display(), e2);
-                                failures.push(format!("{}: could not write {} ({})", wt.branch, path.display(), e2));
+                                failures.push(format!(
+                                    "{}: could not write {} ({})",
+                                    wt.branch,
+                                    path.display(),
+                                    e2
+                                ));
                             }
                         }
                     } else {
                         warn!("{}: could not read {} ({})", wt.branch, path.display(), e);
-                        failures.push(format!("{}: could not read {} ({})", wt.branch, path.display(), e));
+                        failures.push(format!(
+                            "{}: could not read {} ({})",
+                            wt.branch,
+                            path.display(),
+                            e
+                        ));
                     }
                 }
             }

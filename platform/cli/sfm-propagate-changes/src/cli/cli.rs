@@ -1,5 +1,4 @@
 use crate::logging::LoggingConfig;
-
 use chrono::Local;
 use facet::Facet;
 use figue::FigueBuiltins;
@@ -67,8 +66,6 @@ impl Cli {
         self.command.invoke()
     }
 }
-
-
 
 /// Available commands
 #[derive(Facet, Debug)]

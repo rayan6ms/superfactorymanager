@@ -1,6 +1,10 @@
+use crate::cli::compile::BuildResult;
+use crate::cli::compile::BuildStatus;
+use crate::cli::compile::print_summary;
 use crate::worktree::get_sorted_worktrees;
 use color_eyre::owo_colors::OwoColorize;
-use eyre::{Context, bail};
+use eyre::Context;
+use eyre::bail;
 use facet::Facet;
 use std::path::PathBuf;
 use std::time::Instant;
@@ -8,8 +12,6 @@ use tokio::process::Command;
 use tokio::task::JoinSet;
 use tracing::info;
 use tracing::warn;
-
-use crate::cli::compile::{BuildResult, BuildStatus, print_summary};
 
 /// Run gradle runData for a worktree
 async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
@@ -71,15 +73,22 @@ async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
         Ok(output) => {
             let stdout = String::from_utf8_lossy(&output.stdout);
             let stderr = String::from_utf8_lossy(&output.stderr);
-            let has_all_providers = stdout.contains("All providers took") || stderr.contains("All providers took");
+            let has_all_providers =
+                stdout.contains("All providers took") || stderr.contains("All providers took");
 
             if output.status.success() || has_all_providers {
                 if !output.status.success() && has_all_providers {
-                    info!("`runData` for {} produced 'All providers took' despite non-zero exit status; treating as success", branch);
+                    info!(
+                        "`runData` for {} produced 'All providers took' despite non-zero exit status; treating as success",
+                        branch
+                    );
                 }
                 BuildStatus::Success { duration }
             } else {
-                warn!("runData for {} failed; exit: {:?}, stdout: {}, stderr: {}", branch, output.status, stdout, stderr);
+                warn!(
+                    "runData for {} failed; exit: {:?}, stdout: {}, stderr: {}",
+                    branch, output.status, stdout, stderr
+                );
                 BuildStatus::Failed { duration }
             }
         }

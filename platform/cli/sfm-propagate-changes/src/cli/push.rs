@@ -1,8 +1,10 @@
 use crate::worktree::get_sorted_worktrees;
-use eyre::{bail, Context};
+use eyre::Context;
+use eyre::bail;
 use facet::Facet;
 use std::process::Command;
-use tracing::{info, warn};
+use tracing::info;
+use tracing::warn;
 
 /// Push command - runs `git push` in each worktree
 #[derive(Facet, Debug, Default)]
@@ -34,7 +36,10 @@ impl PushCommand {
             if !output.status.success() {
                 let stdout = String::from_utf8_lossy(&output.stdout);
                 let stderr = String::from_utf8_lossy(&output.stderr);
-                warn!("Push failed for {}: exit: {:?}, stdout: {}, stderr: {}", wt.branch, output.status, stdout, stderr);
+                warn!(
+                    "Push failed for {}: exit: {:?}, stdout: {}, stderr: {}",
+                    wt.branch, output.status, stdout, stderr
+                );
                 failures.push(format!("{}: exit {:?}", wt.branch, output.status));
             } else {
                 info!("Push successful for {}", wt.branch);

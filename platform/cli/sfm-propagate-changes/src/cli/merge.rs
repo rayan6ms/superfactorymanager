@@ -1,6 +1,6 @@
+use crate::propagate;
 use facet::Facet;
 use figue::{self as args};
-use crate::propagate;
 
 /// Options for the merge command
 #[derive(Facet, Debug, Default)]

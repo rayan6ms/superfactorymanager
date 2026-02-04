@@ -1,6 +1,8 @@
-use crate::worktree::{get_sorted_worktrees, Worktree};
+use crate::worktree::Worktree;
+use crate::worktree::get_sorted_worktrees;
 use color_eyre::owo_colors::OwoColorize;
-use eyre::{Context, bail};
+use eyre::Context;
+use eyre::bail;
 use facet::Facet;
 use figue as args;
 use std::path::PathBuf;
@@ -168,10 +170,7 @@ impl WorktreeStatus {
 
         if self.is_clean() && !self.is_merging {
             if !self.short {
-                println!(
-                    "  {}",
-                    "Nothing to commit, working tree clean".dimmed()
-                );
+                println!("  {}", "Nothing to commit, working tree clean".dimmed());
             }
             return;
         }
@@ -217,11 +216,7 @@ impl WorktreeStatus {
                     self.untracked.len()
                 );
             } else {
-                println!(
-                    "  {} ({}):",
-                    "Untracked".dimmed(),
-                    self.untracked.len()
-                );
+                println!("  {} ({}):", "Untracked".dimmed(), self.untracked.len());
                 for file in &self.untracked {
                     println!("    {} {}", "?".dimmed(), file.dimmed());
                 }
@@ -358,12 +353,7 @@ impl StatusCommand {
                         info_parts.join(" ")
                     };
 
-                    println!(
-                        "  {} {} {}",
-                        icon,
-                        status.branch.cyan().bold(),
-                        info
-                    );
+                    println!("  {} {} {}", icon, status.branch.cyan().bold(), info);
 
                     // Count for totals
                     if status.is_merging {
