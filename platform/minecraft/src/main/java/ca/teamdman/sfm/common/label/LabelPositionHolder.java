@@ -32,8 +32,21 @@ public record LabelPositionHolder(Map<String, BlockPosSet> labels) {
                             Codec.unboundedMap(
                                     Codec.STRING,
                                     BlockPos.CODEC.listOf().xmap(HashSet::new, ArrayList::new)
-                            ).fieldOf("labels").forGetter(LabelPositionHolder::labels)
-                    ).apply(builder, LabelPositionHolder::new)
+                            ).fieldOf("labels").forGetter(labelPositionHolder -> {
+                                Map<String, HashSet<BlockPos>> rtn = new HashMap<>();
+                                Map<String, BlockPosSet> data = labelPositionHolder.labels();
+                                for (Map.Entry<String, BlockPosSet> entry : data.entrySet()) {
+                                    HashSet<BlockPos> positions = new HashSet<>();
+                                    entry.getValue().blockPosIterator().forEach(pos -> positions.add(pos.immutable()));
+                                    rtn.put(entry.getKey(), positions);
+                                }
+                                return rtn;
+                            })
+                    ).apply(builder, data -> {
+                        Map<String, BlockPosSet> map = new HashMap<>();
+                        data.forEach((key, value) -> map.put(key, new BlockPosSet(value)));
+                        return new LabelPositionHolder(map);
+                    })
             );
 
     private final static WeakHashMap<ItemStack, LabelPositionHolder> CACHE = new WeakHashMap<>();
@@ -54,12 +67,12 @@ public record LabelPositionHolder(Map<String, BlockPosSet> labels) {
             FriendlyByteBuf friendlyByteBuf
     ) {
         friendlyByteBuf.writeVarInt(labelPositionHolder.labels().size());
-        for (Map.Entry<String, ? extends Set<BlockPos>> entry : labelPositionHolder.labels().entrySet()) {
+        for (Map.Entry<String, BlockPosSet> entry : labelPositionHolder.labels().entrySet()) {
             String label = entry.getKey();
-            Set<BlockPos> positions = entry.getValue();
+            BlockPosSet positions = entry.getValue();
             friendlyByteBuf.writeUtf(label);
             friendlyByteBuf.writeVarInt(positions.size());
-            positions.forEach(friendlyByteBuf::writeBlockPos);
+            positions.blockPosIterator().forEach(friendlyByteBuf::writeBlockPos);
         }
     }
 
@@ -69,7 +82,7 @@ public record LabelPositionHolder(Map<String, BlockPosSet> labels) {
         for (int i = 0; i < size; i++) {
             String label = friendlyByteBuf.readUtf();
             int positionsSize = friendlyByteBuf.readVarInt();
-            HashSet<BlockPos> positions = new HashSet<>();
+            BlockPosSet positions = new BlockPosSet();
             for (int j = 0; j < positionsSize; j++) {
                 positions.add(friendlyByteBuf.readBlockPos());
             }

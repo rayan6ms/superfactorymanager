@@ -6,9 +6,9 @@ import ca.teamdman.sfm.common.registry.SFMBlockEntities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -20,7 +20,11 @@ import java.util.List;
 
 public class TunnelledManagerBlock extends ManagerBlock {
     @Override
-    public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
+    public BlockEntity newBlockEntity(
+            BlockPos pos,
+            BlockState state
+    ) {
+        //noinspection DataFlowIssue
         return SFMBlockEntities.TUNNELLED_MANAGER_BLOCK_ENTITY
                 .get()
                 .create(pos, state);
@@ -29,10 +33,11 @@ public class TunnelledManagerBlock extends ManagerBlock {
     @Override
     public void appendHoverText(
             ItemStack pStack,
-            @Nullable BlockGetter pLevel,
+            Item.TooltipContext pContext,
             List<Component> pTooltip,
             TooltipFlag pFlag
     ) {
+
         pTooltip.add(LocalizationKeys.TUNNELLED_MANAGER_ITEM_TOOLTIP
                              .getComponent()
                              .withStyle(ChatFormatting.GRAY));
@@ -44,7 +49,13 @@ public class TunnelledManagerBlock extends ManagerBlock {
             BlockState state,
             BlockEntityType<T> type
     ) {
+
         if (level.isClientSide()) return null;
-        return createTickerHelper(type, SFMBlockEntities.TUNNELLED_MANAGER_BLOCK_ENTITY.get(), TunnelledManagerBlockEntity::serverTick);
+        return createTickerHelper(
+                type,
+                SFMBlockEntities.TUNNELLED_MANAGER_BLOCK_ENTITY.get(),
+                TunnelledManagerBlockEntity::serverTick
+        );
     }
+
 }

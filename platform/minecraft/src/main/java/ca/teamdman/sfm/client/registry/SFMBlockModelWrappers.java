@@ -11,7 +11,6 @@ import com.google.common.collect.ImmutableList;
 import net.minecraft.client.renderer.block.BlockModelShaper;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.ModelResourceLocation;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.event.ModelEvent;
@@ -60,7 +59,7 @@ public class SFMBlockModelWrappers {
                 };
 
         // Apply the model redirection for each relationship
-        Map<ResourceLocation, BakedModel> models = event.getModels();
+        Map<ModelResourceLocation, BakedModel> models = event.getModels();
         for (var relationship : relationships) {
             // Get the possible states for the facaded block
             ImmutableList<BlockState> possibleStates = relationship

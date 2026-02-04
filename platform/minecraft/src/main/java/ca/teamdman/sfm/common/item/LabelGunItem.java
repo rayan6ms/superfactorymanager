@@ -148,7 +148,7 @@ public class LabelGunItem extends Item {
     @Override
     public void appendHoverText(
             ItemStack stack,
-            TooltipContext pContext,
+            Item.TooltipContext pContext,
             List<Component> lines,
             TooltipFlag pTooltipFlag
     ) {
