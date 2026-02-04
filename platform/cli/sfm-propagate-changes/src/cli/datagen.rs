@@ -67,8 +67,21 @@ async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
     let duration = start.elapsed();
 
     let status = match result {
-        Ok(output) if output.status.success() => BuildStatus::Success { duration },
-        Ok(_) => BuildStatus::Failed { duration },
+        Ok(output) => {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            let has_all_providers = stdout.contains("All providers took") || stderr.contains("All providers took");
+
+            if output.status.success() || has_all_providers {
+                if !output.status.success() && has_all_providers {
+                    info!("`runData` for {} produced 'All providers took' despite non-zero exit status; treating as success", branch);
+                }
+                BuildStatus::Success { duration }
+            } else {
+                info!("runData for {} failed; exit: {:?}, stdout: {}, stderr: {}", branch, output.status, stdout, stderr);
+                BuildStatus::Failed { duration }
+            }
+        }
         Err(e) => {
             info!("Failed to run gradlew for {}: {}", branch, e);
             BuildStatus::Failed { duration }
