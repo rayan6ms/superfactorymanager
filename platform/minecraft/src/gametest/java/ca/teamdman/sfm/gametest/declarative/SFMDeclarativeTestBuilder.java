@@ -49,7 +49,7 @@ public class SFMDeclarativeTestBuilder {
         // todo: chaos
     }
 
-    private @NotNull BlockPos calculateManagerPos() {
+    private BlockPos calculateManagerPos() {
         return BoundingBox.encapsulatingPositions(
                         spec.blocks()
                                 .stream()

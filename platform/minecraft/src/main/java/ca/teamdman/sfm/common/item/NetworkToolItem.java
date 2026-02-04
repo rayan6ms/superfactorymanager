@@ -24,6 +24,7 @@ import net.minecraft.world.level.Level;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.Set;
+import java.util.stream.Stream;
 
 public class NetworkToolItem extends Item {
     public NetworkToolItem() {

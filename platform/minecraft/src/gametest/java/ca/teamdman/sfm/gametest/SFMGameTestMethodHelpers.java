@@ -5,7 +5,6 @@ import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.config.SFMServerConfig;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.program_builder.ProgramBuilder;
 import it.unimi.dsi.fastutil.Pair;
@@ -79,7 +78,7 @@ public class SFMGameTestMethodHelpers {
 
     public static IItemHandler getItemHandler(
             GameTestHelper helper,
-            @NotStored BlockPos pos
+            BlockPos pos
     ) {
         BlockPos worldPos = helper.absolutePos(pos);
         var found = helper
