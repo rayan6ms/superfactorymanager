@@ -3,6 +3,7 @@ use color_eyre::owo_colors::OwoColorize;
 use eyre::Context;
 use eyre::bail;
 use facet::Facet;
+use figue::{self as args};
 use std::path::PathBuf;
 use std::time::Duration;
 use std::time::Instant;
@@ -38,7 +39,7 @@ fn format_duration(duration: Duration) -> String {
 }
 
 /// Run gradle compile for a worktree
-async fn compile_worktree(branch: String, path: PathBuf) -> BuildResult {
+async fn compile_worktree(branch: String, path: PathBuf, all: bool) -> BuildResult {
     let minecraft_dir = path.join("platform").join("minecraft");
 
     // Check if the minecraft directory exists
@@ -77,29 +78,65 @@ async fn compile_worktree(branch: String, path: PathBuf) -> BuildResult {
     }
 
     println!(
-        "{} {} {}",
+        "{} {} {}{}",
         "Compiling".cyan().bold(),
         branch.yellow().bold(),
-        format!("({})", minecraft_dir.display()).dimmed()
+        format!("({})", minecraft_dir.display()).dimmed(),
+        if all { " [--all]" } else { "" }
     );
 
     let start = Instant::now();
 
-    let result = Command::new(&gradlew)
-        .arg("compileJava")
-        .current_dir(&minecraft_dir)
-        .output()
-        .await;
+    // Helper to run a single gradlew task and return success
+    async fn run_task(gradlew: &PathBuf, dir: &PathBuf, task: &str) -> Result<(), String> {
+        let output = Command::new(gradlew)
+            .arg(task)
+            .current_dir(dir)
+            .output()
+            .await
+            .map_err(|e| format!("Failed to run {}: {}", task, e))?;
+
+        if output.status.success() {
+            Ok(())
+        } else {
+            let stdout = String::from_utf8_lossy(&output.stdout);
+            let stderr = String::from_utf8_lossy(&output.stderr);
+            Err(format!("{} failed: status: {:?}, stdout: {}, stderr: {}", task, output.status, stdout, stderr))
+        }
+    }
+
+    // Run compileJava first
+    let mut ok = match run_task(&gradlew, &minecraft_dir, "compileJava").await {
+        Ok(()) => true,
+        Err(err) => {
+            info!("{}", err);
+            false
+        }
+    };
+
+    // If --all is set, run the additional tasks sequentially
+    if ok && all {
+        // compileDatagenJava
+        if let Err(err) = run_task(&gradlew, &minecraft_dir, "compileDatagenJava").await {
+            info!("{}", err);
+            ok = false;
+        }
+
+        // compileGametestJava
+        if ok {
+            if let Err(err) = run_task(&gradlew, &minecraft_dir, "compileGametestJava").await {
+                info!("{}", err);
+                ok = false;
+            }
+        }
+    }
 
     let duration = start.elapsed();
 
-    let status = match result {
-        Ok(output) if output.status.success() => BuildStatus::Success { duration },
-        Ok(_) => BuildStatus::Failed { duration },
-        Err(e) => {
-            info!("Failed to run gradlew for {}: {}", branch, e);
-            BuildStatus::Failed { duration }
-        }
+    let status = if ok {
+        BuildStatus::Success { duration }
+    } else {
+        BuildStatus::Failed { duration }
     };
 
     BuildResult { branch, status }
@@ -182,7 +219,11 @@ pub(crate) fn print_summary(results: &[BuildResult]) {
 
 /// Compile command - compiles all worktrees in parallel
 #[derive(Facet, Debug, Default)]
-pub struct CompileCommand;
+pub struct CompileCommand {
+    /// If set, run additional compilation tasks: `compileDatagenJava` and `compileGametestJava`.
+    #[facet(args::named)]
+    pub all: bool,
+}
 
 impl CompileCommand {
     /// # Errors
@@ -217,7 +258,8 @@ impl CompileCommand {
         for worktree in worktrees {
             let branch = worktree.branch.clone();
             let path = worktree.path.clone();
-            join_set.spawn(compile_worktree(branch, path));
+            let all = self.all;
+            join_set.spawn(compile_worktree(branch, path, all));
         }
 
         // Collect all results
