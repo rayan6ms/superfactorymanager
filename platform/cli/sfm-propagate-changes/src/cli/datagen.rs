@@ -3,40 +3,15 @@ use color_eyre::owo_colors::OwoColorize;
 use eyre::{Context, bail};
 use facet::Facet;
 use std::path::PathBuf;
-use std::time::{Duration, Instant};
+use std::time::Instant;
 use tokio::process::Command;
 use tokio::task::JoinSet;
 use tracing::info;
 
-/// Build status for a single worktree
-#[derive(Debug, Clone)]
-pub(crate) enum BuildStatus {
-    Success { duration: Duration },
-    Failed { duration: Duration },
-    NotFound { reason: String },
-} 
+use crate::cli::compile::{BuildResult, BuildStatus, print_summary};
 
-/// Result of building a worktree
-#[derive(Debug, Clone)]
-pub(crate) struct BuildResult {
-    pub(crate) branch: String,
-    pub(crate) status: BuildStatus,
-} 
-
-/// Format a duration as a human-readable string
-fn format_duration(duration: Duration) -> String {
-    let secs = duration.as_secs();
-    if secs >= 60 {
-        let mins = secs / 60;
-        let remaining_secs = secs % 60;
-        format!("{}m {:02}s", mins, remaining_secs)
-    } else {
-        format!("{}.{:01}s", secs, duration.subsec_millis() / 100)
-    }
-}
-
-/// Run gradle compile for a worktree
-async fn compile_worktree(branch: String, path: PathBuf) -> BuildResult {
+/// Run gradle runData for a worktree
+async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
     let minecraft_dir = path.join("platform").join("minecraft");
 
     // Check if the minecraft directory exists
@@ -76,7 +51,7 @@ async fn compile_worktree(branch: String, path: PathBuf) -> BuildResult {
 
     println!(
         "{} {} {}",
-        "Compiling".cyan().bold(),
+        "Running datagen".cyan().bold(),
         branch.yellow().bold(),
         format!("({})", minecraft_dir.display()).dimmed()
     );
@@ -84,7 +59,7 @@ async fn compile_worktree(branch: String, path: PathBuf) -> BuildResult {
     let start = Instant::now();
 
     let result = Command::new(&gradlew)
-        .arg("compileJava")
+        .arg("runData")
         .current_dir(&minecraft_dir)
         .output()
         .await;
@@ -103,85 +78,14 @@ async fn compile_worktree(branch: String, path: PathBuf) -> BuildResult {
     BuildResult { branch, status }
 }
 
-/// Print the summary of all builds
-pub(crate) fn print_summary(results: &[BuildResult]) {
-    println!();
-    println!("{}", "═".repeat(60).dimmed());
-    println!("{}", "  COMPILE SUMMARY".bold());
-    println!("{}", "═".repeat(60).dimmed());
-    println!();
-
-    let mut successful = 0;
-    let mut failed = 0;
-    let mut skipped = 0;
-
-    for result in results {
-        let (status_icon, status_text, duration_text) = match &result.status {
-            BuildStatus::Success { duration } => {
-                successful += 1;
-                (
-                    "✓".green().bold().to_string(),
-                    "SUCCESS".green().bold().to_string(),
-                    format!(" ({})", format_duration(*duration)).dimmed().to_string(),
-                )
-            }
-            BuildStatus::Failed { duration } => {
-                failed += 1;
-                (
-                    "✗".red().bold().to_string(),
-                    "FAILED".red().bold().to_string(),
-                    format!(" ({})", format_duration(*duration)).dimmed().to_string(),
-                )
-            }
-            BuildStatus::NotFound { reason } => {
-                skipped += 1;
-                (
-                    "○".yellow().to_string(),
-                    "NOT FOUND".yellow().to_string(),
-                    format!(" ({})", reason).dimmed().to_string(),
-                )
-            }
-        };
-
-        println!(
-            "  {} {:12} {}{}",
-            status_icon,
-            result.branch.bold(),
-            status_text,
-            duration_text
-        );
-    }
-
-    println!();
-    println!("{}", "─".repeat(60).dimmed());
-
-    // Print totals
-    let total = results.len();
-    print!("  Total: {} ", total.to_string().bold());
-
-    let mut parts = Vec::new();
-    if successful > 0 {
-        parts.push(format!("{} {}", successful, "successful".green()));
-    }
-    if failed > 0 {
-        parts.push(format!("{} {}", failed, "failed".red()));
-    }
-    if skipped > 0 {
-        parts.push(format!("{} {}", skipped, "skipped".yellow()));
-    }
-
-    println!("({})", parts.join(", "));
-    println!();
-}
-
-/// Compile command - compiles all worktrees in parallel
+/// Datagen command - runs `gradlew runData` for all worktrees in parallel
 #[derive(Facet, Debug, Default)]
-pub struct CompileCommand {}
+pub struct DatagenCommand {}
 
-impl CompileCommand {
+impl DatagenCommand {
     /// # Errors
     ///
-    /// Returns an error if compilation fails.
+    /// Returns an error if datagen fails.
     pub fn invoke(self) -> eyre::Result<()> {
         let rt = tokio::runtime::Builder::new_multi_thread()
             .enable_all()
@@ -200,18 +104,18 @@ impl CompileCommand {
         }
 
         info!(
-            "Compiling {} worktree(s) in parallel: {:?}",
+            "Running datagen for {} worktree(s) in parallel: {:?}",
             worktrees.len(),
             worktrees.iter().map(|w| &w.branch).collect::<Vec<_>>()
         );
 
         let mut join_set: JoinSet<BuildResult> = JoinSet::new();
 
-        // Spawn all compile tasks
+        // Spawn all datagen tasks
         for worktree in worktrees {
             let branch = worktree.branch.clone();
             let path = worktree.path.clone();
-            join_set.spawn(compile_worktree(branch, path));
+            join_set.spawn(run_datagen_worktree(branch, path));
         }
 
         // Collect all results
@@ -235,7 +139,7 @@ impl CompileCommand {
             .any(|r| matches!(r.status, BuildStatus::Failed { .. }));
 
         if had_failure {
-            bail!("One or more compilations failed");
+            bail!("One or more datagen runs failed");
         }
 
         Ok(())
