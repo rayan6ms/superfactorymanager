@@ -7,6 +7,7 @@ use std::time::Instant;
 use tokio::process::Command;
 use tokio::task::JoinSet;
 use tracing::info;
+use tracing::warn;
 
 use crate::cli::compile::{BuildResult, BuildStatus, print_summary};
 
@@ -78,12 +79,12 @@ async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
                 }
                 BuildStatus::Success { duration }
             } else {
-                info!("runData for {} failed; exit: {:?}, stdout: {}, stderr: {}", branch, output.status, stdout, stderr);
+                warn!("runData for {} failed; exit: {:?}, stdout: {}, stderr: {}", branch, output.status, stdout, stderr);
                 BuildStatus::Failed { duration }
             }
         }
         Err(e) => {
-            info!("Failed to run gradlew for {}: {}", branch, e);
+            warn!("Failed to run gradlew for {}: {}", branch, e);
             BuildStatus::Failed { duration }
         }
     };
