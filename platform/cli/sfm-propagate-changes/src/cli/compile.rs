@@ -19,11 +19,14 @@ pub(crate) enum BuildStatus {
     NotFound { reason: String },
 }
 
-/// Result of building a worktree
+/// Result of building a worktree, with per-task statuses
 #[derive(Debug, Clone)]
 pub(crate) struct BuildResult {
     pub(crate) branch: String,
-    pub(crate) status: BuildStatus,
+    pub(crate) main: BuildStatus,
+    pub(crate) datagen: Option<BuildStatus>,
+    pub(crate) gametest: Option<BuildStatus>,
+    pub(crate) duration: Duration,
 }
 
 /// Format a duration as a human-readable string
@@ -50,9 +53,12 @@ async fn compile_worktree(branch: String, path: PathBuf, all: bool) -> BuildResu
         );
         return BuildResult {
             branch,
-            status: BuildStatus::NotFound {
+            main: BuildStatus::NotFound {
                 reason: "platform/minecraft directory not found".to_string(),
             },
+            datagen: None,
+            gametest: None,
+            duration: Duration::from_secs(0),
         };
     }
 
@@ -71,9 +77,12 @@ async fn compile_worktree(branch: String, path: PathBuf, all: bool) -> BuildResu
         );
         return BuildResult {
             branch,
-            status: BuildStatus::NotFound {
+            main: BuildStatus::NotFound {
                 reason: format!("gradlew not found in {}", minecraft_dir.display()),
             },
+            datagen: None,
+            gametest: None,
+            duration: Duration::from_secs(0),
         };
     }
 
@@ -133,13 +142,44 @@ async fn compile_worktree(branch: String, path: PathBuf, all: bool) -> BuildResu
 
     let duration = start.elapsed();
 
-    let status = if ok {
+    let main_status = if ok {
         BuildStatus::Success { duration }
     } else {
         BuildStatus::Failed { duration }
     };
 
-    BuildResult { branch, status }
+    // datagen and gametest statuses (only present when --all is true)
+    let datagen_status = if all {
+        match run_task(&gradlew, &minecraft_dir, "compileDatagenJava").await {
+            Ok(()) => Some(BuildStatus::Success { duration }),
+            Err(err) => {
+                info!("{}", err);
+                Some(BuildStatus::Failed { duration })
+            }
+        }
+    } else {
+        None
+    };
+
+    let gametest_status = if all && datagen_status.is_some() && matches!(datagen_status.as_ref().unwrap(), BuildStatus::Success { .. }) {
+        match run_task(&gradlew, &minecraft_dir, "compileGametestJava").await {
+            Ok(()) => Some(BuildStatus::Success { duration }),
+            Err(err) => {
+                info!("{}", err);
+                Some(BuildStatus::Failed { duration })
+            }
+        }
+    } else {
+        None
+    };
+
+    BuildResult {
+        branch,
+        main: main_status,
+        datagen: datagen_status,
+        gametest: gametest_status,
+        duration,
+    }
 }
 
 /// Print the summary of all builds
@@ -150,53 +190,73 @@ pub(crate) fn print_summary(results: &[BuildResult]) {
     println!("{}", "═".repeat(60).dimmed());
     println!();
 
+    // Print per-task sections
+    fn print_task_section<F>(title: &str, results: &[BuildResult], mut get_status: F)
+    where
+        F: FnMut(&BuildResult) -> Option<&BuildStatus>,
+    {
+        println!("\n{}", title);
+
+        let mut success_list = Vec::new();
+        let mut failed_list = Vec::new();
+        let mut skipped_list = Vec::new();
+
+        for r in results {
+            match get_status(r) {
+                Some(BuildStatus::Success { duration }) => {
+                    success_list.push((r.branch.clone(), format_duration(*duration)));
+                }
+                Some(BuildStatus::Failed { duration }) => {
+                    failed_list.push((r.branch.clone(), format_duration(*duration)));
+                }
+                Some(BuildStatus::NotFound { reason }) => {
+                    skipped_list.push((r.branch.clone(), reason.clone()));
+                }
+                None => {
+                    skipped_list.push((r.branch.clone(), "skipped".to_string()));
+                }
+            }
+        }
+
+        if !success_list.is_empty() {
+            println!("  SUCCESS:");
+            for (b, d) in success_list {
+                println!("    {} {} ({})", "✓".green(), b.bold(), d.dimmed());
+            }
+        }
+        if !failed_list.is_empty() {
+            println!("  FAILED:");
+            for (b, d) in failed_list {
+                println!("    {} {} ({})", "✗".red(), b.bold(), d.dimmed());
+            }
+        }
+        if !skipped_list.is_empty() {
+            println!("  SKIPPED:");
+            for (b, reason) in skipped_list {
+                println!("    {} {} ({})", "○".yellow(), b.bold(), reason.dimmed());
+            }
+        }
+    }
+
+    print_task_section("MAIN", results, |r| Some(&r.main));
+    print_task_section("DATAGEN", results, |r| r.datagen.as_ref());
+    print_task_section("GAMETEST", results, |r| r.gametest.as_ref());
+
+    println!();
+
+    // Print totals summary (overall per-branch success/failed/skipped based on main)
+    println!("{}", "─".repeat(60).dimmed());
+
     let mut successful = 0;
     let mut failed = 0;
     let mut skipped = 0;
-
-    for result in results {
-        let (status_icon, status_text, duration_text) = match &result.status {
-            BuildStatus::Success { duration } => {
-                successful += 1;
-                (
-                    "✓".green().bold().to_string(),
-                    "SUCCESS".green().bold().to_string(),
-                    format!(" ({})", format_duration(*duration))
-                        .dimmed()
-                        .to_string(),
-                )
-            }
-            BuildStatus::Failed { duration } => {
-                failed += 1;
-                (
-                    "✗".red().bold().to_string(),
-                    "FAILED".red().bold().to_string(),
-                    format!(" ({})", format_duration(*duration))
-                        .dimmed()
-                        .to_string(),
-                )
-            }
-            BuildStatus::NotFound { reason } => {
-                skipped += 1;
-                (
-                    "○".yellow().to_string(),
-                    "NOT FOUND".yellow().to_string(),
-                    format!(" ({reason})").dimmed().to_string(),
-                )
-            }
-        };
-
-        println!(
-            "  {} {:12} {}{}",
-            status_icon,
-            result.branch.bold(),
-            status_text,
-            duration_text
-        );
+    for r in results {
+        match &r.main {
+            BuildStatus::Success { .. } => successful += 1,
+            BuildStatus::Failed { .. } => failed += 1,
+            BuildStatus::NotFound { .. } => skipped += 1,
+        }
     }
-
-    println!();
-    println!("{}", "─".repeat(60).dimmed());
 
     // Print totals
     let total = results.len();
@@ -280,7 +340,7 @@ impl CompileCommand {
 
         let had_failure = results
             .iter()
-            .any(|r| matches!(r.status, BuildStatus::Failed { .. }));
+            .any(|r| matches!(r.main, BuildStatus::Failed { .. }));
 
         if had_failure {
             bail!("One or more compilations failed");
