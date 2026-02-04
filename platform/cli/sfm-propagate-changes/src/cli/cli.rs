@@ -111,6 +111,12 @@ pub enum Command {
         #[facet(flatten)]
         command: super::datagen::DatagenCommand,
     },
+    /// Check workspace files for correctness
+    Check {
+        /// Check options
+        #[facet(flatten)]
+        command: super::check::CheckCommand,
+    },
     /// Home directory related commands
     Home {
         /// Home subcommand
@@ -146,6 +152,7 @@ impl Command {
             Command::Merge { command } => command.invoke(),
             Command::Compile { command } => command.invoke(),
             Command::Datagen { command } => command.invoke(),
+            Command::Check { command } => command.invoke(),
             Command::Home { command } => command.invoke(),
             Command::Cache { command } => command.invoke(),
             Command::RepoRoot { command } => command.invoke(),
