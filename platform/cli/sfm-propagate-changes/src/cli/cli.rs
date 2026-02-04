@@ -98,6 +98,12 @@ pub enum Command {
         #[facet(flatten)]
         command: super::check::CheckCommand,
     },
+    /// Push branches (runs `git push` in each worktree)
+    Push {
+        /// Push options
+        #[facet(flatten)]
+        command: super::push::PushCommand,
+    },
     /// Home directory related commands
     Home {
         /// Home subcommand
@@ -134,6 +140,7 @@ impl Command {
             Command::Compile { command } => command.invoke(),
             Command::Datagen { command } => command.invoke(),
             Command::Check { command } => command.invoke(),
+            Command::Push { command } => command.invoke(),
             Command::Home { command } => command.invoke(),
             Command::Cache { command } => command.invoke(),
             Command::RepoRoot { command } => command.invoke(),
