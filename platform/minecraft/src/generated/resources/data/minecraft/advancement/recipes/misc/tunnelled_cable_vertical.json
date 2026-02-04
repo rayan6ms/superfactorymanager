@@ -5,9 +5,7 @@
       "conditions": {
         "items": [
           {
-            "items": [
-              "sfm:cable"
-            ]
+            "items": "sfm:cable"
           }
         ]
       },
@@ -17,7 +15,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "forge:fences"
+            "items": "#c:fences"
           }
         ]
       },
@@ -25,7 +23,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "minecraft:tunnelled_cable_horizontal"
+        "recipe": "minecraft:tunnelled_cable_vertical"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -39,7 +37,7 @@
   ],
   "rewards": {
     "recipes": [
-      "minecraft:tunnelled_cable_horizontal"
+      "minecraft:tunnelled_cable_vertical"
     ]
   }
 }

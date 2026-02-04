@@ -6,15 +6,16 @@
       "item": "minecraft:obsidian"
     },
     "B": {
-      "item": "sfm:fancy_cable"
+      "item": "sfm:cable"
     }
   },
   "pattern": [
-    "AAA",
-    " B ",
-    "AAA"
+    "A A",
+    "ABA",
+    "A A"
   ],
   "result": {
-    "item": "sfm:tough_fancy_cable"
+    "count": 1,
+    "id": "sfm:tough_cable"
   }
 }

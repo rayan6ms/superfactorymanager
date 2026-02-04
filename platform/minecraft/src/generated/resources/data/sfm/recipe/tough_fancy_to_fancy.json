@@ -3,10 +3,11 @@
   "category": "misc",
   "ingredients": [
     {
-      "item": "sfm:tough_cable"
+      "item": "sfm:tough_fancy_cable"
     }
   ],
   "result": {
-    "item": "sfm:cable"
+    "count": 1,
+    "id": "sfm:fancy_cable"
   }
 }

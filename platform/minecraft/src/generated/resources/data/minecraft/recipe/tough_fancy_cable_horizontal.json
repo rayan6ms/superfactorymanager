@@ -10,11 +10,12 @@
     }
   },
   "pattern": [
-    "A A",
-    "ABA",
-    "A A"
+    "AAA",
+    " B ",
+    "AAA"
   ],
   "result": {
-    "item": "sfm:tough_fancy_cable"
+    "count": 1,
+    "id": "sfm:tough_fancy_cable"
   }
 }
