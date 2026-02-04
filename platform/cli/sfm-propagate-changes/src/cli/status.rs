@@ -1,6 +1,8 @@
-use crate::worktree::{get_sorted_worktrees, Worktree};
+use crate::worktree::Worktree;
+use crate::worktree::get_sorted_worktrees;
 use color_eyre::owo_colors::OwoColorize;
-use eyre::{Context, bail};
+use eyre::Context;
+use eyre::bail;
 use facet::Facet;
 use figue as args;
 use std::path::PathBuf;
@@ -168,10 +170,7 @@ impl WorktreeStatus {
 
         if self.is_clean() && !self.is_merging {
             if !self.short {
-                println!(
-                    "  {}",
-                    "Nothing to commit, working tree clean".dimmed()
-                );
+                println!("  {}", "Nothing to commit, working tree clean".dimmed());
             }
             return;
         }
@@ -217,11 +216,7 @@ impl WorktreeStatus {
                     self.untracked.len()
                 );
             } else {
-                println!(
-                    "  {} ({}):",
-                    "Untracked".dimmed(),
-                    self.untracked.len()
-                );
+                println!("  {} ({}):", "Untracked".dimmed(), self.untracked.len());
                 for file in &self.untracked {
                     println!("    {} {}", "?".dimmed(), file.dimmed());
                 }
@@ -269,147 +264,153 @@ impl StatusCommand {
         }
 
         match self {
-            StatusCommand::All { short } => {
-                println!(
-                    "Status for {} worktree(s):",
-                    worktrees.len().to_string().cyan().bold()
-                );
-                for wt in &worktrees {
-                    let status = get_worktree_status(&wt, short)?;
-                    status.display();
-                }
+            StatusCommand::All { short } => StatusCommand::run_all(&worktrees, short)?,
+            StatusCommand::Dirty { short } => StatusCommand::run_dirty(&worktrees, short)?,
+            StatusCommand::Summary => StatusCommand::run_summary(&worktrees)?,
+        }
+
+        Ok(())
+    }
+
+    fn run_all(worktrees: &[Worktree], short: bool) -> eyre::Result<()> {
+        println!(
+            "Status for {} worktree(s):",
+            worktrees.len().to_string().cyan().bold()
+        );
+        for wt in worktrees {
+            let status = get_worktree_status(wt, short)?;
+            status.display();
+        }
+        Ok(())
+    }
+
+    fn run_dirty(worktrees: &[Worktree], short: bool) -> eyre::Result<()> {
+        let mut dirty_count = 0;
+        let mut statuses = Vec::new();
+
+        for wt in worktrees {
+            let status = get_worktree_status(wt, short)?;
+            if !status.is_clean() || status.is_merging {
+                dirty_count += 1;
+                statuses.push(status);
             }
-            StatusCommand::Dirty { short } => {
-                let mut dirty_count = 0;
-                let mut statuses = Vec::new();
+        }
 
-                for wt in &worktrees {
-                    let status = get_worktree_status(&wt, short)?;
-                    if !status.is_clean() || status.is_merging {
-                        dirty_count += 1;
-                        statuses.push(status);
-                    }
-                }
-
-                if statuses.is_empty() {
-                    println!(
-                        "All {} worktree(s) are clean! {}",
-                        worktrees.len().to_string().cyan().bold(),
-                        "✓".green().bold()
-                    );
-                } else {
-                    println!(
-                        "{} of {} worktree(s) have uncommitted changes:",
-                        dirty_count.to_string().yellow().bold(),
-                        worktrees.len().to_string().cyan().bold()
-                    );
-                    for status in statuses {
-                        status.display();
-                    }
-                }
+        if statuses.is_empty() {
+            println!(
+                "All {} worktree(s) are clean! {}",
+                worktrees.len().to_string().cyan().bold(),
+                "✓".green().bold()
+            );
+        } else {
+            println!(
+                "{} of {} worktree(s) have uncommitted changes:",
+                dirty_count.to_string().yellow().bold(),
+                worktrees.len().to_string().cyan().bold()
+            );
+            for status in statuses {
+                status.display();
             }
-            StatusCommand::Summary => {
-                let mut clean = 0;
-                let mut dirty = 0;
-                let mut merging = 0;
-                let mut conflicts = 0;
+        }
 
-                // Print one-line status for each worktree
-                for wt in &worktrees {
-                    let status = get_worktree_status(&wt, true)?;
+        Ok(())
+    }
 
-                    // Determine the status icon
-                    let icon = if status.is_merging {
-                        "⚠".yellow().to_string()
-                    } else if !status.conflicts.is_empty() {
-                        "!!".red().bold().to_string()
-                    } else if status.is_clean() {
-                        "✓".green().to_string()
-                    } else {
-                        "~".yellow().to_string()
-                    };
+    fn run_summary(worktrees: &[Worktree]) -> eyre::Result<()> {
+        let mut clean = 0;
+        let mut dirty = 0;
+        let mut merging = 0;
+        let mut conflicts = 0;
 
-                    // Build compact info
-                    let mut info_parts = Vec::new();
-                    if status.is_merging {
-                        info_parts.push("merging".yellow().to_string());
-                    }
-                    if !status.conflicts.is_empty() {
-                        let n = status.conflicts.len();
-                        let word = if n == 1 { "conflict" } else { "conflicts" };
-                        info_parts.push(format!("{n} {word}").red().to_string());
-                    }
-                    if !status.staged.is_empty() {
-                        let n = status.staged.len();
-                        info_parts.push(format!("{n} staged").green().to_string());
-                    }
-                    if !status.unstaged.is_empty() {
-                        let n = status.unstaged.len();
-                        info_parts.push(format!("{n} unstaged").yellow().to_string());
-                    }
-                    if !status.untracked.is_empty() {
-                        let n = status.untracked.len();
-                        info_parts.push(format!("{n} untracked").dimmed().to_string());
-                    }
+        // Print one-line status for each worktree
+        for wt in worktrees {
+            let status = get_worktree_status(wt, true)?;
 
-                    let info = if info_parts.is_empty() {
-                        "clean".dimmed().to_string()
-                    } else {
-                        info_parts.join(" ")
-                    };
+            // Determine the status icon
+            let icon = if status.is_merging {
+                "⚠".yellow().to_string()
+            } else if !status.conflicts.is_empty() {
+                "!!".red().bold().to_string()
+            } else if status.is_clean() {
+                "✓".green().to_string()
+            } else {
+                "~".yellow().to_string()
+            };
 
-                    println!(
-                        "  {} {} {}",
-                        icon,
-                        status.branch.cyan().bold(),
-                        info
-                    );
-
-                    // Count for totals
-                    if status.is_merging {
-                        merging += 1;
-                    }
-                    if !status.conflicts.is_empty() {
-                        conflicts += 1;
-                    }
-                    if status.is_clean() && !status.is_merging {
-                        clean += 1;
-                    } else {
-                        dirty += 1;
-                    }
-                }
-
-                // Print totals
-                println!();
-                println!(
-                    "Totals ({} worktrees):",
-                    worktrees.len().to_string().cyan().bold()
-                );
-                println!(
-                    "  {} Clean:      {}",
-                    "✓".green(),
-                    clean.to_string().green()
-                );
-                println!(
-                    "  {} Dirty:      {}",
-                    "~".yellow(),
-                    dirty.to_string().yellow()
-                );
-                if merging > 0 {
-                    println!(
-                        "  {} Merging:    {}",
-                        "⚠".yellow(),
-                        merging.to_string().yellow().bold()
-                    );
-                }
-                if conflicts > 0 {
-                    println!(
-                        "  {} Conflicts:  {}",
-                        "!!".red(),
-                        conflicts.to_string().red().bold()
-                    );
-                }
+            // Build compact info
+            let mut info_parts = Vec::new();
+            if status.is_merging {
+                info_parts.push("merging".yellow().to_string());
             }
+            if !status.conflicts.is_empty() {
+                let n = status.conflicts.len();
+                let word = if n == 1 { "conflict" } else { "conflicts" };
+                info_parts.push(format!("{n} {word}").red().to_string());
+            }
+            if !status.staged.is_empty() {
+                let n = status.staged.len();
+                info_parts.push(format!("{n} staged").green().to_string());
+            }
+            if !status.unstaged.is_empty() {
+                let n = status.unstaged.len();
+                info_parts.push(format!("{n} unstaged").yellow().to_string());
+            }
+            if !status.untracked.is_empty() {
+                let n = status.untracked.len();
+                info_parts.push(format!("{n} untracked").dimmed().to_string());
+            }
+
+            let info = if info_parts.is_empty() {
+                "clean".dimmed().to_string()
+            } else {
+                info_parts.join(" ")
+            };
+
+            println!("  {} {} {}", icon, status.branch.cyan().bold(), info);
+
+            // Count for totals
+            if status.is_merging {
+                merging += 1;
+            }
+            if !status.conflicts.is_empty() {
+                conflicts += 1;
+            }
+            if status.is_clean() && !status.is_merging {
+                clean += 1;
+            } else {
+                dirty += 1;
+            }
+        }
+
+        // Print totals
+        println!();
+        println!(
+            "Totals ({} worktrees):",
+            worktrees.len().to_string().cyan().bold()
+        );
+        println!(
+            "  {} Clean:      {}",
+            "✓".green(),
+            clean.to_string().green()
+        );
+        println!(
+            "  {} Dirty:      {}",
+            "~".yellow(),
+            dirty.to_string().yellow()
+        );
+        if merging > 0 {
+            println!(
+                "  {} Merging:    {}",
+                "⚠".yellow(),
+                merging.to_string().yellow().bold()
+            );
+        }
+        if conflicts > 0 {
+            println!(
+                "  {} Conflicts:  {}",
+                "!!".red(),
+                conflicts.to_string().red().bold()
+            );
         }
 
         Ok(())
