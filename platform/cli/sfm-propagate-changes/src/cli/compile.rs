@@ -1,9 +1,11 @@
 use crate::worktree::get_sorted_worktrees;
 use color_eyre::owo_colors::OwoColorize;
-use eyre::{Context, bail};
+use eyre::Context;
+use eyre::bail;
 use facet::Facet;
 use std::path::PathBuf;
-use std::time::{Duration, Instant};
+use std::time::Duration;
+use std::time::Instant;
 use tokio::process::Command;
 use tokio::task::JoinSet;
 use tracing::info;
@@ -14,14 +16,14 @@ pub(crate) enum BuildStatus {
     Success { duration: Duration },
     Failed { duration: Duration },
     NotFound { reason: String },
-} 
+}
 
 /// Result of building a worktree
 #[derive(Debug, Clone)]
 pub(crate) struct BuildResult {
     pub(crate) branch: String,
     pub(crate) status: BuildStatus,
-} 
+}
 
 /// Format a duration as a human-readable string
 fn format_duration(duration: Duration) -> String {
@@ -29,7 +31,7 @@ fn format_duration(duration: Duration) -> String {
     if secs >= 60 {
         let mins = secs / 60;
         let remaining_secs = secs % 60;
-        format!("{}m {:02}s", mins, remaining_secs)
+        format!("{mins}m {remaining_secs:02}s")
     } else {
         format!("{}.{:01}s", secs, duration.subsec_millis() / 100)
     }
@@ -122,7 +124,9 @@ pub(crate) fn print_summary(results: &[BuildResult]) {
                 (
                     "✓".green().bold().to_string(),
                     "SUCCESS".green().bold().to_string(),
-                    format!(" ({})", format_duration(*duration)).dimmed().to_string(),
+                    format!(" ({})", format_duration(*duration))
+                        .dimmed()
+                        .to_string(),
                 )
             }
             BuildStatus::Failed { duration } => {
@@ -130,7 +134,9 @@ pub(crate) fn print_summary(results: &[BuildResult]) {
                 (
                     "✗".red().bold().to_string(),
                     "FAILED".red().bold().to_string(),
-                    format!(" ({})", format_duration(*duration)).dimmed().to_string(),
+                    format!(" ({})", format_duration(*duration))
+                        .dimmed()
+                        .to_string(),
                 )
             }
             BuildStatus::NotFound { reason } => {
@@ -138,7 +144,7 @@ pub(crate) fn print_summary(results: &[BuildResult]) {
                 (
                     "○".yellow().to_string(),
                     "NOT FOUND".yellow().to_string(),
-                    format!(" ({})", reason).dimmed().to_string(),
+                    format!(" ({reason})").dimmed().to_string(),
                 )
             }
         };
@@ -176,7 +182,7 @@ pub(crate) fn print_summary(results: &[BuildResult]) {
 
 /// Compile command - compiles all worktrees in parallel
 #[derive(Facet, Debug, Default)]
-pub struct CompileCommand {}
+pub struct CompileCommand;
 
 impl CompileCommand {
     /// # Errors
