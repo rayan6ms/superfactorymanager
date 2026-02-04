@@ -270,7 +270,7 @@ impl StatusCommand {
                     worktrees.len().to_string().cyan().bold()
                 );
                 for wt in &worktrees {
-                    let status = get_worktree_status(&wt, short)?;
+                    let status = get_worktree_status(wt, short)?;
                     status.display();
                 }
             }
@@ -279,7 +279,7 @@ impl StatusCommand {
                 let mut statuses = Vec::new();
 
                 for wt in &worktrees {
-                    let status = get_worktree_status(&wt, short)?;
+                    let status = get_worktree_status(wt, short)?;
                     if !status.is_clean() || status.is_merging {
                         dirty_count += 1;
                         statuses.push(status);
@@ -311,7 +311,7 @@ impl StatusCommand {
 
                 // Print one-line status for each worktree
                 for wt in &worktrees {
-                    let status = get_worktree_status(&wt, true)?;
+                    let status = get_worktree_status(wt, true)?;
 
                     // Determine the status icon
                     let icon = if status.is_merging {

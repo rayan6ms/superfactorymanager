@@ -40,11 +40,13 @@ impl CheckCommand {
             match fs::read_to_string(&path) {
                 Ok(content) => {
                     let found = content.trim();
-                    if found != expected {
+                    if found == expected {
+                        info!("{}: .idea/.name OK", wt.branch);
+                    } else {
                         if self.fix {
                             // Attempt to overwrite with expected value
-                            if let Some(parent) = path.parent() {
-                                if let Err(e) = fs::create_dir_all(parent) {
+                            if let Some(parent) = path.parent()
+                                && let Err(e) = fs::create_dir_all(parent) {
                                     warn!(
                                         "{}: failed to create parent dir {}: {}",
                                         wt.branch,
@@ -59,10 +61,9 @@ impl CheckCommand {
                                     ));
                                     continue;
                                 }
-                            }
 
                             match fs::write(&path, expected.as_bytes()) {
-                                Ok(_) => {
+                                Ok(()) => {
                                     info!(
                                         "{}: fixed .idea/.name (wrote '{}')",
                                         wt.branch, expected
@@ -90,15 +91,13 @@ impl CheckCommand {
                                 wt.branch, expected, found
                             ));
                         }
-                    } else {
-                        info!("{}: .idea/.name OK", wt.branch);
                     }
                 }
                 Err(e) => {
                     if self.fix {
                         // Try to create parent directories and write the expected file
-                        if let Some(parent) = path.parent() {
-                            if let Err(e2) = fs::create_dir_all(parent) {
+                        if let Some(parent) = path.parent()
+                            && let Err(e2) = fs::create_dir_all(parent) {
                                 warn!(
                                     "{}: failed to create parent dir {}: {}",
                                     wt.branch,
@@ -113,10 +112,9 @@ impl CheckCommand {
                                 ));
                                 continue;
                             }
-                        }
 
                         match fs::write(&path, expected.as_bytes()) {
-                            Ok(_) => {
+                            Ok(()) => {
                                 info!("{}: created .idea/.name with '{}'", wt.branch, expected);
                             }
                             Err(e2) => {

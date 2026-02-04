@@ -392,8 +392,8 @@ fn preview_merge(source: &Worktree, dest: &Worktree) -> eyre::Result<MergePrevie
 
     if let Err(e) = abort_output {
         warn!("Failed to abort preview merge: {e}");
-    } else if let Ok(output) = abort_output {
-        if !output.status.success() {
+    } else if let Ok(output) = abort_output
+        && !output.status.success() {
             // merge --abort can fail if there was nothing to abort (e.g., already up to date)
             // This is fine, we just log it at debug level
             debug!(
@@ -401,7 +401,6 @@ fn preview_merge(source: &Worktree, dest: &Worktree) -> eyre::Result<MergePrevie
                 String::from_utf8_lossy(&output.stderr)
             );
         }
-    }
 
     if has_conflicts {
         Ok(MergePreviewResult::WouldConflict)

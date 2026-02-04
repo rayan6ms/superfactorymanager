@@ -33,7 +33,9 @@ impl PushCommand {
                 .output()
                 .wrap_err_with(|| format!("Failed to run git push in {}", wt.path.display()))?;
 
-            if !output.status.success() {
+            if output.status.success() {
+                info!("Push successful for {}", wt.branch);
+            } else {
                 let stdout = String::from_utf8_lossy(&output.stdout);
                 let stderr = String::from_utf8_lossy(&output.stderr);
                 warn!(
@@ -41,8 +43,6 @@ impl PushCommand {
                     wt.branch, output.status, stdout, stderr
                 );
                 failures.push(format!("{}: exit {:?}", wt.branch, output.status));
-            } else {
-                info!("Push successful for {}", wt.branch);
             }
         }
 

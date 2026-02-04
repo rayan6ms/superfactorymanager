@@ -31,7 +31,7 @@ fn format_duration(duration: Duration) -> String {
     if secs >= 60 {
         let mins = secs / 60;
         let remaining_secs = secs % 60;
-        format!("{}m {:02}s", mins, remaining_secs)
+        format!("{mins}m {remaining_secs:02}s")
     } else {
         format!("{}.{:01}s", secs, duration.subsec_millis() / 100)
     }
@@ -144,7 +144,7 @@ pub(crate) fn print_summary(results: &[BuildResult]) {
                 (
                     "○".yellow().to_string(),
                     "NOT FOUND".yellow().to_string(),
-                    format!(" ({})", reason).dimmed().to_string(),
+                    format!(" ({reason})").dimmed().to_string(),
                 )
             }
         };

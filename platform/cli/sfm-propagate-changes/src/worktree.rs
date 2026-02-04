@@ -55,6 +55,7 @@ pub fn get_worktrees(repo_root: &PathBuf) -> eyre::Result<Vec<Worktree>> {
 
 /// Parse a Minecraft version string into comparable parts
 /// Returns (major, minor, patch) as numbers for sorting
+#[must_use] 
 pub fn parse_version(version: &str) -> Option<(u32, u32, u32)> {
     let parts: Vec<&str> = version.split('.').collect();
     match parts.len() {
