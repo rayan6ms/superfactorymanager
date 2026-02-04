@@ -103,7 +103,7 @@ async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
 
 /// Datagen command - runs `gradlew runData` for all worktrees in parallel
 #[derive(Facet, Debug, Default)]
-pub struct DatagenCommand {}
+pub struct DatagenCommand;
 
 impl DatagenCommand {
     /// # Errors

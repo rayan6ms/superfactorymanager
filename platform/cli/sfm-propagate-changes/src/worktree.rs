@@ -14,6 +14,10 @@ pub struct Worktree {
 }
 
 /// Parse the output of `git worktree list` to get all worktrees
+///
+/// # Errors
+///
+/// Returns an error if `git worktree list --porcelain` fails or its output cannot be parsed.
 pub fn get_worktrees(repo_root: &PathBuf) -> eyre::Result<Vec<Worktree>> {
     let output = Command::new("git")
         .args(["worktree", "list", "--porcelain"])
@@ -55,7 +59,7 @@ pub fn get_worktrees(repo_root: &PathBuf) -> eyre::Result<Vec<Worktree>> {
 
 /// Parse a Minecraft version string into comparable parts
 /// Returns (major, minor, patch) as numbers for sorting
-#[must_use] 
+#[must_use]
 pub fn parse_version(version: &str) -> Option<(u32, u32, u32)> {
     let parts: Vec<&str> = version.split('.').collect();
     match parts.len() {
@@ -90,6 +94,10 @@ pub fn sort_worktrees_by_version(worktrees: &mut [Worktree]) {
 }
 
 /// Get all worktrees from the repo root, sorted by version
+///
+/// # Errors
+///
+/// Returns an error if getting the repo root fails or `git worktree list` fails.
 pub fn get_sorted_worktrees() -> eyre::Result<Vec<Worktree>> {
     let repo_root = get_repo_root()?;
     let mut worktrees = get_worktrees(&repo_root)?;

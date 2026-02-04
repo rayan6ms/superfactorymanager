@@ -182,7 +182,7 @@ pub(crate) fn print_summary(results: &[BuildResult]) {
 
 /// Compile command - compiles all worktrees in parallel
 #[derive(Facet, Debug, Default)]
-pub struct CompileCommand {}
+pub struct CompileCommand;
 
 impl CompileCommand {
     /// # Errors

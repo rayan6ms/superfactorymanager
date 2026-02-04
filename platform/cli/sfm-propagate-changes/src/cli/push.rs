@@ -8,7 +8,7 @@ use tracing::warn;
 
 /// Push command - runs `git push` in each worktree
 #[derive(Facet, Debug, Default)]
-pub struct PushCommand {}
+pub struct PushCommand;
 
 impl PushCommand {
     /// # Errors
