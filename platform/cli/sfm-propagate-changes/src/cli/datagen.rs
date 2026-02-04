@@ -1,14 +1,17 @@
+use crate::cli::compile::BuildResult;
+use crate::cli::compile::BuildStatus;
+use crate::cli::compile::print_summary;
 use crate::worktree::get_sorted_worktrees;
 use color_eyre::owo_colors::OwoColorize;
-use eyre::{Context, bail};
+use eyre::Context;
+use eyre::bail;
 use facet::Facet;
 use std::path::PathBuf;
 use std::time::Instant;
 use tokio::process::Command;
 use tokio::task::JoinSet;
 use tracing::info;
-
-use crate::cli::compile::{BuildResult, BuildStatus, print_summary};
+use tracing::warn;
 
 /// Run gradle runData for a worktree
 async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
@@ -70,20 +73,27 @@ async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
         Ok(output) => {
             let stdout = String::from_utf8_lossy(&output.stdout);
             let stderr = String::from_utf8_lossy(&output.stderr);
-            let has_all_providers = stdout.contains("All providers took") || stderr.contains("All providers took");
+            let has_all_providers =
+                stdout.contains("All providers took") || stderr.contains("All providers took");
 
             if output.status.success() || has_all_providers {
                 if !output.status.success() && has_all_providers {
-                    info!("`runData` for {} produced 'All providers took' despite non-zero exit status; treating as success", branch);
+                    info!(
+                        "`runData` for {} produced 'All providers took' despite non-zero exit status; treating as success",
+                        branch
+                    );
                 }
                 BuildStatus::Success { duration }
             } else {
-                info!("runData for {} failed; exit: {:?}, stdout: {}, stderr: {}", branch, output.status, stdout, stderr);
+                warn!(
+                    "runData for {} failed; exit: {:?}, stdout: {}, stderr: {}",
+                    branch, output.status, stdout, stderr
+                );
                 BuildStatus::Failed { duration }
             }
         }
         Err(e) => {
-            info!("Failed to run gradlew for {}: {}", branch, e);
+            warn!("Failed to run gradlew for {}: {}", branch, e);
             BuildStatus::Failed { duration }
         }
     };
@@ -93,7 +103,7 @@ async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
 
 /// Datagen command - runs `gradlew runData` for all worktrees in parallel
 #[derive(Facet, Debug, Default)]
-pub struct DatagenCommand {}
+pub struct DatagenCommand;
 
 impl DatagenCommand {
     /// # Errors

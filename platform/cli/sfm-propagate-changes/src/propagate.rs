@@ -2,7 +2,9 @@ use crate::cli::repo_root::get_repo_root;
 use crate::sfm_path::SfmPath;
 use crate::state::State;
 use crate::state::Status;
-use crate::worktree::{get_worktrees, sort_worktrees_by_version, Worktree};
+use crate::worktree::Worktree;
+use crate::worktree::get_worktrees;
+use crate::worktree::sort_worktrees_by_version;
 use eyre::Context;
 use eyre::bail;
 use std::fmt::Write;
@@ -379,8 +381,8 @@ fn preview_merge(source: &Worktree, dest: &Worktree) -> eyre::Result<MergePrevie
         return Ok(MergePreviewResult::AlreadyUpToDate);
     }
 
-    let has_conflicts = !output.status.success()
-        && (stderr.contains("CONFLICT") || stdout.contains("CONFLICT"));
+    let has_conflicts =
+        !output.status.success() && (stderr.contains("CONFLICT") || stdout.contains("CONFLICT"));
 
     // Always abort the preview merge to restore the original state
     let abort_output = Command::new("git")
@@ -390,15 +392,15 @@ fn preview_merge(source: &Worktree, dest: &Worktree) -> eyre::Result<MergePrevie
 
     if let Err(e) = abort_output {
         warn!("Failed to abort preview merge: {e}");
-    } else if let Ok(output) = abort_output {
-        if !output.status.success() {
-            // merge --abort can fail if there was nothing to abort (e.g., already up to date)
-            // This is fine, we just log it at debug level
-            debug!(
-                "git merge --abort returned non-zero (may be expected): {}",
-                String::from_utf8_lossy(&output.stderr)
-            );
-        }
+    } else if let Ok(output) = abort_output
+        && !output.status.success()
+    {
+        // merge --abort can fail if there was nothing to abort (e.g., already up to date)
+        // This is fine, we just log it at debug level
+        debug!(
+            "git merge --abort returned non-zero (may be expected): {}",
+            String::from_utf8_lossy(&output.stderr)
+        );
     }
 
     if has_conflicts {
@@ -588,7 +590,11 @@ pub fn run(options: PropagateOptions) -> eyre::Result<()> {
     Ok(())
 }
 
-fn run_idle_state(repo_root: &PathBuf, state: &mut State, options: &PropagateOptions) -> eyre::Result<()> {
+fn run_idle_state(
+    repo_root: &PathBuf,
+    state: &mut State,
+    options: &PropagateOptions,
+) -> eyre::Result<()> {
     // Get all worktrees
     let mut worktrees = get_worktrees(repo_root)?;
     debug!(?worktrees, "Found worktrees");
