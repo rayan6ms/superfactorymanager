@@ -1,9 +1,11 @@
-use crate::worktree::{get_sorted_worktrees, Worktree};
+use crate::worktree::Worktree;
+use crate::worktree::get_sorted_worktrees;
 use eyre::bail;
 use facet::Facet;
 use figue::{self as args};
 use std::fs;
-use tracing::{info, warn};
+use tracing::info;
+use tracing::warn;
 
 /// Check command - verifies platform/minecraft/.idea/.name matches sfm-<mcversion>
 #[derive(Facet, Debug, Default)]
@@ -65,7 +67,9 @@ impl CheckCommand {
                     info!("{}: .idea/.name OK", wt.branch);
                     None
                 } else if self.fix {
-                    if let Some(parent) = path.parent() && let Err(e) = fs::create_dir_all(parent) {
+                    if let Some(parent) = path.parent()
+                        && let Err(e) = fs::create_dir_all(parent)
+                    {
                         return Some(format!(
                             "{}: could not create parent dir {} ({})",
                             wt.branch,
@@ -87,12 +91,17 @@ impl CheckCommand {
                         )),
                     }
                 } else {
-                    Some(format!("{}: expected '{}', found '{}'", wt.branch, expected, found))
+                    Some(format!(
+                        "{}: expected '{}', found '{}'",
+                        wt.branch, expected, found
+                    ))
                 }
             }
             Err(e) => {
                 if self.fix {
-                    if let Some(parent) = path.parent() && let Err(e2) = fs::create_dir_all(parent) {
+                    if let Some(parent) = path.parent()
+                        && let Err(e2) = fs::create_dir_all(parent)
+                    {
                         return Some(format!(
                             "{}: could not create parent dir {} ({})",
                             wt.branch,
