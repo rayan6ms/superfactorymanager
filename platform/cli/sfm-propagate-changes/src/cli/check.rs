@@ -1,9 +1,11 @@
+use crate::worktree::Worktree;
 use crate::worktree::get_sorted_worktrees;
 use eyre::bail;
 use facet::Facet;
 use figue::{self as args};
 use std::fs;
-use tracing::{info, warn};
+use tracing::info;
+use tracing::warn;
 
 /// Check command - verifies platform/minecraft/.idea/.name matches sfm-<mcversion>
 #[derive(Facet, Debug, Default)]
@@ -28,65 +30,9 @@ impl CheckCommand {
         let mut failures: Vec<String> = Vec::new();
 
         for wt in worktrees {
-            let path = wt.path.join("platform").join("minecraft").join(".idea").join(".name");
-            let expected = format!("sfm-{}", wt.branch);
-
-            match fs::read_to_string(&path) {
-                Ok(content) => {
-                    let found = content.trim();
-                    if found != expected {
-                        if self.fix {
-                            // Attempt to overwrite with expected value
-                            if let Some(parent) = path.parent() {
-                                if let Err(e) = fs::create_dir_all(parent) {
-                                    warn!("{}: failed to create parent dir {}: {}", wt.branch, parent.display(), e);
-                                    failures.push(format!("{}: could not create parent dir {} ({})", wt.branch, parent.display(), e));
-                                    continue;
-                                }
-                            }
-
-                            match fs::write(&path, expected.as_bytes()) {
-                                Ok(_) => {
-                                    info!("{}: fixed .idea/.name (wrote '{}')", wt.branch, expected);
-                                }
-                                Err(e) => {
-                                    warn!("{}: failed to write {}: {}", wt.branch, path.display(), e);
-                                    failures.push(format!("{}: could not write {} ({})", wt.branch, path.display(), e));
-                                }
-                            }
-                        } else {
-                            warn!("{}: expected '{}', found '{}'", wt.branch, expected, found);
-                            failures.push(format!("{}: expected '{}', found '{}'", wt.branch, expected, found));
-                        }
-                    } else {
-                        info!("{}: .idea/.name OK", wt.branch);
-                    }
-                }
-                Err(e) => {
-                    if self.fix {
-                        // Try to create parent directories and write the expected file
-                        if let Some(parent) = path.parent() {
-                            if let Err(e2) = fs::create_dir_all(parent) {
-                                warn!("{}: failed to create parent dir {}: {}", wt.branch, parent.display(), e2);
-                                failures.push(format!("{}: could not create parent dir {} ({})", wt.branch, parent.display(), e2));
-                                continue;
-                            }
-                        }
-
-                        match fs::write(&path, expected.as_bytes()) {
-                            Ok(_) => {
-                                info!("{}: created .idea/.name with '{}'", wt.branch, expected);
-                            }
-                            Err(e2) => {
-                                warn!("{}: failed to write {}: {}", wt.branch, path.display(), e2);
-                                failures.push(format!("{}: could not write {} ({})", wt.branch, path.display(), e2));
-                            }
-                        }
-                    } else {
-                        warn!("{}: could not read {} ({})", wt.branch, path.display(), e);
-                        failures.push(format!("{}: could not read {} ({})", wt.branch, path.display(), e));
-                    }
-                }
+            if let Some(err) = self.check_worktree(&wt) {
+                warn!("{}", err);
+                failures.push(err);
             }
         }
 
@@ -102,6 +48,89 @@ impl CheckCommand {
                 msg.push('\n');
             }
             bail!(msg)
+        }
+    }
+
+    fn check_worktree(&self, wt: &Worktree) -> Option<String> {
+        let path = wt
+            .path
+            .join("platform")
+            .join("minecraft")
+            .join(".idea")
+            .join(".name");
+        let expected = format!("sfm-{}", wt.branch);
+
+        match fs::read_to_string(&path) {
+            Ok(content) => {
+                let found = content.trim();
+                if found == expected {
+                    info!("{}: .idea/.name OK", wt.branch);
+                    None
+                } else if self.fix {
+                    if let Some(parent) = path.parent()
+                        && let Err(e) = fs::create_dir_all(parent)
+                    {
+                        return Some(format!(
+                            "{}: could not create parent dir {} ({})",
+                            wt.branch,
+                            parent.display(),
+                            e
+                        ));
+                    }
+
+                    match fs::write(&path, expected.as_bytes()) {
+                        Ok(()) => {
+                            info!("{}: fixed .idea/.name (wrote '{}')", wt.branch, expected);
+                            None
+                        }
+                        Err(e) => Some(format!(
+                            "{}: could not write {} ({})",
+                            wt.branch,
+                            path.display(),
+                            e
+                        )),
+                    }
+                } else {
+                    Some(format!(
+                        "{}: expected '{}', found '{}'",
+                        wt.branch, expected, found
+                    ))
+                }
+            }
+            Err(e) => {
+                if self.fix {
+                    if let Some(parent) = path.parent()
+                        && let Err(e2) = fs::create_dir_all(parent)
+                    {
+                        return Some(format!(
+                            "{}: could not create parent dir {} ({})",
+                            wt.branch,
+                            parent.display(),
+                            e2
+                        ));
+                    }
+
+                    match fs::write(&path, expected.as_bytes()) {
+                        Ok(()) => {
+                            info!("{}: created .idea/.name with '{}'", wt.branch, expected);
+                            None
+                        }
+                        Err(e2) => Some(format!(
+                            "{}: could not write {} ({})",
+                            wt.branch,
+                            path.display(),
+                            e2
+                        )),
+                    }
+                } else {
+                    Some(format!(
+                        "{}: could not read {} ({})",
+                        wt.branch,
+                        path.display(),
+                        e
+                    ))
+                }
+            }
         }
     }
 }
