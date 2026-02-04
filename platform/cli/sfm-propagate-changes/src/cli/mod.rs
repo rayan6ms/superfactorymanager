@@ -1,6 +1,7 @@
 pub mod cache;
 pub mod compile;
 pub mod datagen;
+pub mod merge;
 pub mod check;
 mod cli;
 pub mod home;

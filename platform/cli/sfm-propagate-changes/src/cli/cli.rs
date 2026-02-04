@@ -1,5 +1,5 @@
 use crate::logging::LoggingConfig;
-use crate::propagate;
+
 use chrono::Local;
 use facet::Facet;
 use figue::FigueBuiltins;
@@ -68,26 +68,7 @@ impl Cli {
     }
 }
 
-/// Options for the merge command
-#[derive(Facet, Debug, Default)]
-pub struct MergeCommand {
-    /// Automatically abort merges that would result in conflicts. Only aborts merges
-    /// that we start ourselves - will not abort pre-existing merge conflicts to avoid
-    /// losing manual progress.
-    #[facet(args::named)]
-    pub auto_abort: bool,
-}
 
-impl MergeCommand {
-    /// # Errors
-    ///
-    /// This function will return an error if the merge fails.
-    pub fn invoke(self) -> eyre::Result<()> {
-        propagate::run(propagate::PropagateOptions {
-            auto_abort: self.auto_abort,
-        })
-    }
-}
 
 /// Available commands
 #[derive(Facet, Debug)]
@@ -97,7 +78,7 @@ pub enum Command {
     Merge {
         /// Merge options
         #[facet(flatten)]
-        command: MergeCommand,
+        command: super::merge::MergeCommand,
     },
     /// Compile all worktrees by running gradlew compileJava
     Compile {
