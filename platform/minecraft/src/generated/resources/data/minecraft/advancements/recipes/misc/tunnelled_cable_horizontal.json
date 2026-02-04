@@ -32,15 +32,14 @@
   },
   "requirements": [
     [
+      "has_the_recipe",
       "has_fence",
-      "has_cable",
-      "has_the_recipe"
+      "has_cable"
     ]
   ],
   "rewards": {
     "recipes": [
       "minecraft:tunnelled_cable_horizontal"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }

@@ -34,15 +34,14 @@
   },
   "requirements": [
     [
+      "has_the_recipe",
       "has_obsidian",
-      "has_cable",
-      "has_the_recipe"
+      "has_cable"
     ]
   ],
   "rewards": {
     "recipes": [
       "sfm:tough_cable"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }
