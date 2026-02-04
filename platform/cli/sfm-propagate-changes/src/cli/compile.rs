@@ -190,57 +190,51 @@ pub(crate) fn print_summary(results: &[BuildResult]) {
     println!("{}", "═".repeat(60).dimmed());
     println!();
 
-    // Print per-task sections
-    fn print_task_section<F>(title: &str, results: &[BuildResult], mut get_status: F)
-    where
-        F: FnMut(&BuildResult) -> Option<&BuildStatus>,
-    {
-        println!("\n{}", title);
-
-        let mut success_list = Vec::new();
-        let mut failed_list = Vec::new();
-        let mut skipped_list = Vec::new();
-
-        for r in results {
-            match get_status(r) {
+    // Build columnar table rows
+    let mut rows: Vec<(String, String, String, String)> = Vec::new();
+    for r in results {
+        // helper to format status + duration or reason
+        let fmt = |s: &Option<BuildStatus>| -> String {
+            match s {
                 Some(BuildStatus::Success { duration }) => {
-                    success_list.push((r.branch.clone(), format_duration(*duration)));
+                    format!("SUCCESS ({})", format_duration(*duration))
                 }
                 Some(BuildStatus::Failed { duration }) => {
-                    failed_list.push((r.branch.clone(), format_duration(*duration)));
+                    format!("FAILED ({})", format_duration(*duration))
                 }
                 Some(BuildStatus::NotFound { reason }) => {
-                    skipped_list.push((r.branch.clone(), reason.clone()));
+                    format!("NOT FOUND ({})", reason)
                 }
-                None => {
-                    skipped_list.push((r.branch.clone(), "skipped".to_string()));
-                }
+                None => "SKIPPED".to_string(),
             }
-        }
+        };
 
-        if !success_list.is_empty() {
-            println!("  SUCCESS:");
-            for (b, d) in success_list {
-                println!("    {} {} ({})", "✓".green(), b.bold(), d.dimmed());
-            }
-        }
-        if !failed_list.is_empty() {
-            println!("  FAILED:");
-            for (b, d) in failed_list {
-                println!("    {} {} ({})", "✗".red(), b.bold(), d.dimmed());
-            }
-        }
-        if !skipped_list.is_empty() {
-            println!("  SKIPPED:");
-            for (b, reason) in skipped_list {
-                println!("    {} {} ({})", "○".yellow(), b.bold(), reason.dimmed());
-            }
-        }
+        let main_cell = fmt(&Some(r.main.clone()));
+        let datagen_cell = fmt(&r.datagen);
+        let gametest_cell = fmt(&r.gametest);
+
+        rows.push((r.branch.clone(), main_cell, datagen_cell, gametest_cell));
     }
 
-    print_task_section("MAIN", results, |r| Some(&r.main));
-    print_task_section("DATAGEN", results, |r| r.datagen.as_ref());
-    print_task_section("GAMETEST", results, |r| r.gametest.as_ref());
+    // compute column widths
+    let branch_w = rows.iter().map(|(b, _, _, _)| b.len()).max().unwrap_or(6).max("BRANCH".len());
+    let main_w = rows.iter().map(|(_, m, _, _)| m.len()).max().unwrap_or(4).max("MAIN".len());
+    let datagen_w = rows.iter().map(|(_, _, d, _)| d.len()).max().unwrap_or(6).max("DATAGEN".len());
+    let gametest_w = rows.iter().map(|(_, _, _, g)| g.len()).max().unwrap_or(7).max("GAMETEST".len());
+
+    // print header
+    println!("{:<branch_w$}  {:<main_w$}  {:<datagen_w$}  {:<gametest_w$}",
+        "BRANCH", "MAIN", "DATAGEN", "GAMETEST",
+        branch_w = branch_w, main_w = main_w, datagen_w = datagen_w, gametest_w = gametest_w
+    );
+
+    // print rows
+    for (b, m, d, g) in rows {
+        println!("{:<branch_w$}  {:<main_w$}  {:<datagen_w$}  {:<gametest_w$}",
+            b, m, d, g,
+            branch_w = branch_w, main_w = main_w, datagen_w = datagen_w, gametest_w = gametest_w
+        );
+    }
 
     println!();
 
