@@ -22,14 +22,13 @@
   },
   "requirements": [
     [
-      "has_tough_cable",
-      "has_the_recipe"
+      "has_the_recipe",
+      "has_tough_cable"
     ]
   ],
   "rewards": {
     "recipes": [
       "sfm:tough_to_cable"
     ]
-  },
-  "sends_telemetry_event": false
+  }
 }
