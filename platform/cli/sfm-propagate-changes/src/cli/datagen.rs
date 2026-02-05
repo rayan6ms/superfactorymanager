@@ -25,9 +25,12 @@ async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
         );
         return BuildResult {
             branch,
-            status: BuildStatus::NotFound {
+            main: BuildStatus::NotFound {
                 reason: "platform/minecraft directory not found".to_string(),
             },
+            datagen: None,
+            gametest: None,
+            duration: std::time::Duration::from_secs(0),
         };
     }
 
@@ -46,9 +49,12 @@ async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
         );
         return BuildResult {
             branch,
-            status: BuildStatus::NotFound {
+            main: BuildStatus::NotFound {
                 reason: format!("gradlew not found in {}", minecraft_dir.display()),
             },
+            datagen: None,
+            gametest: None,
+            duration: std::time::Duration::from_secs(0),
         };
     }
 
@@ -69,7 +75,7 @@ async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
 
     let duration = start.elapsed();
 
-    let status = match result {
+    let datagen_status = match result {
         Ok(output) => {
             let stdout = String::from_utf8_lossy(&output.stdout);
             let stderr = String::from_utf8_lossy(&output.stderr);
@@ -83,22 +89,28 @@ async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
                         branch
                     );
                 }
-                BuildStatus::Success { duration }
+                Some(BuildStatus::Success { duration })
             } else {
                 warn!(
                     "runData for {} failed; exit: {:?}, stdout: {}, stderr: {}",
                     branch, output.status, stdout, stderr
                 );
-                BuildStatus::Failed { duration }
+                Some(BuildStatus::Failed { duration })
             }
         }
         Err(e) => {
             warn!("Failed to run gradlew for {}: {}", branch, e);
-            BuildStatus::Failed { duration }
+            Some(BuildStatus::Failed { duration })
         }
     };
 
-    BuildResult { branch, status }
+    BuildResult {
+        branch,
+        main: BuildStatus::NotFound { reason: "not run".to_string() },
+        datagen: datagen_status,
+        gametest: None,
+        duration,
+    }
 }
 
 /// Datagen command - runs `gradlew runData` for all worktrees in parallel
@@ -159,7 +171,7 @@ impl DatagenCommand {
 
         let had_failure = results
             .iter()
-            .any(|r| matches!(r.status, BuildStatus::Failed { .. }));
+            .any(|r| matches!(r.datagen, Some(BuildStatus::Failed { .. })));
 
         if had_failure {
             bail!("One or more datagen runs failed");
