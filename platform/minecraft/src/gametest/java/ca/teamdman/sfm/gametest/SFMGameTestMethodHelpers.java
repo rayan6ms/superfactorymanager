@@ -2,17 +2,10 @@ package ca.teamdman.sfm.gametest;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.item.DiskItem;
-import ca.teamdman.sfm.common.util.NotStored;
 import ca.teamdman.sfml.ast.Program;
 import ca.teamdman.sfml.program_builder.ProgramBuilder;
-import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
-import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.neoforged.neoforge.common.capabilities.Capabilities;
-import net.neoforged.neoforge.items.IItemHandler;
 
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 
 public class SFMGameTestMethodHelpers {
