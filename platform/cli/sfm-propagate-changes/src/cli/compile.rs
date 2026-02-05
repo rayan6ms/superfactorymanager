@@ -581,6 +581,7 @@ impl CompileCommand {
                 viewport: Viewport::Inline(terminal_height),
             },
         )?;
+        terminal.hide_cursor()?;
 
         // Spawn all compile tasks
         for (i, branch_state) in app_state.branches.iter().enumerate() {
@@ -625,6 +626,7 @@ impl CompileCommand {
             }
             interval.tick().await;
         }
+        let _ = terminal.show_cursor();
 
         // Move the cursor past the TUI viewport on stderr so that error messages 
         // don't overwrite the table, even if stdout is being redirected/captured.
