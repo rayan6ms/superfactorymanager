@@ -22,8 +22,8 @@
   },
   "requirements": [
     [
-      "has_tough_fancy_cable",
-      "has_the_recipe"
+      "has_the_recipe",
+      "has_tough_fancy_cable"
     ]
   ],
   "rewards": {

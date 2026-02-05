@@ -34,9 +34,9 @@
   },
   "requirements": [
     [
+      "has_the_recipe",
       "has_obsidian",
-      "has_fancy_cable",
-      "has_the_recipe"
+      "has_fancy_cable"
     ]
   ],
   "rewards": {
