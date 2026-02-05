@@ -19,6 +19,9 @@ use std::time::Instant;
 use tokio::process::Command;
 use tokio::sync::mpsc;
 
+use ratatui::crossterm::style::{Attribute, Color as CTermColor, SetAttribute, SetForegroundColor};
+use ratatui::crossterm::ExecutableCommand;
+
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum TaskState {
     NotStarted,
@@ -340,7 +343,7 @@ fn render(f: &mut ratatui::Frame, state: &AppState) {
 
     // Constrain the table width so the border doesn't stretch across the whole terminal
     let [table_area, _] = ratatui::layout::Layout::horizontal([
-        Constraint::Length(72), // 12 + 18*3 + padding/borders
+        Constraint::Length(80), // Increased from 72 to accommodate longer statuses
         Constraint::Min(0),
     ])
     .areas(area);
@@ -365,9 +368,9 @@ fn render(f: &mut ratatui::Frame, state: &AppState) {
         rows,
         [
             Constraint::Length(12),
-            Constraint::Length(18),
-            Constraint::Length(18),
-            Constraint::Length(18),
+            Constraint::Length(20), // Increased from 18
+            Constraint::Length(20), // Increased from 18
+            Constraint::Length(20), // Increased from 18
         ],
     )
     .header(
@@ -380,95 +383,135 @@ fn render(f: &mut ratatui::Frame, state: &AppState) {
 }
 
 fn print_final_report(state: &AppState) {
-    let mut successful = 0;
-    let mut failed = 0;
-    let mut skipped = 0;
+    let mut stdout = std::io::stdout();
+
+    let mut successful_branches = 0;
+    let mut failed_branches = 0;
+    let mut skipped_branches = 0;
 
     for b in &state.branches {
-        match &b.main {
-            TaskState::Success { .. } => successful += 1,
-            TaskState::Failed { .. } => failed += 1,
-            TaskState::NotFound { .. } => skipped += 1,
-            _ => {
-                if matches!(b.main, TaskState::Skipped) {
-                    skipped += 1;
-                }
-            }
+        let tasks = [&b.main, &b.datagen, &b.gametest];
+        if tasks.iter().any(|t| matches!(t, TaskState::Failed { .. })) {
+            failed_branches += 1;
+        } else if tasks
+            .iter()
+            .all(|t| matches!(t, TaskState::Success { .. } | TaskState::Skipped))
+        {
+            successful_branches += 1;
+        } else {
+            skipped_branches += 1;
         }
     }
 
-    println!();
-    println!("{}", "═".repeat(60).cyan().dimmed());
-    // Use owo_colors for the final terminal output
-    let header_text = "  COMPILE SUMMARY".bold();
-    if failed > 0 {
-        println!("{}", header_text.red());
-    } else if successful == state.branches.len() {
-        println!("{}", header_text.green());
+    let header_color = if failed_branches > 0 {
+        CTermColor::Red
+    } else if failed_branches == 0 && skipped_branches == 0 {
+        CTermColor::Green
     } else {
-        println!("{}", header_text.yellow());
-    }
-    println!("{}", "═".repeat(60).cyan().dimmed());
-    println!();
-
-    let total_branches_text = state.branches.len().to_string();
-    let colored_total = if failed > 0 {
-        total_branches_text.red().bold()
-    } else if successful == state.branches.len() {
-        total_branches_text.green().bold()
-    } else {
-        total_branches_text.yellow().bold()
+        CTermColor::Yellow
     };
 
-    print!("  Total branches: {} ", colored_total);
-    let mut parts = Vec::new();
-    if successful > 0 {
-        parts.push(format!("{} {}", successful.to_string().bold(), "successful".green()));
+    println!();
+    let _ = stdout.execute(SetForegroundColor(CTermColor::DarkGrey));
+    println!("{}", "═".repeat(60));
+    let _ = stdout.execute(SetForegroundColor(header_color));
+    let _ = stdout.execute(SetAttribute(Attribute::Bold));
+    println!("  COMPILE SUMMARY");
+    let _ = stdout.execute(SetAttribute(Attribute::Reset));
+    let _ = stdout.execute(SetForegroundColor(CTermColor::DarkGrey));
+    println!("{}", "═".repeat(60));
+    let _ = stdout.execute(SetAttribute(Attribute::Reset));
+    println!();
+
+    print!("  Total branches: ");
+    let _ = stdout.execute(SetAttribute(Attribute::Bold));
+    print!("{}", state.branches.len());
+    let _ = stdout.execute(SetAttribute(Attribute::Reset));
+    print!(" (");
+
+    if successful_branches > 0 {
+        let _ = stdout.execute(SetForegroundColor(CTermColor::Green));
+        print!("{} successful", successful_branches);
+        let _ = stdout.execute(SetAttribute(Attribute::Reset));
+        if failed_branches > 0 || skipped_branches > 0 {
+            print!(", ");
+        }
     }
-    if failed > 0 {
-        parts.push(format!("{} {}", failed.to_string().bold(), "failed".red()));
+    if failed_branches > 0 {
+        let _ = stdout.execute(SetForegroundColor(CTermColor::Red));
+        print!("{} failed", failed_branches);
+        let _ = stdout.execute(SetAttribute(Attribute::Reset));
+        if skipped_branches > 0 {
+            print!(", ");
+        }
     }
-    if skipped > 0 {
-        parts.push(format!("{} {}", skipped.to_string().bold(), "skipped".yellow()));
+    if skipped_branches > 0 {
+        let _ = stdout.execute(SetForegroundColor(CTermColor::Yellow));
+        print!("{} skipped", skipped_branches);
+        let _ = stdout.execute(SetAttribute(Attribute::Reset));
     }
-    println!("({})", parts.join(", "));
+    println!(")");
 
     // Error details
     let mut failures = Vec::new();
     for b in &state.branches {
         if let TaskState::Failed { error, .. } = &b.main {
-            failures.push((&b.branch, "MAIN".cyan(), error));
+            failures.push((&b.branch, "MAIN", error, CTermColor::Cyan));
         }
         if let TaskState::Failed { error, .. } = &b.datagen {
-            failures.push((&b.branch, "DATAGEN".magenta(), error));
+            failures.push((&b.branch, "DATAGEN", error, CTermColor::Magenta));
         }
         if let TaskState::Failed { error, .. } = &b.gametest {
-            failures.push((&b.branch, "GAMETEST".blue(), error));
+            failures.push((&b.branch, "GAMETEST", error, CTermColor::Blue));
         }
     }
 
     if !failures.is_empty() {
         println!();
-        println!("{}", "FAILURE DETAILS".red().bold());
-        println!("{}", "─".repeat(60).red().dimmed());
-        for (branch, task, err) in failures {
+        let _ = stdout.execute(SetForegroundColor(CTermColor::Red));
+        let _ = stdout.execute(SetAttribute(Attribute::Bold));
+        println!("FAILURE DETAILS");
+        let _ = stdout.execute(SetAttribute(Attribute::Reset));
+        let _ = stdout.execute(SetForegroundColor(CTermColor::DarkGrey));
+        println!("{}", "─".repeat(60));
+        let _ = stdout.execute(SetAttribute(Attribute::Reset));
+
+        for (branch, task_name, err, task_color) in failures {
             println!();
-            println!(
-                "{} {} on branch {}:",
-                "✖ ERROR".red().bold(),
-                task.bold(),
-                branch.yellow().bold()
-            );
+            let _ = stdout.execute(SetForegroundColor(CTermColor::Red));
+            let _ = stdout.execute(SetAttribute(Attribute::Bold));
+            print!("✖ ERROR ");
+            let _ = stdout.execute(SetAttribute(Attribute::Reset));
+
+            let _ = stdout.execute(SetForegroundColor(task_color));
+            let _ = stdout.execute(SetAttribute(Attribute::Bold));
+            print!("{}", task_name);
+            let _ = stdout.execute(SetAttribute(Attribute::Reset));
+
+            print!(" on branch ");
+            let _ = stdout.execute(SetForegroundColor(CTermColor::Yellow));
+            let _ = stdout.execute(SetAttribute(Attribute::Bold));
+            print!("{}", branch);
+            let _ = stdout.execute(SetAttribute(Attribute::Reset));
+            println!(":");
+
             // Indent and dim the actual error message
+            let _ = stdout.execute(SetForegroundColor(CTermColor::Grey));
             for line in err.lines() {
-                println!("   {}", line.dimmed());
+                println!("   {}", line);
             }
+            let _ = stdout.execute(SetAttribute(Attribute::Reset));
         }
         println!();
-        println!("{}", "─".repeat(60).red().dimmed());
-    } else if successful == state.branches.len() {
+        let _ = stdout.execute(SetForegroundColor(CTermColor::DarkGrey));
+        println!("{}", "─".repeat(60));
+        let _ = stdout.execute(SetAttribute(Attribute::Reset));
+    } else if successful_branches == state.branches.len() {
         println!();
-        println!("  {}", "✔ All compilations finished successfully!".green().bold());
+        let _ = stdout.execute(SetForegroundColor(CTermColor::Green));
+        let _ = stdout.execute(SetAttribute(Attribute::Bold));
+        println!("  ✔ All compilations finished successfully!");
+        let _ = stdout.execute(SetAttribute(Attribute::Reset));
     }
     println!();
 }
@@ -583,9 +626,10 @@ impl CompileCommand {
             interval.tick().await;
         }
 
-        // Move the cursor past the TUI viewport before printing the summary
-        for _ in 0..terminal_height {
-            println!();
+        // Move the cursor past the TUI viewport on stderr so that error messages 
+        // don't overwrite the table, even if stdout is being redirected/captured.
+        for _ in 0..terminal_height + 1 {
+            eprintln!();
         }
 
         // Print final report to stdout
