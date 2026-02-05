@@ -20,6 +20,8 @@ facet = { git = "https://github.com/facet-rs/facet", branch = "main", version = 
 facet-styx = { git = "https://github.com/bearcove/styx", version = "1.0.1" }
 figue = { git = "https://github.com/bearcove/figue", branch = "main" }
 open = { version = "5.3.3", features = ["shellexecute-on-windows"] }
+rand = "0.9.2"
+ratatui = "0.30.0"
 tokio = { version = "1.49.0", features = ["full"] }
 tracing = "0.1.44"
 tracing-subscriber = { version = "0.3.22", features = ["env-filter", "json"] }
