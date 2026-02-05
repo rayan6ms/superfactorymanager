@@ -185,6 +185,7 @@ async fn compile_worktree_task(
     path: PathBuf,
     all: bool,
     mock: bool,
+    parallel: bool,
 ) {
     let minecraft_dir = path.join("platform").join("minecraft");
 
@@ -266,70 +267,125 @@ async fn compile_worktree_task(
 
     if all {
         // DATAGEN and GAMETEST
-        tx.send(Message::StatusUpdate(
-            index,
-            TaskType::DataGen,
-            TaskState::Running {
-                start_time: Instant::now(),
-            },
-        ))
-        .ok();
-        tx.send(Message::StatusUpdate(
-            index,
-            TaskType::GameTest,
-            TaskState::Running {
-                start_time: Instant::now(),
-            },
-        ))
-        .ok();
+        if parallel {
+            tx.send(Message::StatusUpdate(
+                index,
+                TaskType::DataGen,
+                TaskState::Running {
+                    start_time: Instant::now(),
+                },
+            ))
+            .ok();
+            tx.send(Message::StatusUpdate(
+                index,
+                TaskType::GameTest,
+                TaskState::Running {
+                    start_time: Instant::now(),
+                },
+            ))
+            .ok();
 
-        let gradlew_dg = gradlew.clone();
-        let dir_dg = minecraft_dir.clone();
-        let tx_dg = tx.clone();
-        let dg_handle = tokio::spawn(async move {
-            let res = run_task(&gradlew_dg, &dir_dg, "compileDatagenJava", mock).await;
-            match res {
-                Ok(duration) => tx_dg
+            let gradlew_dg = gradlew.clone();
+            let dir_dg = minecraft_dir.clone();
+            let tx_dg = tx.clone();
+            let dg_handle = tokio::spawn(async move {
+                let res = run_task(&gradlew_dg, &dir_dg, "compileDatagenJava", mock).await;
+                match res {
+                    Ok(duration) => tx_dg
+                        .send(Message::StatusUpdate(
+                            index,
+                            TaskType::DataGen,
+                            TaskState::Success { duration },
+                        ))
+                        .ok(),
+                    Err((duration, err)) => tx_dg
+                        .send(Message::StatusUpdate(
+                            index,
+                            TaskType::DataGen,
+                            TaskState::Failed { duration, error: err },
+                        ))
+                        .ok(),
+                }
+            });
+
+            let gradlew_gt = gradlew.clone();
+            let dir_gt = minecraft_dir.clone();
+            let tx_gt = tx.clone();
+            let gt_handle = tokio::spawn(async move {
+                let res = run_task(&gradlew_gt, &dir_gt, "compileGametestJava", mock).await;
+                match res {
+                    Ok(duration) => tx_gt
+                        .send(Message::StatusUpdate(
+                            index,
+                            TaskType::GameTest,
+                            TaskState::Success { duration },
+                        ))
+                        .ok(),
+                    Err((duration, err)) => tx_gt
+                        .send(Message::StatusUpdate(
+                            index,
+                            TaskType::GameTest,
+                            TaskState::Failed { duration, error: err },
+                        ))
+                        .ok(),
+                }
+            });
+
+            let _ = tokio::join!(dg_handle, gt_handle);
+        } else {
+            // Serial execution within the worktree
+            tx.send(Message::StatusUpdate(
+                index,
+                TaskType::DataGen,
+                TaskState::Running {
+                    start_time: Instant::now(),
+                },
+            ))
+            .ok();
+            let res_dg = run_task(&gradlew, &minecraft_dir, "compileDatagenJava", mock).await;
+            match res_dg {
+                Ok(duration) => tx
                     .send(Message::StatusUpdate(
                         index,
                         TaskType::DataGen,
                         TaskState::Success { duration },
                     ))
                     .ok(),
-                Err((duration, err)) => tx_dg
+                Err((duration, err)) => tx
                     .send(Message::StatusUpdate(
                         index,
                         TaskType::DataGen,
                         TaskState::Failed { duration, error: err },
                     ))
                     .ok(),
-            }
-        });
+            };
 
-        let gradlew_gt = gradlew.clone();
-        let dir_gt = minecraft_dir.clone();
-        let tx_gt = tx.clone();
-        let gt_handle = tokio::spawn(async move {
-            let res = run_task(&gradlew_gt, &dir_gt, "compileGametestJava", mock).await;
-            match res {
-                Ok(duration) => tx_gt
+            tx.send(Message::StatusUpdate(
+                index,
+                TaskType::GameTest,
+                TaskState::Running {
+                    start_time: Instant::now(),
+                },
+            ))
+            .ok();
+            let res_gt = run_task(&gradlew, &minecraft_dir, "compileGametestJava", mock).await;
+            match res_gt {
+                Ok(duration) => tx
                     .send(Message::StatusUpdate(
                         index,
                         TaskType::GameTest,
                         TaskState::Success { duration },
                     ))
                     .ok(),
-                Err((duration, err)) => tx_gt
+                Err((duration, err)) => tx
                     .send(Message::StatusUpdate(
                         index,
                         TaskType::GameTest,
                         TaskState::Failed { duration, error: err },
                     ))
                     .ok(),
-            }
-        });
-
-        let _ = tokio::join!(dg_handle, gt_handle);
+            };
+        }
     }
 }
 
@@ -526,6 +582,10 @@ pub struct CompileCommand {
     /// If set, mock the compilation process with random results and durations.
     #[facet(args::named)]
     pub mock: bool,
+
+    /// If set, run compilation tasks in parallel.
+    #[facet(args::named)]
+    pub parallel: bool,
 }
 
 impl CompileCommand {
@@ -581,19 +641,38 @@ impl CompileCommand {
                 viewport: Viewport::Inline(terminal_height),
             },
         )?;
+        terminal.hide_cursor()?;
 
-        // Spawn all compile tasks
-        for (i, branch_state) in app_state.branches.iter().enumerate() {
-            let branch_name = branch_state.branch.clone();
-            let worktree = worktrees.iter().find(|w| w.branch == branch_name).unwrap();
-            let path = worktree.path.clone();
-            let all = self.all;
-            let mock = self.mock;
-            let tx = tx.clone();
-            tokio::spawn(async move {
-                compile_worktree_task(i, tx, path, all, mock).await;
-            });
-        }
+        let branches_info: Vec<_> = app_state
+            .branches
+            .iter()
+            .enumerate()
+            .map(|(i, b)| {
+                let worktree = worktrees.iter().find(|w| w.branch == b.branch).unwrap();
+                (i, worktree.path.clone())
+            })
+            .collect();
+
+        let all = self.all;
+        let mock = self.mock;
+        let parallel = self.parallel;
+        let p_tx = tx.clone();
+
+        // Spawn a manager task to handle the execution strategy
+        tokio::spawn(async move {
+            if parallel {
+                for (i, path) in branches_info {
+                    let tx = p_tx.clone();
+                    tokio::spawn(async move {
+                        compile_worktree_task(i, tx, path, all, mock, true).await;
+                    });
+                }
+            } else {
+                for (i, path) in branches_info {
+                    compile_worktree_task(i, p_tx.clone(), path, all, mock, false).await;
+                }
+            }
+        });
 
         // TUI loop
         let mut interval = tokio::time::interval(Duration::from_millis(100));
@@ -625,6 +704,7 @@ impl CompileCommand {
             }
             interval.tick().await;
         }
+        let _ = terminal.show_cursor();
 
         // Move the cursor past the TUI viewport on stderr so that error messages 
         // don't overwrite the table, even if stdout is being redirected/captured.
