@@ -134,7 +134,12 @@ public class NetworkToolItem extends Item {
      */
     public static NetworkToolOverlayMode getOverlayMode(ItemStack stack) {
 
-        int ordinal = stack.getOrCreateTag().getInt("sfm:network_tool_overlay_mode");
+        CompoundTag tag = stack.getOrCreateTag();
+        if (tag.contains("sfm:network_tool_overlay_disabled") && tag.getBoolean("sfm:network_tool_overlay_disabled")) {
+            return NetworkToolOverlayMode.HIDDEN;
+        }
+
+        int ordinal = tag.getInt("sfm:network_tool_overlay_mode");
         // fallback if out of bounds or missing
         if (ordinal < 0 || ordinal >= NetworkToolOverlayMode.values().length) {
             return NetworkToolOverlayMode.SHOW_ALL;
@@ -249,7 +254,7 @@ public class NetworkToolItem extends Item {
         }
 
         // remove the data stored by older versions of the mod
-        stack.getOrCreateTag().remove("network_tool_overlay_disabled");
+        stack.getOrCreateTag().remove("sfm:network_tool_overlay_disabled");
     }
 
     public enum NetworkToolOverlayMode {
