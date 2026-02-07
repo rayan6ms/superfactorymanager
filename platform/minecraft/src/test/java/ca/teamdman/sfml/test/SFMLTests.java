@@ -762,6 +762,7 @@ public class SFMLTests {
         System.out.println("Starting search for " + relativePath + " from " + cwd);
         for (int i = 0; i < 3; i++) {
             java.nio.file.Path candidate = cwd.resolve(relativePath);
+            System.out.println("Checking " + candidate);
             if (Files.isDirectory(candidate)) {
                 return candidate;
             }
