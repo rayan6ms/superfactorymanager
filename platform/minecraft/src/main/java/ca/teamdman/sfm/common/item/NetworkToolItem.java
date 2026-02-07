@@ -105,13 +105,13 @@ public class NetworkToolItem extends Item {
     }
 
     public static void regenerateCablePositions(ItemStack pStack, Level pLevel, Player pPlayer) {
-        Set<BlockPos> cablePositions = getNetworksForOverlay(pStack, pLevel, pPlayer)
+        BlockPosSet cablePositions = getNetworksForOverlay(pStack, pLevel, pPlayer)
                 .flatMap(CableNetwork::getCablePositions)
-                .collect(Collectors.toSet());
+                .collect(BlockPosSet.collector());
         setCablePositions(pStack, cablePositions);
-        Set<BlockPos> capabilityProviderPositions = getNetworksForOverlay(pStack, pLevel, pPlayer)
+        BlockPosSet capabilityProviderPositions = getNetworksForOverlay(pStack, pLevel, pPlayer)
                 .flatMap(CableNetwork::getCapabilityProviderPositions)
-                .collect(Collectors.toSet());
+                .collect(BlockPosSet.collector());
         setCapabilityProviderPositions(pStack, capabilityProviderPositions);
     }
 
