@@ -83,6 +83,12 @@ pub enum Command {
         #[facet(flatten)]
         command: super::compile::CompileCommand,
     },
+    /// Build all worktrees by running gradlew build
+    Build {
+        /// Build options
+        #[facet(flatten)]
+        command: super::build::BuildCommand,
+    },
     /// Run data generation (gradlew runData) for each worktree
     Datagen {
         /// Datagen options
@@ -141,6 +147,7 @@ impl Command {
         match self {
             Command::Merge { command } => command.invoke(),
             Command::Compile { command } => command.invoke(),
+            Command::Build { command } => command.invoke(),
             Command::Datagen { command } => command.invoke(),
             Command::Test { command } => command.invoke(),
             Command::Check { command } => command.invoke(),
