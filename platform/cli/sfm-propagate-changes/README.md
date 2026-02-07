@@ -1,5 +1,7 @@
 # sfm-propagate-changes
 
+(note that this readme was written before the rust code was written, so it is more eager and may be out of date.)
+
 This tool is responsible for executing the git merge commands that apply changes to later versions of Minecraft.
 
 For example:
