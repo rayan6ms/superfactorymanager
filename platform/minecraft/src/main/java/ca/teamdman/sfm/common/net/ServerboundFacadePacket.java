@@ -3,8 +3,8 @@ package ca.teamdman.sfm.common.net;
 import ca.teamdman.sfm.common.facade.FacadePlanner;
 import ca.teamdman.sfm.common.facade.FacadeSpreadLogic;
 import ca.teamdman.sfm.common.facade.IFacadePlan;
-import ca.teamdman.sfm.common.util.SFMPlayerUtils;
 import net.minecraft.network.RegistryFriendlyByteBuf;
+import ca.teamdman.sfm.common.util.SFMEntityUtils;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -21,7 +21,8 @@ public record ServerboundFacadePacket(
             ServerboundFacadePacket msg,
             Player sender
     ) {
-        Level level = SFMPlayerUtils.getLevel(sender);
+
+        Level level = SFMEntityUtils.getLevel(sender);
         IFacadePlan facadePlan = FacadePlanner.getFacadePlan(sender, level, msg);
         if (facadePlan == null) {
             return;

@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.logging.TranslatableLogger;
 import ca.teamdman.sfm.common.util.*;
+import it.unimi.dsi.fastutil.longs.LongSet;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.ChunkPos;
@@ -149,10 +150,18 @@ public class CableNetwork extends BlockNetwork<Level, Unit> {
 
         return levelCapabilityCache.getPositions();
     }
+    public LongSet getCapabilityProviderPositionsRaw() {
+        return levelCapabilityCache.getPositionsRaw();
+    }
+
 
     public BlockPosIterator getCablePositions() {
 
         return members().positions();
+    }
+
+    public LongSet getCablePositionsRaw() {
+        return members().keySet();
     }
 
     @Override
