@@ -3,6 +3,7 @@ package ca.teamdman.sfm.common.label;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunUsePacket;
+import ca.teamdman.sfm.common.util.SFMEntityUtils;
 import net.minecraft.world.entity.player.Player;
 import org.jetbrains.annotations.Nullable;
 
@@ -15,7 +16,7 @@ public class LabelGunPlanner {
             boolean doWarning
     ) {
         var gunStack = player.getItemInHand(msg.hand());
-        var level = player.level();
+        var level = SFMEntityUtils.getLevel(player);
         if (!(gunStack.getItem() instanceof LabelGunItem)) {
             return null;
         }

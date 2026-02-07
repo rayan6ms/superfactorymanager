@@ -2,6 +2,7 @@ package ca.teamdman.sfm.common.net;
 
 import ca.teamdman.sfm.common.item.NetworkToolItem;
 import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.util.SFMEntityUtils;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionHand;
@@ -38,7 +39,7 @@ public record ServerboundNetworkToolToggleOverlayPacket(
             ItemStack networkToolItemStack = sender.getItemInHand(msg.hand);
             if (networkToolItemStack.getItem() == SFMItems.NETWORK_TOOL_ITEM.get()) {
                 NetworkToolItem.cycleOverlayMode(networkToolItemStack);
-                NetworkToolItem.regenerateCablePositions(networkToolItemStack, sender.getLevel(), sender);
+                NetworkToolItem.regenerateCablePositions(networkToolItemStack, SFMEntityUtils.getLevel(sender), sender);
             }
         }
 
