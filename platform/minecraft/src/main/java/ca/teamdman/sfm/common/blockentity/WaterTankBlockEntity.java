@@ -14,7 +14,7 @@ import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 public class WaterTankBlockEntity extends BlockEntity {
 
     public final FluidTank TANK = new FluidTank(
-            1000,
+            0,
             fluidStack -> false // The tank cannot be filled, only drained.
     ) {
         @Override
