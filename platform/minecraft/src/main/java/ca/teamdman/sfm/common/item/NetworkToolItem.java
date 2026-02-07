@@ -104,14 +104,24 @@ public class NetworkToolItem extends Item {
         pStack.getOrCreateTag().remove("networks");
     }
 
-    public static void regenerateCablePositions(ItemStack pStack, Level pLevel, Player pPlayer) {
-        Set<BlockPos> cablePositions = getNetworksForOverlay(pStack, pLevel, pPlayer)
-                .flatMap(CableNetwork::getCablePositions)
-                .collect(Collectors.toSet());
+    public static void regenerateCablePositions(
+            ItemStack pStack,
+            Level pLevel,
+            Player pPlayer
+    ) {
+        // Initialize with default capacity
+        // We don't know how many *unique* positions we are going to see
+        BlockPosSet cablePositions = new BlockPosSet();
+        BlockPosSet capabilityProviderPositions = new BlockPosSet();
+
+        // Find the networks and track the positions
+        for (CableNetwork cableNetwork : (Iterable<CableNetwork>) getNetworksForOverlay(pStack, pLevel, pPlayer)::iterator) {
+            cablePositions.addAll(cableNetwork.getCablePositionsRaw());
+            capabilityProviderPositions.addAll(cableNetwork.getCapabilityProviderPositionsRaw());
+        }
+
+        // Update the item data
         setCablePositions(pStack, cablePositions);
-        Set<BlockPos> capabilityProviderPositions = getNetworksForOverlay(pStack, pLevel, pPlayer)
-                .flatMap(CableNetwork::getCapabilityProviderPositions)
-                .collect(Collectors.toSet());
         setCapabilityProviderPositions(pStack, capabilityProviderPositions);
     }
 
