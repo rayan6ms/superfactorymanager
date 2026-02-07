@@ -10,8 +10,8 @@ import ca.teamdman.sfm.common.registry.SFMCreativeTabs;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.BlockPosSet;
 import ca.teamdman.sfm.common.util.CompressedBlockPosSet;
-import net.minecraft.core.BlockPos;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -27,7 +27,6 @@ import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -42,6 +41,7 @@ public class NetworkToolItem extends Item {
             ItemStack stack,
             UseOnContext ctx
     ) {
+
         var level = ctx.getLevel();
         Player player = ctx.getPlayer();
         if (level.isClientSide && player != null) {
@@ -125,25 +125,8 @@ public class NetworkToolItem extends Item {
         setCapabilityProviderPositions(pStack, capabilityProviderPositions);
     }
 
-    protected static Stream<CableNetwork> getNetworksForOverlay(
-            ItemStack pStack,
-            Level pLevel,
-            Player pPlayer
-    ) {
-        final long maxDistance = 128;
-
-        BlockPos blockPos = getOverlayMode(pStack) == NetworkToolOverlayMode.SHOW_SELECTED_NETWORK
-                ? getSelectedNetworkBlockPos(pStack)
-                : null;
-
-        if (blockPos != null) {
-            return CableNetworkManager.getOrRegisterNetworkFromCablePosition(pLevel, blockPos).stream();
-        } else {
-            return CableNetworkManager.getNetworksInRange(pLevel, pPlayer.blockPosition(), maxDistance);
-        }
-    }
-
     public static boolean getOverlayEnabled(ItemStack stack) {
+
         return getOverlayMode(stack) != NetworkToolOverlayMode.HIDDEN;
     }
 
@@ -151,6 +134,7 @@ public class NetworkToolItem extends Item {
      * Returns the current enum mode for the label gun item.
      */
     public static NetworkToolOverlayMode getOverlayMode(ItemStack stack) {
+
         int ordinal = stack.getOrCreateTag().getInt("sfm:network_tool_overlay_mode");
         // fallback if out of bounds or missing
         if (ordinal < 0 || ordinal >= NetworkToolOverlayMode.values().length) {
@@ -159,40 +143,30 @@ public class NetworkToolItem extends Item {
         return NetworkToolOverlayMode.values()[ordinal];
     }
 
-    /**
-     * Sets the view mode in NBT.
-     */
-    protected static void setOverlayMode(
-            ItemStack stack,
-            NetworkToolOverlayMode mode
-    ) {
-        stack.getOrCreateTag().putInt("sfm:network_tool_overlay_mode", mode.ordinal());
-        if (mode != NetworkToolOverlayMode.SHOW_SELECTED_NETWORK) {
-            stack.getOrCreateTag().remove("sfm:selected_network_block_pos");
-        }
-
-        // remove the data stored by older versions of the mod
-        stack.getOrCreateTag().remove("network_tool_overlay_disabled");
-    }
-
     public static void cycleOverlayMode(ItemStack stack) {
+
         NetworkToolOverlayMode current = getOverlayMode(stack);
         NetworkToolOverlayMode newMode = current == NetworkToolOverlayMode.SHOW_ALL
-                ? NetworkToolOverlayMode.HIDDEN
-                : NetworkToolOverlayMode.SHOW_ALL;
+                                         ? NetworkToolOverlayMode.HIDDEN
+                                         : NetworkToolOverlayMode.SHOW_ALL;
         setOverlayMode(stack, newMode);
     }
 
-    public static void setSelectedNetworkBlockPos(ItemStack stack, BlockPos pos) {
+    public static void setSelectedNetworkBlockPos(
+            ItemStack stack,
+            BlockPos pos
+    ) {
+
         setOverlayMode(stack, NetworkToolOverlayMode.SHOW_SELECTED_NETWORK);
         stack.getOrCreateTag().put("sfm:selected_network_block_pos", NbtUtils.writeBlockPos(pos));
     }
 
     @Nullable
     public static BlockPos getSelectedNetworkBlockPos(ItemStack stack) {
+
         return stack.getOrCreateTag().contains("sfm:selected_network_block_pos")
-                ? NbtUtils.readBlockPos(stack.getOrCreateTag().getCompound("sfm:selected_network_block_pos"))
-                : null;
+               ? NbtUtils.readBlockPos(stack.getOrCreateTag().getCompound("sfm:selected_network_block_pos"))
+               : null;
     }
 
     public static void setCablePositions(
@@ -243,9 +217,46 @@ public class NetworkToolItem extends Item {
                 .collect(BlockPosSet.collector());
     }
 
+    protected static Stream<CableNetwork> getNetworksForOverlay(
+            ItemStack pStack,
+            Level pLevel,
+            Player pPlayer
+    ) {
+
+        final long maxDistance = 128;
+
+        BlockPos blockPos = getOverlayMode(pStack) == NetworkToolOverlayMode.SHOW_SELECTED_NETWORK
+                            ? getSelectedNetworkBlockPos(pStack)
+                            : null;
+
+        if (blockPos != null) {
+            return CableNetworkManager.getOrRegisterNetworkFromCablePosition(pLevel, blockPos).stream();
+        } else {
+            return CableNetworkManager.getNetworksInRange(pLevel, pPlayer.blockPosition(), maxDistance);
+        }
+    }
+
+    /**
+     * Sets the view mode in NBT.
+     */
+    protected static void setOverlayMode(
+            ItemStack stack,
+            NetworkToolOverlayMode mode
+    ) {
+
+        stack.getOrCreateTag().putInt("sfm:network_tool_overlay_mode", mode.ordinal());
+        if (mode != NetworkToolOverlayMode.SHOW_SELECTED_NETWORK) {
+            stack.getOrCreateTag().remove("sfm:selected_network_block_pos");
+        }
+
+        // remove the data stored by older versions of the mod
+        stack.getOrCreateTag().remove("network_tool_overlay_disabled");
+    }
+
     public enum NetworkToolOverlayMode {
         SHOW_ALL,
         SHOW_SELECTED_NETWORK,
         HIDDEN
     }
+
 }
