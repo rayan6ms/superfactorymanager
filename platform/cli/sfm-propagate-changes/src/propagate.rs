@@ -5,6 +5,7 @@ use crate::state::Status;
 use crate::worktree::Worktree;
 use crate::worktree::get_worktrees;
 use crate::worktree::sort_worktrees_by_version;
+use dunce::canonicalize;
 use eyre::Context;
 use eyre::bail;
 use std::fmt::Write;
@@ -148,24 +149,46 @@ fn format_file_list(files: &[String], limit: usize) -> String {
     result
 }
 
+/// Canonicalize a worktree path for display (fall back to the original path on error)
+fn canonicalize_worktree_path(path: &PathBuf) -> String {
+    canonicalize(path)
+        .map(|p| p.display().to_string())
+        .unwrap_or_else(|_| path.display().to_string())
+}
+
+/// Canonicalize a file path relative to a base directory for display
+fn canonicalize_relative_path(base: &PathBuf, relative: &str) -> String {
+    let joined = base.join(relative);
+    canonicalize(&joined)
+        .map(|p| p.display().to_string())
+        .unwrap_or_else(|_| joined.display().to_string())
+}
+
 /// Format conflict error message with file list and rename hints
 fn format_conflict_error(path: &PathBuf, branch: &str) -> eyre::Result<String> {
     let conflicts = get_conflicted_files(path)?;
     let staged = get_staged_files(path)?;
     let renames = find_potential_renames(&conflicts, &staged);
+    let canonical_path = canonicalize_worktree_path(path);
+    let canonical_conflicts: Vec<String> = conflicts
+        .iter()
+        .map(|conflict| canonicalize_relative_path(path, conflict))
+        .collect();
 
     let mut msg = format!(
         "Worktree {} is in the middle of a merge with {} unresolved conflict(s).\n\n\
          Unresolved conflicts:\n{}",
         branch,
         conflicts.len(),
-        format_file_list(&conflicts, 10)
+        format_file_list(&canonical_conflicts, 10)
     );
 
     if !renames.is_empty() {
         msg.push_str("\n\nPotential renames detected (same filename in different paths):");
         for (conflict, staged_file) in &renames {
-            let _ = write!(msg, "\n  {conflict} <- {staged_file}");
+            let conflict_path = canonicalize_relative_path(path, conflict);
+            let staged_path = canonicalize_relative_path(path, staged_file);
+            let _ = write!(msg, "\n  {conflict_path} <- {staged_path}");
         }
         msg.push_str(
             "\n\nHint: Git may not have detected these as renames. Check if the staged file",
@@ -177,7 +200,7 @@ fn format_conflict_error(path: &PathBuf, branch: &str) -> eyre::Result<String> {
         msg,
         "\n\nPlease resolve the conflicts in {} and run this command again,\n\
          or abort the merge with `git merge --abort`.",
-        path.display()
+        canonical_path
     );
 
     Ok(msg)
