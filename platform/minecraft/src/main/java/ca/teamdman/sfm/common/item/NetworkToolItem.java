@@ -130,7 +130,7 @@ public class NetworkToolItem extends Item {
     }
 
     /**
-     * Returns the current enum mode for the label gun item.
+     * Returns the current enum mode for the network tool item.
      */
     public static NetworkToolOverlayMode getOverlayMode(ItemStack stack) {
 
