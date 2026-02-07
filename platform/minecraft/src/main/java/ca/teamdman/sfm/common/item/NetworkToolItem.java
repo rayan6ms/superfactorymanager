@@ -73,8 +73,13 @@ public class NetworkToolItem extends Item {
         lines.add(LocalizationKeys.NETWORK_TOOL_ITEM_TOOLTIP_2.getComponent().withStyle(ChatFormatting.GRAY));
         lines.add(
                 LocalizationKeys.NETWORK_TOOL_ITEM_TOOLTIP_3
-                        .getComponent(SFMKeyMappings.CONTAINER_INSPECTOR_KEY.get().getTranslatedKeyMessage())
+                .getComponent(SFMKeyMappings.getKeyDisplay(SFMKeyMappings.CONTAINER_INSPECTOR_KEY))
                         .withStyle(ChatFormatting.AQUA)
+        );
+        lines.add(
+            LocalizationKeys.NETWORK_TOOL_ITEM_TOOLTIP_8
+                .getComponent(SFMKeyMappings.getKeyDisplay(SFMKeyMappings.TOGGLE_NETWORK_TOOL_OVERLAY_KEY))
+                .withStyle(ChatFormatting.AQUA)
         );
         lines.add(LocalizationKeys.NETWORK_TOOL_ITEM_TOOLTIP_4.getComponent().withStyle(ChatFormatting.LIGHT_PURPLE));
         lines.add(LocalizationKeys.NETWORK_TOOL_ITEM_TOOLTIP_5.getComponent().withStyle(ChatFormatting.LIGHT_PURPLE));
