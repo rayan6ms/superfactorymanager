@@ -55,7 +55,12 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
             BlockState pOldState,
             boolean pIsMoving
     ) {
-        /// Do nothing because the {@link WaterTankBlockEntity#onLoad()} method handles this logic
+        /// Do nothing because the {@link WaterTankBlockEntity#onLoad()} method handles this logic.
+        /// Note that the timing of {@link WaterTankBlockEntity#onLoad()} is different as of 1.20.2.
+        /// See {@link net.minecraft.world.level.chunk.LevelChunk#addAndRegisterBlockEntity(BlockEntity)}.
+        /// For <1.20.2: onLoad is called immediately.
+        /// For >=1.20.2: onLoad is deferred to the next block entity tick.
+        /// In practice, this just affects the timing of how game tests should expect changes to be reflected in the {@link WaterTankBlockEntity#TANK} capacity.
 //        WaterNetworkManager.onWaterTankBlockActiveStateChanged(pLevel, pPos);
     }
 

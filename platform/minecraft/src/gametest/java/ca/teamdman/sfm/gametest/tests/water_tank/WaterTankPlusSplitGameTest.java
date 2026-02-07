@@ -159,20 +159,23 @@ public class WaterTankPlusSplitGameTest extends SFMGameTestDefinition {
         // Restore center tank - networks should merge back
         helper.setBlock(center, SFMBlocks.WATER_TANK_BLOCK.get());
 
-        // Refresh references
-        centerTank = (WaterTankBlockEntity) helper.getBlockEntity(center);
-        northTank = (WaterTankBlockEntity) helper.getBlockEntity(north);
+        helper.runAfterDelay(1, ()->{
 
-        // Back to 4 active members (center is still inactive): capacity = 8000
-        assertTrue(
-                centerTank.TANK.getCapacity() == expectedCapacity,
-                "Center tank should have capacity " + expectedCapacity + " after merge but had " + centerTank.TANK.getCapacity()
-        );
-        assertTrue(
-                northTank.TANK.getCapacity() == expectedCapacity,
-                "North tank should have capacity " + expectedCapacity + " after merge but had " + northTank.TANK.getCapacity()
-        );
+            // Refresh references
+            WaterTankBlockEntity centerTankNew = (WaterTankBlockEntity) helper.getBlockEntity(center);
+            WaterTankBlockEntity northTankNew = (WaterTankBlockEntity) helper.getBlockEntity(north);
 
-        helper.succeed();
+            // Back to 4 active members (center is still inactive): capacity = 8000
+            assertTrue(
+                    centerTankNew.TANK.getCapacity() == expectedCapacity,
+                    "Center tank should have capacity " + expectedCapacity + " after merge but had " + centerTankNew.TANK.getCapacity()
+            );
+            assertTrue(
+                    northTankNew.TANK.getCapacity() == expectedCapacity,
+                    "North tank should have capacity " + expectedCapacity + " after merge but had " + northTankNew.TANK.getCapacity()
+            );
+
+            helper.succeed();
+        });
     }
 }
