@@ -89,6 +89,12 @@ pub enum Command {
         #[facet(flatten)]
         command: super::datagen::DatagenCommand,
     },
+    /// Run gradlew test for each worktree
+    Test {
+        /// Test options
+        #[facet(flatten)]
+        command: super::test::TestCommand,
+    },
     /// Check workspace files for correctness
     Check {
         /// Check options
@@ -136,6 +142,7 @@ impl Command {
             Command::Merge { command } => command.invoke(),
             Command::Compile { command } => command.invoke(),
             Command::Datagen { command } => command.invoke(),
+            Command::Test { command } => command.invoke(),
             Command::Check { command } => command.invoke(),
             Command::Push { command } => command.invoke(),
             Command::Home { command } => command.invoke(),
