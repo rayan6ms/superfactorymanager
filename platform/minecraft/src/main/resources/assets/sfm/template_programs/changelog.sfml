@@ -16,10 +16,10 @@ NAME "Changelog"
 -- Update block network logic used by cable networks and water tanks
 ---- Should fix https://github.com/FTBTeam/FTB-Modpack-Issues/issues/10084
 ---- Should fix https://github.com/TeamDman/SuperFactoryManager/issues/426
--- Network tool can now be attuned to a block position, thanks @MasonD for the contribution! #456
-    -- TODO: add tooltip explaining
+-- Network tool can now be attuned to a block position, thanks @Mei for the contribution! #456
 -- Update PT_BR localization, thanks @PrincessStelllar for the contribution! #431, #497
 -- Update ZH_CN localization, thanks @ZHAY10086 for the contribution! #438, #439, #498
+-- Fix ResourcesProgramLinter not tracking warningsp roperly, thanks @Mei! #440
 
 ---- 4.28.0 ----
 -- Fix #430 where fancy cable improperly visually connects to blocks it should not
