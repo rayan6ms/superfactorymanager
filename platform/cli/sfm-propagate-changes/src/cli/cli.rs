@@ -95,6 +95,12 @@ pub enum Command {
         #[facet(flatten)]
         command: super::datagen::DatagenCommand,
     },
+    /// Run gametests (gradlew gameTestServer) for each worktree
+    Gametest {
+        /// Gametest options
+        #[facet(flatten)]
+        command: super::gametest::GametestCommand,
+    },
     /// Run gradlew test for each worktree
     Test {
         /// Test options
@@ -149,6 +155,7 @@ impl Command {
             Command::Compile { command } => command.invoke(),
             Command::Build { command } => command.invoke(),
             Command::Datagen { command } => command.invoke(),
+            Command::Gametest { command } => command.invoke(),
             Command::Test { command } => command.invoke(),
             Command::Check { command } => command.invoke(),
             Command::Push { command } => command.invoke(),
