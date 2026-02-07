@@ -69,7 +69,12 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
             boolean pIsMoving
     ) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        WaterNetworkManager.onWaterTankBlockRemoved(pLevel, pPos);
+
+        // Changing the active block state causes this to fire, we want to debounce this
+        // so that the neighbour method does a single update for remove+place when changing active state
+        if (!pNewState.is(pState.getBlock())) {
+            WaterNetworkManager.onWaterTankBlockRemoved(pLevel, pPos);
+        }
     }
 
 
