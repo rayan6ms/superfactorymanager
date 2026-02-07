@@ -112,7 +112,9 @@ async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
 
     BuildResult {
         branch,
-        main: BuildStatus::NotFound { reason: "not run".to_string() },
+        main: BuildStatus::NotFound {
+            reason: "not run".to_string(),
+        },
         datagen: datagen_status,
         gametest: None,
         duration,
@@ -160,7 +162,7 @@ async fn commit_generated_if_needed(repo_root: &PathBuf, branch: &str) -> eyre::
         );
     }
 
-    let message = format!("{{{}}} - resources - datagen", branch);
+    let message = format!("{{{branch}}} - resources - datagen");
     let commit_output = Command::new("git")
         .args(["commit", "-m", &message])
         .current_dir(repo_root)
