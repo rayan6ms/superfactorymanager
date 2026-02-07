@@ -6,7 +6,7 @@ use figue::{self as args};
 use ratatui::{
     backend::CrosstermBackend,
     layout::Constraint,
-    style::{Color, Modifier, Style, Stylize},
+    style::{Color, Modifier, Style},
     text::Span,
     widgets::{Block, Cell, Paragraph, Row, Table},
     Terminal, TerminalOptions, Viewport,
