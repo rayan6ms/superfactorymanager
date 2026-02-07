@@ -9,6 +9,7 @@ import ca.teamdman.sfm.common.item.NetworkToolItem;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.SFMDirections;
+import ca.teamdman.sfm.common.util.SFMEntityUtils;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import ca.teamdman.sfml.ast.Side;
 import net.minecraft.core.BlockPos;
@@ -71,7 +72,7 @@ public record ServerboundNetworkToolUsePacket(
 
             ServerPlayer player = context.sender();
             if (player == null) return;
-            Level level = player.getLevel();
+            Level level = SFMEntityUtils.getLevel(player);
             BlockPos pos = msg.blockPosition();
             if (!level.isLoaded(pos)) return;
             if (msg.isOverlayToggleModifierActive) {
