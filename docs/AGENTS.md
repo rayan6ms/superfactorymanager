@@ -92,16 +92,8 @@ COMMANDS:
 
 ## Commit Messages
 
-Commit messages should contain the worktrees relevant to the work that was done.
-
-Examples:
-
-```
-git commit -m "1.19.2 - Add BlockPosSet datastructure"
-git commit -m "1.20.2 - Fix build errors after merge"
-git commit -m "1.21.1 - generate resources using `gradlew runData`"
-git commit -m "Merge branch '1.21.0' into 1.21.1"
-git commit -m "Propagate changes: merge 1.20.2 into 1.20.3"
-```
+Commit messages should contain the worktrees relevant to the work that was done (1.19.2, etc).
 
 [Conventional commits](https://www.conventionalcommits.org/en/v1.0.0/) should be used by agents.
+
+Commit messages should contain the platform relevant to the work that was done ("mod" (platform/minecraft; java), cli (platform/cli/sfm-propagate-changes), etc).
