@@ -708,43 +708,37 @@ public class SFMLTests {
 
     @Test
     public void demos() throws IOException {
-        var rootDir = System.getProperty("user.dir");
-        rootDir = rootDir.replaceAll(
-                "runs"
-                + FileSystems.getDefault().getSeparator().replaceAll("\\\\", "\\\\\\\\")
-                + "junit$", ""
-        );
-        var examplesDir = Paths.get(rootDir, "examples").toFile();
+        var examplesPath = findDirectoryUpwards("examples");
+        assertNotNull(examplesPath, "Could not locate examples directory starting from " + System.getProperty("user.dir"));
         var found = 0;
-        //noinspection DataFlowIssue
-        for (var entry : examplesDir.listFiles()) {
-            if (!FileNameUtils.getExtension(entry.getPath()).equals("sfm")) continue;
-            System.out.println("Reading " + entry);
-            var content = Files.readString(entry.toPath());
-            assertNoCompileErrors(content);
-            found++;
+        try (var ds = Files.newDirectoryStream(examplesPath)) {
+            for (var entryPath : ds) {
+                var entry = entryPath.toFile();
+                if (!"sfm".equals(FileNameUtils.getExtension(entry.getPath()))) continue;
+                System.out.println("Reading " + entry);
+                var content = Files.readString(entryPath);
+                assertNoCompileErrors(content);
+                found++;
+            }
         }
         assertNotEquals(0, found);
     }
 
     @Test
     public void templates() throws IOException {
-        var rootDir = System.getProperty("user.dir");
-        rootDir = rootDir.replaceAll(
-                "runs"
-                + FileSystems.getDefault().getSeparator().replaceAll("\\\\", "\\\\\\\\")
-                + "junit$", ""
-        );
-        var examplesDir = Paths.get(rootDir, "src/main/resources/assets/sfm/template_programs").toFile();
+        var examplesPath = findDirectoryUpwards("src/main/resources/assets/sfm/template_programs");
+        assertNotNull(examplesPath, "Could not locate template programs directory starting from " + System.getProperty("user.dir"));
         var found = 0;
-        //noinspection DataFlowIssue
-        for (var entry : examplesDir.listFiles()) {
-            assertEquals("sfml", FileNameUtils.getExtension(entry.getPath()));
-            System.out.println("Reading " + entry);
-            var content = Files.readString(entry.toPath());
-            content = content.replace("$REPLACE_RESOURCE_TYPES_HERE$", "");
-            assertNoCompileErrors(content);
-            found++;
+        try (var ds = Files.newDirectoryStream(examplesPath)) {
+            for (var entryPath : ds) {
+                var entry = entryPath.toFile();
+                assertEquals("sfml", FileNameUtils.getExtension(entry.getPath()));
+                System.out.println("Reading " + entry);
+                var content = Files.readString(entryPath);
+                content = content.replace("$REPLACE_RESOURCE_TYPES_HERE$", "");
+                assertNoCompileErrors(content);
+                found++;
+            }
         }
         assertNotEquals(0, found);
     }
@@ -761,6 +755,20 @@ public class SFMLTests {
         var cursorPos = programString.indexOf("INPUT") + 2;
         var x = ProgramTokenContextActions.getContextAction(programString, cursorPos);
         assertTrue(x.isPresent());
+    }
+
+    private static java.nio.file.Path findDirectoryUpwards(String relativePath) {
+        java.nio.file.Path cwd = Paths.get(System.getProperty("user.dir"));
+        System.out.println("Starting search for " + relativePath + " from " + cwd);
+        for (int i = 0; i < 3; i++) {
+            java.nio.file.Path candidate = cwd.resolve(relativePath);
+            if (Files.isDirectory(candidate)) {
+                return candidate;
+            }
+            cwd = cwd.getParent();
+            if (cwd == null) break;
+        }
+        return null;
     }
 
     @Test
