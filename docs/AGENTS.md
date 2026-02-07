@@ -86,6 +86,8 @@ COMMANDS:
             Show git status for all worktrees
 ```
 
+After making changes to rust code, run [`check-all.ps1`](../platform/cli/sfm-propagate-changes/check-all.ps1) to validate formatting and linting and build errors.
+
 ## Changelog
 
 [I track significant changes using one of the template programs that is visible in-game.](../platform/minecraft/src/main/resources/assets/sfm/template_programs/changelog.sfml)
