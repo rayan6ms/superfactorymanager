@@ -5,6 +5,7 @@ import ca.teamdman.sfm.common.block_network.CableNetworkManager;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
+import ca.teamdman.sfm.common.item.NetworkToolItem;
 import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.registry.SFMResourceTypes;
 import ca.teamdman.sfm.common.util.SFMDirections;
@@ -15,6 +16,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -26,9 +28,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public record ServerboundNetworkToolUsePacket(
+        InteractionHand hand,
         BlockPos blockPosition,
-
-        Direction blockFace
+        Direction blockFace,
+        boolean isOverlayToggleModifierActive
 ) implements SFMPacket {
     public static class Daddy implements SFMPacketDaddy<ServerboundNetworkToolUsePacket> {
         @Override
@@ -43,16 +46,20 @@ public record ServerboundNetworkToolUsePacket(
                 FriendlyByteBuf friendlyByteBuf
         ) {
 
+            friendlyByteBuf.writeEnum(msg.hand);
             friendlyByteBuf.writeBlockPos(msg.blockPosition);
             friendlyByteBuf.writeEnum(msg.blockFace);
+            friendlyByteBuf.writeBoolean(msg.isOverlayToggleModifierActive);
         }
 
         @Override
         public ServerboundNetworkToolUsePacket decode(FriendlyByteBuf friendlyByteBuf) {
 
             return new ServerboundNetworkToolUsePacket(
+                    friendlyByteBuf.readEnum(InteractionHand.class),
                     friendlyByteBuf.readBlockPos(),
-                    friendlyByteBuf.readEnum(Direction.class)
+                    friendlyByteBuf.readEnum(Direction.class),
+                    friendlyByteBuf.readBoolean()
             );
         }
 
@@ -62,13 +69,39 @@ public record ServerboundNetworkToolUsePacket(
                 SFMPacketHandlingContext context
         ) {
 
+            ServerPlayer player = context.sender();
+            if (player == null) return;
+            Level level = player.getLevel();
+            BlockPos pos = msg.blockPosition();
+            if (!level.isLoaded(pos)) return;
+            if (msg.isOverlayToggleModifierActive) {
+                handleOverlayFocusSelect(player, level, pos, msg.hand);
+            } else {
+                handleBlockInspectionRequest(player, level, pos, msg.blockFace());
+            }
+        }
+
+        private void handleOverlayFocusSelect(
+                ServerPlayer player,
+                Level level,
+                BlockPos pos,
+                InteractionHand hand
+        ) {
+            var networkToolStack = player.getItemInHand(hand);
+            if (!(networkToolStack.getItem() instanceof NetworkToolItem)) {
+                return;
+            }
+            NetworkToolItem.setSelectedNetworkBlockPos(networkToolStack, pos);
+            NetworkToolItem.regenerateCablePositions(networkToolStack, level, player);
+        }
+
+        public void handleBlockInspectionRequest(
+                ServerPlayer player,
+                Level level,
+                BlockPos pos,
+                Direction blockFace
+        ) {
             {
-                // we don't know if the player has the program edit screen open from a manager or a disk in hand
-                ServerPlayer player = context.sender();
-                if (player == null) return;
-                Level level = player.getLevel();
-                BlockPos pos = msg.blockPosition();
-                if (!level.isLoaded(pos)) return;
                 StringBuilder payload = new StringBuilder()
                         .append("---- block position ----\n")
                         .append(pos)
@@ -118,16 +151,16 @@ public record ServerboundNetworkToolUsePacket(
                 }
 
                 Direction[] directions = new Direction[SFMDirections.DIRECTIONS_WITHOUT_NULL.length + 1];
-                directions[0] = msg.blockFace;
+                directions[0] = blockFace;
                 directions[1] = null;
                 int assignmentIndex = 2;
                 for (Direction direction : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
-                    if (direction == msg.blockFace) continue;
+                    if (direction == blockFace) continue;
                     directions[assignmentIndex++] = direction;
                 }
 
                 String[] messages = new String[directions.length];
-                messages[0] = String.format("---- exports for selected face: %s ----", msg.blockFace);
+                messages[0] = String.format("---- exports for selected face: %s ----", blockFace);
                 for (int i = 1; i < directions.length; i++) {
                     messages[i] = String.format("---- exports for face: %s ----", directions[i]);
                 }
