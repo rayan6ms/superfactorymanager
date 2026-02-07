@@ -250,7 +250,7 @@ public class ItemWorldRenderer {
             drawVbo(
                     VBOKind.NETWORK_TOOL_CABLES,
                     poseStack,
-                    Set.of(selectedPos),
+                    BlockPosSet.of(selectedPos),
                     noNetworkErrorColor,
                     event
             );
