@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.gametest;
 
+import ca.teamdman.sfm.SFM;
 import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.world.level.block.Rotation;
@@ -28,7 +29,12 @@ public class SFMDelegatedTestFunction extends TestFunction {
 
     @Override
     public void run(GameTestHelper pGameTestHelper) {
-        definition.run(new SFMGameTestHelper(pGameTestHelper));
+        try {
+            definition.run(new SFMGameTestHelper(pGameTestHelper));
+        } catch (Exception e) {
+            SFM.LOGGER.error("Test failed: {}", getTestName(), e);
+            throw e;
+        }
     }
 
     @Override
