@@ -1,6 +1,7 @@
 use crate::cli::compile::BuildResult;
 use crate::cli::compile::BuildStatus;
 use crate::cli::compile::print_summary;
+use crate::cli::status::assert_worktrees_clean_or_autocommit_generated;
 use crate::worktree::get_sorted_worktrees;
 use color_eyre::owo_colors::OwoColorize;
 use eyre::Context;
@@ -9,7 +10,6 @@ use facet::Facet;
 use std::path::PathBuf;
 use std::time::Instant;
 use tokio::process::Command;
-use tokio::task::JoinSet;
 use tracing::info;
 use tracing::warn;
 
@@ -89,6 +89,12 @@ async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
                         branch
                     );
                 }
+                if let Err(err) = commit_generated_if_needed(&path, &branch).await {
+                    warn!(
+                        "Failed to commit generated resources for {}: {}",
+                        branch, err
+                    );
+                }
                 Some(BuildStatus::Success { duration })
             } else {
                 warn!(
@@ -113,7 +119,67 @@ async fn run_datagen_worktree(branch: String, path: PathBuf) -> BuildResult {
     }
 }
 
-/// Datagen command - runs `gradlew runData` for all worktrees in parallel
+async fn commit_generated_if_needed(repo_root: &PathBuf, branch: &str) -> eyre::Result<()> {
+    let output = Command::new("git")
+        .args([
+            "status",
+            "--porcelain=v1",
+            "--",
+            "platform/minecraft/src/generated",
+        ])
+        .current_dir(repo_root)
+        .output()
+        .await
+        .wrap_err("Failed to check git status for generated resources")?;
+
+    if !output.status.success() {
+        bail!(
+            "git status failed in {}: {}",
+            repo_root.display(),
+            String::from_utf8_lossy(&output.stderr)
+        );
+    }
+
+    let stdout = String::from_utf8_lossy(&output.stdout);
+    if stdout.trim().is_empty() {
+        return Ok(());
+    }
+
+    let add_output = Command::new("git")
+        .args(["add", "platform/minecraft/src/generated"])
+        .current_dir(repo_root)
+        .output()
+        .await
+        .wrap_err("Failed to stage generated resources")?;
+
+    if !add_output.status.success() {
+        bail!(
+            "git add failed in {}: {}",
+            repo_root.display(),
+            String::from_utf8_lossy(&add_output.stderr)
+        );
+    }
+
+    let message = format!("{{{}}} - resources - datagen", branch);
+    let commit_output = Command::new("git")
+        .args(["commit", "-m", &message])
+        .current_dir(repo_root)
+        .output()
+        .await
+        .wrap_err("Failed to commit generated resources")?;
+
+    if !commit_output.status.success() {
+        bail!(
+            "git commit failed in {}: {}",
+            repo_root.display(),
+            String::from_utf8_lossy(&commit_output.stderr)
+        );
+    }
+
+    Ok(())
+}
+
+/// Datagen command - runs `gradlew runData` for all worktrees in series
 #[derive(Facet, Debug, Default)]
 pub struct DatagenCommand;
 
@@ -138,30 +204,20 @@ impl DatagenCommand {
             return Ok(());
         }
 
+        assert_worktrees_clean_or_autocommit_generated(&worktrees)?;
+
         info!(
-            "Running datagen for {} worktree(s) in parallel: {:?}",
+            "Running datagen for {} worktree(s) in series: {:?}",
             worktrees.len(),
             worktrees.iter().map(|w| &w.branch).collect::<Vec<_>>()
         );
 
-        let mut join_set: JoinSet<BuildResult> = JoinSet::new();
-
-        // Spawn all datagen tasks
+        let mut results: Vec<BuildResult> = Vec::new();
         for worktree in worktrees {
             let branch = worktree.branch.clone();
             let path = worktree.path.clone();
-            join_set.spawn(run_datagen_worktree(branch, path));
-        }
-
-        // Collect all results
-        let mut results: Vec<BuildResult> = Vec::new();
-        while let Some(result) = join_set.join_next().await {
-            match result {
-                Ok(build_result) => results.push(build_result),
-                Err(e) => {
-                    info!("Task panicked: {}", e);
-                }
-            }
+            let result = run_datagen_worktree(branch, path).await;
+            results.push(result);
         }
 
         // Sort results by branch name for consistent output
