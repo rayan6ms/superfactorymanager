@@ -5,6 +5,7 @@ use eyre::Context;
 use eyre::bail;
 use facet::Facet;
 use figue as args;
+use std::io::Write;
 use std::path::PathBuf;
 use std::process::Command;
 
@@ -199,8 +200,7 @@ impl WorktreeStatus {
         let parse_entry = |entry: &String| -> String {
             entry
                 .split_once(' ')
-                .map(|(_, path)| path)
-                .unwrap_or(entry)
+                .map_or(entry.as_str(), |(_, path)| path)
                 .trim_matches('"')
                 .to_string()
         };
@@ -340,8 +340,9 @@ fn prompt_autocommit_generated(status: &WorktreeStatus) -> eyre::Result<bool> {
             .bold()
     );
     print!("Would you like to auto-commit these changes? [Y/n] ");
-    use std::io::Write;
-    std::io::stdout().flush().ok();
+    std::io::stdout()
+        .flush()
+        .wrap_err("Failed to flush stdout")?;
 
     let mut input = String::new();
     std::io::stdin()
