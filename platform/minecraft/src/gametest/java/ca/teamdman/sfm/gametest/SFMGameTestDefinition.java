@@ -1,8 +1,12 @@
 package ca.teamdman.sfm.gametest;
 
+import ca.teamdman.sfm.SFM;
+import net.minecraft.gametest.framework.GameTestHelper;
 import net.minecraft.gametest.framework.TestFunction;
+import net.minecraft.world.level.block.Rotation;
 
 import java.util.Locale;
+import java.util.function.Consumer;
 
 public abstract class SFMGameTestDefinition {
     public abstract String template();
@@ -33,7 +37,32 @@ public abstract class SFMGameTestDefinition {
     }
 
     public TestFunction intoTestFunction() {
-        return new SFMDelegatedTestFunction(this);
+
+        String batchName = this.batchName();
+        String testName = this.testName();
+        String structureName = this.templateModId() + ":" + this.template();
+        Rotation rotation = Rotation.NONE;
+        int maxTicks = this.maxTicks();
+        int setupTicks = this.setupTicks();
+        boolean required = this.required();
+        Consumer<GameTestHelper> runner = (GameTestHelper helper) -> {
+            try {
+                this.run(new SFMGameTestHelper(helper));
+            } catch (Exception e) {
+                SFM.LOGGER.error("Test failed: {}", testName, e);
+                throw e;
+            }
+        };
+        return new TestFunction(
+                batchName,
+                testName,
+                structureName,
+                rotation,
+                maxTicks,
+                setupTicks,
+                required,
+                runner
+        );
     }
 
     private String toSnakeCase(String input) {
