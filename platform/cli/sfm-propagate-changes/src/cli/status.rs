@@ -117,6 +117,68 @@ fn get_worktree_status(worktree: &Worktree, short: bool) -> eyre::Result<Worktre
     })
 }
 
+/// Ensure all worktrees are clean (no uncommitted changes or merge state).
+///
+/// # Errors
+///
+/// Returns an error if any worktree has uncommitted changes or is merging.
+pub(crate) fn assert_worktrees_clean(worktrees: &[Worktree]) -> eyre::Result<()> {
+    let mut dirty = Vec::new();
+
+    for wt in worktrees {
+        let status = get_worktree_status(wt, false)?;
+        if !status.is_clean() || status.is_merging {
+            dirty.push(status);
+        }
+    }
+
+    if dirty.is_empty() {
+        return Ok(());
+    }
+
+    println!(
+        "{} of {} worktree(s) have uncommitted changes:",
+        dirty.len().to_string().yellow().bold(),
+        worktrees.len().to_string().cyan().bold()
+    );
+    for status in dirty {
+        status.display();
+    }
+
+    bail!("Uncommitted changes found; aborting")
+}
+
+/// Ensure all worktrees are clean. If only generated resources changed, prompt to auto-commit.
+///
+/// # Errors
+///
+/// Returns an error if any worktree has uncommitted changes outside generated resources
+/// or if the user declines the auto-commit prompt.
+pub(crate) fn assert_worktrees_clean_or_autocommit_generated(
+    worktrees: &[Worktree],
+) -> eyre::Result<()> {
+    for wt in worktrees {
+        let status = get_worktree_status(wt, false)?;
+        if status.is_clean() && !status.is_merging {
+            continue;
+        }
+
+        status.display();
+
+        if status.only_generated_changes() {
+            let committed = prompt_autocommit_generated(&status)?;
+            if committed {
+                continue;
+            }
+            bail!("Uncommitted generated changes left uncommitted; aborting");
+        }
+
+        bail!("Uncommitted changes found; aborting");
+    }
+
+    Ok(())
+}
+
 /// Status information for a single worktree
 struct WorktreeStatus {
     branch: String,
@@ -132,6 +194,50 @@ struct WorktreeStatus {
 }
 
 impl WorktreeStatus {
+    fn changed_paths(&self) -> Vec<String> {
+        let mut paths: Vec<String> = Vec::new();
+        let parse_entry = |entry: &String| -> String {
+            entry
+                .split_once(' ')
+                .map(|(_, path)| path)
+                .unwrap_or(entry)
+                .trim_matches('"')
+                .to_string()
+        };
+
+        for entry in &self.staged {
+            paths.push(parse_entry(entry));
+        }
+        for entry in &self.unstaged {
+            paths.push(parse_entry(entry));
+        }
+        for entry in &self.untracked {
+            paths.push(parse_entry(entry));
+        }
+        for entry in &self.conflicts {
+            paths.push(entry.clone());
+        }
+
+        paths
+    }
+
+    fn only_generated_changes(&self) -> bool {
+        if self.is_merging || !self.conflicts.is_empty() {
+            return false;
+        }
+
+        let paths = self.changed_paths();
+        if paths.is_empty() {
+            return false;
+        }
+
+        paths.iter().all(|path| {
+            let normalized = path.replace('\\', "/");
+            normalized.starts_with("platform/minecraft/src/generated/")
+                || normalized == "platform/minecraft/src/generated"
+        })
+    }
+
     fn is_clean(&self) -> bool {
         !self.is_merging
             && self.staged.is_empty()
@@ -225,6 +331,61 @@ impl WorktreeStatus {
     }
 }
 
+fn prompt_autocommit_generated(status: &WorktreeStatus) -> eyre::Result<bool> {
+    println!();
+    println!(
+        "{}",
+        "Only generated resources changed under platform/minecraft/src/generated."
+            .yellow()
+            .bold()
+    );
+    print!("Would you like to auto-commit these changes? [Y/n] ");
+    use std::io::Write;
+    std::io::stdout().flush().ok();
+
+    let mut input = String::new();
+    std::io::stdin()
+        .read_line(&mut input)
+        .wrap_err("Failed to read user input")?;
+    let input = input.trim().to_lowercase();
+    let should_commit = input.is_empty() || input == "y" || input == "yes";
+
+    if !should_commit {
+        return Ok(false);
+    }
+
+    let add_output = Command::new("git")
+        .args(["add", "platform/minecraft/src/generated"])
+        .current_dir(&status.path)
+        .output()
+        .wrap_err("Failed to stage generated resources")?;
+
+    if !add_output.status.success() {
+        bail!(
+            "git add failed in {}: {}",
+            status.path.display(),
+            String::from_utf8_lossy(&add_output.stderr)
+        );
+    }
+
+    let message = format!("{{{}}} - resources - datagen", status.branch);
+    let commit_output = Command::new("git")
+        .args(["commit", "-m", &message])
+        .current_dir(&status.path)
+        .output()
+        .wrap_err("Failed to commit generated resources")?;
+
+    if !commit_output.status.success() {
+        bail!(
+            "git commit failed in {}: {}",
+            status.path.display(),
+            String::from_utf8_lossy(&commit_output.stderr)
+        );
+    }
+
+    Ok(true)
+}
+
 /// Status command - show git status for all worktrees
 #[derive(Facet, Debug)]
 #[repr(u8)]
@@ -280,6 +441,9 @@ impl StatusCommand {
         for wt in worktrees {
             let status = get_worktree_status(wt, short)?;
             status.display();
+            if !status.is_clean() && !status.is_merging && status.only_generated_changes() {
+                let _ = prompt_autocommit_generated(&status)?;
+            }
         }
         Ok(())
     }
@@ -310,6 +474,9 @@ impl StatusCommand {
             );
             for status in statuses {
                 status.display();
+                if !status.is_merging && status.only_generated_changes() {
+                    let _ = prompt_autocommit_generated(&status)?;
+                }
             }
         }
 
