@@ -25,7 +25,7 @@ fn has_gametest_success(output: &str) -> bool {
     false
 }
 
-/// Run gradle gameTestServer for a worktree
+/// Run gradle runGameTestServer for a worktree
 async fn run_gametest_worktree(branch: String, path: PathBuf) -> eyre::Result<()> {
     let minecraft_dir = path.join("platform").join("minecraft");
 
@@ -60,7 +60,7 @@ async fn run_gametest_worktree(branch: String, path: PathBuf) -> eyre::Result<()
     );
 
     let result = Command::new(&gradlew)
-        .arg("gameTestServer")
+        .arg("runGameTestServer")
         .current_dir(&minecraft_dir)
         .output()
         .await
@@ -74,11 +74,11 @@ async fn run_gametest_worktree(branch: String, path: PathBuf) -> eyre::Result<()
         Ok(())
     } else {
         warn!(
-            "gameTestServer for {} did not report success; exit: {:?}",
+            "runGameTestServer for {} did not report success; exit: {:?}",
             branch, result.status
         );
         bail!(
-            "gameTestServer failed for {}\nStdout: {}\nStderr: {}",
+            "runGameTestServer failed for {}\nStdout: {}\nStderr: {}",
             branch,
             stdout,
             stderr
@@ -86,7 +86,7 @@ async fn run_gametest_worktree(branch: String, path: PathBuf) -> eyre::Result<()
     }
 }
 
-/// Gametest command - runs `gradlew gameTestServer` for all worktrees in series
+/// Gametest command - runs `gradlew runGameTestServer` for all worktrees in series
 #[derive(Facet, Debug, Default)]
 pub struct GametestCommand;
 
