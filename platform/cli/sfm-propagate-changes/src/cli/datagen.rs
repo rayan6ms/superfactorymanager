@@ -1,7 +1,7 @@
 use crate::cli::compile::BuildResult;
 use crate::cli::compile::BuildStatus;
 use crate::cli::compile::print_summary;
-use crate::cli::status::assert_worktrees_clean;
+use crate::cli::status::assert_worktrees_clean_or_autocommit_generated;
 use crate::worktree::get_sorted_worktrees;
 use color_eyre::owo_colors::OwoColorize;
 use eyre::Context;
@@ -204,7 +204,7 @@ impl DatagenCommand {
             return Ok(());
         }
 
-        assert_worktrees_clean(&worktrees)?;
+        assert_worktrees_clean_or_autocommit_generated(&worktrees)?;
 
         info!(
             "Running datagen for {} worktree(s) in series: {:?}",
