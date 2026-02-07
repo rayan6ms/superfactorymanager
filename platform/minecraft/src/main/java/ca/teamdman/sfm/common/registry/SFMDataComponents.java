@@ -3,9 +3,11 @@ package ca.teamdman.sfm.common.registry;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.component.ItemStackBox;
 import ca.teamdman.sfm.common.item.LabelGunItem;
+import ca.teamdman.sfm.common.item.NetworkToolItem;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.util.CompressedBlockPosSet;
 import com.mojang.serialization.Codec;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.component.DataComponentType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
@@ -55,6 +57,24 @@ public class SFMDataComponents {
                     .<Boolean>builder()
                     .persistent(Codec.BOOL)
                     .networkSynchronized(ByteBufCodecs.BOOL)
+                    .cacheEncoding()
+                    .build()
+    );
+    public static final Supplier<DataComponentType<NetworkToolItem.NetworkToolOverlayMode>> NETWORK_TOOL_OVERLAY_MODE = DATA_COMPONENT_TYPES.register(
+            "network_tool_overlay_mode",
+            () -> DataComponentType
+                    .<NetworkToolItem.NetworkToolOverlayMode>builder()
+                    .persistent(NetworkToolItem.NetworkToolOverlayMode.CODEC)
+                    .networkSynchronized(NetworkToolItem.NetworkToolOverlayMode.STREAM_CODEC)
+                    .cacheEncoding()
+                    .build()
+    );
+    public static final Supplier<DataComponentType<BlockPos>> NETWORK_TOOL_SELECTED_BLOCK_POS = DATA_COMPONENT_TYPES.register(
+            "network_tool_selected_block_pos",
+            () -> DataComponentType
+                    .<BlockPos>builder()
+                    .persistent(BlockPos.CODEC)
+                    .networkSynchronized(BlockPos.STREAM_CODEC)
                     .cacheEncoding()
                     .build()
     );
