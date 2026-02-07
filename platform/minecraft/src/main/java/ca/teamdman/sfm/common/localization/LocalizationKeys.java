@@ -280,6 +280,10 @@ public final class LocalizationKeys {
             () -> SFMItems.NETWORK_TOOL_ITEM.get().getDescriptionId() + ".tooltip.7",
             () -> "Ctrl-alt-click to facade entire network."
     );
+    public static final LocalizationEntry NETWORK_TOOL_ITEM_TOOLTIP_8 = new LocalizationEntry(
+            () -> SFMItems.NETWORK_TOOL_ITEM.get().getDescriptionId() + ".tooltip.8",
+            () -> "Hold %s and right-click a block to attune the tool to that position."
+    );
     public static final LocalizationEntry LABEL_GUN_ITEM_TOOLTIP_TOGGLE_LABEL_REMINDER = new LocalizationEntry(
             () -> SFMItems.LABEL_GUN_ITEM.get().getDescriptionId() + ".tooltip.toggle_label_reminder",
             () -> "%s a block to toggle the active label on it."

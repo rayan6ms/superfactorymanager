@@ -37,8 +37,8 @@ public record ServerboundNetworkToolToggleOverlayPacket(
             if (sender == null) return;
             ItemStack networkToolItemStack = sender.getItemInHand(msg.hand);
             if (networkToolItemStack.getItem() == SFMItems.NETWORK_TOOL_ITEM.get()) {
-                boolean active = NetworkToolItem.getOverlayEnabled(networkToolItemStack);
-                NetworkToolItem.setOverlayEnabled(networkToolItemStack, !active);
+                NetworkToolItem.cycleOverlayMode(networkToolItemStack);
+                NetworkToolItem.regenerateCablePositions(networkToolItemStack, sender.getLevel(), sender);
             }
         }
 

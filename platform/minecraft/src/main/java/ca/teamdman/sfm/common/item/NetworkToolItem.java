@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.item;
 
+import ca.teamdman.sfm.client.handler.NetworkToolKeyMappingHandler;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.block_network.CableNetwork;
 import ca.teamdman.sfm.common.block_network.CableNetworkManager;
@@ -9,6 +10,7 @@ import ca.teamdman.sfm.common.registry.SFMPackets;
 import ca.teamdman.sfm.common.util.BlockPosSet;
 import ca.teamdman.sfm.common.util.CompressedBlockPosSet;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.ByteArrayTag;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtUtils;
@@ -34,14 +36,26 @@ public class NetworkToolItem extends Item {
     @Override
     public InteractionResult onItemUseFirst(
             ItemStack stack,
-            UseOnContext pContext
+            UseOnContext ctx
     ) {
 
-        if (!pContext.getLevel().isClientSide) return InteractionResult.SUCCESS;
-        SFMPackets.sendToServer(new ServerboundNetworkToolUsePacket(
-                pContext.getClickedPos(),
-                pContext.getClickedFace()
-        ));
+        var level = ctx.getLevel();
+        Player player = ctx.getPlayer();
+        if (level.isClientSide && player != null) {
+            boolean pickBlock = SFMKeyMappings.isKeyDown(SFMKeyMappings.TOGGLE_NETWORK_TOOL_OVERLAY_KEY);
+            ServerboundNetworkToolUsePacket msg = new ServerboundNetworkToolUsePacket(
+                    ctx.getHand(),
+                    ctx.getClickedPos(),
+                    ctx.getClickedFace(),
+                    pickBlock
+            );
+            SFMPackets.sendToServer(msg);
+            if (pickBlock) {
+                // we don't want to toggle the overlay if we're using pick-block
+                NetworkToolKeyMappingHandler.setExternalDebounce();
+            }
+            return InteractionResult.SUCCESS;
+        }
         return InteractionResult.CONSUME;
     }
 
@@ -57,8 +71,13 @@ public class NetworkToolItem extends Item {
         lines.add(LocalizationKeys.NETWORK_TOOL_ITEM_TOOLTIP_2.getComponent().withStyle(ChatFormatting.GRAY));
         lines.add(
                 LocalizationKeys.NETWORK_TOOL_ITEM_TOOLTIP_3
-                        .getComponent(SFMKeyMappings.CONTAINER_INSPECTOR_KEY.get().getTranslatedKeyMessage())
+                .getComponent(SFMKeyMappings.getKeyDisplay(SFMKeyMappings.CONTAINER_INSPECTOR_KEY))
                         .withStyle(ChatFormatting.AQUA)
+        );
+        lines.add(
+            LocalizationKeys.NETWORK_TOOL_ITEM_TOOLTIP_8
+                .getComponent(SFMKeyMappings.getKeyDisplay(SFMKeyMappings.TOGGLE_NETWORK_TOOL_OVERLAY_KEY))
+                .withStyle(ChatFormatting.AQUA)
         );
         lines.add(LocalizationKeys.NETWORK_TOOL_ITEM_TOOLTIP_4.getComponent().withStyle(ChatFormatting.LIGHT_PURPLE));
         lines.add(LocalizationKeys.NETWORK_TOOL_ITEM_TOOLTIP_5.getComponent().withStyle(ChatFormatting.LIGHT_PURPLE));
@@ -81,46 +100,80 @@ public class NetworkToolItem extends Item {
         if (!isInHand) return;
         boolean shouldRefresh = pEntity.tickCount % 20 == 0;
         if (!shouldRefresh) return;
-
-        final long maxDistance = 128;
-
-        // Get the networks in range
-        Stream<CableNetwork> networksInRange = CableNetworkManager
-                .getNetworksInRange(pLevel, pEntity.blockPosition(), maxDistance);
-
-        // Get the positions of the cables and the capability providers from the networks
-        BlockPosSet cablePositions = new BlockPosSet();
-        BlockPosSet capabilityProviderPositions = new BlockPosSet();
-        networksInRange
-                .forEach(network -> {
-                    network.getCablePositions().forEach(cablePositions::add);
-                    network.getCapabilityProviderPositions().forEach(capabilityProviderPositions::add);
-                });
-
-        // Update the network tool data
-        setCablePositions(pStack, cablePositions);
-        setCapabilityProviderPositions(pStack, capabilityProviderPositions);
+        regenerateCablePositions(pStack, pLevel, pPlayer);
 
         // Remove the data stored by older versions of the mod
         pStack.getOrCreateTag().remove("networks");
     }
 
+    public static void regenerateCablePositions(
+            ItemStack pStack,
+            Level pLevel,
+            Player pPlayer
+    ) {
+        // Initialize with default capacity
+        // We don't know how many *unique* positions we are going to see
+        BlockPosSet cablePositions = new BlockPosSet();
+        BlockPosSet capabilityProviderPositions = new BlockPosSet();
+
+        // Find the networks and track the positions
+        for (CableNetwork cableNetwork : (Iterable<CableNetwork>) getNetworksForOverlay(pStack, pLevel, pPlayer)::iterator) {
+            cablePositions.addAll(cableNetwork.getCablePositionsRaw());
+            capabilityProviderPositions.addAll(cableNetwork.getCapabilityProviderPositionsRaw());
+        }
+
+        // Update the item data
+        setCablePositions(pStack, cablePositions);
+        setCapabilityProviderPositions(pStack, capabilityProviderPositions);
+    }
 
     public static boolean getOverlayEnabled(ItemStack stack) {
 
-        return !stack.getOrCreateTag().getBoolean("sfm:network_tool_overlay_disabled");
+        return getOverlayMode(stack) != NetworkToolOverlayMode.HIDDEN;
     }
 
-    public static void setOverlayEnabled(
+    /**
+     * Returns the current enum mode for the network tool item.
+     */
+    public static NetworkToolOverlayMode getOverlayMode(ItemStack stack) {
+
+        CompoundTag tag = stack.getOrCreateTag();
+        if (tag.contains("sfm:network_tool_overlay_disabled") && tag.getBoolean("sfm:network_tool_overlay_disabled")) {
+            return NetworkToolOverlayMode.HIDDEN;
+        }
+
+        int ordinal = tag.getInt("sfm:network_tool_overlay_mode");
+        // fallback if out of bounds or missing
+        if (ordinal < 0 || ordinal >= NetworkToolOverlayMode.values().length) {
+            return NetworkToolOverlayMode.SHOW_ALL;
+        }
+        return NetworkToolOverlayMode.values()[ordinal];
+    }
+
+    public static void cycleOverlayMode(ItemStack stack) {
+
+        NetworkToolOverlayMode current = getOverlayMode(stack);
+        NetworkToolOverlayMode newMode = current == NetworkToolOverlayMode.SHOW_ALL
+                                         ? NetworkToolOverlayMode.HIDDEN
+                                         : NetworkToolOverlayMode.SHOW_ALL;
+        setOverlayMode(stack, newMode);
+    }
+
+    public static void setSelectedNetworkBlockPos(
             ItemStack stack,
-            boolean value
+            BlockPos pos
     ) {
 
-        if (value) {
-            stack.getOrCreateTag().remove("sfm:network_tool_overlay_disabled");
-        } else {
-            stack.getOrCreateTag().putBoolean("sfm:network_tool_overlay_disabled", true);
-        }
+        setOverlayMode(stack, NetworkToolOverlayMode.SHOW_SELECTED_NETWORK);
+        stack.getOrCreateTag().put("sfm:selected_network_block_pos", NbtUtils.writeBlockPos(pos));
+    }
+
+    @Nullable
+    public static BlockPos getSelectedNetworkBlockPos(ItemStack stack) {
+
+        return stack.getOrCreateTag().contains("sfm:selected_network_block_pos")
+               ? NbtUtils.readBlockPos(stack.getOrCreateTag().getCompound("sfm:selected_network_block_pos"))
+               : null;
     }
 
     public static void setCablePositions(
@@ -169,6 +222,48 @@ public class NetworkToolItem extends Item {
                 .map(CompoundTag.class::cast)
                 .map(NbtUtils::readBlockPos)
                 .collect(BlockPosSet.collector());
+    }
+
+    protected static Stream<CableNetwork> getNetworksForOverlay(
+            ItemStack pStack,
+            Level pLevel,
+            Player pPlayer
+    ) {
+
+        final long maxDistance = 128;
+
+        BlockPos blockPos = getOverlayMode(pStack) == NetworkToolOverlayMode.SHOW_SELECTED_NETWORK
+                            ? getSelectedNetworkBlockPos(pStack)
+                            : null;
+
+        if (blockPos != null) {
+            return CableNetworkManager.getOrRegisterNetworkFromCablePosition(pLevel, blockPos).stream();
+        } else {
+            return CableNetworkManager.getNetworksInRange(pLevel, pPlayer.blockPosition(), maxDistance);
+        }
+    }
+
+    /**
+     * Sets the view mode in NBT.
+     */
+    protected static void setOverlayMode(
+            ItemStack stack,
+            NetworkToolOverlayMode mode
+    ) {
+
+        stack.getOrCreateTag().putInt("sfm:network_tool_overlay_mode", mode.ordinal());
+        if (mode != NetworkToolOverlayMode.SHOW_SELECTED_NETWORK) {
+            stack.getOrCreateTag().remove("sfm:selected_network_block_pos");
+        }
+
+        // remove the data stored by older versions of the mod
+        stack.getOrCreateTag().remove("sfm:network_tool_overlay_disabled");
+    }
+
+    public enum NetworkToolOverlayMode {
+        SHOW_ALL,
+        SHOW_SELECTED_NETWORK,
+        HIDDEN
     }
 
 }
