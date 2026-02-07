@@ -21,7 +21,7 @@ import org.jetbrains.annotations.Nullable;
 public class WaterTankBlockEntity extends BlockEntity {
 
     public final FluidTank TANK = new FluidTank(
-            1000,
+            0,
             fluidStack -> false // The tank cannot be filled, only drained.
     ) {
         @Override
