@@ -4,43 +4,46 @@ use eyre::Context;
 use eyre::bail;
 use facet::Facet;
 use figue::{self as args};
-use ratatui::{
-    backend::CrosstermBackend,
-    layout::Constraint,
-    style::{Color, Modifier, Style, Stylize},
-    text::Span,
-    widgets::{Block, Cell, Paragraph, Row, Table},
-    Terminal, TerminalOptions, Viewport,
-};
+use ratatui::Terminal;
+use ratatui::TerminalOptions;
+use ratatui::Viewport;
+use ratatui::backend::CrosstermBackend;
+use ratatui::crossterm::ExecutableCommand;
+use ratatui::crossterm::style::Attribute;
+use ratatui::crossterm::style::Color as CTermColor;
+use ratatui::crossterm::style::SetAttribute;
+use ratatui::crossterm::style::SetForegroundColor;
+use ratatui::layout::Constraint;
+use ratatui::style::Color;
+use ratatui::style::Modifier;
+use ratatui::style::Style;
+use ratatui::style::Stylize;
+use ratatui::text::Span;
+use ratatui::widgets::Block;
+use ratatui::widgets::Cell;
+use ratatui::widgets::Paragraph;
+use ratatui::widgets::Row;
+use ratatui::widgets::Table;
+use std::io::Write;
 use std::io::stderr;
 use std::path::PathBuf;
-use std::sync::{Arc, atomic::{AtomicBool, Ordering}};
+use std::sync::Arc;
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering;
 use std::time::Duration;
 use std::time::Instant;
 use tokio::process::Command;
 use tokio::sync::mpsc;
 use tokio::task::JoinSet;
 
-use ratatui::crossterm::style::{Attribute, Color as CTermColor, SetAttribute, SetForegroundColor};
-use ratatui::crossterm::ExecutableCommand;
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub(crate) enum TaskState {
     NotStarted,
-    Running {
-        start_time: Instant,
-    },
-    Success {
-        duration: Duration,
-    },
-    Failed {
-        duration: Duration,
-        error: String,
-    },
+    Running { start_time: Instant },
+    Success { duration: Duration },
+    Failed { duration: Duration, error: String },
     Skipped,
-    NotFound {
-        reason: String,
-    },
+    NotFound { reason: String },
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -58,13 +61,13 @@ pub(crate) enum Message {
 
 impl TaskState {
     fn is_finished(&self) -> bool {
-        match self {
+        matches!(
+            self,
             TaskState::Success { .. }
-            | TaskState::Failed { .. }
-            | TaskState::Skipped
-            | TaskState::NotFound { .. } => true,
-            _ => false,
-        }
+                | TaskState::Failed { .. }
+                | TaskState::Skipped
+                | TaskState::NotFound { .. }
+        )
     }
 
     fn status_text(&self) -> String {
@@ -98,11 +101,11 @@ impl TaskState {
                 if duration.as_secs_f32() > 0.0 {
                     format!("({})", format_duration(*duration))
                 } else {
-                    "".to_string()
+                    String::new()
                 }
             }
             TaskState::NotFound { reason } => format!("({reason})"),
-            _ => "".to_string(),
+            _ => String::new(),
         }
     }
 }
@@ -149,9 +152,8 @@ async fn run_task(
 
         if success {
             return Ok(duration);
-        } else {
-            return Err((duration, format!("Mock failure for {}", task)));
         }
+        return Err((duration, format!("Mock failure for {task}")));
     }
 
     let start = Instant::now();
@@ -179,10 +181,14 @@ async fn run_task(
                 ))
             }
         }
-        Err(e) => Err((duration, format!("Failed to start {}: {}", task, e))),
+        Err(e) => Err((duration, format!("Failed to start {task}: {e}"))),
     }
 }
 
+#[expect(
+    clippy::too_many_lines,
+    reason = "Detailed task orchestration is easier to follow inline."
+)]
 async fn compile_worktree_task(
     index: usize,
     tx: mpsc::UnboundedSender<Message>,
@@ -190,7 +196,7 @@ async fn compile_worktree_task(
     all: bool,
     mock: bool,
     parallel: bool,
-) -> bool {
+) -> eyre::Result<bool> {
     let minecraft_dir = path.join("platform").join("minecraft");
 
     if !minecraft_dir.exists() {
@@ -201,12 +207,22 @@ async fn compile_worktree_task(
                 reason: "platform/minecraft not found".into(),
             },
         ))
-        .ok();
+        .wrap_err("Failed to send missing minecraft status")?;
         if all {
-            tx.send(Message::StatusUpdate(index, TaskType::DataGen, TaskState::Skipped)).ok();
-            tx.send(Message::StatusUpdate(index, TaskType::GameTest, TaskState::Skipped)).ok();
+            tx.send(Message::StatusUpdate(
+                index,
+                TaskType::DataGen,
+                TaskState::Skipped,
+            ))
+            .wrap_err("Failed to send skipped datagen status")?;
+            tx.send(Message::StatusUpdate(
+                index,
+                TaskType::GameTest,
+                TaskState::Skipped,
+            ))
+            .wrap_err("Failed to send skipped gametest status")?;
         }
-        return false;
+        return Ok(false);
     }
 
     let gradlew = if cfg!(windows) {
@@ -223,12 +239,22 @@ async fn compile_worktree_task(
                 reason: format!("gradlew not found in {}", minecraft_dir.display()),
             },
         ))
-        .ok();
+        .wrap_err("Failed to send missing gradlew status")?;
         if all {
-            tx.send(Message::StatusUpdate(index, TaskType::DataGen, TaskState::Skipped)).ok();
-            tx.send(Message::StatusUpdate(index, TaskType::GameTest, TaskState::Skipped)).ok();
+            tx.send(Message::StatusUpdate(
+                index,
+                TaskType::DataGen,
+                TaskState::Skipped,
+            ))
+            .wrap_err("Failed to send skipped datagen status")?;
+            tx.send(Message::StatusUpdate(
+                index,
+                TaskType::GameTest,
+                TaskState::Skipped,
+            ))
+            .wrap_err("Failed to send skipped gametest status")?;
         }
-        return false;
+        return Ok(false);
     }
 
     // MAIN
@@ -239,7 +265,7 @@ async fn compile_worktree_task(
             start_time: Instant::now(),
         },
     ))
-    .ok();
+    .wrap_err("Failed to send main running status")?;
 
     let main_res = run_task(&gradlew, &minecraft_dir, "compileJava", mock).await;
     match main_res {
@@ -249,7 +275,7 @@ async fn compile_worktree_task(
                 TaskType::Main,
                 TaskState::Success { duration },
             ))
-            .ok();
+            .wrap_err("Failed to send main success status")?;
         }
         Err((duration, err)) => {
             tx.send(Message::StatusUpdate(
@@ -260,12 +286,22 @@ async fn compile_worktree_task(
                     error: err,
                 },
             ))
-            .ok();
+            .wrap_err("Failed to send main failure status")?;
             if all {
-                tx.send(Message::StatusUpdate(index, TaskType::DataGen, TaskState::Skipped)).ok();
-                tx.send(Message::StatusUpdate(index, TaskType::GameTest, TaskState::Skipped)).ok();
+                tx.send(Message::StatusUpdate(
+                    index,
+                    TaskType::DataGen,
+                    TaskState::Skipped,
+                ))
+                .wrap_err("Failed to send skipped datagen status")?;
+                tx.send(Message::StatusUpdate(
+                    index,
+                    TaskType::GameTest,
+                    TaskState::Skipped,
+                ))
+                .wrap_err("Failed to send skipped gametest status")?;
             }
-            return false;
+            return Ok(false);
         }
     }
 
@@ -279,7 +315,7 @@ async fn compile_worktree_task(
                     start_time: Instant::now(),
                 },
             ))
-            .ok();
+            .wrap_err("Failed to send datagen running status")?;
             tx.send(Message::StatusUpdate(
                 index,
                 TaskType::GameTest,
@@ -287,7 +323,7 @@ async fn compile_worktree_task(
                     start_time: Instant::now(),
                 },
             ))
-            .ok();
+            .wrap_err("Failed to send gametest running status")?;
 
             let gradlew_dg = gradlew.clone();
             let dir_dg = minecraft_dir.clone();
@@ -302,18 +338,21 @@ async fn compile_worktree_task(
                                 TaskType::DataGen,
                                 TaskState::Success { duration },
                             ))
-                            .ok();
-                        true
+                            .wrap_err("Failed to send datagen success status")?;
+                        Ok::<bool, eyre::Report>(true)
                     }
                     Err((duration, err)) => {
                         tx_dg
                             .send(Message::StatusUpdate(
                                 index,
                                 TaskType::DataGen,
-                                TaskState::Failed { duration, error: err },
+                                TaskState::Failed {
+                                    duration,
+                                    error: err,
+                                },
                             ))
-                            .ok();
-                        false
+                            .wrap_err("Failed to send datagen failure status")?;
+                        Ok::<bool, eyre::Report>(false)
                     }
                 }
             });
@@ -331,91 +370,104 @@ async fn compile_worktree_task(
                                 TaskType::GameTest,
                                 TaskState::Success { duration },
                             ))
-                            .ok();
-                        true
+                            .wrap_err("Failed to send gametest success status")?;
+                        Ok::<bool, eyre::Report>(true)
                     }
                     Err((duration, err)) => {
                         tx_gt
                             .send(Message::StatusUpdate(
                                 index,
                                 TaskType::GameTest,
-                                TaskState::Failed { duration, error: err },
+                                TaskState::Failed {
+                                    duration,
+                                    error: err,
+                                },
                             ))
-                            .ok();
-                        false
+                            .wrap_err("Failed to send gametest failure status")?;
+                        Ok::<bool, eyre::Report>(false)
                     }
                 }
             });
 
             let (dg_ok, gt_ok) = tokio::join!(dg_handle, gt_handle);
-            let dg_ok = dg_ok.unwrap_or(false);
-            let gt_ok = gt_ok.unwrap_or(false);
-            return dg_ok && gt_ok;
-        } else {
-            // Serial execution within the worktree
-            tx.send(Message::StatusUpdate(
-                index,
-                TaskType::DataGen,
-                TaskState::Running {
-                    start_time: Instant::now(),
-                },
-            ))
-            .ok();
-            let res_dg = run_task(&gradlew, &minecraft_dir, "compileDatagenJava", mock).await;
-            match res_dg {
-                Ok(duration) => tx
-                    .send(Message::StatusUpdate(
-                        index,
-                        TaskType::DataGen,
-                        TaskState::Success { duration },
-                    ))
-                    .ok(),
-                Err((duration, err)) => {
-                    tx
-                        .send(Message::StatusUpdate(
-                            index,
-                            TaskType::DataGen,
-                            TaskState::Failed { duration, error: err },
-                        ))
-                        .ok();
-                    tx.send(Message::StatusUpdate(index, TaskType::GameTest, TaskState::Skipped))
-                        .ok();
-                    return false;
-                }
-            };
+            let dg_ok = dg_ok.wrap_err("Datagen task panicked")??;
+            let gt_ok = gt_ok.wrap_err("Gametest task panicked")??;
+            return Ok(dg_ok && gt_ok);
+        }
 
-            tx.send(Message::StatusUpdate(
-                index,
-                TaskType::GameTest,
-                TaskState::Running {
-                    start_time: Instant::now(),
-                },
-            ))
-            .ok();
-            let res_gt = run_task(&gradlew, &minecraft_dir, "compileGametestJava", mock).await;
-            match res_gt {
-                Ok(duration) => tx
-                    .send(Message::StatusUpdate(
-                        index,
-                        TaskType::GameTest,
-                        TaskState::Success { duration },
-                    ))
-                    .ok(),
-                Err((duration, err)) => {
-                    tx
-                        .send(Message::StatusUpdate(
-                            index,
-                            TaskType::GameTest,
-                            TaskState::Failed { duration, error: err },
-                        ))
-                        .ok();
-                    return false;
-                }
-            };
+        // Serial execution within the worktree
+        tx.send(Message::StatusUpdate(
+            index,
+            TaskType::DataGen,
+            TaskState::Running {
+                start_time: Instant::now(),
+            },
+        ))
+        .wrap_err("Failed to send datagen running status")?;
+        let res_dg = run_task(&gradlew, &minecraft_dir, "compileDatagenJava", mock).await;
+        match res_dg {
+            Ok(duration) => {
+                tx.send(Message::StatusUpdate(
+                    index,
+                    TaskType::DataGen,
+                    TaskState::Success { duration },
+                ))
+                .wrap_err("Failed to send datagen success status")?;
+            }
+            Err((duration, err)) => {
+                tx.send(Message::StatusUpdate(
+                    index,
+                    TaskType::DataGen,
+                    TaskState::Failed {
+                        duration,
+                        error: err,
+                    },
+                ))
+                .wrap_err("Failed to send datagen failure status")?;
+                tx.send(Message::StatusUpdate(
+                    index,
+                    TaskType::GameTest,
+                    TaskState::Skipped,
+                ))
+                .wrap_err("Failed to send gametest skipped status")?;
+                return Ok(false);
+            }
+        }
+
+        tx.send(Message::StatusUpdate(
+            index,
+            TaskType::GameTest,
+            TaskState::Running {
+                start_time: Instant::now(),
+            },
+        ))
+        .wrap_err("Failed to send gametest running status")?;
+        let res_gt = run_task(&gradlew, &minecraft_dir, "compileGametestJava", mock).await;
+        match res_gt {
+            Ok(duration) => {
+                tx.send(Message::StatusUpdate(
+                    index,
+                    TaskType::GameTest,
+                    TaskState::Success { duration },
+                ))
+                .wrap_err("Failed to send gametest success status")?;
+            }
+            Err((duration, err)) => {
+                tx.send(Message::StatusUpdate(
+                    index,
+                    TaskType::GameTest,
+                    TaskState::Failed {
+                        duration,
+                        error: err,
+                    },
+                ))
+                .wrap_err("Failed to send gametest failure status")?;
+                return Ok(false);
+            }
         }
     }
 
-    true
+    Ok(true)
 }
 
 fn mark_remaining_skipped(state: &mut AppState) {
@@ -451,7 +503,9 @@ fn render(f: &mut ratatui::Frame, state: &AppState) {
     for b in &state.branches {
         let branch_name = Span::styled(
             b.branch.clone(),
-            Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
         );
         let mut row_cells = vec![Cell::from(branch_name)];
 
@@ -481,6 +535,10 @@ fn render(f: &mut ratatui::Frame, state: &AppState) {
     f.render_widget(table, table_area);
 }
 
+#[expect(
+    clippy::too_many_lines,
+    reason = "Verbose report output is clearer inline."
+)]
 fn print_final_report(state: &AppState) {
     let mut stdout = std::io::stdout();
 
@@ -530,7 +588,7 @@ fn print_final_report(state: &AppState) {
 
     if successful_branches > 0 {
         let _ = stdout.execute(SetForegroundColor(CTermColor::Green));
-        print!("{} successful", successful_branches);
+        print!("{successful_branches} successful");
         let _ = stdout.execute(SetAttribute(Attribute::Reset));
         if failed_branches > 0 || skipped_branches > 0 {
             print!(", ");
@@ -538,7 +596,7 @@ fn print_final_report(state: &AppState) {
     }
     if failed_branches > 0 {
         let _ = stdout.execute(SetForegroundColor(CTermColor::Red));
-        print!("{} failed", failed_branches);
+        print!("{failed_branches} failed");
         let _ = stdout.execute(SetAttribute(Attribute::Reset));
         if skipped_branches > 0 {
             print!(", ");
@@ -546,7 +604,7 @@ fn print_final_report(state: &AppState) {
     }
     if skipped_branches > 0 {
         let _ = stdout.execute(SetForegroundColor(CTermColor::Yellow));
-        print!("{} skipped", skipped_branches);
+        print!("{skipped_branches} skipped");
         let _ = stdout.execute(SetAttribute(Attribute::Reset));
     }
     println!(")");
@@ -584,20 +642,20 @@ fn print_final_report(state: &AppState) {
 
             let _ = stdout.execute(SetForegroundColor(task_color));
             let _ = stdout.execute(SetAttribute(Attribute::Bold));
-            print!("{}", task_name);
+            print!("{task_name}");
             let _ = stdout.execute(SetAttribute(Attribute::Reset));
 
             print!(" on branch ");
             let _ = stdout.execute(SetForegroundColor(CTermColor::Yellow));
             let _ = stdout.execute(SetAttribute(Attribute::Bold));
-            print!("{}", branch);
+            print!("{branch}");
             let _ = stdout.execute(SetAttribute(Attribute::Reset));
             println!(":");
 
             // Indent and dim the actual error message
             let _ = stdout.execute(SetForegroundColor(CTermColor::Grey));
             for line in err.lines() {
-                println!("   {}", line);
+                println!("   {line}");
             }
             let _ = stdout.execute(SetAttribute(Attribute::Reset));
         }
@@ -644,6 +702,10 @@ impl CompileCommand {
         rt.block_on(self.invoke_async())
     }
 
+    #[expect(
+        clippy::too_many_lines,
+        reason = "TUI orchestration is easier to follow inline."
+    )]
     async fn invoke_async(self) -> eyre::Result<()> {
         let worktrees = get_sorted_worktrees()?;
 
@@ -677,7 +739,7 @@ impl CompileCommand {
         let mut app_state = AppState { branches };
 
         let backend = CrosstermBackend::new(stderr());
-        let terminal_height = (worktrees.len() + 3) as u16;
+        let terminal_height = u16::try_from(worktrees.len() + 3).unwrap_or(u16::MAX);
         let mut terminal = Terminal::with_options(
             backend,
             TerminalOptions {
@@ -701,10 +763,10 @@ impl CompileCommand {
         let parallel = self.parallel;
         let p_tx = tx.clone();
         let cancel = Arc::new(AtomicBool::new(false));
-        let cancel_worker = cancel.clone();
+        let cancel_worker = Arc::clone(&cancel);
 
         // Spawn a manager task to handle the execution strategy
-        tokio::spawn(async move {
+        let manager = tokio::spawn(async move {
             if parallel {
                 let mut join_set = JoinSet::new();
                 for (i, path) in branches_info {
@@ -722,16 +784,13 @@ impl CompileCommand {
                         join_set.abort_all();
                         break;
                     }
-                    match res {
-                        Ok(true) => {}
-                        Ok(false) | Err(_) => {
-                            cancel_worker.store(true, Ordering::SeqCst);
-                            join_set.abort_all();
-                            let _ = p_tx.send(Message::AbortRemaining(
-                                "Stopped after failure".into(),
-                            ));
-                            break;
-                        }
+                    if let Ok(Ok(true)) = res {
+                    } else {
+                        cancel_worker.store(true, Ordering::SeqCst);
+                        join_set.abort_all();
+                        p_tx.send(Message::AbortRemaining("Stopped after failure".into()))
+                            .wrap_err("Failed to send abort message")?;
+                        break;
                     }
                 }
             } else {
@@ -739,22 +798,22 @@ impl CompileCommand {
                     if cancel_worker.load(Ordering::SeqCst) {
                         break;
                     }
-                    let ok = compile_worktree_task(i, p_tx.clone(), path, all, mock, false).await;
+                    let ok = compile_worktree_task(i, p_tx.clone(), path, all, mock, false).await?;
                     if !ok {
                         cancel_worker.store(true, Ordering::SeqCst);
-                        let _ = p_tx
-                            .send(Message::AbortRemaining("Stopped after failure".into()));
+                        p_tx.send(Message::AbortRemaining("Stopped after failure".into()))
+                            .wrap_err("Failed to send abort message")?;
                         break;
                     }
                 }
             }
+            Ok::<(), eyre::Report>(())
         });
 
         // TUI loop
         let mut interval = tokio::time::interval(Duration::from_millis(100));
         let mut abort_reason: Option<String> = None;
         let mut ctrl_c_fired = false;
-        use std::io::Write;
         loop {
             // Handle all pending messages
             while let Ok(msg) = rx.try_recv() {
@@ -780,7 +839,7 @@ impl CompileCommand {
             }
 
             terminal.draw(|f| render(f, &app_state))?;
-            std::io::stderr().flush().ok();
+            let _ = std::io::stderr().flush();
 
             let all_finished = app_state.branches.iter().all(|b| {
                 b.main.is_finished() && b.datagen.is_finished() && b.gametest.is_finished()
@@ -801,11 +860,14 @@ impl CompileCommand {
         }
         let _ = terminal.show_cursor();
 
-        // Move the cursor past the TUI viewport on stderr so that error messages 
+        // Move the cursor past the TUI viewport on stderr so that error messages
         // don't overwrite the table, even if stdout is being redirected/captured.
-        for _ in 0..terminal_height + 1 {
+        for _ in 0..=terminal_height {
             eprintln!();
         }
+
+        // Ensure the manager task completed without errors.
+        manager.await.wrap_err("Manager task panicked")??;
 
         // Print final report to stdout
         print_final_report(&app_state);
@@ -833,7 +895,6 @@ impl CompileCommand {
 // ----------------------------------------------------------------------------
 
 /// Build status for a single worktree
-#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub(crate) enum BuildStatus {
     Success { duration: Duration },
@@ -842,13 +903,13 @@ pub(crate) enum BuildStatus {
 }
 
 /// Result of building a worktree, with per-task statuses
-#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub(crate) struct BuildResult {
     pub(crate) branch: String,
     pub(crate) main: BuildStatus,
     pub(crate) datagen: Option<BuildStatus>,
     pub(crate) gametest: Option<BuildStatus>,
+    #[expect(dead_code, reason = "Reserved for summary output")]
     pub(crate) duration: Duration,
 }
 
@@ -871,7 +932,7 @@ pub(crate) fn print_summary(results: &[BuildResult]) {
                     format!("FAILED ({})", format_duration(*duration))
                 }
                 Some(BuildStatus::NotFound { reason }) => {
-                    format!("NOT FOUND ({})", reason)
+                    format!("NOT FOUND ({reason})")
                 }
                 None => "SKIPPED".to_string(),
             }
@@ -911,28 +972,10 @@ pub(crate) fn print_summary(results: &[BuildResult]) {
 
     println!(
         "{:<branch_w$}  {:<main_w$}  {:<datagen_w$}  {:<gametest_w$}",
-        "BRANCH",
-        "MAIN",
-        "DATAGEN",
-        "GAMETEST",
-        branch_w = branch_w,
-        main_w = main_w,
-        datagen_w = datagen_w,
-        gametest_w = gametest_w
+        "BRANCH", "MAIN", "DATAGEN", "GAMETEST"
     );
 
     for (b, m, d, g) in rows {
-        println!(
-            "{:<branch_w$}  {:<main_w$}  {:<datagen_w$}  {:<gametest_w$}",
-            b,
-            m,
-            d,
-            g,
-            branch_w = branch_w,
-            main_w = main_w,
-            datagen_w = datagen_w,
-            gametest_w = gametest_w
-        );
+        println!("{b:<branch_w$}  {m:<main_w$}  {d:<datagen_w$}  {g:<gametest_w$}");
     }
 }
-

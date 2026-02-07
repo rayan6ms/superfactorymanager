@@ -1,47 +1,47 @@
 use crate::worktree::get_sorted_worktrees;
-use eyre::bail;
 use eyre::Context;
+use eyre::bail;
 use facet::Facet;
 use figue::{self as args};
-use ratatui::{
-    backend::CrosstermBackend,
-    layout::Constraint,
-    style::{Color, Modifier, Style},
-    text::Span,
-    widgets::{Block, Cell, Paragraph, Row, Table},
-    Terminal, TerminalOptions, Viewport,
-};
+use ratatui::Terminal;
+use ratatui::TerminalOptions;
+use ratatui::Viewport;
+use ratatui::backend::CrosstermBackend;
+use ratatui::crossterm::ExecutableCommand;
+use ratatui::crossterm::style::Attribute;
+use ratatui::crossterm::style::Color as CTermColor;
+use ratatui::crossterm::style::SetAttribute;
+use ratatui::crossterm::style::SetForegroundColor;
+use ratatui::layout::Constraint;
+use ratatui::style::Color;
+use ratatui::style::Modifier;
+use ratatui::style::Style;
+use ratatui::text::Span;
+use ratatui::widgets::Block;
+use ratatui::widgets::Cell;
+use ratatui::widgets::Paragraph;
+use ratatui::widgets::Row;
+use ratatui::widgets::Table;
+use std::io::Write;
 use std::io::stderr;
 use std::path::PathBuf;
-use std::sync::{
-    atomic::{AtomicBool, Ordering},
-    Arc,
-};
-use std::time::{Duration, Instant};
+use std::sync::Arc;
+use std::sync::atomic::AtomicBool;
+use std::sync::atomic::Ordering;
+use std::time::Duration;
+use std::time::Instant;
 use tokio::process::Command;
 use tokio::sync::mpsc;
 use tokio::task::JoinSet;
 
-use ratatui::crossterm::style::{Attribute, Color as CTermColor, SetAttribute, SetForegroundColor};
-use ratatui::crossterm::ExecutableCommand;
-
 #[derive(Debug, Clone, PartialEq, Eq)]
 enum TaskState {
     NotStarted,
-    Running {
-        start_time: Instant,
-    },
-    Success {
-        duration: Duration,
-    },
-    Failed {
-        duration: Duration,
-        error: String,
-    },
+    Running { start_time: Instant },
+    Success { duration: Duration },
+    Failed { duration: Duration, error: String },
     Skipped,
-    NotFound {
-        reason: String,
-    },
+    NotFound { reason: String },
 }
 
 #[derive(Debug)]
@@ -52,13 +52,13 @@ enum Message {
 
 impl TaskState {
     fn is_finished(&self) -> bool {
-        match self {
+        matches!(
+            self,
             TaskState::Success { .. }
-            | TaskState::Failed { .. }
-            | TaskState::Skipped
-            | TaskState::NotFound { .. } => true,
-            _ => false,
-        }
+                | TaskState::Failed { .. }
+                | TaskState::Skipped
+                | TaskState::NotFound { .. }
+        )
     }
 
     fn status_text(&self) -> String {
@@ -92,11 +92,11 @@ impl TaskState {
                 if duration.as_secs_f32() > 0.0 {
                     format!("({})", format_duration(*duration))
                 } else {
-                    "".to_string()
+                    String::new()
                 }
             }
             TaskState::NotFound { reason } => format!("({reason})"),
-            _ => "".to_string(),
+            _ => String::new(),
         }
     }
 }
@@ -141,9 +141,8 @@ async fn run_task(
 
         if success {
             return Ok(duration);
-        } else {
-            return Err((duration, format!("Mock failure for {}", task)));
         }
+        return Err((duration, format!("Mock failure for {task}")));
     }
 
     let start = Instant::now();
@@ -171,7 +170,7 @@ async fn run_task(
                 ))
             }
         }
-        Err(e) => Err((duration, format!("Failed to start {}: {}", task, e))),
+        Err(e) => Err((duration, format!("Failed to start {task}: {e}"))),
     }
 }
 
@@ -180,7 +179,7 @@ async fn test_worktree_task(
     tx: mpsc::UnboundedSender<Message>,
     path: PathBuf,
     mock: bool,
-) -> bool {
+) -> eyre::Result<bool> {
     let minecraft_dir = path.join("platform").join("minecraft");
 
     if !minecraft_dir.exists() {
@@ -190,8 +189,8 @@ async fn test_worktree_task(
                 reason: "platform/minecraft not found".into(),
             },
         ))
-        .ok();
-        return false;
+        .wrap_err("Failed to send missing minecraft status")?;
+        return Ok(false);
     }
 
     let gradlew = if cfg!(windows) {
@@ -207,8 +206,8 @@ async fn test_worktree_task(
                 reason: format!("gradlew not found in {}", minecraft_dir.display()),
             },
         ))
-        .ok();
-        return false;
+        .wrap_err("Failed to send missing gradlew status")?;
+        return Ok(false);
     }
 
     tx.send(Message::StatusUpdate(
@@ -217,7 +216,7 @@ async fn test_worktree_task(
             start_time: Instant::now(),
         },
     ))
-    .ok();
+    .wrap_err("Failed to send test running status")?;
 
     let test_res = run_task(&gradlew, &minecraft_dir, "test", mock).await;
     match test_res {
@@ -226,8 +225,8 @@ async fn test_worktree_task(
                 index,
                 TaskState::Success { duration },
             ))
-            .ok();
-            true
+            .wrap_err("Failed to send test success status")?;
+            Ok(true)
         }
         Err((duration, err)) => {
             tx.send(Message::StatusUpdate(
@@ -237,8 +236,8 @@ async fn test_worktree_task(
                     error: err,
                 },
             ))
-            .ok();
-            false
+            .wrap_err("Failed to send test failure status")?;
+            Ok(false)
         }
     }
 }
@@ -259,17 +258,17 @@ fn render(f: &mut ratatui::Frame, state: &AppState) {
         return;
     }
 
-    let [table_area, _] = ratatui::layout::Layout::horizontal([
-        Constraint::Length(60),
-        Constraint::Min(0),
-    ])
-    .areas(area);
+    let [table_area, _] =
+        ratatui::layout::Layout::horizontal([Constraint::Length(60), Constraint::Min(0)])
+            .areas(area);
 
     let mut rows = Vec::new();
     for b in &state.branches {
         let branch_name = Span::styled(
             b.branch.clone(),
-            Style::default().fg(Color::Yellow).add_modifier(Modifier::BOLD),
+            Style::default()
+                .fg(Color::Yellow)
+                .add_modifier(Modifier::BOLD),
         );
         let mut row_cells = vec![Cell::from(branch_name)];
 
@@ -289,6 +288,10 @@ fn render(f: &mut ratatui::Frame, state: &AppState) {
     f.render_widget(table, table_area);
 }
 
+#[expect(
+    clippy::too_many_lines,
+    reason = "Verbose report output is clearer inline."
+)]
 fn print_final_report(state: &AppState) {
     let mut stdout = std::io::stdout();
 
@@ -332,7 +335,7 @@ fn print_final_report(state: &AppState) {
 
     if successful_branches > 0 {
         let _ = stdout.execute(SetForegroundColor(CTermColor::Green));
-        print!("{} successful", successful_branches);
+        print!("{successful_branches} successful");
         let _ = stdout.execute(SetAttribute(Attribute::Reset));
         if failed_branches > 0 || skipped_branches > 0 {
             print!(", ");
@@ -340,7 +343,7 @@ fn print_final_report(state: &AppState) {
     }
     if failed_branches > 0 {
         let _ = stdout.execute(SetForegroundColor(CTermColor::Red));
-        print!("{} failed", failed_branches);
+        print!("{failed_branches} failed");
         let _ = stdout.execute(SetAttribute(Attribute::Reset));
         if skipped_branches > 0 {
             print!(", ");
@@ -348,7 +351,7 @@ fn print_final_report(state: &AppState) {
     }
     if skipped_branches > 0 {
         let _ = stdout.execute(SetForegroundColor(CTermColor::Yellow));
-        print!("{} skipped", skipped_branches);
+        print!("{skipped_branches} skipped");
         let _ = stdout.execute(SetAttribute(Attribute::Reset));
     }
     println!(")");
@@ -385,13 +388,13 @@ fn print_final_report(state: &AppState) {
             print!(" on branch ");
             let _ = stdout.execute(SetForegroundColor(CTermColor::Yellow));
             let _ = stdout.execute(SetAttribute(Attribute::Bold));
-            print!("{}", branch);
+            print!("{branch}");
             let _ = stdout.execute(SetAttribute(Attribute::Reset));
             println!(":");
 
             let _ = stdout.execute(SetForegroundColor(CTermColor::Grey));
             for line in err.lines() {
-                println!("   {}", line);
+                println!("   {line}");
             }
             let _ = stdout.execute(SetAttribute(Attribute::Reset));
         }
@@ -434,6 +437,10 @@ impl TestCommand {
         rt.block_on(self.invoke_async())
     }
 
+    #[expect(
+        clippy::too_many_lines,
+        reason = "TUI orchestration is easier to follow inline."
+    )]
     async fn invoke_async(self) -> eyre::Result<()> {
         let worktrees = get_sorted_worktrees()?;
 
@@ -457,7 +464,7 @@ impl TestCommand {
         let mut app_state = AppState { branches };
 
         let backend = CrosstermBackend::new(stderr());
-        let terminal_height = (worktrees.len() + 3) as u16;
+        let terminal_height = u16::try_from(worktrees.len() + 3).unwrap_or(u16::MAX);
         let mut terminal = Terminal::with_options(
             backend,
             TerminalOptions {
@@ -480,9 +487,9 @@ impl TestCommand {
         let parallel = self.parallel;
         let p_tx = tx.clone();
         let cancel = Arc::new(AtomicBool::new(false));
-        let cancel_worker = cancel.clone();
+        let cancel_worker = Arc::clone(&cancel);
 
-        tokio::spawn(async move {
+        let manager = tokio::spawn(async move {
             if parallel {
                 let mut join_set = JoinSet::new();
                 for (i, path) in branches_info {
@@ -498,15 +505,13 @@ impl TestCommand {
                         join_set.abort_all();
                         break;
                     }
-                    match res {
-                        Ok(true) => {}
-                        Ok(false) | Err(_) => {
-                            cancel_worker.store(true, Ordering::SeqCst);
-                            join_set.abort_all();
-                            let _ = p_tx
-                                .send(Message::AbortRemaining("Stopped after failure".into()));
-                            break;
-                        }
+                    if let Ok(Ok(true)) = res {
+                    } else {
+                        cancel_worker.store(true, Ordering::SeqCst);
+                        join_set.abort_all();
+                        p_tx.send(Message::AbortRemaining("Stopped after failure".into()))
+                            .wrap_err("Failed to send abort message")?;
+                        break;
                     }
                 }
             } else {
@@ -514,21 +519,21 @@ impl TestCommand {
                     if cancel_worker.load(Ordering::SeqCst) {
                         break;
                     }
-                    let ok = test_worktree_task(i, p_tx.clone(), path, mock).await;
+                    let ok = test_worktree_task(i, p_tx.clone(), path, mock).await?;
                     if !ok {
                         cancel_worker.store(true, Ordering::SeqCst);
-                        let _ = p_tx
-                            .send(Message::AbortRemaining("Stopped after failure".into()));
+                        p_tx.send(Message::AbortRemaining("Stopped after failure".into()))
+                            .wrap_err("Failed to send abort message")?;
                         break;
                     }
                 }
             }
+            Ok::<(), eyre::Report>(())
         });
 
         let mut interval = tokio::time::interval(Duration::from_millis(100));
         let mut abort_reason: Option<String> = None;
         let mut ctrl_c_fired = false;
-        use std::io::Write;
         loop {
             while let Ok(msg) = rx.try_recv() {
                 match msg {
@@ -549,7 +554,7 @@ impl TestCommand {
             }
 
             terminal.draw(|f| render(f, &app_state))?;
-            std::io::stderr().flush().ok();
+            let _ = std::io::stderr().flush();
 
             let all_finished = app_state.branches.iter().all(|b| b.test.is_finished());
 
@@ -568,9 +573,11 @@ impl TestCommand {
         }
         let _ = terminal.show_cursor();
 
-        for _ in 0..terminal_height + 1 {
+        for _ in 0..=terminal_height {
             eprintln!();
         }
+
+        manager.await.wrap_err("Manager task panicked")??;
 
         print_final_report(&app_state);
 

@@ -11,6 +11,7 @@ use eyre::bail;
 use std::fmt::Write;
 use std::io::BufRead;
 use std::io::Write as IoWrite;
+use std::path::Path;
 use std::path::PathBuf;
 use std::process::Command;
 use tracing::debug;
@@ -150,18 +151,17 @@ fn format_file_list(files: &[String], limit: usize) -> String {
 }
 
 /// Canonicalize a worktree path for display (fall back to the original path on error)
-fn canonicalize_worktree_path(path: &PathBuf) -> String {
-    canonicalize(path)
-        .map(|p| p.display().to_string())
-        .unwrap_or_else(|_| path.display().to_string())
+fn canonicalize_worktree_path(path: &Path) -> String {
+    canonicalize(path).map_or_else(|_| path.display().to_string(), |p| p.display().to_string())
 }
 
 /// Canonicalize a file path relative to a base directory for display
-fn canonicalize_relative_path(base: &PathBuf, relative: &str) -> String {
+fn canonicalize_relative_path(base: &Path, relative: &str) -> String {
     let joined = base.join(relative);
-    canonicalize(&joined)
-        .map(|p| p.display().to_string())
-        .unwrap_or_else(|_| joined.display().to_string())
+    canonicalize(&joined).map_or_else(
+        |_| joined.display().to_string(),
+        |p| p.display().to_string(),
+    )
 }
 
 /// Format conflict error message with file list and rename hints
@@ -198,9 +198,8 @@ fn format_conflict_error(path: &PathBuf, branch: &str) -> eyre::Result<String> {
 
     let _ = write!(
         msg,
-        "\n\nPlease resolve the conflicts in {} and run this command again,\n\
+        "\n\nPlease resolve the conflicts in {canonical_path} and run this command again,\n\
          or abort the merge with `git merge --abort`.",
-        canonical_path
     );
 
     Ok(msg)
