@@ -2,8 +2,8 @@ package ca.teamdman.sfm.gametest.tests.migrated;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -38,9 +38,9 @@ public class ComparisonLtGameTest extends SFMGameTestDefinition {
         var leftPos = new BlockPos(2, 2, 0);
         var rightPos = new BlockPos(0, 2, 0);
         var managerPos = new BlockPos(1, 2, 0);
-        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
-        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL.get());
+        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
         var left = (Container) helper.getBlockEntity(leftPos);
         var right = (Container) helper.getBlockEntity(rightPos);
         var manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
@@ -50,7 +50,7 @@ public class ComparisonLtGameTest extends SFMGameTestDefinition {
         right.setItem(0, new ItemStack(Items.STICK, 13));
         right.setItem(1, new ItemStack(Items.STICK, 64));
         right.setItem(2, new ItemStack(Items.DIRT, 1));
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
         manager.setProgram("""
                                    NAME "comparison_lt test"
                                    EVERY 20 TICKS DO

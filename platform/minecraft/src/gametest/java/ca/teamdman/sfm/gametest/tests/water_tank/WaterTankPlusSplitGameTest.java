@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.gametest.tests.water_tank;
 
 import ca.teamdman.sfm.common.blockentity.WaterTankBlockEntity;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -64,11 +64,11 @@ public class WaterTankPlusSplitGameTest extends SFMGameTestDefinition {
         BlockPos east = new BlockPos(cx + 1, y, cz);
         BlockPos west = new BlockPos(cx - 1, y, cz);
 
-        helper.setBlock(center, SFMBlocks.WATER_TANK_BLOCK.get());
-        helper.setBlock(north, SFMBlocks.WATER_TANK_BLOCK.get());
-        helper.setBlock(south, SFMBlocks.WATER_TANK_BLOCK.get());
-        helper.setBlock(east, SFMBlocks.WATER_TANK_BLOCK.get());
-        helper.setBlock(west, SFMBlocks.WATER_TANK_BLOCK.get());
+        helper.setBlock(center, SFMBlocks.WATER_TANK.get());
+        helper.setBlock(north, SFMBlocks.WATER_TANK.get());
+        helper.setBlock(south, SFMBlocks.WATER_TANK.get());
+        helper.setBlock(east, SFMBlocks.WATER_TANK.get());
+        helper.setBlock(west, SFMBlocks.WATER_TANK.get());
 
         // Place water sources around each tank (need 2 per tank to activate)
         // Center tank already has 4 tank neighbors, so it needs water in diagonal positions
@@ -157,7 +157,7 @@ public class WaterTankPlusSplitGameTest extends SFMGameTestDefinition {
         );
 
         // Restore center tank - networks should merge back
-        helper.setBlock(center, SFMBlocks.WATER_TANK_BLOCK.get());
+        helper.setBlock(center, SFMBlocks.WATER_TANK.get());
 
         helper.runAfterDelay(1, ()->{
 

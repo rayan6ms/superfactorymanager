@@ -3,7 +3,7 @@ package ca.teamdman.sfm.common.block;
 import ca.teamdman.sfm.common.block.shape.ShapeCache;
 import ca.teamdman.sfm.common.block_network.ICableBlock;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import com.google.common.collect.ImmutableMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -65,12 +65,12 @@ public class FancyCableBlock extends CableBlock implements IFacadableBlock {
 
     @Override
     public IFacadableBlock getNonFacadeBlock() {
-        return SFMBlocks.FANCY_CABLE_BLOCK.get();
+        return SFMBlocks.FANCY_CABLE.get();
     }
 
     @Override
     public IFacadableBlock getFacadeBlock() {
-        return SFMBlocks.FANCY_CABLE_FACADE_BLOCK.get();
+        return SFMBlocks.FANCY_CABLE_FACADE.get();
     }
 
     @Override

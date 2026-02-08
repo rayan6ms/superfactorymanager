@@ -3,8 +3,8 @@ package ca.teamdman.sfm.common.net;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMEntityUtils;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.core.BlockPos;
@@ -51,9 +51,9 @@ public record ServerboundLabelInspectionRequestPacket(
                 SFM.LOGGER.info("Player is using a manager container menu - will append additional info to payload");
                 labelPositionHolder = LabelPositionHolder.from(mcm.CONTAINER.getItem(0));
             } else {
-                if (player.getMainHandItem().is(SFMItems.DISK_ITEM.get())) {
+                if (player.getMainHandItem().is(SFMItems.DISK.get())) {
                     labelPositionHolder = LabelPositionHolder.from(player.getMainHandItem());
-                } else if (player.getOffhandItem().is(SFMItems.DISK_ITEM.get())) {
+                } else if (player.getOffhandItem().is(SFMItems.DISK.get())) {
                     labelPositionHolder = LabelPositionHolder.from(player.getOffhandItem());
                 } else {
                     labelPositionHolder = null;

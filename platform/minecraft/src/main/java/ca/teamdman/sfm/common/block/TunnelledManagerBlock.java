@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.blockentity.TunnelledManagerBlockEntity;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -25,7 +25,7 @@ public class TunnelledManagerBlock extends ManagerBlock {
             BlockState state
     ) {
         //noinspection DataFlowIssue
-        return SFMBlockEntities.TUNNELLED_MANAGER_BLOCK_ENTITY
+        return SFMBlockEntities.TUNNELLED_MANAGER
                 .get()
                 .create(pos, state);
     }
@@ -53,7 +53,7 @@ public class TunnelledManagerBlock extends ManagerBlock {
         if (level.isClientSide()) return null;
         return createTickerHelper(
                 type,
-                SFMBlockEntities.TUNNELLED_MANAGER_BLOCK_ENTITY.get(),
+                SFMBlockEntities.TUNNELLED_MANAGER.get(),
                 TunnelledManagerBlockEntity::serverTick
         );
     }

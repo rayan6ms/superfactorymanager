@@ -2,8 +2,8 @@ package ca.teamdman.sfm.gametest.tests.cable.tunnelled;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -33,9 +33,9 @@ public class TunnelledManagerGameTest extends SFMGameTestDefinition {
         BlockPos leftPos = new BlockPos(2, 2, 0);
 
         // set blocks
-        helper.setBlock(managerPos, SFMBlocks.TUNNELLED_MANAGER_BLOCK.get());
-        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
-        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.TUNNELLED_MANAGER.get());
+        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL.get());
+        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL.get());
 
         // get handlers
         var rightChest = helper.getItemHandler(rightPos);
@@ -46,7 +46,7 @@ public class TunnelledManagerGameTest extends SFMGameTestDefinition {
 
         // prepare manager
         ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
 
         // set program
         manager.setProgram("""

@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.common.recipe;
 
 import ca.teamdman.sfm.common.item.DiskItem;
-import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.registry.SFMRecipeSerializers;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMRecipeSerializers;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
@@ -48,7 +48,7 @@ public class DiskResetRecipe extends CustomRecipe {
     ) {
         int foundDisks = countDisks(craftingInput);
         if (foundDisks > 0) {
-            return new ItemStack(SFMItems.DISK_ITEM.get(), foundDisks);
+            return new ItemStack(SFMItems.DISK.get(), foundDisks);
         } else {
             return ItemStack.EMPTY;
         }

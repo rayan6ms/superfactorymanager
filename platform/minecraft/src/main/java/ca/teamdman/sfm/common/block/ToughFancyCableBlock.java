@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -29,11 +29,11 @@ public class ToughFancyCableBlock extends FancyCableBlock {
 
     @Override
     public IFacadableBlock getNonFacadeBlock() {
-        return SFMBlocks.TOUGH_FANCY_CABLE_BLOCK.get();
+        return SFMBlocks.TOUGH_FANCY_CABLE.get();
     }
 
     @Override
     public IFacadableBlock getFacadeBlock() {
-        return SFMBlocks.TOUGH_FANCY_CABLE_FACADE_BLOCK.get();
+        return SFMBlocks.TOUGH_FANCY_CABLE_FACADE.get();
     }
 }

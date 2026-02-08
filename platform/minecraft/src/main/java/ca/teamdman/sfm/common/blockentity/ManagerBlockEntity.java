@@ -15,8 +15,8 @@ import ca.teamdman.sfm.common.net.ClientboundManagerGuiUpdatePacket;
 import ca.teamdman.sfm.common.net.ClientboundManagerLogLevelUpdatedPacket;
 import ca.teamdman.sfm.common.net.ClientboundManagerLogsPacket;
 import ca.teamdman.sfm.common.program.IProgramHooks;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
-import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMPackets;
 import ca.teamdman.sfm.common.timing.SFMEpochInstant;
 import ca.teamdman.sfm.common.timing.SFMInstant;
 import ca.teamdman.sfm.common.util.SFMContainerUtil;
@@ -84,7 +84,7 @@ public class ManagerBlockEntity extends BaseContainerBlockEntity {
             BlockState blockState
     ) {
 
-        this(SFMBlockEntities.MANAGER_BLOCK_ENTITY.get(), blockPos, blockState);
+        this(SFMBlockEntities.MANAGER.get(), blockPos, blockState);
     }
 
     public ManagerBlockEntity(

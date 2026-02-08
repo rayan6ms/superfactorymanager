@@ -1,9 +1,13 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.common.registry.registration;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
 import ca.teamdman.sfm.common.compat.SFMModCompat;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegister;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegisterBuilder;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
+import ca.teamdman.sfm.common.registry.SFMRegistryWrapper;
 import ca.teamdman.sfm.common.resourcetype.*;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;

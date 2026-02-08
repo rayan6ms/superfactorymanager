@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.common.recipe;
 
 import ca.teamdman.sfm.common.item.LabelGunItem;
-import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.registry.SFMRecipeSerializers;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMRecipeSerializers;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingBookCategory;
@@ -52,7 +52,7 @@ public class LabelGunResetRecipe extends CustomRecipe {
                 return ItemStack.EMPTY;
             }
         }
-        return foundLabelGuns > 0 ? new ItemStack(SFMItems.LABEL_GUN_ITEM.get(), foundLabelGuns) : ItemStack.EMPTY;
+        return foundLabelGuns > 0 ? new ItemStack(SFMItems.LABEL_GUN.get(), foundLabelGuns) : ItemStack.EMPTY;
     }
 
     @Override

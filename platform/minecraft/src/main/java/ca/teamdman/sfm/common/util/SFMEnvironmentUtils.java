@@ -1,7 +1,6 @@
 package ca.teamdman.sfm.common.util;
 
 import cpw.mods.modlauncher.Launcher;
-import net.neoforged.api.distmarker.Dist;
 import net.neoforged.fml.loading.FMLEnvironment;
 
 /// Convenience helpers, also reduces {@link MCVersionDependentBehaviour} in import statements.

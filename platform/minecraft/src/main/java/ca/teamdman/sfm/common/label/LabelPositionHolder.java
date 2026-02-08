@@ -1,9 +1,9 @@
 package ca.teamdman.sfm.common.label;
 
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.registry.SFMDataComponents;
 import ca.teamdman.sfm.common.util.BlockPosIterator;
 import ca.teamdman.sfm.common.util.BlockPosSet;
-import ca.teamdman.sfm.common.registry.SFMDataComponents;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.MapCodec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

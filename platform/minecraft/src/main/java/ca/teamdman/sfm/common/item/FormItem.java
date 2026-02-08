@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.item;
 
 import ca.teamdman.sfm.common.component.ItemStackBox;
 import ca.teamdman.sfm.common.registry.SFMDataComponents;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
@@ -21,7 +21,7 @@ public class FormItem extends Item {
         stack = stack.copy();
 
         // Create the form stack
-        var formStack = new ItemStack(SFMItems.FORM_ITEM.get());
+        var formStack = new ItemStack(SFMItems.FORM.get());
 
         // Set the inner item
         formStack.set(SFMDataComponents.FORM_REFERENCE, new ItemStackBox(stack));

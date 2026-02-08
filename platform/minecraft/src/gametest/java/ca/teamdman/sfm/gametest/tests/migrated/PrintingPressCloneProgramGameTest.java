@@ -3,8 +3,8 @@ package ca.teamdman.sfm.gametest.tests.migrated;
 import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.item.FormItem;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -51,11 +51,11 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
         var chestPos = new BlockPos(0, 2, 1);
 
         // Place blocks
-        helper.setBlock(printingPos, SFMBlocks.PRINTING_PRESS_BLOCK.get());
+        helper.setBlock(printingPos, SFMBlocks.PRINTING_PRESS.get());
         helper.setBlock(pistonPos, Blocks.PISTON.defaultBlockState().setValue(DirectionalBlock.FACING, Direction.DOWN));
         helper.setBlock(woodPos, Blocks.OAK_PLANKS);
         helper.setBlock(buttonPos, Blocks.STONE_BUTTON);
-        helper.setBlock(chestPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(chestPos, SFMBlocks.TEST_BARREL.get());
 
         // Get helper objects
         var printingPress = (PrintingPressBlockEntity) helper.getBlockEntity(printingPos);
@@ -66,11 +66,11 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
         helper.useBlock(printingPos, player);
 
         // Place paper
-        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(SFMItems.DISK_ITEM.get()));
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(SFMItems.DISK.get()));
         helper.useBlock(printingPos, player);
 
         // Place form
-        var disk = new ItemStack(SFMItems.DISK_ITEM.get());
+        var disk = new ItemStack(SFMItems.DISK.get());
         DiskItem.setProgram(disk, """
                     EVERY 20 TICKS DO
                         INPUT FROM a TOP SIDE SLOTS 0,1,3-4,5
@@ -91,7 +91,7 @@ public class PrintingPressCloneProgramGameTest extends SFMGameTestDefinition {
             ItemStack held = player.getMainHandItem();
 
             // Fail if the result is not a perfect clone of the disk
-            if (!held.is(SFMItems.DISK_ITEM.get()) || !DiskItem.getProgramString(held).equals(DiskItem.getProgramString(disk))) {
+            if (!held.is(SFMItems.DISK.get()) || !DiskItem.getProgramString(held).equals(DiskItem.getProgramString(disk))) {
                 helper.fail("Disk was not cloned");
             }
 

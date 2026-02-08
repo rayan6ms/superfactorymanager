@@ -3,7 +3,7 @@ package ca.teamdman.sfm.client.registry;
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.screen.ManagerScreen;
 import ca.teamdman.sfm.client.screen.TestBarrelTankScreen;
-import ca.teamdman.sfm.common.registry.SFMMenus;
+import ca.teamdman.sfm.common.registry.registration.SFMMenus;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
@@ -12,7 +12,7 @@ import net.neoforged.neoforge.client.event.RegisterMenuScreensEvent;
 public class SFMMenuScreens {
     @SubscribeEvent
     public static void register(RegisterMenuScreensEvent event) {
-        event.register(SFMMenus.MANAGER_MENU.get(), ManagerScreen::new);
-        event.register(SFMMenus.TEST_BARREL_TANK_MENU.get(), TestBarrelTankScreen::new);
+        event.register(SFMMenus.MANAGER.get(), ManagerScreen::new);
+        event.register(SFMMenus.TEST_BARREL_TANK.get(), TestBarrelTankScreen::new);
     }
 }

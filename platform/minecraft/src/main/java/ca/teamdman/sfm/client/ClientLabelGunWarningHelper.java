@@ -6,7 +6,7 @@ import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.common.label.LabelGunPlan;
 import ca.teamdman.sfm.common.label.LabelGunPlanner;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunUsePacket;
-import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.registry.registration.SFMPackets;
 import ca.teamdman.sfm.common.util.ConfirmationParams;
 import net.minecraft.world.entity.player.Player;
 

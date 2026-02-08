@@ -3,8 +3,8 @@ package ca.teamdman.sfm.gametest.tests.general;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -32,9 +32,9 @@ public class ManagerSwapProgramGameTest extends SFMGameTestDefinition {
         BlockPos leftPos = new BlockPos(2, 2, 0);
 
         // set blocks
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
-        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
-        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
+        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL.get());
+        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL.get());
 
         // get handlers
         var rightChest = helper.getItemHandler(rightPos);
@@ -51,7 +51,7 @@ public class ManagerSwapProgramGameTest extends SFMGameTestDefinition {
         labels.add("manager", helper.absolutePos(managerPos));
 
         // create disk 1
-        ItemStack moveSandDisk = new ItemStack(SFMItems.DISK_ITEM.get());
+        ItemStack moveSandDisk = new ItemStack(SFMItems.DISK.get());
         DiskItem.setProgram(
                 moveSandDisk, """
                         NAME "move sand"
@@ -70,7 +70,7 @@ public class ManagerSwapProgramGameTest extends SFMGameTestDefinition {
         labels.save(moveSandDisk);
 
         // create disk 2
-        ItemStack moveDirtDisk = new ItemStack(SFMItems.DISK_ITEM.get());
+        ItemStack moveDirtDisk = new ItemStack(SFMItems.DISK.get());
         DiskItem.setProgram(
                 moveDirtDisk, """
                         NAME "move dirt"

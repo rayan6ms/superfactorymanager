@@ -15,8 +15,6 @@ import net.minecraft.world.level.chunk.ChunkAccess;
 import net.neoforged.neoforge.capabilities.ICapabilityInvalidationListener;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.stream.Stream;
-
 /// See {@link net.neoforged.neoforge.capabilities.BlockCapability} and {@link net.neoforged.neoforge.capabilities.BlockCapabilityCache}
 public class SFMBlockCapabilityCacheForLevel {
     // Position => Capability => Direction => CapabilityResult/LazyOptional
