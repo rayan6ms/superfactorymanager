@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.gametest.tests.water_tank;
 
 import ca.teamdman.sfm.common.blockentity.WaterTankBlockEntity;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -71,7 +71,7 @@ public class WaterTankRowWithWaterGameTest extends SFMGameTestDefinition {
         for (int x = 1; x <= 5; x++) {
             BlockPos pos = new BlockPos(x, 2, 2);
             tankPositions[x - 1] = pos;
-            helper.setBlock(pos, SFMBlocks.WATER_TANK_BLOCK.get());
+            helper.setBlock(pos, SFMBlocks.WATER_TANK.get());
         }
 
         // Place water sources in the rows above and below the tanks (z=1 and z=3)

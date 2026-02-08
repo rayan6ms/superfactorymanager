@@ -6,6 +6,9 @@ import ca.teamdman.sfm.client.text_editor.ISFMTextEditorRegistration;
 import ca.teamdman.sfm.client.text_editor.action.ITextEditAction;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProvider;
 import ca.teamdman.sfm.common.program.linting.IProgramLinter;
+import ca.teamdman.sfm.common.registry.registration.SFMGlobalBlockCapabilityProviders;
+import ca.teamdman.sfm.common.registry.registration.SFMProgramLinters;
+import ca.teamdman.sfm.common.registry.registration.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -17,7 +20,6 @@ import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
-import net.neoforged.neoforge.registries.NeoForgeRegistries;
 
 /// Helps reduce {@link ca.teamdman.sfm.common.util.MCVersionDependentBehaviour}
 @SuppressWarnings("unused")

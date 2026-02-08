@@ -1,18 +1,18 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.common.registry.registration;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.capability.BlockEntityCapabilityProvider;
 import ca.teamdman.sfm.common.capability.CauldronBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.RedstoneSignalCapabilityProvider;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProvider;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegister;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegisterBuilder;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
+import ca.teamdman.sfm.common.registry.SFMRegistryWrapper;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.core.Registry;
-import net.minecraft.resources.ResourceLocation;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.RegistryBuilder;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -27,7 +27,7 @@ public class SFMGlobalBlockCapabilityProviders {
 
 //    /// Conditionally present
 //    public static final SFMRegistryObject<SFMBlockCapabilityProvider<?>, EnergyAcceptorBlockCapabilityProvider>
-//            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER;
+//            AE2_ENERGY_ACCEPTOR;
 
     private static final SFMDeferredRegister<SFMBlockCapabilityProvider<?>> REGISTERER =
             new SFMDeferredRegisterBuilder<SFMBlockCapabilityProvider<?>>()
@@ -48,7 +48,7 @@ public class SFMGlobalBlockCapabilityProviders {
 //    static {
 //        if (SFMModCompat.isAE2Loaded()) {
 //
-//            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER = REGISTERER.register(
+//            AE2_ENERGY_ACCEPTOR = REGISTERER.register(
 //                    "ae2/energy_acceptor",
 //                    EnergyAcceptorBlockCapabilityProvider::new
 //            );
@@ -57,7 +57,7 @@ public class SFMGlobalBlockCapabilityProviders {
 //
 //        } else {
 //
-//            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER = REGISTERER.registerEmpty(
+//            AE2_ENERGY_ACCEPTOR = REGISTERER.registerEmpty(
 //                    "ae2/energy_acceptor"
 //            );
 //

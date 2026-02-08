@@ -2,7 +2,6 @@ package ca.teamdman.sfm.common.compat;
 
 import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;

@@ -5,7 +5,7 @@ import ca.teamdman.sfm.common.block_network.ICableBlock;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.item.DiskItem;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -25,8 +25,8 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import org.jetbrains.annotations.Nullable;
 import net.neoforged.neoforge.network.NetworkHooks;
+import org.jetbrains.annotations.Nullable;
 
 public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICableBlock {
     public static final BooleanProperty TRIGGERED = BlockStateProperties.TRIGGERED;
@@ -74,7 +74,7 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
             BlockState state
     ) {
         //noinspection DataFlowIssue
-        return SFMBlockEntities.MANAGER_BLOCK_ENTITY.get().create(pos, state);
+        return SFMBlockEntities.MANAGER.get().create(pos, state);
     }
 
     @Override
@@ -104,7 +104,7 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
             BlockEntityType<T> type
     ) {
         if (level.isClientSide()) return null;
-        return createTickerHelper(type, SFMBlockEntities.MANAGER_BLOCK_ENTITY.get(), ManagerBlockEntity::serverTick);
+        return createTickerHelper(type, SFMBlockEntities.MANAGER.get(), ManagerBlockEntity::serverTick);
     }
 
     @Override

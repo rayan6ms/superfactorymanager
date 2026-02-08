@@ -1,9 +1,12 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.common.registry.registration;
 
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.blockentity.*;
-import net.minecraft.core.registries.BuiltInRegistries;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegister;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegisterBuilder;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.bus.api.IEventBus;
 
@@ -16,10 +19,10 @@ public final class SFMBlockEntities {
                     .build();
 
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<TestBarrelBlockEntity>>
-            TEST_BARREL_BLOCK_ENTITY = REGISTERER.register(
+            TEST_BARREL = REGISTERER.register(
             "test_barrel",
             () -> BlockEntityType.Builder
-                    .of(TestBarrelBlockEntity::new, SFMBlocks.TEST_BARREL_BLOCK.get())
+                    .of(TestBarrelBlockEntity::new, SFMBlocks.TEST_BARREL.get())
                     .build(null)
     );
 
@@ -29,15 +32,15 @@ public final class SFMBlockEntities {
     }
 
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<ManagerBlockEntity>>
-            MANAGER_BLOCK_ENTITY = REGISTERER.register(
+            MANAGER = REGISTERER.register(
             "manager",
             () -> BlockEntityType.Builder
-                    .of(ManagerBlockEntity::new, SFMBlocks.MANAGER_BLOCK.get())
+                    .of(ManagerBlockEntity::new, SFMBlocks.MANAGER.get())
                     .build(null)
     );
 
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<BufferBlockEntity>>
-            BUFFER_BLOCK_ENTITY = REGISTERER.register(
+            BUFFER = REGISTERER.register(
             "buffer",
             () -> BlockEntityType.Builder
                     .of(BufferBlockEntity::new, SFMBlocks.BUFFER_BLOCK.get())
@@ -45,98 +48,98 @@ public final class SFMBlockEntities {
     );
 
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<TunnelledManagerBlockEntity>>
-            TUNNELLED_MANAGER_BLOCK_ENTITY = REGISTERER.register(
+            TUNNELLED_MANAGER = REGISTERER.register(
             "tunnelled_manager",
             () -> BlockEntityType.Builder
-                    .of(TunnelledManagerBlockEntity::new, SFMBlocks.TUNNELLED_MANAGER_BLOCK.get())
+                    .of(TunnelledManagerBlockEntity::new, SFMBlocks.TUNNELLED_MANAGER.get())
                     .build(null)
     );
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<CableFacadeBlockEntity>>
-            CABLE_FACADE_BLOCK_ENTITY = REGISTERER.register(
+            CABLE_FACADE = REGISTERER.register(
             "cable_facade",
             () -> BlockEntityType.Builder
-                    .of(CableFacadeBlockEntity::new, SFMBlocks.CABLE_FACADE_BLOCK.get())
+                    .of(CableFacadeBlockEntity::new, SFMBlocks.CABLE_FACADE.get())
                     .build(null)
     );
 
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<FancyCableFacadeBlockEntity>>
-            FANCY_CABLE_FACADE_BLOCK_ENTITY = REGISTERER.register(
+            FANCY_CABLE_FACADE = REGISTERER.register(
             "fancy_cable_facade",
             () -> BlockEntityType.Builder
-                    .of(FancyCableFacadeBlockEntity::new, SFMBlocks.FANCY_CABLE_FACADE_BLOCK.get())
+                    .of(FancyCableFacadeBlockEntity::new, SFMBlocks.FANCY_CABLE_FACADE.get())
                     .build(null)
     );
 
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<PrintingPressBlockEntity>>
-            PRINTING_PRESS_BLOCK_ENTITY = REGISTERER.register(
+            PRINTING_PRESS = REGISTERER.register(
             "printing_press",
             () -> BlockEntityType.Builder
-                    .of(PrintingPressBlockEntity::new, SFMBlocks.PRINTING_PRESS_BLOCK.get())
+                    .of(PrintingPressBlockEntity::new, SFMBlocks.PRINTING_PRESS.get())
                     .build(null)
     );
 
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<WaterTankBlockEntity>>
-            WATER_TANK_BLOCK_ENTITY = REGISTERER.register(
+            WATER_TANK = REGISTERER.register(
             "water_tank",
             () -> BlockEntityType.Builder
-                    .of(WaterTankBlockEntity::new, SFMBlocks.WATER_TANK_BLOCK.get())
+                    .of(WaterTankBlockEntity::new, SFMBlocks.WATER_TANK.get())
                     .build(null)
     );
 
 
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<TestBarrelTankBlockEntity>>
-            TEST_BARREL_TANK_BLOCK_ENTITY = REGISTERER.register(
+            TEST_BARREL_TANK = REGISTERER.register(
             "test_barrel_tank",
             () -> BlockEntityType.Builder
-                    .of(TestBarrelTankBlockEntity::new, SFMBlocks.TEST_BARREL_BLOCK.get())
+                    .of(TestBarrelTankBlockEntity::new, SFMBlocks.TEST_BARREL.get())
                     .build(null)
     );
 
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<TunnelledCableBlockEntity>>
-            TUNNELLED_CABLE_BLOCK_ENTITY = REGISTERER.register(
+            TUNNELLED_CABLE = REGISTERER.register(
             "tunnelled_cable",
             () -> BlockEntityType.Builder
-                    .of(TunnelledCableBlockEntity::new, SFMBlocks.TUNNELLED_CABLE_BLOCK.get())
+                    .of(TunnelledCableBlockEntity::new, SFMBlocks.TUNNELLED_CABLE.get())
                     .build(null)
     );
 
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<TunnelledCableFacadeBlockEntity>>
-            TUNNELLED_CABLE_FACADE_BLOCK_ENTITY = REGISTERER.register(
+            TUNNELLED_CABLE_FACADE = REGISTERER.register(
             "tunnelled_cable_facade",
             () -> BlockEntityType.Builder
-                    .of(TunnelledCableFacadeBlockEntity::new, SFMBlocks.TUNNELLED_CABLE_FACADE_BLOCK.get())
+                    .of(TunnelledCableFacadeBlockEntity::new, SFMBlocks.TUNNELLED_CABLE_FACADE.get())
                     .build(null)
     );
 
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<TunnelledFancyCableBlockEntity>>
-            TUNNELLED_FANCY_CABLE_BLOCK_ENTITY = REGISTERER.register(
+            TUNNELLED_FANCY_CABLE = REGISTERER.register(
             "tunnelled_fancy_cable",
             () -> BlockEntityType.Builder
-                    .of(TunnelledFancyCableBlockEntity::new, SFMBlocks.TUNNELLED_FANCY_CABLE_BLOCK.get())
+                    .of(TunnelledFancyCableBlockEntity::new, SFMBlocks.TUNNELLED_FANCY_CABLE.get())
                     .build(null)
     );
 
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<TunnelledFancyCableFacadeBlockEntity>>
-            TUNNELLED_FANCY_CABLE_FACADE_BLOCK_ENTITY = REGISTERER.register(
+            TUNNELLED_FANCY_CABLE_FACADE = REGISTERER.register(
             "tunnelled_fancy_cable_facade",
             () -> BlockEntityType.Builder
-                    .of(TunnelledFancyCableFacadeBlockEntity::new, SFMBlocks.TUNNELLED_FANCY_CABLE_FACADE_BLOCK.get())
+                    .of(TunnelledFancyCableFacadeBlockEntity::new, SFMBlocks.TUNNELLED_FANCY_CABLE_FACADE.get())
                     .build(null)
     );
 
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<ToughCableFacadeBlockEntity>>
-            TOUGH_CABLE_FACADE_BLOCK_ENTITY = REGISTERER.register(
+            TOUGH_CABLE_FACADE = REGISTERER.register(
             "tough_cable_facade",
             () -> BlockEntityType.Builder
-                    .of(ToughCableFacadeBlockEntity::new, SFMBlocks.TOUGH_CABLE_FACADE_BLOCK.get())
+                    .of(ToughCableFacadeBlockEntity::new, SFMBlocks.TOUGH_CABLE_FACADE.get())
                     .build(null)
     );
 
     public static final SFMRegistryObject<BlockEntityType<?>, BlockEntityType<ToughFancyCableFacadeBlockEntity>>
-            TOUGH_FANCY_CABLE_FACADE_BLOCK_ENTITY = REGISTERER.register(
+            TOUGH_FANCY_CABLE_FACADE = REGISTERER.register(
             "tough_fancy_cable_facade",
             () -> BlockEntityType.Builder
-                    .of(ToughFancyCableFacadeBlockEntity::new, SFMBlocks.TOUGH_FANCY_CABLE_FACADE_BLOCK.get())
+                    .of(ToughFancyCableFacadeBlockEntity::new, SFMBlocks.TOUGH_FANCY_CABLE_FACADE.get())
                     .build(null)
     );
 }

@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.capability;
 
 
-import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.registry.registration.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.neoforged.neoforge.common.capabilities.Capabilities;
@@ -10,7 +10,6 @@ import net.neoforged.neoforge.common.capabilities.CapabilityToken;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.items.IItemHandler;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.stream.Stream;
 

@@ -2,8 +2,8 @@ package ca.teamdman.sfm.gametest.tests.capability_cache;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -43,9 +43,9 @@ public class CapabilityCacheRemoveBothGameTest extends SFMGameTestDefinition {
         BlockPos leftPos = new BlockPos(2, 2, 0);
 
         // set blocks
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
-        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
-        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
+        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL.get());
+        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL.get());
 
         // get handlers
         AtomicReference<IItemHandler> rightChest = new AtomicReference<>(helper.getItemHandler(rightPos));
@@ -56,7 +56,7 @@ public class CapabilityCacheRemoveBothGameTest extends SFMGameTestDefinition {
 
         // prepare manager
         ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
 
         // set program
         manager.setProgram("""
@@ -100,7 +100,7 @@ public class CapabilityCacheRemoveBothGameTest extends SFMGameTestDefinition {
                             assertCount(rightChest, 2, "Still none should arrive after source is broken");
 
                             // restore source block
-                            helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+                            helper.setBlock(leftPos, SFMBlocks.TEST_BARREL.get());
                             leftChest.set(helper.getItemHandler(leftPos));
                             leftChest.get().insertItem(0, new ItemStack(Blocks.DIRT, 64), false);
                         },
@@ -128,7 +128,7 @@ public class CapabilityCacheRemoveBothGameTest extends SFMGameTestDefinition {
                             assertCount(rightChest, 4, "Still none should arrive after dest is broken");
 
                             // restore destination block
-                            helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+                            helper.setBlock(rightPos, SFMBlocks.TEST_BARREL.get());
                             rightChest.set(helper.getItemHandler(rightPos));
                         },
                         () -> {

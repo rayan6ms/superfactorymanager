@@ -2,9 +2,9 @@ package ca.teamdman.sfm.datagen;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.recipe.PrintingPressFinishedRecipe;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.registry.SFMRecipeSerializers;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMRecipeSerializers;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticRecipeDataGen;
 import net.minecraft.data.recipes.RecipeOutput;
@@ -27,7 +27,7 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
     @Override
     protected void populate(RecipeOutput writer) {
 
-        beginShaped(SFMBlocks.CABLE_BLOCK.get(), 16)
+        beginShaped(SFMBlocks.CABLE.get(), 16)
                 .define('D', Tags.Items.DYES_BLACK)
                 .define('G', Items.LIGHT_WEIGHTED_PRESSURE_PLATE)
                 .define('C', Tags.Items.CHESTS)
@@ -39,111 +39,111 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
                 .unlockedBy("has_chest", RecipeProvider.has(Tags.Items.CHESTS))
                 .save(writer);
 
-        beginShapeless(SFMBlocks.FANCY_CABLE_BLOCK.get(), 1)
-                .requires(SFMBlocks.CABLE_BLOCK.get(), 1)
+        beginShapeless(SFMBlocks.FANCY_CABLE.get(), 1)
+                .requires(SFMBlocks.CABLE.get(), 1)
                 .unlockedBy("has_iron_ingot", RecipeProvider.has(Items.IRON_INGOT))
                 .unlockedBy("has_chest", RecipeProvider.has(Tags.Items.CHESTS))
                 .save(writer);
 
-        beginShapeless(SFMBlocks.CABLE_BLOCK.get(), 1)
-                .requires(SFMBlocks.FANCY_CABLE_BLOCK.get(), 1)
+        beginShapeless(SFMBlocks.CABLE.get(), 1)
+                .requires(SFMBlocks.FANCY_CABLE.get(), 1)
                 .unlockedBy("has_iron_ingot", RecipeProvider.has(Items.IRON_INGOT))
                 .unlockedBy("has_chest", RecipeProvider.has(Tags.Items.CHESTS))
                 .save(writer, SFMResourceLocation.fromSFMPath("fancy_to_cable"));
 
-        beginShaped(SFMBlocks.TOUGH_CABLE_BLOCK.get(), 1)
+        beginShaped(SFMBlocks.TOUGH_CABLE.get(), 1)
                 .define('A', Blocks.OBSIDIAN)
-                .define('B', SFMBlocks.CABLE_BLOCK.get())
+                .define('B', SFMBlocks.CABLE.get())
                 .unlockedBy("has_obsidian", RecipeProvider.has(Items.OBSIDIAN))
-                .unlockedBy("has_cable", RecipeProvider.has(SFMItems.CABLE_ITEM.get()))
+                .unlockedBy("has_cable", RecipeProvider.has(SFMItems.CABLE.get()))
                 .pattern("A A")
                 .pattern("ABA")
                 .pattern("A A")
                 .save(writer);
 
-        beginShaped(SFMBlocks.TOUGH_CABLE_BLOCK.get(), 1)
+        beginShaped(SFMBlocks.TOUGH_CABLE.get(), 1)
                 .define('A', Blocks.OBSIDIAN)
-                .define('B', SFMBlocks.CABLE_BLOCK.get())
+                .define('B', SFMBlocks.CABLE.get())
                 .unlockedBy("has_obsidian", RecipeProvider.has(Items.OBSIDIAN))
-                .unlockedBy("has_cable", RecipeProvider.has(SFMItems.CABLE_ITEM.get()))
+                .unlockedBy("has_cable", RecipeProvider.has(SFMItems.CABLE.get()))
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern("AAA")
                 .save(writer, "tough_cable_horizontal");
 
-        beginShaped(SFMBlocks.TOUGH_FANCY_CABLE_BLOCK.get(), 1)
+        beginShaped(SFMBlocks.TOUGH_FANCY_CABLE.get(), 1)
                 .define('A', Blocks.OBSIDIAN)
-                .define('B', SFMBlocks.FANCY_CABLE_BLOCK.get())
+                .define('B', SFMBlocks.FANCY_CABLE.get())
                 .unlockedBy("has_obsidian", RecipeProvider.has(Items.OBSIDIAN))
-                .unlockedBy("has_fancy_cable", RecipeProvider.has(SFMItems.FANCY_CABLE_ITEM.get()))
+                .unlockedBy("has_fancy_cable", RecipeProvider.has(SFMItems.FANCY_CABLE.get()))
                 .pattern("A A")
                 .pattern("ABA")
                 .pattern("A A")
                 .save(writer, "tough_cable_vertical");
 
-        beginShaped(SFMBlocks.TOUGH_FANCY_CABLE_BLOCK.get(), 1)
+        beginShaped(SFMBlocks.TOUGH_FANCY_CABLE.get(), 1)
                 .define('A', Blocks.OBSIDIAN)
-                .define('B', SFMBlocks.FANCY_CABLE_BLOCK.get())
+                .define('B', SFMBlocks.FANCY_CABLE.get())
                 .unlockedBy("has_obsidian", RecipeProvider.has(Items.OBSIDIAN))
-                .unlockedBy("has_fancy_cable", RecipeProvider.has(SFMItems.FANCY_CABLE_ITEM.get()))
+                .unlockedBy("has_fancy_cable", RecipeProvider.has(SFMItems.FANCY_CABLE.get()))
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern("AAA")
                 .save(writer, "tough_fancy_cable_horizontal");
 
-        beginShapeless(SFMBlocks.CABLE_BLOCK.get(), 1)
-                .requires(SFMBlocks.TOUGH_CABLE_BLOCK.get(), 1)
-                .unlockedBy("has_tough_cable", RecipeProvider.has(SFMItems.TOUGH_CABLE_ITEM.get()))
+        beginShapeless(SFMBlocks.CABLE.get(), 1)
+                .requires(SFMBlocks.TOUGH_CABLE.get(), 1)
+                .unlockedBy("has_tough_cable", RecipeProvider.has(SFMItems.TOUGH_CABLE.get()))
                 .save(writer, SFMResourceLocation.fromSFMPath("tough_to_cable"));
 
-        beginShapeless(SFMBlocks.FANCY_CABLE_BLOCK.get(), 1)
-                .requires(SFMBlocks.TOUGH_FANCY_CABLE_BLOCK.get(), 1)
-                .unlockedBy("has_tough_fancy_cable", RecipeProvider.has(SFMItems.TOUGH_FANCY_CABLE_ITEM.get()))
+        beginShapeless(SFMBlocks.FANCY_CABLE.get(), 1)
+                .requires(SFMBlocks.TOUGH_FANCY_CABLE.get(), 1)
+                .unlockedBy("has_tough_fancy_cable", RecipeProvider.has(SFMItems.TOUGH_FANCY_CABLE.get()))
                 .save(writer, SFMResourceLocation.fromSFMPath("tough_fancy_to_fancy"));
 
-        beginShaped(SFMBlocks.TUNNELLED_CABLE_BLOCK.get(), 1)
+        beginShaped(SFMBlocks.TUNNELLED_CABLE.get(), 1)
                 .define('A', Tags.Items.FENCES)
-                .define('B', SFMBlocks.CABLE_BLOCK.get())
+                .define('B', SFMBlocks.CABLE.get())
                 .unlockedBy("has_fence", RecipeProvider.has(Tags.Items.FENCES))
-                .unlockedBy("has_cable", RecipeProvider.has(SFMItems.CABLE_ITEM.get()))
+                .unlockedBy("has_cable", RecipeProvider.has(SFMItems.CABLE.get()))
                 .pattern("A A")
                 .pattern("ABA")
                 .pattern("A A")
                 .save(writer, "tunnelled_cable_vertical");
 
-        beginShaped(SFMBlocks.TUNNELLED_CABLE_BLOCK.get(), 1)
+        beginShaped(SFMBlocks.TUNNELLED_CABLE.get(), 1)
                 .define('A', Tags.Items.FENCES)
-                .define('B', SFMBlocks.CABLE_BLOCK.get())
+                .define('B', SFMBlocks.CABLE.get())
                 .unlockedBy("has_fence", RecipeProvider.has(Tags.Items.FENCES))
-                .unlockedBy("has_cable", RecipeProvider.has(SFMItems.CABLE_ITEM.get()))
+                .unlockedBy("has_cable", RecipeProvider.has(SFMItems.CABLE.get()))
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern("AAA")
                 .save(writer, "tunnelled_cable_horizontal");
 
-        beginShaped(SFMBlocks.TUNNELLED_FANCY_CABLE_BLOCK.get(), 1)
+        beginShaped(SFMBlocks.TUNNELLED_FANCY_CABLE.get(), 1)
                 .define('A', Tags.Items.FENCES)
-                .define('B', SFMBlocks.FANCY_CABLE_BLOCK.get())
+                .define('B', SFMBlocks.FANCY_CABLE.get())
                 .unlockedBy("has_fence", RecipeProvider.has(Tags.Items.FENCES))
-                .unlockedBy("has_fancy_cable", RecipeProvider.has(SFMItems.FANCY_CABLE_ITEM.get()))
+                .unlockedBy("has_fancy_cable", RecipeProvider.has(SFMItems.FANCY_CABLE.get()))
                 .pattern("A A")
                 .pattern("ABA")
                 .pattern("A A")
                 .save(writer, "tunnelled_fancy_cable_vertical");
 
-        beginShaped(SFMBlocks.TUNNELLED_FANCY_CABLE_BLOCK.get(), 1)
+        beginShaped(SFMBlocks.TUNNELLED_FANCY_CABLE.get(), 1)
                 .define('A', Tags.Items.FENCES)
-                .define('B', SFMBlocks.FANCY_CABLE_BLOCK.get())
+                .define('B', SFMBlocks.FANCY_CABLE.get())
                 .unlockedBy("has_fence", RecipeProvider.has(Tags.Items.FENCES))
-                .unlockedBy("has_fancy_cable", RecipeProvider.has(SFMItems.FANCY_CABLE_ITEM.get()))
+                .unlockedBy("has_fancy_cable", RecipeProvider.has(SFMItems.FANCY_CABLE.get()))
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern("AAA")
                 .save(writer, "tunnelled_fancy_cable_horizontal");
 
-        beginShaped(SFMBlocks.MANAGER_BLOCK.get(), 1)
+        beginShaped(SFMBlocks.MANAGER.get(), 1)
                 .define('A', Tags.Items.CHESTS)
-                .define('B', SFMBlocks.CABLE_BLOCK.get())
+                .define('B', SFMBlocks.CABLE.get())
                 .define('C', Items.REPEATER)
                 .unlockedBy("has_iron_ingot", RecipeProvider.has(Items.IRON_INGOT))
                 .unlockedBy("has_chest", RecipeProvider.has(Tags.Items.CHESTS))
@@ -152,30 +152,30 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
                 .pattern("ABA")
                 .save(writer);
 
-        beginShaped(SFMBlocks.TUNNELLED_MANAGER_BLOCK.get(), 1)
+        beginShaped(SFMBlocks.TUNNELLED_MANAGER.get(), 1)
                 .define('A', Tags.Items.FENCES)
-                .define('B', SFMBlocks.MANAGER_BLOCK.get())
-                .unlockedBy("has_manager", RecipeProvider.has(SFMItems.MANAGER_ITEM.get()))
+                .define('B', SFMBlocks.MANAGER.get())
+                .unlockedBy("has_manager", RecipeProvider.has(SFMItems.MANAGER.get()))
                 .pattern("A A")
                 .pattern("ABA")
                 .pattern("A A")
                 .save(writer);
 
-        beginShaped(SFMBlocks.TUNNELLED_MANAGER_BLOCK.get(), 1)
+        beginShaped(SFMBlocks.TUNNELLED_MANAGER.get(), 1)
                 .define('A', Tags.Items.FENCES)
-                .define('B', SFMBlocks.MANAGER_BLOCK.get())
-                .unlockedBy("has_manager", RecipeProvider.has(SFMItems.MANAGER_ITEM.get()))
+                .define('B', SFMBlocks.MANAGER.get())
+                .unlockedBy("has_manager", RecipeProvider.has(SFMItems.MANAGER.get()))
                 .pattern("AAA")
                 .pattern(" B ")
                 .pattern("AAA")
                 .save(writer, "tunnelled_manager_horizontal");
 
-        beginShapeless(SFMBlocks.MANAGER_BLOCK.get(), 1)
-                .requires(SFMItems.TUNNELLED_MANAGER_ITEM.get())
-                .unlockedBy("has_manager", RecipeProvider.has(SFMItems.TUNNELLED_MANAGER_ITEM.get()))
+        beginShapeless(SFMBlocks.MANAGER.get(), 1)
+                .requires(SFMItems.TUNNELLED_MANAGER.get())
+                .unlockedBy("has_manager", RecipeProvider.has(SFMItems.TUNNELLED_MANAGER.get()))
                 .save(writer, "uncraft_tunnelled_manager");
 
-        beginShaped(SFMItems.LABEL_GUN_ITEM.get(), 1)
+        beginShaped(SFMItems.LABEL_GUN.get(), 1)
                 .define('S', Tags.Items.RODS_WOODEN)
                 .define('B', Tags.Items.DYES_BLACK)
                 .define('L', Tags.Items.DYES_BLUE)
@@ -187,7 +187,7 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
                 .save(writer, "tunnelled_manager_vertical");
 
 
-        beginShaped(SFMItems.NETWORK_TOOL_ITEM.get(), 1)
+        beginShaped(SFMItems.NETWORK_TOOL.get(), 1)
                 .define('S', Items.IRON_INGOT)
                 .define('L', Items.REDSTONE_LAMP)
                 .define('P', Items.HEAVY_WEIGHTED_PRESSURE_PLATE)
@@ -199,7 +199,7 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
                 .save(writer);
 
 
-        beginShaped(SFMItems.DISK_ITEM.get(), 1)
+        beginShaped(SFMItems.DISK.get(), 1)
                 .define('R', Blocks.REDSTONE_BLOCK)
                 .define('e', Items.REDSTONE)
                 .define('d', Items.REPEATER)
@@ -213,7 +213,7 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
                 .pattern("ede")
                 .save(writer);
 
-        beginShaped(SFMItems.WATER_TANK_ITEM.get(), 1)
+        beginShaped(SFMItems.WATER_TANK.get(), 1)
                 .define('b', Items.WATER_BUCKET)
                 .define('g', Items.IRON_BARS)
                 .define('p', Items.LIGHT_WEIGHTED_PRESSURE_PLATE)
@@ -223,13 +223,13 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
                 .pattern("gbg")
                 .save(writer);
 
-        beginShapeless(SFMItems.EXPERIENCE_GOOP_ITEM.get(), 1)
-                .requires(SFMItems.EXPERIENCE_SHARD_ITEM.get(), 9)
-                .unlockedBy("has_experience_shard", RecipeProvider.has(SFMItems.EXPERIENCE_SHARD_ITEM.get()))
+        beginShapeless(SFMItems.EXPERIENCE_GOOP.get(), 1)
+                .requires(SFMItems.EXPERIENCE_SHARD.get(), 9)
+                .unlockedBy("has_experience_shard", RecipeProvider.has(SFMItems.EXPERIENCE_SHARD.get()))
                 .save(writer);
 
 
-        beginShaped(SFMItems.PRINTING_PRESS_ITEM.get(), 1)
+        beginShaped(SFMItems.PRINTING_PRESS.get(), 1)
                 .define('a', Items.ANVIL)
                 .define('i', Tags.Items.DYES_BLACK)
                 .define('p', Items.LIGHT_WEIGHTED_PRESSURE_PLATE)
@@ -254,7 +254,7 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
                 writer,
                 SFMResourceLocation.fromSFMPath("enchanted_book_copy"),
                 Ingredient.of(Items.ENCHANTED_BOOK),
-                Ingredient.of(SFMItems.EXPERIENCE_GOOP_ITEM.get()),
+                Ingredient.of(SFMItems.EXPERIENCE_GOOP.get()),
                 Ingredient.of(Items.BOOK)
         );
 
@@ -269,9 +269,9 @@ public class SFMRecipesDatagen extends MCVersionAgnosticRecipeDataGen {
         addPrintingPressRecipe(
                 writer,
                 SFMResourceLocation.fromSFMPath("program_copy"),
-                Ingredient.of(SFMItems.DISK_ITEM.get()),
+                Ingredient.of(SFMItems.DISK.get()),
                 Ingredient.of(Tags.Items.DYES_BLACK),
-                Ingredient.of(SFMItems.DISK_ITEM.get())
+                Ingredient.of(SFMItems.DISK.get())
         );
 
         //noinspection DataFlowIssue

@@ -5,7 +5,7 @@ import ca.teamdman.sfm.common.block.BufferBlockTier;
 import ca.teamdman.sfm.common.capability.BufferBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -28,7 +28,7 @@ public class BufferBlockEntity extends BlockEntity {
             BlockPos pPos,
             BlockState pBlockState
     ) {
-        super(SFMBlockEntities.BUFFER_BLOCK_ENTITY.get(), pPos, pBlockState);
+        super(SFMBlockEntities.BUFFER.get(), pPos, pBlockState);
         BufferBlockTier tier = pBlockState.getBlock() instanceof BufferBlock bufferBlock
                                ? bufferBlock.tier
                                : BufferBlockTier.Unit;

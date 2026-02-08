@@ -6,7 +6,6 @@ import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
 import net.neoforged.neoforge.registries.DeferredRegister;
-import net.neoforged.neoforge.registries.RegistryBuilder;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.BooleanSupplier;

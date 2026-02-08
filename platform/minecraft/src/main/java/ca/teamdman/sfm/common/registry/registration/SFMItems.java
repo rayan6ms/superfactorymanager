@@ -1,16 +1,16 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.common.registry.registration;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.item.*;
-import net.minecraft.core.registries.BuiltInRegistries;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegister;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegisterBuilder;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.bus.api.IEventBus;
-
-import java.util.function.Supplier;
 
 public class SFMItems {
     public static final SFMDeferredRegister<Item> REGISTERER = new SFMDeferredRegisterBuilder<Item>()
@@ -18,60 +18,60 @@ public class SFMItems {
             .registry(SFMWellKnownRegistries.ITEMS.registryKey())
             .build();
 
-    public static final SFMRegistryObject<Item, BlockItem> MANAGER_ITEM
-            = register("manager", SFMBlocks.MANAGER_BLOCK);
+    public static final SFMRegistryObject<Item, BlockItem> MANAGER
+            = register("manager", SFMBlocks.MANAGER);
 
-    public static final SFMRegistryObject<Item, BlockItem> TUNNELLED_MANAGER_ITEM
+    public static final SFMRegistryObject<Item, BlockItem> TUNNELLED_MANAGER
             = register(
             "tunnelled_manager",
-            SFMBlocks.TUNNELLED_MANAGER_BLOCK
+            SFMBlocks.TUNNELLED_MANAGER
     );
 
-    public static final SFMRegistryObject<Item, BlockItem> CABLE_ITEM
-            = register("cable", SFMBlocks.CABLE_BLOCK);
+    public static final SFMRegistryObject<Item, BlockItem> CABLE
+            = register("cable", SFMBlocks.CABLE);
 
-    public static final SFMRegistryObject<Item, BlockItem> FANCY_CABLE_ITEM
+    public static final SFMRegistryObject<Item, BlockItem> FANCY_CABLE
             = register(
             "fancy_cable",
-            SFMBlocks.FANCY_CABLE_BLOCK
+            SFMBlocks.FANCY_CABLE
     );
 
-    public static final SFMRegistryObject<Item, BlockItem> TOUGH_CABLE_ITEM = register(
+    public static final SFMRegistryObject<Item, BlockItem> TOUGH_CABLE = register(
             "tough_cable",
-            SFMBlocks.TOUGH_CABLE_BLOCK
+            SFMBlocks.TOUGH_CABLE
     );
 
-    public static final SFMRegistryObject<Item, BlockItem> TOUGH_FANCY_CABLE_ITEM = register(
+    public static final SFMRegistryObject<Item, BlockItem> TOUGH_FANCY_CABLE = register(
             "tough_fancy_cable",
-            SFMBlocks.TOUGH_FANCY_CABLE_BLOCK
+            SFMBlocks.TOUGH_FANCY_CABLE
     );
 
-    public static final SFMRegistryObject<Item, BlockItem> TUNNELLED_CABLE_ITEM = register(
+    public static final SFMRegistryObject<Item, BlockItem> TUNNELLED_CABLE = register(
             "tunnelled_cable",
-            SFMBlocks.TUNNELLED_CABLE_BLOCK
+            SFMBlocks.TUNNELLED_CABLE
     );
 
-    public static final SFMRegistryObject<Item, BlockItem> TUNNELLED_FANCY_CABLE_ITEM = register(
+    public static final SFMRegistryObject<Item, BlockItem> TUNNELLED_FANCY_CABLE = register(
             "tunnelled_fancy_cable",
-            SFMBlocks.TUNNELLED_FANCY_CABLE_BLOCK
+            SFMBlocks.TUNNELLED_FANCY_CABLE
     );
 
-    public static final SFMRegistryObject<Item, PrintingPressBlockItem> PRINTING_PRESS_ITEM
+    public static final SFMRegistryObject<Item, PrintingPressBlockItem> PRINTING_PRESS
             = REGISTERER.register(
             "printing_press",
             PrintingPressBlockItem::new
     );
 
-    public static final SFMRegistryObject<Item, BlockItem> WATER_TANK_ITEM
+    public static final SFMRegistryObject<Item, BlockItem> WATER_TANK
             = register(
             "water_tank",
-            SFMBlocks.WATER_TANK_BLOCK
+            SFMBlocks.WATER_TANK
     );
 
-    public static final SFMRegistryObject<Item, DiskItem> DISK_ITEM
+    public static final SFMRegistryObject<Item, DiskItem> DISK
             = REGISTERER.register("disk", DiskItem::new);
 
-    public static final SFMRegistryObject<Item, LabelGunItem> LABEL_GUN_ITEM
+    public static final SFMRegistryObject<Item, LabelGunItem> LABEL_GUN
             = REGISTERER.register(
             "labelgun",
             () -> new LabelGunItem(
@@ -81,32 +81,32 @@ public class SFMItems {
             )
     );
 
-    public static final SFMRegistryObject<Item, NetworkToolItem> NETWORK_TOOL_ITEM
+    public static final SFMRegistryObject<Item, NetworkToolItem> NETWORK_TOOL
             = REGISTERER.register(
             "network_tool",
             NetworkToolItem::new
     );
 
-    public static final SFMRegistryObject<Item, FormItem> FORM_ITEM
+    public static final SFMRegistryObject<Item, FormItem> FORM
             = REGISTERER.register("form", FormItem::new);
 
-    public static final SFMRegistryObject<Item, ExperienceShardItem> EXPERIENCE_SHARD_ITEM
+    public static final SFMRegistryObject<Item, ExperienceShardItem> EXPERIENCE_SHARD
             = REGISTERER.register(
             "xp_shard",
             ExperienceShardItem::new
     );
 
-    public static final SFMRegistryObject<Item, ExperienceGoopItem> EXPERIENCE_GOOP_ITEM
+    public static final SFMRegistryObject<Item, ExperienceGoopItem> EXPERIENCE_GOOP
             = REGISTERER.register(
             "xp_goop",
             ExperienceGoopItem::new
     );
 
-    public static SFMRegistryObject<Item, BlockItem> BUFFER_ITEM = null;
+    public static SFMRegistryObject<Item, BlockItem> BUFFER = null;
 
     static {
         if (SFMEnvironmentUtils.isInIDE()) {
-            BUFFER_ITEM = register("buffer", SFMBlocks.BUFFER_BLOCK);
+            BUFFER = register("buffer", SFMBlocks.BUFFER_BLOCK);
         }
     }
 

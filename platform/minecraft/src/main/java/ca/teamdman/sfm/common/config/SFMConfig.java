@@ -1,9 +1,9 @@
 package ca.teamdman.sfm.common.config;
 
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import net.neoforged.fml.ModLoadingContext;
 import net.neoforged.fml.config.ModConfig;
+import net.neoforged.neoforge.common.ModConfigSpec;
 
 
 /*

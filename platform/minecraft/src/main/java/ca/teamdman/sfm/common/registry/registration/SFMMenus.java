@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.common.registry.registration;
 
 
 import ca.teamdman.sfm.SFM;
@@ -7,8 +7,11 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.blockentity.TestBarrelTankBlockEntity;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegister;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegisterBuilder;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.inventory.MenuType;
@@ -16,9 +19,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.common.extensions.IMenuTypeExtension;
 import net.neoforged.neoforge.network.IContainerFactory;
-import net.neoforged.neoforge.registries.DeferredRegister;
-
-import java.util.function.Supplier;
 
 public class SFMMenus {
     private static final SFMDeferredRegister<MenuType<?>> MENU_TYPES =
@@ -27,7 +27,7 @@ public class SFMMenus {
                     .registry(SFMWellKnownRegistries.MENU_TYPES.registryKey())
                     .build();
 
-    public static final SFMRegistryObject<MenuType<?>, MenuType<ManagerContainerMenu>> MANAGER_MENU = MENU_TYPES.register(
+    public static final SFMRegistryObject<MenuType<?>, MenuType<ManagerContainerMenu>> MANAGER = MENU_TYPES.register(
             "manager",
             () -> IMenuTypeExtension.create(
                     new IContainerFactory<>() {
@@ -67,7 +67,7 @@ public class SFMMenus {
                     })
     );
 
-    public static final SFMRegistryObject<MenuType<?>, MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK_MENU = MENU_TYPES.register(
+    public static final SFMRegistryObject<MenuType<?>, MenuType<TestBarrelTankContainerMenu>> TEST_BARREL_TANK = MENU_TYPES.register(
             "test_barrel_tank",
             () -> IMenuTypeExtension.create(
                     new IContainerFactory<>() {

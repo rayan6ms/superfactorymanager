@@ -2,7 +2,7 @@ package ca.teamdman.sfm.gametest.tests.falling_anvil;
 
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.item.FormItem;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
@@ -38,7 +38,7 @@ public class FallingAnvilProgramFormGameTest extends SFMGameTestDefinition {
     public void run(SFMGameTestHelper helper) {
         helper.setBlock(new BlockPos(1, 2, 1), Blocks.IRON_BLOCK);
         var pos = helper.absoluteVec(new Vec3(1.5, 3.5, 1.5));
-        ItemStack disk = new ItemStack(SFMItems.DISK_ITEM.get());
+        ItemStack disk = new ItemStack(SFMItems.DISK.get());
         DiskItem.setProgram(disk, """
                     NAME "falling anvil test"
                     EVERY 20 TICKS DO

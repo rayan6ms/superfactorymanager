@@ -3,9 +3,9 @@ package ca.teamdman.sfm.common.config;
 import ca.teamdman.sfm.client.registry.SFMTextEditors;
 import ca.teamdman.sfm.client.text_editor.ISFMTextEditorRegistration;
 import ca.teamdman.sfm.client.text_editor.SFMTextEditorIntellisenseLevel;
-import net.neoforged.neoforge.common.ModConfigSpec;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.resources.ResourceLocation;
+import net.neoforged.neoforge.common.ModConfigSpec;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

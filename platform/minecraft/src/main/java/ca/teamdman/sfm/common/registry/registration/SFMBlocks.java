@@ -1,19 +1,16 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.common.registry.registration;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.block.*;
-import net.minecraft.core.registries.BuiltInRegistries;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegister;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegisterBuilder;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.neoforged.bus.api.IEventBus;
-import net.neoforged.neoforge.registries.DeferredHolder;
-import net.neoforged.neoforge.registries.DeferredRegister;
-
-import java.util.HashSet;
-import java.util.Set;
-import java.util.function.Supplier;
 
 
 public class SFMBlocks {
@@ -23,7 +20,7 @@ public class SFMBlocks {
                     .registry(SFMWellKnownRegistries.BLOCKS.registryKey())
                     .build();
 
-    public static final SFMRegistryObject<Block, ManagerBlock> MANAGER_BLOCK
+    public static final SFMRegistryObject<Block, ManagerBlock> MANAGER
             =
             REGISTERER.register("manager", ManagerBlock::new);
 
@@ -36,29 +33,29 @@ public class SFMBlocks {
                     )
             );
 
-    public static final SFMRegistryObject<Block, TunnelledManagerBlock> TUNNELLED_MANAGER_BLOCK
+    public static final SFMRegistryObject<Block, TunnelledManagerBlock> TUNNELLED_MANAGER
             =
             REGISTERER.register("tunnelled_manager", TunnelledManagerBlock::new);
 
-    public static final SFMRegistryObject<Block, PrintingPressBlock> PRINTING_PRESS_BLOCK
+    public static final SFMRegistryObject<Block, PrintingPressBlock> PRINTING_PRESS
             =
             REGISTERER.register("printing_press", PrintingPressBlock::new);
 
-    public static final SFMRegistryObject<Block, WaterTankBlock> WATER_TANK_BLOCK
+    public static final SFMRegistryObject<Block, WaterTankBlock> WATER_TANK
             =
             REGISTERER.register("water_tank", WaterTankBlock::new);
 
-    public static final SFMRegistryObject<Block, TestBarrelBlock> TEST_BARREL_BLOCK
+    public static final SFMRegistryObject<Block, TestBarrelBlock> TEST_BARREL
             =
             REGISTERER.register("test_barrel", TestBarrelBlock::new);
 
-    public static final SFMRegistryObject<Block, TestBarrelTankBlock> TEST_BARREL_TANK_BLOCK // TODO: remove this one
+    public static final SFMRegistryObject<Block, TestBarrelTankBlock> TEST_BARREL_TANK // TODO: remove this one
             =
             REGISTERER.register("test_barrel_tank", TestBarrelTankBlock::new);
 
     // TODO: pull out properties from other block constructors to enable mutating in inheriting class constructors
 
-    public static final SFMRegistryObject<Block, CableBlock> CABLE_BLOCK =
+    public static final SFMRegistryObject<Block, CableBlock> CABLE =
             REGISTERER.register(
                     "cable",
                     () -> new CableBlock(
@@ -70,7 +67,7 @@ public class SFMBlocks {
                     )
             );
 
-    public static final SFMRegistryObject<Block, CableFacadeBlock> CABLE_FACADE_BLOCK =
+    public static final SFMRegistryObject<Block, CableFacadeBlock> CABLE_FACADE =
             REGISTERER.register(
                     "cable_facade",
                     () -> new CableFacadeBlock(
@@ -82,7 +79,7 @@ public class SFMBlocks {
                     )
             );
 
-    public static final SFMRegistryObject<Block, FancyCableBlock> FANCY_CABLE_BLOCK =
+    public static final SFMRegistryObject<Block, FancyCableBlock> FANCY_CABLE =
             REGISTERER.register(
                     "fancy_cable",
                     () -> new FancyCableBlock(
@@ -94,7 +91,7 @@ public class SFMBlocks {
                     )
             );
 
-    public static final SFMRegistryObject<Block, FancyCableFacadeBlock> FANCY_CABLE_FACADE_BLOCK =
+    public static final SFMRegistryObject<Block, FancyCableFacadeBlock> FANCY_CABLE_FACADE =
             REGISTERER.register(
                     "fancy_cable_facade",
                     () -> new FancyCableFacadeBlock(
@@ -107,7 +104,7 @@ public class SFMBlocks {
             );
 
     // Tough variants
-    public static final SFMRegistryObject<Block, ToughCableBlock> TOUGH_CABLE_BLOCK =
+    public static final SFMRegistryObject<Block, ToughCableBlock> TOUGH_CABLE =
             REGISTERER.register(
                     "tough_cable",
                     () -> new ToughCableBlock(
@@ -118,7 +115,7 @@ public class SFMBlocks {
                     )
             );
 
-    public static final SFMRegistryObject<Block, ToughCableFacadeBlock> TOUGH_CABLE_FACADE_BLOCK =
+    public static final SFMRegistryObject<Block, ToughCableFacadeBlock> TOUGH_CABLE_FACADE =
             REGISTERER.register(
                     "tough_cable_facade",
                     () -> new ToughCableFacadeBlock(
@@ -129,7 +126,7 @@ public class SFMBlocks {
                     )
             );
 
-    public static final SFMRegistryObject<Block, ToughFancyCableBlock> TOUGH_FANCY_CABLE_BLOCK =
+    public static final SFMRegistryObject<Block, ToughFancyCableBlock> TOUGH_FANCY_CABLE =
             REGISTERER.register(
                     "tough_fancy_cable",
                     () -> new ToughFancyCableBlock(
@@ -140,7 +137,7 @@ public class SFMBlocks {
                     )
             );
 
-    public static final SFMRegistryObject<Block, ToughFancyCableFacadeBlock> TOUGH_FANCY_CABLE_FACADE_BLOCK =
+    public static final SFMRegistryObject<Block, ToughFancyCableFacadeBlock> TOUGH_FANCY_CABLE_FACADE =
             REGISTERER.register(
                     "tough_fancy_cable_facade",
                     () -> new ToughFancyCableFacadeBlock(
@@ -152,7 +149,7 @@ public class SFMBlocks {
             );
 
     // Tunnelled variants
-    public static final SFMRegistryObject<Block, TunnelledCableBlock> TUNNELLED_CABLE_BLOCK =
+    public static final SFMRegistryObject<Block, TunnelledCableBlock> TUNNELLED_CABLE =
             REGISTERER.register(
                     "tunnelled_cable",
                     () -> new TunnelledCableBlock(
@@ -163,7 +160,7 @@ public class SFMBlocks {
                     )
             );
 
-    public static final SFMRegistryObject<Block, TunnelledCableFacadeBlock> TUNNELLED_CABLE_FACADE_BLOCK =
+    public static final SFMRegistryObject<Block, TunnelledCableFacadeBlock> TUNNELLED_CABLE_FACADE =
             REGISTERER.register(
                     "tunnelled_cable_facade",
                     () -> new TunnelledCableFacadeBlock(
@@ -174,7 +171,7 @@ public class SFMBlocks {
                     )
             );
 
-    public static final SFMRegistryObject<Block, TunnelledFancyCableBlock> TUNNELLED_FANCY_CABLE_BLOCK =
+    public static final SFMRegistryObject<Block, TunnelledFancyCableBlock> TUNNELLED_FANCY_CABLE =
             REGISTERER.register(
                     "tunnelled_fancy_cable",
                     () -> new TunnelledFancyCableBlock(
@@ -185,7 +182,7 @@ public class SFMBlocks {
                     )
             );
 
-    public static final SFMRegistryObject<Block, TunnelledFancyCableFacadeBlock> TUNNELLED_FANCY_CABLE_FACADE_BLOCK =
+    public static final SFMRegistryObject<Block, TunnelledFancyCableFacadeBlock> TUNNELLED_FANCY_CABLE_FACADE =
             REGISTERER.register(
                     "tunnelled_fancy_cable_facade",
                     () -> new TunnelledFancyCableFacadeBlock(

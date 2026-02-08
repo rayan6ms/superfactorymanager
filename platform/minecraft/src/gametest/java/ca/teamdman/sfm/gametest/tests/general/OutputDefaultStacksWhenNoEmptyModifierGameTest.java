@@ -2,8 +2,8 @@ package ca.teamdman.sfm.gametest.tests.general;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -29,9 +29,9 @@ public class OutputDefaultStacksWhenNoEmptyModifierGameTest extends SFMGameTestD
         BlockPos rightPos = new BlockPos(0, 2, 0);
         BlockPos leftPos = new BlockPos(2, 2, 0);
 
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
-        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
-        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
+        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL.get());
+        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL.get());
 
         var rightChest = helper.getItemHandler(rightPos);
         var leftChest = helper.getItemHandler(leftPos);
@@ -42,7 +42,7 @@ public class OutputDefaultStacksWhenNoEmptyModifierGameTest extends SFMGameTestD
         rightChest.insertItem(0, new ItemStack(Blocks.DIRT, 10), false);
 
         ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
 
         // No EMPTY SLOTS IN modifier -> should stack into slot 0 first
         manager.setProgram((

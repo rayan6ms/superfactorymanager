@@ -3,8 +3,8 @@ package ca.teamdman.sfm.gametest.tests.compat.multiple;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -26,10 +26,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.neoforged.common.capabilities.ForgeCapabilities;
 import net.neoforged.fluids.FluidStack;
 import net.neoforged.fluids.capability.IFluidHandler;
-import net.neoforged.gametest.GameTestHolder;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
@@ -133,10 +131,10 @@ public class MeatFluidGameTest extends SFMGameTestDefinition {
                 .insertItem(0, new ItemStack(Items.RAW_IRON, 64), false);
 
         // place the manager
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
         ManagerBlockEntity manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
         assert manager != null;
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
         manager.setProgram("""
                                    NAME "bruh"
                                    EVERY 20 TICKS DO
