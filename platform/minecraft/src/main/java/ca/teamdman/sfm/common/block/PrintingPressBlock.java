@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.Containers;
@@ -26,7 +26,7 @@ public class PrintingPressBlock extends BaseEntityBlock implements EntityBlock {
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-        return SFMBlockEntities.PRINTING_PRESS_BLOCK_ENTITY
+        return SFMBlockEntities.PRINTING_PRESS
                 .get()
                 .create(pos, state);
     }

@@ -2,8 +2,8 @@ package ca.teamdman.sfm.common.recipe;
 
 import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
 import ca.teamdman.sfm.common.item.FormItem;
-import ca.teamdman.sfm.common.registry.SFMRecipeSerializers;
-import ca.teamdman.sfm.common.registry.SFMRecipeTypes;
+import ca.teamdman.sfm.common.registry.registration.SFMRecipeSerializers;
+import ca.teamdman.sfm.common.registry.registration.SFMRecipeTypes;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;

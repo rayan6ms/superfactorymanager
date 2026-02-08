@@ -3,11 +3,13 @@ package ca.teamdman.sfm.common.blockentity;
 import ca.teamdman.sfm.common.block.WaterTankBlock;
 import ca.teamdman.sfm.common.block_network.BlockNetwork;
 import ca.teamdman.sfm.common.block_network.WaterNetworkManager;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.common.util.LazyOptional;
 import net.neoforged.neoforge.fluids.FluidStack;
 import net.neoforged.neoforge.fluids.capability.templates.FluidTank;
 
@@ -41,7 +43,7 @@ public class WaterTankBlockEntity extends BlockEntity {
             BlockState state
     ) {
 
-        super(SFMBlockEntities.WATER_TANK_BLOCK_ENTITY.get(), pos, state);
+        super(SFMBlockEntities.WATER_TANK.get(), pos, state);
     }
 
     public void updateActiveFromBlockState() {

@@ -2,8 +2,8 @@ package ca.teamdman.sfm.gametest.tests.migrated;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -47,7 +47,7 @@ public class CableSpiralGameTest extends SFMGameTestDefinition {
         while (len > 0) {
             // fill len blocks
             for (int i = 0; i < len; i++) {
-                helper.setBlock(current, SFMBlocks.CABLE_BLOCK.get());
+                helper.setBlock(current, SFMBlocks.CABLE.get());
                 current = current.relative(dir);
             }
             // turn right
@@ -56,9 +56,9 @@ public class CableSpiralGameTest extends SFMGameTestDefinition {
         }
 
         // fill in the blocks needed for the test
-        helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
-        helper.setBlock(start, SFMBlocks.TEST_BARREL_BLOCK.get());
-        helper.setBlock(end, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.MANAGER.get());
+        helper.setBlock(start, SFMBlocks.TEST_BARREL.get());
+        helper.setBlock(end, SFMBlocks.TEST_BARREL.get());
 
         // add some items
         Container startChest = (Container) helper.getBlockEntity(start);
@@ -67,7 +67,7 @@ public class CableSpiralGameTest extends SFMGameTestDefinition {
 
 
         ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(new BlockPos(1, 2, 0));
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
 
         // set the labels
         LabelPositionHolder.empty()

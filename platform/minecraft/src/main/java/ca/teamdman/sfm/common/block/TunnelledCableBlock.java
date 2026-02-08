@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
@@ -26,7 +26,7 @@ public class TunnelledCableBlock extends CableBlock implements EntityBlock {
             BlockPos blockPos,
             BlockState blockState
     ) {
-        return SFMBlockEntities.TUNNELLED_CABLE_BLOCK_ENTITY.get().create(blockPos, blockState);
+        return SFMBlockEntities.TUNNELLED_CABLE.get().create(blockPos, blockState);
     }
 
     @Override
@@ -43,11 +43,11 @@ public class TunnelledCableBlock extends CableBlock implements EntityBlock {
 
     @Override
     public IFacadableBlock getNonFacadeBlock() {
-        return SFMBlocks.TUNNELLED_CABLE_BLOCK.get();
+        return SFMBlocks.TUNNELLED_CABLE.get();
     }
 
     @Override
     public IFacadableBlock getFacadeBlock() {
-        return SFMBlocks.TUNNELLED_CABLE_FACADE_BLOCK.get();
+        return SFMBlocks.TUNNELLED_CABLE_FACADE.get();
     }
 }

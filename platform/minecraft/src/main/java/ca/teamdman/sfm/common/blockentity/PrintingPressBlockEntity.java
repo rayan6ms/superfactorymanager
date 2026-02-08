@@ -2,9 +2,9 @@ package ca.teamdman.sfm.common.blockentity;
 
 import ca.teamdman.sfm.common.recipe.NotContainer;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
-import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.registry.SFMRecipeTypes;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMRecipeTypes;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -17,6 +17,9 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.neoforged.neoforge.common.capabilities.Capability;
+import net.neoforged.neoforge.common.util.LazyOptional;
+import net.neoforged.neoforge.items.IItemHandler;
 import net.neoforged.neoforge.items.ItemStackHandler;
 import net.neoforged.neoforge.items.wrapper.CombinedInvWrapper;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +45,7 @@ public class PrintingPressBlockEntity extends BlockEntity implements NotContaine
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return stack.getItem() == SFMItems.FORM_ITEM.get();
+            return stack.getItem() == SFMItems.FORM.get();
         }
     };
 
@@ -88,7 +91,7 @@ public class PrintingPressBlockEntity extends BlockEntity implements NotContaine
     public PrintingPressBlockEntity(
             BlockPos pPos, BlockState pBlockState
     ) {
-        super(SFMBlockEntities.PRINTING_PRESS_BLOCK_ENTITY.get(), pPos, pBlockState);
+        super(SFMBlockEntities.PRINTING_PRESS.get(), pPos, pBlockState);
     }
 
     @Override
