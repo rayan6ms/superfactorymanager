@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.gametest.tests.migrated;
 
 import ca.teamdman.sfm.common.block_network.CableNetworkManager;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -29,9 +29,9 @@ public class CableNetworkRebuildingGameTest extends SFMGameTestDefinition {
 
     @Override
     public void run(SFMGameTestHelper helper) {
-        helper.setBlock(new BlockPos(0, 2, 0), SFMBlocks.CABLE_BLOCK.get());
-        helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.CABLE_BLOCK.get());
-        helper.setBlock(new BlockPos(2, 2, 0), SFMBlocks.CABLE_BLOCK.get());
+        helper.setBlock(new BlockPos(0, 2, 0), SFMBlocks.CABLE.get());
+        helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.CABLE.get());
+        helper.setBlock(new BlockPos(2, 2, 0), SFMBlocks.CABLE.get());
         var network = CableNetworkManager.getOrRegisterNetworkFromCablePosition(
                 helper.getLevel(),
                 helper.absolutePos(new BlockPos(0, 2, 0))

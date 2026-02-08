@@ -2,7 +2,7 @@ package ca.teamdman.sfm.gametest.tests.migrated;
 
 import ca.teamdman.sfm.common.block_network.CableNetwork;
 import ca.teamdman.sfm.common.block_network.CableNetworkManager;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
@@ -37,7 +37,7 @@ public class CableNetworkFormationGameTest extends SFMGameTestDefinition {
     public void run(SFMGameTestHelper helper) {
         // create a row of cables
         for (int i = 0; i < 10; i++) {
-            helper.setBlock(new BlockPos(i, 2, 0), SFMBlocks.CABLE_BLOCK.get());
+            helper.setBlock(new BlockPos(i, 2, 0), SFMBlocks.CABLE.get());
         }
 
         var net = CableNetworkManager
@@ -86,7 +86,7 @@ public class CableNetworkFormationGameTest extends SFMGameTestDefinition {
         }
 
         // repair the cable
-        helper.setBlock(new BlockPos(5, 2, 0), SFMBlocks.CABLE_BLOCK.get());
+        helper.setBlock(new BlockPos(5, 2, 0), SFMBlocks.CABLE.get());
         // the network should merge
         net = CableNetworkManager
                 .getOrRegisterNetworkFromCablePosition(helper.getLevel(), helper.absolutePos(new BlockPos(0, 2, 0)))
@@ -101,8 +101,8 @@ public class CableNetworkFormationGameTest extends SFMGameTestDefinition {
         }
 
         // add cables in the corner
-        helper.setBlock(new BlockPos(0, 2, 1), SFMBlocks.CABLE_BLOCK.get());
-        helper.setBlock(new BlockPos(1, 2, 1), SFMBlocks.CABLE_BLOCK.get());
+        helper.setBlock(new BlockPos(0, 2, 1), SFMBlocks.CABLE.get());
+        helper.setBlock(new BlockPos(1, 2, 1), SFMBlocks.CABLE.get());
         assertTrue(CableNetworkManager
                            .getOrRegisterNetworkFromCablePosition(
                                    helper.getLevel(),
@@ -123,9 +123,9 @@ public class CableNetworkFormationGameTest extends SFMGameTestDefinition {
 
 
         // create a new network in a plus shape
-        helper.setBlock(new BlockPos(15, 2, 15), SFMBlocks.CABLE_BLOCK.get());
+        helper.setBlock(new BlockPos(15, 2, 15), SFMBlocks.CABLE.get());
         for (Direction value : SFMDirections.DIRECTIONS_WITHOUT_NULL) {
-            helper.setBlock(new BlockPos(15, 2, 15).relative(value), SFMBlocks.CABLE_BLOCK.get());
+            helper.setBlock(new BlockPos(15, 2, 15).relative(value), SFMBlocks.CABLE.get());
         }
         // should all be on the same network
         net = CableNetworkManager
@@ -168,7 +168,7 @@ public class CableNetworkFormationGameTest extends SFMGameTestDefinition {
         }
 
         // add the block back
-        helper.setBlock(new BlockPos(15, 2, 15), SFMBlocks.CABLE_BLOCK.get());
+        helper.setBlock(new BlockPos(15, 2, 15), SFMBlocks.CABLE.get());
         // the network should merge
         net = CableNetworkManager
                 .getOrRegisterNetworkFromCablePosition(helper.getLevel(), helper.absolutePos(new BlockPos(15, 2, 15)))
@@ -188,7 +188,7 @@ public class CableNetworkFormationGameTest extends SFMGameTestDefinition {
 
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
-                helper.setBlock(new BlockPos(7 + i, 2, 7 + j), SFMBlocks.CABLE_BLOCK.get());
+                helper.setBlock(new BlockPos(7 + i, 2, 7 + j), SFMBlocks.CABLE.get());
             }
         }
         // make sure it's all in a single network

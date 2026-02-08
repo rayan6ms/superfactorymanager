@@ -1,6 +1,6 @@
 package ca.teamdman.sfml.ast;
 
-import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.registry.registration.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import net.minecraft.resources.ResourceLocation;
 import org.jetbrains.annotations.NotNull;

@@ -5,7 +5,7 @@ import ca.teamdman.sfm.common.block_network.CableNetworkManager;
 import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
 import ca.teamdman.sfm.common.facade.FacadeData;
 import ca.teamdman.sfm.common.facade.FacadeTextureMode;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -110,20 +110,20 @@ public class CableArrayGameTest extends SFMGameTestDefinition {
     private static Variant @NotNull [] createVariants() {
 
         return new Variant[]{
-                new Variant(SFMBlocks.CABLE_BLOCK.get(), false),
-                new Variant(SFMBlocks.CABLE_FACADE_BLOCK.get(), true),
-                new Variant(SFMBlocks.FANCY_CABLE_BLOCK.get(), false),
-                new Variant(SFMBlocks.FANCY_CABLE_FACADE_BLOCK.get(), true),
-                new Variant(SFMBlocks.TOUGH_CABLE_BLOCK.get(), false),
-                new Variant(SFMBlocks.TOUGH_CABLE_FACADE_BLOCK.get(), true),
-                new Variant(SFMBlocks.TOUGH_FANCY_CABLE_BLOCK.get(), false),
-                new Variant(SFMBlocks.TOUGH_FANCY_CABLE_FACADE_BLOCK.get(), true),
-                new Variant(SFMBlocks.TUNNELLED_CABLE_BLOCK.get(), false),
-                new Variant(SFMBlocks.TUNNELLED_CABLE_FACADE_BLOCK.get(), true),
-                new Variant(SFMBlocks.TUNNELLED_FANCY_CABLE_BLOCK.get(), false),
-                new Variant(SFMBlocks.TUNNELLED_FANCY_CABLE_FACADE_BLOCK.get(), true),
-                new Variant(SFMBlocks.MANAGER_BLOCK.get(), false),
-                new Variant(SFMBlocks.TUNNELLED_MANAGER_BLOCK.get(), false)
+                new Variant(SFMBlocks.CABLE.get(), false),
+                new Variant(SFMBlocks.CABLE_FACADE.get(), true),
+                new Variant(SFMBlocks.FANCY_CABLE.get(), false),
+                new Variant(SFMBlocks.FANCY_CABLE_FACADE.get(), true),
+                new Variant(SFMBlocks.TOUGH_CABLE.get(), false),
+                new Variant(SFMBlocks.TOUGH_CABLE_FACADE.get(), true),
+                new Variant(SFMBlocks.TOUGH_FANCY_CABLE.get(), false),
+                new Variant(SFMBlocks.TOUGH_FANCY_CABLE_FACADE.get(), true),
+                new Variant(SFMBlocks.TUNNELLED_CABLE.get(), false),
+                new Variant(SFMBlocks.TUNNELLED_CABLE_FACADE.get(), true),
+                new Variant(SFMBlocks.TUNNELLED_FANCY_CABLE.get(), false),
+                new Variant(SFMBlocks.TUNNELLED_FANCY_CABLE_FACADE.get(), true),
+                new Variant(SFMBlocks.MANAGER.get(), false),
+                new Variant(SFMBlocks.TUNNELLED_MANAGER.get(), false)
         };
     }
 

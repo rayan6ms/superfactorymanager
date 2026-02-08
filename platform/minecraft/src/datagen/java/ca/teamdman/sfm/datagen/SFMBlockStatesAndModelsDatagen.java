@@ -4,8 +4,8 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.block.BufferBlock;
 import ca.teamdman.sfm.common.block.FancyCableBlock;
 import ca.teamdman.sfm.common.block.WaterTankBlock;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMRegistryObject;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticBlockStatesAndModelsDataGen;
 import net.minecraft.core.Direction;
@@ -29,24 +29,24 @@ public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStates
         registerTunnelledManager();
         registerTestBarrelTank();
         registerCableVariants(
-                SFMBlocks.CABLE_BLOCK,
-                SFMBlocks.CABLE_FACADE_BLOCK,
-                SFMBlocks.FANCY_CABLE_BLOCK,
-                SFMBlocks.FANCY_CABLE_FACADE_BLOCK
+                SFMBlocks.CABLE,
+                SFMBlocks.CABLE_FACADE,
+                SFMBlocks.FANCY_CABLE,
+                SFMBlocks.FANCY_CABLE_FACADE
 
         );
         registerCableVariants(
-                SFMBlocks.TUNNELLED_CABLE_BLOCK,
-                SFMBlocks.TUNNELLED_CABLE_FACADE_BLOCK,
-                SFMBlocks.TUNNELLED_FANCY_CABLE_BLOCK,
-                SFMBlocks.TUNNELLED_FANCY_CABLE_FACADE_BLOCK
+                SFMBlocks.TUNNELLED_CABLE,
+                SFMBlocks.TUNNELLED_CABLE_FACADE,
+                SFMBlocks.TUNNELLED_FANCY_CABLE,
+                SFMBlocks.TUNNELLED_FANCY_CABLE_FACADE
 
         );
         registerCableVariants(
-                SFMBlocks.TOUGH_CABLE_BLOCK,
-                SFMBlocks.TOUGH_CABLE_FACADE_BLOCK,
-                SFMBlocks.TOUGH_FANCY_CABLE_BLOCK,
-                SFMBlocks.TOUGH_FANCY_CABLE_FACADE_BLOCK
+                SFMBlocks.TOUGH_CABLE,
+                SFMBlocks.TOUGH_CABLE_FACADE,
+                SFMBlocks.TOUGH_FANCY_CABLE,
+                SFMBlocks.TOUGH_FANCY_CABLE_FACADE
 
         );
         registerPrintingPress();
@@ -60,7 +60,7 @@ public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStates
         ModelFile barrelModel = models().getExistingFile(mcLoc("block/barrel"));
         ModelFile barrelOpenModel = models().getExistingFile(mcLoc("block/barrel_open"));
 
-        getVariantBuilder(SFMBlocks.TEST_BARREL_BLOCK.get())
+        getVariantBuilder(SFMBlocks.TEST_BARREL.get())
                 .forAllStates(state -> {
                     Direction facing = state.getValue(BlockStateProperties.FACING);
                     boolean open = state.getValue(BlockStateProperties.OPEN);
@@ -104,14 +104,14 @@ public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStates
 
     private void registerPrintingPress() {
 
-        simpleBlock(SFMBlocks.PRINTING_PRESS_BLOCK.get(), models().getExistingFile(modLoc("block/printing_press")));
+        simpleBlock(SFMBlocks.PRINTING_PRESS.get(), models().getExistingFile(modLoc("block/printing_press")));
     }
 
     private void registerTestBarrelTank() {
 
         simpleBlock(
-                SFMBlocks.TEST_BARREL_TANK_BLOCK.get(), models().cubeAll(
-                        SFMBlocks.TEST_BARREL_TANK_BLOCK.getPath(),
+                SFMBlocks.TEST_BARREL_TANK.get(), models().cubeAll(
+                        SFMBlocks.TEST_BARREL_TANK.getPath(),
                         modLoc("block/test_barrel_tank")
                 ).texture("particle", "#all")
         );
@@ -120,8 +120,8 @@ public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStates
     private void registerTunnelledManager() {
 
         simpleBlock(
-                SFMBlocks.TUNNELLED_MANAGER_BLOCK.get(), models().cubeBottomTop(
-                        SFMBlocks.TUNNELLED_MANAGER_BLOCK.getPath(),
+                SFMBlocks.TUNNELLED_MANAGER.get(), models().cubeBottomTop(
+                        SFMBlocks.TUNNELLED_MANAGER.getPath(),
                         modLoc("block/tunnelled_manager_side"),
                         modLoc("block/tunnelled_manager_bot"),
                         modLoc("block/tunnelled_manager_top")
@@ -132,8 +132,8 @@ public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStates
     private void registerManager() {
 
         simpleBlock(
-                SFMBlocks.MANAGER_BLOCK.get(), models().cubeBottomTop(
-                        SFMBlocks.MANAGER_BLOCK.getPath(),
+                SFMBlocks.MANAGER.get(), models().cubeBottomTop(
+                        SFMBlocks.MANAGER.getPath(),
                         modLoc("block/manager_side"),
                         modLoc("block/manager_bot"),
                         modLoc("block/manager_top")
@@ -145,15 +145,15 @@ public class SFMBlockStatesAndModelsDatagen extends MCVersionAgnosticBlockStates
 
         ModelFile waterIntakeModelActive = models()
                 .cubeAll(
-                        SFMBlocks.WATER_TANK_BLOCK.getPath() + "_active",
+                        SFMBlocks.WATER_TANK.getPath() + "_active",
                         modLoc("block/water_intake_active")
                 );
         ModelFile waterIntakeModelInactive = models()
                 .cubeAll(
-                        SFMBlocks.WATER_TANK_BLOCK.getPath() + "_inactive",
+                        SFMBlocks.WATER_TANK.getPath() + "_inactive",
                         modLoc("block/water_intake_inactive")
                 );
-        getVariantBuilder(SFMBlocks.WATER_TANK_BLOCK.get())
+        getVariantBuilder(SFMBlocks.WATER_TANK.get())
                 .forAllStates(state -> ConfiguredModel
                         .builder()
                         .modelFile(

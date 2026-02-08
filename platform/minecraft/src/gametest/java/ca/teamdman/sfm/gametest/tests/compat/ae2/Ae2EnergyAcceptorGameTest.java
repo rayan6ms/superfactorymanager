@@ -4,8 +4,8 @@ import appeng.core.definitions.AEBlocks;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.compat.SFMMekanismCompat;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -47,7 +47,7 @@ public class Ae2EnergyAcceptorGameTest extends SFMGameTestDefinition {
                 DataType.OUTPUT
         );
 
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
         var manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
 
         helper.setBlock(acceptorPos, AEBlocks.ENERGY_ACCEPTOR.block());
@@ -55,7 +55,7 @@ public class Ae2EnergyAcceptorGameTest extends SFMGameTestDefinition {
         helper.setBlock(dense2Pos, AEBlocks.DENSE_ENERGY_CELL.block());
 
         // Program: move FE from cube to energy acceptor
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
         manager.setProgram(
                 """
                         EVERY 20 TICKS DO

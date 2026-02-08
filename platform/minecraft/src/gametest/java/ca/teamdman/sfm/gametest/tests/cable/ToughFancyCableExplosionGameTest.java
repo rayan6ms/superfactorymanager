@@ -2,7 +2,7 @@ package ca.teamdman.sfm.gametest.tests.cable;
 
 import ca.teamdman.sfm.common.facade.FacadeData;
 import ca.teamdman.sfm.common.facade.FacadeTextureMode;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -25,7 +25,7 @@ public class ToughFancyCableExplosionGameTest extends SFMGameTestDefinition {
         BlockPos absolute = helper.absolutePos(localPos);
 
         // place tough fancy cable facade
-        helper.getLevel().setBlock(absolute, SFMBlocks.TOUGH_FANCY_CABLE_FACADE_BLOCK.get().defaultBlockState(), 3);
+        helper.getLevel().setBlock(absolute, SFMBlocks.TOUGH_FANCY_CABLE_FACADE.get().defaultBlockState(), 3);
 
         // set facade to mimic obsidian
         var be = helper.getLevel().getBlockEntity(absolute);
@@ -44,7 +44,7 @@ public class ToughFancyCableExplosionGameTest extends SFMGameTestDefinition {
 
         // check after 40 ticks that the block still exists
         helper.runAfterDelay(40, () -> {
-            if (!helper.getLevel().getBlockState(absolute).is(SFMBlocks.TOUGH_FANCY_CABLE_FACADE_BLOCK.get())) {
+            if (!helper.getLevel().getBlockState(absolute).is(SFMBlocks.TOUGH_FANCY_CABLE_FACADE.get())) {
                 helper.fail("Tough fancy cable facade was destroyed by TNT explosion");
             } else {
                 helper.succeed();

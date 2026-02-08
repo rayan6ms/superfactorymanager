@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.gametest.tests.water_tank;
 
 import ca.teamdman.sfm.common.blockentity.WaterTankBlockEntity;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -38,7 +38,7 @@ public class WaterTankNetworkFormationGameTest extends SFMGameTestDefinition {
     public void run(SFMGameTestHelper helper) {
         // Create a row of 5 water tanks (without water - testing network formation only)
         for (int i = 0; i < 5; i++) {
-            helper.setBlock(new BlockPos(i, 2, 0), SFMBlocks.WATER_TANK_BLOCK.get());
+            helper.setBlock(new BlockPos(i, 2, 0), SFMBlocks.WATER_TANK.get());
         }
 
         // All tanks should be in the same network
@@ -82,7 +82,7 @@ public class WaterTankNetworkFormationGameTest extends SFMGameTestDefinition {
         }
 
         // Repair the network by placing the middle tank back
-        helper.setBlock(new BlockPos(2, 2, 0), SFMBlocks.WATER_TANK_BLOCK.get());
+        helper.setBlock(new BlockPos(2, 2, 0), SFMBlocks.WATER_TANK.get());
 
         // All tanks should be in the same network again
         for (int i = 0; i < 5; i++) {
@@ -99,11 +99,11 @@ public class WaterTankNetworkFormationGameTest extends SFMGameTestDefinition {
         BlockPos west = center.west();    // (9, 2, 7)
 
         // Place the plus shape
-        helper.setBlock(center, SFMBlocks.WATER_TANK_BLOCK.get());
-        helper.setBlock(north, SFMBlocks.WATER_TANK_BLOCK.get());
-        helper.setBlock(south, SFMBlocks.WATER_TANK_BLOCK.get());
-        helper.setBlock(east, SFMBlocks.WATER_TANK_BLOCK.get());
-        helper.setBlock(west, SFMBlocks.WATER_TANK_BLOCK.get());
+        helper.setBlock(center, SFMBlocks.WATER_TANK.get());
+        helper.setBlock(north, SFMBlocks.WATER_TANK.get());
+        helper.setBlock(south, SFMBlocks.WATER_TANK.get());
+        helper.setBlock(east, SFMBlocks.WATER_TANK.get());
+        helper.setBlock(west, SFMBlocks.WATER_TANK.get());
 
         // All 5 tanks in the plus should be in the same network
         WaterTankBlockEntity centerTank = (WaterTankBlockEntity) helper.getBlockEntity(center);
@@ -152,7 +152,7 @@ public class WaterTankNetworkFormationGameTest extends SFMGameTestDefinition {
         );
 
         // Restore the center - all 5 should merge back into one network
-        helper.setBlock(center, SFMBlocks.WATER_TANK_BLOCK.get());
+        helper.setBlock(center, SFMBlocks.WATER_TANK.get());
 
         centerTank = (WaterTankBlockEntity) helper.getBlockEntity(center);
         assertTrue(centerTank != null, "Center tank should exist after restoration");

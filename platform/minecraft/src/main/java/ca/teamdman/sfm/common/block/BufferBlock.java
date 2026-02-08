@@ -2,8 +2,8 @@ package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.blockentity.BufferBlockEntity;
 import ca.teamdman.sfm.common.compat.SFMModCompat;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
-import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
@@ -43,7 +43,7 @@ public class BufferBlock extends BaseEntityBlock {
             BlockPos pPos,
             BlockState pState
     ) {
-        return SFMBlockEntities.BUFFER_BLOCK_ENTITY.get().create(pPos, pState);
+        return SFMBlockEntities.BUFFER.get().create(pPos, pState);
     }
 
     @Override
@@ -71,7 +71,7 @@ public class BufferBlock extends BaseEntityBlock {
         if (pLevel.isClientSide()) return null;
         return createTickerHelper(
                 pBlockEntityType,
-                SFMBlockEntities.BUFFER_BLOCK_ENTITY.get(),
+                SFMBlockEntities.BUFFER.get(),
                 BufferBlockEntity::serverTick
         );
     }
