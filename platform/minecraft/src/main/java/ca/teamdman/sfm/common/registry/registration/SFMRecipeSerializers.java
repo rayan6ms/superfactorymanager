@@ -1,9 +1,13 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.common.registry.registration;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.recipe.DiskResetRecipe;
 import ca.teamdman.sfm.common.recipe.LabelGunResetRecipe;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegister;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegisterBuilder;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.SimpleRecipeSerializer;
 import net.minecraftforge.eventbus.api.IEventBus;

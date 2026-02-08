@@ -3,9 +3,9 @@ package ca.teamdman.sfm.common.blockentity;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.recipe.NotContainer;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
-import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.registry.SFMRecipeTypes;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMRecipeTypes;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -48,7 +48,7 @@ public class PrintingPressBlockEntity extends BlockEntity implements NotContaine
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return stack.getItem() == SFMItems.FORM_ITEM.get();
+            return stack.getItem() == SFMItems.FORM.get();
         }
     };
 
@@ -97,7 +97,7 @@ public class PrintingPressBlockEntity extends BlockEntity implements NotContaine
     public PrintingPressBlockEntity(
             BlockPos pPos, BlockState pBlockState
     ) {
-        super(SFMBlockEntities.PRINTING_PRESS_BLOCK_ENTITY.get(), pPos, pBlockState);
+        super(SFMBlockEntities.PRINTING_PRESS.get(), pPos, pBlockState);
     }
 
     @Override

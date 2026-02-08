@@ -3,7 +3,7 @@ package ca.teamdman.sfm.client.registry;
 import ca.teamdman.sfm.client.render.CableFacadeBlockModelWrapper;
 import ca.teamdman.sfm.client.render.FancyCableFacadeBlockModelWrapper;
 import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMDist;
@@ -34,27 +34,27 @@ public class SFMBlockModelWrappers {
         // Define the known relationships
         var relationships = new FacadeModelRelationship[]{
                 new FacadeModelRelationship(
-                        SFMBlocks.CABLE_FACADE_BLOCK,
+                        SFMBlocks.CABLE_FACADE,
                         CableFacadeBlockModelWrapper::new
                 ),
                 new FacadeModelRelationship(
-                        SFMBlocks.FANCY_CABLE_FACADE_BLOCK,
+                        SFMBlocks.FANCY_CABLE_FACADE,
                         FancyCableFacadeBlockModelWrapper::new
                 ),
                 new FacadeModelRelationship(
-                        SFMBlocks.TUNNELLED_CABLE_FACADE_BLOCK,
+                        SFMBlocks.TUNNELLED_CABLE_FACADE,
                         CableFacadeBlockModelWrapper::new
                 ),
                 new FacadeModelRelationship(
-                        SFMBlocks.TUNNELLED_FANCY_CABLE_FACADE_BLOCK,
+                        SFMBlocks.TUNNELLED_FANCY_CABLE_FACADE,
                         FancyCableFacadeBlockModelWrapper::new
                 ),
                 new FacadeModelRelationship(
-                        SFMBlocks.TOUGH_CABLE_FACADE_BLOCK,
+                        SFMBlocks.TOUGH_CABLE_FACADE,
                         CableFacadeBlockModelWrapper::new
                 ),
                 new FacadeModelRelationship(
-                        SFMBlocks.TOUGH_FANCY_CABLE_FACADE_BLOCK,
+                        SFMBlocks.TOUGH_FANCY_CABLE_FACADE,
                         FancyCableFacadeBlockModelWrapper::new
                 ),
                 };

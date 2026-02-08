@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.common.item;
 
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMCreativeTabs;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMCreativeTabs;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
@@ -15,7 +15,7 @@ import java.util.List;
 
 public class PrintingPressBlockItem extends BlockItem {
     public PrintingPressBlockItem() {
-        super(SFMBlocks.PRINTING_PRESS_BLOCK.get(), new Properties().tab(SFMCreativeTabs.TAB));
+        super(SFMBlocks.PRINTING_PRESS.get(), new Properties().tab(SFMCreativeTabs.MAIN));
     }
 
     @Override

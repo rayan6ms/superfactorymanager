@@ -3,8 +3,8 @@ package ca.teamdman.sfm.client.handler;
 import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.net.ServerboundNetworkToolToggleOverlayPacket;
-import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMDist;
 import ca.teamdman.sfm.common.util.SFMHandUtils;
 import net.minecraft.client.Minecraft;
@@ -51,7 +51,7 @@ public class NetworkToolKeyMappingHandler {
                     assert minecraft.player != null;
                     InteractionHand hand = SFMHandUtils.getHandHoldingItem(
                             minecraft.player,
-                            SFMItems.NETWORK_TOOL_ITEM.get()
+                            SFMItems.NETWORK_TOOL.get()
                     );
                     if (hand == null) return;
                     // send packet to server to toggle mode

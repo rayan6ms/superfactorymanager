@@ -4,8 +4,8 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
 import ca.teamdman.sfm.common.program.ExecuteProgramBehaviour;
 import ca.teamdman.sfm.common.program.ProgramContext;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import ca.teamdman.sfml.ast.ASTBuilder;
 import ca.teamdman.sfml.ast.BoolExpr;
@@ -85,9 +85,9 @@ public class SFMDeclarativeTestBuilder {
     }
 
     private ManagerBlockEntity setupManager(BlockPos managerPos) {
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
         if (helper.getBlockEntity(managerPos) instanceof ManagerBlockEntity manager) {
-            manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+            manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
             manager.setProgram(spec.program());
 //            manager.setLogLevel(Level.DEBUG);
             return manager;

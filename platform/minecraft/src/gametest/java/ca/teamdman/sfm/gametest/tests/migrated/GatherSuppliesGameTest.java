@@ -2,8 +2,8 @@ package ca.teamdman.sfm.gametest.tests.migrated;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -76,11 +76,11 @@ public class GatherSuppliesGameTest extends SFMGameTestDefinition {
                     BlockPos pos = new BlockPos(i, k + 2, j);
                     if (j == 3) {
                         if (k == 0) {
-                            helper.setBlock(pos, SFMBlocks.CABLE_BLOCK.get());
+                            helper.setBlock(pos, SFMBlocks.CABLE.get());
                         }
                     } else {
                         if (i % 3 == 0 || i % 3 == 2) {
-                            helper.setBlock(pos, SFMBlocks.TEST_BARREL_BLOCK.get());
+                            helper.setBlock(pos, SFMBlocks.TEST_BARREL.get());
                             // fill the barrel with some items
                             BarrelBlockEntity barrel = (BarrelBlockEntity) helper.getBlockEntity(pos);
                             for (int slot = 0; slot < barrel.getContainerSize(); slot++) {
@@ -89,7 +89,7 @@ public class GatherSuppliesGameTest extends SFMGameTestDefinition {
 
                             storage.add(pos);
                         } else {
-                            helper.setBlock(pos, SFMBlocks.CABLE_BLOCK.get());
+                            helper.setBlock(pos, SFMBlocks.CABLE.get());
                         }
                     }
                 }
@@ -98,15 +98,15 @@ public class GatherSuppliesGameTest extends SFMGameTestDefinition {
 
         // add the crafting station
         helper.setBlock(new BlockPos(0, 2, 1), Blocks.CRAFTING_TABLE);
-        helper.setBlock(new BlockPos(0, 2, 0), SFMBlocks.TEST_BARREL_BLOCK.get());
-        helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.CABLE_BLOCK.get());
-        helper.setBlock(new BlockPos(1, 2, 1), SFMBlocks.CABLE_BLOCK.get());
-        helper.setBlock(new BlockPos(1, 2, 2), SFMBlocks.CABLE_BLOCK.get());
+        helper.setBlock(new BlockPos(0, 2, 0), SFMBlocks.TEST_BARREL.get());
+        helper.setBlock(new BlockPos(1, 2, 0), SFMBlocks.CABLE.get());
+        helper.setBlock(new BlockPos(1, 2, 1), SFMBlocks.CABLE.get());
+        helper.setBlock(new BlockPos(1, 2, 2), SFMBlocks.CABLE.get());
 
         // add the manager
-        helper.setBlock(new BlockPos(2, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(new BlockPos(2, 2, 0), SFMBlocks.MANAGER.get());
         var manager = (ManagerBlockEntity) helper.getBlockEntity(new BlockPos(2, 2, 0));
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
 
         // create the program
         var program = """

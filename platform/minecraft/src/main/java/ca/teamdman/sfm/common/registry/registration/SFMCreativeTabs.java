@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.common.registry.registration;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
@@ -9,7 +9,7 @@ import net.minecraft.world.item.ItemStack;
 
 @MCVersionDependentBehaviour
 public class SFMCreativeTabs {
-    public static final CreativeModeTab TAB = new SFMCreativeModeTab();
+    public static final CreativeModeTab MAIN = new SFMCreativeModeTab();
 
     public static class SFMCreativeModeTab extends CreativeModeTab {
         public SFMCreativeModeTab() {
@@ -18,7 +18,7 @@ public class SFMCreativeTabs {
 
         @Override
         public ItemStack makeIcon() {
-            return new ItemStack(SFMBlocks.MANAGER_BLOCK.get());
+            return new ItemStack(SFMBlocks.MANAGER.get());
         }
 
         @Override

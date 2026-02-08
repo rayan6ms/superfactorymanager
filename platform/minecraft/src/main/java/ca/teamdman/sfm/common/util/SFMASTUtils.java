@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.util;
 
 import ca.teamdman.sfm.common.program.LimitedInputSlot;
-import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.registry.registration.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfml.ast.*;
 import ca.teamdman.sfml.ast.Number;

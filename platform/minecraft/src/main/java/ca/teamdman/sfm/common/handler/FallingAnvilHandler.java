@@ -8,9 +8,9 @@ import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
 import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
-import ca.teamdman.sfm.common.registry.SFMBlockTags;
-import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.registry.SFMRecipeTypes;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockTags;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMRecipeTypes;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.item.FallingBlockEntity;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -257,7 +257,7 @@ public class FallingAnvilHandler {
                 int shardStackSize = (int) Math.min(64, shardsToSpawn);
 
                 // Create the stack
-                ItemStack shardStack = new ItemStack(SFMItems.EXPERIENCE_SHARD_ITEM.get(), shardStackSize);
+                ItemStack shardStack = new ItemStack(SFMItems.EXPERIENCE_SHARD.get(), shardStackSize);
 
                 // Spawn the stack
                 ItemEntity shardItemEntity = new ItemEntity(

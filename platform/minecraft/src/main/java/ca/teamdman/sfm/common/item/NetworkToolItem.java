@@ -6,8 +6,8 @@ import ca.teamdman.sfm.common.block_network.CableNetwork;
 import ca.teamdman.sfm.common.block_network.CableNetworkManager;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundNetworkToolUsePacket;
-import ca.teamdman.sfm.common.registry.SFMCreativeTabs;
-import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.registry.registration.SFMCreativeTabs;
+import ca.teamdman.sfm.common.registry.registration.SFMPackets;
 import ca.teamdman.sfm.common.util.BlockPosSet;
 import ca.teamdman.sfm.common.util.CompressedBlockPosSet;
 import net.minecraft.ChatFormatting;
@@ -32,7 +32,7 @@ import java.util.stream.Stream;
 public class NetworkToolItem extends Item {
     public NetworkToolItem() {
 
-        super(new Item.Properties().stacksTo(1).tab(SFMCreativeTabs.TAB));
+        super(new Item.Properties().stacksTo(1).tab(SFMCreativeTabs.MAIN));
     }
 
     @Override

@@ -2,8 +2,8 @@ package ca.teamdman.sfm.gametest.tests.migrated;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -55,9 +55,9 @@ public class MoveManyRegexGameTest extends SFMGameTestDefinition {
         for (int x = 0; x < 25; x++) {
             for (int z = 0; z < 24; z++) { // make sure we have an even number to split
                 // place a cable below
-                helper.setBlock(new BlockPos(x, 2, z), SFMBlocks.CABLE_BLOCK.get());
+                helper.setBlock(new BlockPos(x, 2, z), SFMBlocks.CABLE.get());
                 // place the barrel on top
-                helper.setBlock(new BlockPos(x, 3, z), SFMBlocks.TEST_BARREL_BLOCK.get());
+                helper.setBlock(new BlockPos(x, 3, z), SFMBlocks.TEST_BARREL.get());
                 if (z % 2 == 0) {
                     sourceBlocks.add(new BlockPos(x, 3, z));
                     BarrelBlockEntity barrel = (BarrelBlockEntity) helper.getBlockEntity(new BlockPos(x, 3, z));
@@ -80,9 +80,9 @@ public class MoveManyRegexGameTest extends SFMGameTestDefinition {
         }
 
         // create the manager block and add the disk
-        helper.setBlock(new BlockPos(0, 2, 0), SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(new BlockPos(0, 2, 0), SFMBlocks.MANAGER.get());
         ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(new BlockPos(0, 2, 0));
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
 
         // create the program
         var program = """

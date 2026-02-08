@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.gametest.tests.water_tank;
 
 import ca.teamdman.sfm.common.blockentity.WaterTankBlockEntity;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -57,7 +57,7 @@ public class WaterTankCapacityScalingGameTest extends SFMGameTestDefinition {
         for (int i = 0; i < 5; i++) {
             BlockPos pos = new BlockPos(i + 2, 2, 2);
             tankPositions[i] = pos;
-            helper.setBlock(pos, SFMBlocks.WATER_TANK_BLOCK.get());
+            helper.setBlock(pos, SFMBlocks.WATER_TANK.get());
         }
 
         // Initially all tanks are inactive, capacity should be 0

@@ -6,7 +6,7 @@ import ca.teamdman.sfm.common.block_network.WaterNetworkManager;
 import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ClientboundShowChangelogPacket;
-import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.registry.registration.SFMPackets;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;

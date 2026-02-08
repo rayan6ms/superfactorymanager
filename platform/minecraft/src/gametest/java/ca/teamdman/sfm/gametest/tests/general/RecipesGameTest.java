@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.gametest.tests.general;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.gametest.SFMGameTest;
@@ -51,9 +51,9 @@ public class RecipesGameTest extends SFMGameTestDefinition {
 
         // Exemptions must not be seen
         var exemptions = new HashMap<SFMRegistryObject<Item, ? extends Item>, Object>();
-        exemptions.put(SFMItems.EXPERIENCE_SHARD_ITEM, "xp shards are acquired through falling anvil crafting");
-        exemptions.put(SFMItems.FORM_ITEM, "forms are acquired through falling anvil crafting");
-        exemptions.put(SFMItems.BUFFER_ITEM, "buffer item is WIP");
+        exemptions.put(SFMItems.EXPERIENCE_SHARD, "xp shards are acquired through falling anvil crafting");
+        exemptions.put(SFMItems.FORM, "forms are acquired through falling anvil crafting");
+        exemptions.put(SFMItems.BUFFER, "buffer item is WIP");
         for (var exemption : exemptions.entrySet()) {
             var old = seenSFMItemIds.put(exemption.getKey().getId().get().location(), exemption.getValue());
             if (old != null) {

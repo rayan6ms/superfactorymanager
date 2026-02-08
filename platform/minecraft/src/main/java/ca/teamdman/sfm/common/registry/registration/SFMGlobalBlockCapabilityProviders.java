@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.common.registry.registration;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.capability.BlockEntityCapabilityProvider;
@@ -7,6 +7,10 @@ import ca.teamdman.sfm.common.capability.RedstoneSignalCapabilityProvider;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.ae2.EnergyAcceptorBlockCapabilityProvider;
 import ca.teamdman.sfm.common.compat.SFMModCompat;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegister;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegisterBuilder;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
+import ca.teamdman.sfm.common.registry.SFMRegistryWrapper;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceKey;
@@ -25,7 +29,7 @@ public class SFMGlobalBlockCapabilityProviders {
 
     /// Conditionally present
     public static final SFMRegistryObject<SFMBlockCapabilityProvider<?>, EnergyAcceptorBlockCapabilityProvider>
-            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER;
+            AE2_ENERGY_ACCEPTOR;
 
     private static final SFMDeferredRegister<SFMBlockCapabilityProvider<?>> REGISTERER =
             new SFMDeferredRegisterBuilder<SFMBlockCapabilityProvider<?>>()
@@ -46,7 +50,7 @@ public class SFMGlobalBlockCapabilityProviders {
     static {
         if (SFMModCompat.isAE2Loaded()) {
 
-            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER = REGISTERER.register(
+            AE2_ENERGY_ACCEPTOR = REGISTERER.register(
                     "ae2/energy_acceptor",
                     EnergyAcceptorBlockCapabilityProvider::new
             );
@@ -55,7 +59,7 @@ public class SFMGlobalBlockCapabilityProviders {
 
         } else {
 
-            AE2_ENERGY_ACCEPTOR_CAPABILITY_PROVIDER_MAPPER = REGISTERER.registerEmpty(
+            AE2_ENERGY_ACCEPTOR = REGISTERER.registerEmpty(
                     "ae2/energy_acceptor"
             );
 

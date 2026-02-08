@@ -3,8 +3,8 @@ package ca.teamdman.sfm.gametest.tests.compat.mekanism;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -49,7 +49,7 @@ public class MekManyLavaCauldronsGameTest extends SFMGameTestDefinition {
         // set up cauldrons
         for (int x = 0; x < 25; x++) {
             for (int z = 1; z < 25; z++) {
-                helper.setBlock(new BlockPos(x, 2, z), SFMBlocks.CABLE_BLOCK.get());
+                helper.setBlock(new BlockPos(x, 2, z), SFMBlocks.CABLE.get());
                 helper.setBlock(new BlockPos(x, 3, z), Blocks.LAVA_CAULDRON);
                 sourceBlocks.add(new BlockPos(x, 3, z));
             }
@@ -63,9 +63,9 @@ public class MekManyLavaCauldronsGameTest extends SFMGameTestDefinition {
         }
 
         // set up the manager
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
         ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
 
         // create the program
         var program = """

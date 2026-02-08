@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.gametest.tests.migrated;
 
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -31,7 +31,7 @@ public class DiskItemClientsideRegressionGameTest extends SFMGameTestDefinition 
 
     @Override
     public void run(SFMGameTestHelper helper) {
-        var stack = new ItemStack(SFMItems.DISK_ITEM.get());
+        var stack = new ItemStack(SFMItems.DISK.get());
         stack.getDisplayName();
         stack.getHoverName();
         stack.getItem().getName(stack);

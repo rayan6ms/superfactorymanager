@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.block;
 
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -30,7 +30,7 @@ public class ToughCableFacadeBlock extends CableFacadeBlock implements EntityBlo
             BlockPos blockPos,
             BlockState blockState
     ) {
-        return SFMBlockEntities.TOUGH_CABLE_FACADE_BLOCK_ENTITY.get().create(blockPos, blockState);
+        return SFMBlockEntities.TOUGH_CABLE_FACADE.get().create(blockPos, blockState);
     }
 
     @SuppressWarnings("deprecation")
@@ -40,17 +40,17 @@ public class ToughCableFacadeBlock extends CableFacadeBlock implements EntityBlo
             BlockPos pPos,
             BlockState pState
     ) {
-        return new ItemStack(SFMBlocks.TOUGH_CABLE_BLOCK.get());
+        return new ItemStack(SFMBlocks.TOUGH_CABLE.get());
     }
 
     @Override
     public IFacadableBlock getNonFacadeBlock() {
-        return SFMBlocks.TOUGH_CABLE_BLOCK.get();
+        return SFMBlocks.TOUGH_CABLE.get();
     }
 
     @Override
     public IFacadableBlock getFacadeBlock() {
-        return SFMBlocks.TOUGH_CABLE_FACADE_BLOCK.get();
+        return SFMBlocks.TOUGH_CABLE_FACADE.get();
     }
 
     // TODO: implement destroyTime to inherit from facade block state
