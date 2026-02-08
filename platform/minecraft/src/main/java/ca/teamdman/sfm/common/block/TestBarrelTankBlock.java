@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.blockentity.TestBarrelTankBlockEntity;
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import com.mojang.serialization.MapCodec;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionResult;
@@ -39,7 +39,7 @@ public class TestBarrelTankBlock extends BaseEntityBlock {
             BlockPos pPos,
             BlockState pState
     ) {
-        return SFMBlockEntities.TEST_BARREL_TANK_BLOCK_ENTITY.get().create(pPos, pState);
+        return SFMBlockEntities.TEST_BARREL_TANK.get().create(pPos, pState);
     }
 
     @Override

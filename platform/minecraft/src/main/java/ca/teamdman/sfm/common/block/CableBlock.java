@@ -7,8 +7,8 @@ import ca.teamdman.sfm.common.block_network.CableNetworkManager;
 import ca.teamdman.sfm.common.block_network.ICableBlock;
 import ca.teamdman.sfm.common.facade.FacadeSpreadLogic;
 import ca.teamdman.sfm.common.net.ServerboundFacadePacket;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
@@ -70,7 +70,7 @@ public class CableBlock extends Block implements ICableBlock, IFacadableBlock {
             InteractionHand pHand,
             BlockHitResult pHitResult
     ) {
-        if (pPlayer.getOffhandItem().getItem() == SFMItems.NETWORK_TOOL_ITEM.get()) {
+        if (pPlayer.getOffhandItem().getItem() == SFMItems.NETWORK_TOOL.get()) {
             if (pLevel.isClientSide() && pHand == InteractionHand.MAIN_HAND) {
                 ServerboundFacadePacket msg = new ServerboundFacadePacket(
                         pHitResult,
@@ -92,12 +92,12 @@ public class CableBlock extends Block implements ICableBlock, IFacadableBlock {
 
     @Override
     public IFacadableBlock getNonFacadeBlock() {
-        return SFMBlocks.CABLE_BLOCK.get();
+        return SFMBlocks.CABLE.get();
     }
 
     @Override
     public IFacadableBlock getFacadeBlock() {
-        return SFMBlocks.CABLE_FACADE_BLOCK.get();
+        return SFMBlocks.CABLE_FACADE.get();
     }
 
     @Override

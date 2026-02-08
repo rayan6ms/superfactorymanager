@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.containermenu;
 
 import ca.teamdman.sfm.common.blockentity.TestBarrelTankBlockEntity;
-import ca.teamdman.sfm.common.registry.SFMMenus;
+import ca.teamdman.sfm.common.registry.registration.SFMMenus;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -23,7 +23,7 @@ public class TestBarrelTankContainerMenu extends AbstractContainerMenu {
             Container container,
             FluidStack tankContents
     ) {
-        super(SFMMenus.TEST_BARREL_TANK_MENU.get(), windowId);
+        super(SFMMenus.TEST_BARREL_TANK.get(), windowId);
         checkContainerSize(container, 1);
         this.container = container;
         this.tank = new FluidTank(1000);

@@ -7,8 +7,8 @@ import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.registry.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMComponentUtils;
 import it.unimi.dsi.fastutil.ints.IntArraySet;
@@ -323,7 +323,7 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
             builder.addSlot(RecipeIngredientRole.INPUT, 0, 36).addItemStack(obsidian);
             builder
                     .addSlot(RecipeIngredientRole.OUTPUT, 50, 18)
-                    .addItemStack(new ItemStack(SFMItems.EXPERIENCE_SHARD_ITEM.get()));
+                    .addItemStack(new ItemStack(SFMItems.EXPERIENCE_SHARD.get()));
         }
     }
 

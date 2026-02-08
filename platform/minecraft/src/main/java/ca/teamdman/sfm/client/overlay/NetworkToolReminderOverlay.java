@@ -4,7 +4,7 @@ import ca.teamdman.sfm.client.registry.SFMKeyMappings;
 import ca.teamdman.sfm.client.screen.SFMFontUtils;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.common.util.SFMHandUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.DeltaTracker;
@@ -58,7 +58,7 @@ public class NetworkToolReminderOverlay implements LayeredDraw.Layer {
         LocalPlayer player = minecraft.player;
         if (player == null) return false;
         if (!SFMConfig.CLIENT_CONFIG.showNetworkToolReminderOverlay.get()) return false;
-        ItemStack networkTool = SFMHandUtils.getItemInEitherHand(player, SFMItems.NETWORK_TOOL_ITEM.get());
+        ItemStack networkTool = SFMHandUtils.getItemInEitherHand(player, SFMItems.NETWORK_TOOL.get());
 //        return !networkTool.isEmpty() && NetworkToolItem.getOverlayEnabled(networkTool);
         return !networkTool.isEmpty();
     }

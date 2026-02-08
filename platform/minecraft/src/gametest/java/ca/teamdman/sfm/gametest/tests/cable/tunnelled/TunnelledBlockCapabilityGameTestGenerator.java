@@ -3,7 +3,7 @@ package ca.teamdman.sfm.gametest.tests.cable.tunnelled;
 import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
 import ca.teamdman.sfm.common.facade.FacadeData;
 import ca.teamdman.sfm.common.facade.FacadeTextureMode;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import ca.teamdman.sfm.gametest.*;
 import net.minecraft.core.BlockPos;
@@ -49,11 +49,11 @@ public class TunnelledBlockCapabilityGameTestGenerator extends SFMGameTestGenera
      * All tunnelled block variants that should be tested.
      */
     private static final List<TunnelledBlockVariant> TUNNELLED_BLOCKS = List.of(
-            new TunnelledBlockVariant("tunnelled_manager", SFMBlocks.TUNNELLED_MANAGER_BLOCK::get),
-            new TunnelledBlockVariant("tunnelled_cable", SFMBlocks.TUNNELLED_CABLE_BLOCK::get),
-            new TunnelledBlockVariant("tunnelled_cable_facade", SFMBlocks.TUNNELLED_CABLE_FACADE_BLOCK::get),
-            new TunnelledBlockVariant("tunnelled_fancy_cable", SFMBlocks.TUNNELLED_FANCY_CABLE_BLOCK::get),
-            new TunnelledBlockVariant("tunnelled_fancy_cable_facade", SFMBlocks.TUNNELLED_FANCY_CABLE_FACADE_BLOCK::get)
+            new TunnelledBlockVariant("tunnelled_manager", SFMBlocks.TUNNELLED_MANAGER::get),
+            new TunnelledBlockVariant("tunnelled_cable", SFMBlocks.TUNNELLED_CABLE::get),
+            new TunnelledBlockVariant("tunnelled_cable_facade", SFMBlocks.TUNNELLED_CABLE_FACADE::get),
+            new TunnelledBlockVariant("tunnelled_fancy_cable", SFMBlocks.TUNNELLED_FANCY_CABLE::get),
+            new TunnelledBlockVariant("tunnelled_fancy_cable_facade", SFMBlocks.TUNNELLED_FANCY_CABLE_FACADE::get)
     );
 
     @Override
@@ -110,7 +110,7 @@ public class TunnelledBlockCapabilityGameTestGenerator extends SFMGameTestGenera
 
             // Set up blocks
             helper.setBlock(tunnelledPos, variant.blockSupplier.get());
-            helper.setBlock(barrelPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+            helper.setBlock(barrelPos, SFMBlocks.TEST_BARREL.get());
 
             // If the variant is a facade type, set the facade data to glowstone
             if (variant.name.contains("facade")) {

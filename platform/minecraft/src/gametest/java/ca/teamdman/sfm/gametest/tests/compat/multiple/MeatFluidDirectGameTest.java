@@ -3,8 +3,8 @@ package ca.teamdman.sfm.gametest.tests.compat.multiple;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -85,10 +85,10 @@ public class MeatFluidDirectGameTest extends SFMGameTestDefinition {
                 .insertItem(0, new ItemStack(Items.RAW_IRON, 64), false);
 
         // place the manager
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
         ManagerBlockEntity manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
         assert manager != null;
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
         manager.setProgram("""
                                    NAME "bruh"
                                    EVERY 20 TICKS DO

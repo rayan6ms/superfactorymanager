@@ -15,9 +15,9 @@ import tfar.dankstorage.blockentity.DockBlockEntity;
 import tfar.dankstorage.init.ModBlocks;
 import tfar.dankstorage.init.ModItems;
 
-import static ca.teamdman.sfm.common.registry.SFMBlocks.MANAGER_BLOCK;
-import static ca.teamdman.sfm.common.registry.SFMBlocks.TEST_BARREL_BLOCK;
-import static ca.teamdman.sfm.common.registry.SFMItems.DISK_ITEM;
+import static ca.teamdman.sfm.common.registry.registration.SFMBlocks.MANAGER;
+import static ca.teamdman.sfm.common.registry.registration.SFMBlocks.TEST_BARREL;
+import static ca.teamdman.sfm.common.registry.registration.SFMItems.DISK;
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 /// [Moving fluid with retain from Fluid Drawer to Industrial Foregoing Latex Processing Unit](https://discord.com/channels/967118679370264627/1372589927090487458)
@@ -53,13 +53,13 @@ public class DankInputRetainRegressionGameTest extends SFMGameTestDefinition {
         var dankInventory = helper.getItemHandler(dankPos, Direction.DOWN); // must happen after addDank
 
         // Place manager block
-        helper.setBlock(managerPos, MANAGER_BLOCK.get());
+        helper.setBlock(managerPos, MANAGER.get());
         var manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
 //        manager.setLogLevel(Level.DEBUG);
-        manager.setItem(0, new ItemStack(DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(DISK.get()));
 
         // Place chest
-        helper.setBlock(chestPos, TEST_BARREL_BLOCK.get());
+        helper.setBlock(chestPos, TEST_BARREL.get());
         var chest = helper.getItemHandler(chestPos);
 
         // Fill the dank with 500 items

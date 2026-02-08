@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.blockentity;
 
 import ca.teamdman.sfm.common.containermenu.TestBarrelTankContainerMenu;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import ca.teamdman.sfm.common.util.SFMContainerUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -26,13 +26,13 @@ public class TestBarrelTankBlockEntity extends BaseContainerBlockEntity {
             BlockPos pPos,
             BlockState pBlockState
     ) {
-        super(SFMBlockEntities.TEST_BARREL_TANK_BLOCK_ENTITY.get(), pPos, pBlockState);
+        super(SFMBlockEntities.TEST_BARREL_TANK.get(), pPos, pBlockState);
     }
 
     //    @Override
     @SuppressWarnings("unused") // 1.21.1 only
     public boolean isValidBlockState(BlockState blockState) {
-        return SFMBlockEntities.TEST_BARREL_BLOCK_ENTITY.get().isValid(blockState);
+        return SFMBlockEntities.TEST_BARREL.get().isValid(blockState);
     }
 
     @Override

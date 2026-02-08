@@ -4,8 +4,8 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.screen.ManagerScreen;
 import ca.teamdman.sfm.client.screen.SFMWidgetUtils;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMRecipeTypes;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMRecipeTypes;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -65,7 +65,7 @@ public class SFMJEIPlugin implements IModPlugin {
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
 
         registration.addRecipeCatalyst(
-                new ItemStack(SFMBlocks.PRINTING_PRESS_BLOCK.get()),
+                new ItemStack(SFMBlocks.PRINTING_PRESS.get()),
                 PrintingPressJEICategory.RECIPE_TYPE
         );
         registration.addRecipeCatalyst(

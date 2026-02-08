@@ -4,7 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
 import mezz.jei.api.helpers.IJeiHelpers;
@@ -28,7 +28,7 @@ public class PrintingPressJEICategory implements IRecipeCategory<PrintingPressRe
     private final IDrawable slot;
 
     public PrintingPressJEICategory(IJeiHelpers jeiHelpers) {
-        icon = jeiHelpers.getGuiHelper().createDrawableItemStack(new ItemStack(SFMBlocks.PRINTING_PRESS_BLOCK.get()));
+        icon = jeiHelpers.getGuiHelper().createDrawableItemStack(new ItemStack(SFMBlocks.PRINTING_PRESS.get()));
         slot = jeiHelpers.getGuiHelper().getSlotDrawable();
     }
 

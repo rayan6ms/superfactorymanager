@@ -5,16 +5,13 @@ import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunCycleViewModePacket;
 import ca.teamdman.sfm.common.net.ServerboundLabelGunSetActiveLabelPacket;
-import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMPackets;
 import ca.teamdman.sfm.common.util.SFMDist;
 import ca.teamdman.sfm.common.util.SFMHandUtils;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
-import net.neoforged.api.distmarker.Dist;
-import net.neoforged.bus.api.SubscribeEvent;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.client.event.ClientTickEvent;
 
 
@@ -43,7 +40,7 @@ public class LabelGunKeyMappingHandler {
         boolean justPressed = !labelSwitchKeyDown && (nextLabelKeyDown || prevLabelKeyDown);
         labelSwitchKeyDown = nextLabelKeyDown || prevLabelKeyDown;
         if (justPressed) {
-            var labelGun = SFMHandUtils.getItemAndHand(player, SFMItems.LABEL_GUN_ITEM.get());
+            var labelGun = SFMHandUtils.getItemAndHand(player, SFMItems.LABEL_GUN.get());
             if (labelGun == null) return;
             var nextLabel = LabelGunItem.getNextLabel(labelGun.stack(), prevLabelKeyDown ? -1 : 1);
             SFMPackets.sendToServer(new ServerboundLabelGunSetActiveLabelPacket(nextLabel, labelGun.hand()));
@@ -70,7 +67,7 @@ public class LabelGunKeyMappingHandler {
                     assert minecraft.player != null;
                     InteractionHand hand = SFMHandUtils.getHandHoldingItem(
                             minecraft.player,
-                            SFMItems.LABEL_GUN_ITEM.get()
+                            SFMItems.LABEL_GUN.get()
                     );
                     if (hand == null) return;
                     // send packet to server to toggle mode

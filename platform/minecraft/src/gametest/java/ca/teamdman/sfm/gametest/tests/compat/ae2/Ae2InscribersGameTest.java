@@ -5,8 +5,8 @@ import appeng.core.definitions.AEBlocks;
 import appeng.core.definitions.AEItems;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -49,9 +49,9 @@ public class Ae2InscribersGameTest extends SFMGameTestDefinition {
     public void run(SFMGameTestHelper helper) {
         var managerPos = new BlockPos(0, 2, 1);
 
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
         for (int i = 0; i < 6; i++) {
-            helper.setBlock(new BlockPos(i + 1, 2, 1), SFMBlocks.CABLE_BLOCK.get());
+            helper.setBlock(new BlockPos(i + 1, 2, 1), SFMBlocks.CABLE.get());
         }
 
         var siliconPos1 = new BlockPos(4, 3, 1);
@@ -110,8 +110,8 @@ public class Ae2InscribersGameTest extends SFMGameTestDefinition {
 
         var materialsPos = new BlockPos(6, 2, 0);
         var resultsPos = new BlockPos(5, 2, 0);
-        helper.setBlock(materialsPos, SFMBlocks.TEST_BARREL_BLOCK.get());
-        helper.setBlock(resultsPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(materialsPos, SFMBlocks.TEST_BARREL.get());
+        helper.setBlock(resultsPos, SFMBlocks.TEST_BARREL.get());
         //noinspection DataFlowIssue,OptionalGetWithoutIsPresent
         var materials = helper.getItemHandler(materialsPos);
         //noinspection DataFlowIssue,OptionalGetWithoutIsPresent
@@ -141,7 +141,7 @@ public class Ae2InscribersGameTest extends SFMGameTestDefinition {
         helper.setSignText(outputSignPos, Component.literal("output"));
 
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
         LabelPositionHolder.empty()
                 .add("silicon", helper.absolutePos(siliconPos1))
                 .add("silicon", helper.absolutePos(siliconPos2))

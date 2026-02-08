@@ -2,8 +2,8 @@ package ca.teamdman.sfm.gametest.tests.migrated;
 
 import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
 import ca.teamdman.sfm.common.item.FormItem;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -53,16 +53,16 @@ public class PrintingPressCloneEnchantmentGameTest extends SFMGameTestDefinition
         var buttonPos = new BlockPos(0, 4, 0);
         var chestPos = new BlockPos(0, 2, 1);
 
-        helper.setBlock(printingPos, SFMBlocks.PRINTING_PRESS_BLOCK.get());
+        helper.setBlock(printingPos, SFMBlocks.PRINTING_PRESS.get());
         helper.setBlock(pistonPos, Blocks.PISTON.defaultBlockState().setValue(DirectionalBlock.FACING, Direction.DOWN));
         helper.setBlock(woodPos, Blocks.OAK_PLANKS);
         helper.setBlock(buttonPos, Blocks.STONE_BUTTON);
-        helper.setBlock(chestPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(chestPos, SFMBlocks.TEST_BARREL.get());
 
         var printingPress = (PrintingPressBlockEntity) helper.getBlockEntity(printingPos);
         Player player = helper.makeMockPlayer(GameType.SURVIVAL);
 
-        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(SFMItems.EXPERIENCE_GOOP_ITEM.get(), 10));
+        player.setItemInHand(InteractionHand.MAIN_HAND, new ItemStack(SFMItems.EXPERIENCE_GOOP.get(), 10));
         BlockState pressState = helper.getBlockState(printingPos);
         helper.useBlock(printingPos, player);
 

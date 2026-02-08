@@ -2,8 +2,8 @@ package ca.teamdman.sfm.gametest.tests.compat.mekanism;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -49,11 +49,11 @@ public class MekChemtankInfusionSomeGameTest extends SFMGameTestDefinition {
         TileEntityChemicalTank leftTank = getAndPrepMekTile(helper, leftPos);
         helper.setBlock(rightPos, MekanismBlocks.ULTIMATE_CHEMICAL_TANK.getBlock());
         TileEntityChemicalTank rightTank = getAndPrepMekTile(helper, rightPos);
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
         var manager = ((ManagerBlockEntity) helper.getBlockEntity(managerPos));
 
         // set up the program
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
         manager.setProgram("""
                                    EVERY 20 TICKS DO
                                       INPUT infusion:*:* FROM a NORTH SIDE -- mek can extract from front by default

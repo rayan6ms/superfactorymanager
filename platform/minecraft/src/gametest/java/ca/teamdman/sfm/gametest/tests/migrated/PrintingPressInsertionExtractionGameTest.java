@@ -2,7 +2,7 @@ package ca.teamdman.sfm.gametest.tests.migrated;
 
 import ca.teamdman.sfm.common.blockentity.PrintingPressBlockEntity;
 import ca.teamdman.sfm.common.item.FormItem;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
@@ -37,7 +37,7 @@ public class PrintingPressInsertionExtractionGameTest extends SFMGameTestDefinit
     @Override
     public void run(SFMGameTestHelper helper) {
         var pos = new BlockPos(0, 2, 0);
-        helper.setBlock(pos, SFMBlocks.PRINTING_PRESS_BLOCK.get());
+        helper.setBlock(pos, SFMBlocks.PRINTING_PRESS.get());
         var printingPress = (PrintingPressBlockEntity) helper.getBlockEntity(pos);
         var player = helper.makeMockPlayer(GameType.SURVIVAL);
         // put black dye in player hand

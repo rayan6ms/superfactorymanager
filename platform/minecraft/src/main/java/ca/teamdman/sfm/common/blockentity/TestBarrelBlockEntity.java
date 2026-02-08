@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.common.blockentity;
 
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BarrelBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -15,6 +15,6 @@ public class TestBarrelBlockEntity extends BarrelBlockEntity {
 
     @Override
     public boolean isValidBlockState(BlockState blockState) {
-        return SFMBlockEntities.TEST_BARREL_BLOCK_ENTITY.get().isValid(blockState);
+        return SFMBlockEntities.TEST_BARREL.get().isValid(blockState);
     }
 }
