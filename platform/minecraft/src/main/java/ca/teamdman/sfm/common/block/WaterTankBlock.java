@@ -3,7 +3,7 @@ package ca.teamdman.sfm.common.block;
 import ca.teamdman.sfm.common.block_network.WaterNetworkManager;
 import ca.teamdman.sfm.common.blockentity.WaterTankBlockEntity;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -104,7 +104,7 @@ public class WaterTankBlock extends BaseEntityBlock implements EntityBlock, Buck
             BlockPos pos,
             BlockState state
     ) {
-        return SFMBlockEntities.WATER_TANK_BLOCK_ENTITY.get().create(pos, state);
+        return SFMBlockEntities.WATER_TANK.get().create(pos, state);
     }
 
     @Override

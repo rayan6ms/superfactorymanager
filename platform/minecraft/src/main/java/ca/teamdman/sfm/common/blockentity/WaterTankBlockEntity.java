@@ -4,7 +4,7 @@ import ca.teamdman.sfm.common.block.WaterTankBlock;
 import ca.teamdman.sfm.common.block_network.BlockNetwork;
 import ca.teamdman.sfm.common.block_network.WaterNetworkManager;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -49,7 +49,7 @@ public class WaterTankBlockEntity extends BlockEntity {
             BlockState state
     ) {
 
-        super(SFMBlockEntities.WATER_TANK_BLOCK_ENTITY.get(), pos, state);
+        super(SFMBlockEntities.WATER_TANK.get(), pos, state);
     }
 
     public void updateActiveFromBlockState() {

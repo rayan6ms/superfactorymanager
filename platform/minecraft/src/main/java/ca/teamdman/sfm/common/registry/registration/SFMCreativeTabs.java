@@ -1,7 +1,8 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.common.registry.registration;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
@@ -14,17 +15,17 @@ import net.minecraftforge.fml.common.Mod;
 @Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class SFMCreativeTabs {
     @SuppressWarnings("NotNullFieldNotInitialized")
-    public static CreativeModeTab TAB;
+    public static CreativeModeTab MAIN;
 
     @SubscribeEvent
     public static void onRegister(CreativeModeTabEvent.Register event) {
-        TAB = event.registerCreativeModeTab(
+        MAIN = event.registerCreativeModeTab(
                 SFMResourceLocation.fromSFMPath("main"),
                 builder ->
                         // Set name of tab to display
                         builder.title(LocalizationKeys.CREATIVE_TAB.getComponent())
                                 // Set icon of creative tab
-                                .icon(() -> new ItemStack(SFMBlocks.MANAGER_BLOCK.get()))
+                                .icon(() -> new ItemStack(SFMBlocks.MANAGER.get()))
                                 // Add default items to tab
                                 .displayItems((params, output) -> output.acceptAll(SFMItems.REGISTERER.getOurEntries()
                                                                                            .stream()

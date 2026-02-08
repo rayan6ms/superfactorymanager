@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.common.blockentity;
 
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -12,7 +12,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class TunnelledCableBlockEntity extends BlockEntity {
     public TunnelledCableBlockEntity(BlockPos blockPos, BlockState blockState) {
-        super(SFMBlockEntities.TUNNELLED_CABLE_BLOCK_ENTITY.get(), blockPos, blockState);
+        super(SFMBlockEntities.TUNNELLED_CABLE.get(), blockPos, blockState);
     }
 
     @Override

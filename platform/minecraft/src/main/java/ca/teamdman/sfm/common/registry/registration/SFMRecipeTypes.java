@@ -1,7 +1,11 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.common.registry.registration;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.recipe.PrintingPressRecipe;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegister;
+import ca.teamdman.sfm.common.registry.SFMDeferredRegisterBuilder;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraftforge.eventbus.api.IEventBus;

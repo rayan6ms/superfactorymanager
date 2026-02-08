@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.block;
 
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -30,7 +30,7 @@ public class TunnelledCableFacadeBlock extends CableFacadeBlock implements Entit
             BlockPos blockPos,
             BlockState blockState
     ) {
-        return SFMBlockEntities.TUNNELLED_CABLE_FACADE_BLOCK_ENTITY.get().create(blockPos, blockState);
+        return SFMBlockEntities.TUNNELLED_CABLE_FACADE.get().create(blockPos, blockState);
     }
 
     @Override
@@ -39,16 +39,16 @@ public class TunnelledCableFacadeBlock extends CableFacadeBlock implements Entit
             BlockPos pPos,
             BlockState pState
     ) {
-        return new ItemStack(SFMBlocks.TUNNELLED_CABLE_BLOCK.get());
+        return new ItemStack(SFMBlocks.TUNNELLED_CABLE.get());
     }
 
     @Override
     public IFacadableBlock getNonFacadeBlock() {
-        return SFMBlocks.TUNNELLED_CABLE_BLOCK.get();
+        return SFMBlocks.TUNNELLED_CABLE.get();
     }
 
     @Override
     public IFacadableBlock getFacadeBlock() {
-        return SFMBlocks.TUNNELLED_CABLE_FACADE_BLOCK.get();
+        return SFMBlocks.TUNNELLED_CABLE_FACADE.get();
     }
 }

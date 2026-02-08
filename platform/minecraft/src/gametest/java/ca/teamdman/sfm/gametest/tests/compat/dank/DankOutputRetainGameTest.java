@@ -15,9 +15,9 @@ import tfar.dankstorage.blockentity.DockBlockEntity;
 import tfar.dankstorage.init.ModBlocks;
 import tfar.dankstorage.init.ModItems;
 
-import static ca.teamdman.sfm.common.registry.SFMBlocks.MANAGER_BLOCK;
-import static ca.teamdman.sfm.common.registry.SFMBlocks.TEST_BARREL_BLOCK;
-import static ca.teamdman.sfm.common.registry.SFMItems.DISK_ITEM;
+import static ca.teamdman.sfm.common.registry.registration.SFMBlocks.MANAGER;
+import static ca.teamdman.sfm.common.registry.registration.SFMBlocks.TEST_BARREL;
+import static ca.teamdman.sfm.common.registry.registration.SFMItems.DISK;
 import static ca.teamdman.sfm.gametest.SFMGameTestCountHelpers.count;
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
@@ -42,12 +42,12 @@ public class DankOutputRetainGameTest extends SFMGameTestDefinition {
         dankBlockEntity.addDank(new ItemStack(ModItems.DANKS.get(0)));
 
         // Place manager block
-        helper.setBlock(managerPos, MANAGER_BLOCK.get());
+        helper.setBlock(managerPos, MANAGER.get());
         var manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
-        manager.setItem(0, new ItemStack(DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(DISK.get()));
 
         // Place chest
-        helper.setBlock(chestPos, TEST_BARREL_BLOCK.get());
+        helper.setBlock(chestPos, TEST_BARREL.get());
         var chest = helper.getItemHandler(chestPos);
 
         // Fill the chest with items

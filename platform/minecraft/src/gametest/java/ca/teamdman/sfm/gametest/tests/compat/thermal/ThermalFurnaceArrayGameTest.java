@@ -2,8 +2,8 @@ package ca.teamdman.sfm.gametest.tests.compat.thermal;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.gametest.SFMGameTest;
@@ -65,7 +65,7 @@ public class ThermalFurnaceArrayGameTest extends SFMGameTestDefinition {
         ));
         for (int x = 0; x < 25; x++) {
             for (int z = 1; z < 25; z++) {
-                helper.setBlock(new BlockPos(x, 2, z), SFMBlocks.CABLE_BLOCK.get());
+                helper.setBlock(new BlockPos(x, 2, z), SFMBlocks.CABLE.get());
                 helper.setBlock(new BlockPos(x, 3, z), furnaceBlock);
                 furnacePositions.add(new BlockPos(x, 3, z));
                 var furnace = (MachineFurnaceTile) helper.getBlockEntity(new BlockPos(x, 3, z));
@@ -77,14 +77,14 @@ public class ThermalFurnaceArrayGameTest extends SFMGameTestDefinition {
         // set up destinations
         for (int i = 2; i <= 3; i++) {
             BlockPos pos = new BlockPos(i, 2, 0);
-            helper.setBlock(pos, SFMBlocks.TEST_BARREL_BLOCK.get());
+            helper.setBlock(pos, SFMBlocks.TEST_BARREL.get());
             resultChestPositions.add(pos);
         }
 
         // set up ingredients
         for (int i = 5; i <= 6; i++) {
             BlockPos pos = new BlockPos(i, 2, 0);
-            helper.setBlock(pos, SFMBlocks.TEST_BARREL_BLOCK.get());
+            helper.setBlock(pos, SFMBlocks.TEST_BARREL.get());
             ingredientChestPositions.add(pos);
             for (int slot = 0; slot < 27; slot++) {
                 helper.getItemHandler(pos).insertItem(slot, new ItemStack(Items.CHICKEN, 64), false);
@@ -92,9 +92,9 @@ public class ThermalFurnaceArrayGameTest extends SFMGameTestDefinition {
         }
 
         // set up the manager
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
         ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
 
         // create the program
         var program = """

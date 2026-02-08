@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.common.recipe;
 
 import ca.teamdman.sfm.common.item.DiskItem;
-import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.registry.SFMRecipeSerializers;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMRecipeSerializers;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.CraftingContainer;
@@ -45,7 +45,7 @@ public class DiskResetRecipe extends CustomRecipe {
                 return ItemStack.EMPTY;
             }
         }
-        return foundDisks > 0 ? new ItemStack(SFMItems.DISK_ITEM.get(), foundDisks) : ItemStack.EMPTY;
+        return foundDisks > 0 ? new ItemStack(SFMItems.DISK.get(), foundDisks) : ItemStack.EMPTY;
     }
 
     @Override

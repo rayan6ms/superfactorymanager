@@ -4,8 +4,8 @@ import ca.teamdman.sfm.common.config.SFMServerConfig.LevelsToShards;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentAliases;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
 import ca.teamdman.sfm.common.handler.FallingAnvilHandler;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -70,7 +70,7 @@ public class FallingAnvilXpShardManyGameTest extends SFMGameTestDefinition {
 
             BlockPos chestPos = new BlockPos(index * CHEST_SPACING + 1, 2, 1);
 
-            helper.setBlock(chestPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+            helper.setBlock(chestPos, SFMBlocks.TEST_BARREL.get());
             helper.setBlock(chestPos.above(), Blocks.OAK_SIGN.defaultBlockState().setValue(StandingSignBlock.ROTATION, 8));
             helper.setSignText(
                     chestPos.above(),
@@ -82,7 +82,7 @@ public class FallingAnvilXpShardManyGameTest extends SFMGameTestDefinition {
 
             fill(handler, parameters.bookTemplate(), parameters.bookCount());
 
-            fill(handler, new ItemStack(SFMItems.EXPERIENCE_SHARD_ITEM.get()), expectedShards);
+            fill(handler, new ItemStack(SFMItems.EXPERIENCE_SHARD.get()), expectedShards);
 
             assertCount(
                     handler,
@@ -93,7 +93,7 @@ public class FallingAnvilXpShardManyGameTest extends SFMGameTestDefinition {
 
             assertCount(
                     handler,
-                    SFMItems.EXPERIENCE_SHARD_ITEM.get().asItem(),
+                    SFMItems.EXPERIENCE_SHARD.get().asItem(),
                     expectedShards,
                     "chest for " + mode + " did not receive expected shard count"
             );

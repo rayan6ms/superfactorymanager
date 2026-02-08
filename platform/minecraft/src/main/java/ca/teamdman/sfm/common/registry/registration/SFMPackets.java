@@ -1,4 +1,4 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.common.registry.registration;
 
 import ca.teamdman.sfm.common.net.*;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;

@@ -2,8 +2,8 @@ package ca.teamdman.sfm.gametest;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.common.util.SFMItemUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestAssertException;
@@ -218,7 +218,7 @@ public abstract class SFMTestBuilder {
             String name,
             BlockPos pos
     ) {
-        helper.setBlock(pos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(pos, SFMBlocks.TEST_BARREL.get());
         IItemHandler chest = helper.getItemHandler(pos);
         chests.put(name, chest);
         positions.put(name, pos);
@@ -230,10 +230,10 @@ public abstract class SFMTestBuilder {
 
     protected void setupManager(BlockPos offset) {
         BlockPos managerPos = new BlockPos(1, 2, 0).offset(offset);
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
         manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
         assertTrue(manager != null, "Manager not found");
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
         assertTrue(program != null, "Program not set");
         manager.setProgram(program.stripTrailing().stripIndent());
     }

@@ -2,8 +2,8 @@ package ca.teamdman.sfm.gametest.tests.migrated;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -35,13 +35,13 @@ public class MoveIfPoweredGameTest extends SFMGameTestDefinition {
     @Override
     public void run(SFMGameTestHelper helper) {
         BlockPos managerPos = new BlockPos(1, 2, 1);
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
         BlockPos leftPos = managerPos.east();
-        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(leftPos, SFMBlocks.TEST_BARREL.get());
         BlockPos rightPos = managerPos.west();
-        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(rightPos, SFMBlocks.TEST_BARREL.get());
         BlockPos topPos = managerPos.above();
-        helper.setBlock(topPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(topPos, SFMBlocks.TEST_BARREL.get());
 
         BlockPos leverPos = managerPos.north();
         helper.setBlock(leverPos, Blocks.LEVER);
@@ -58,7 +58,7 @@ public class MoveIfPoweredGameTest extends SFMGameTestDefinition {
         leftChest.insertItem(5, new ItemStack(Items.GOLD_NUGGET, 64), false);
 
         ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
         manager.setProgram("""
                                        EVERY 20 TICKS DO
                                            IF redstone GT 0 THEN
