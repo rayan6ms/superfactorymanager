@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.common.capability;
 
-import ca.teamdman.sfm.common.registry.SFMGlobalBlockCapabilityProviders;
+import ca.teamdman.sfm.common.registry.registration.SFMGlobalBlockCapabilityProviders;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.common.util.NonNullConsumer;

@@ -7,7 +7,7 @@ import ca.teamdman.sfm.common.enchantment.SFMEnchantmentCollection;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.common.handler.FallingAnvilHandler;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -88,7 +88,7 @@ public class FallingAnvilXpShardGameTest extends SFMGameTestDefinition {
 
             List<String> unexpectedItems = found
                     .stream()
-                    .filter(item -> !item.getItem().is(SFMItems.EXPERIENCE_SHARD_ITEM.get()))
+                    .filter(item -> !item.getItem().is(SFMItems.EXPERIENCE_SHARD.get()))
                     .map(item -> item.getItem().getDescriptionId())
                     .collect(Collectors.toList());
             assertTrue(

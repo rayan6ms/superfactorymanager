@@ -1,7 +1,8 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.common.registry.registration;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.item.CreativeModeTab;
@@ -18,12 +19,12 @@ public class SFMCreativeTabs {
     );
 
     @SuppressWarnings("unused")
-    public static final RegistryObject<CreativeModeTab> MAIN_TAB = CREATIVE_TABS.register(
+    public static final RegistryObject<CreativeModeTab> MAIN = CREATIVE_TABS.register(
             "main",
             () -> CreativeModeTab
                     .builder()
                     .title(LocalizationKeys.CREATIVE_TAB.getComponent())
-                    .icon(() -> new ItemStack(SFMBlocks.MANAGER_BLOCK.get()))
+                    .icon(() -> new ItemStack(SFMBlocks.MANAGER.get()))
                     .displayItems(SFMCreativeTabs::populateMainCreativeTab)
                     .build()
     );

@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.gametest.tests.cable.tunnelled;
 
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -56,14 +56,14 @@ public class TunnelledManagerHopperLongInterruptedGameTest extends SFMGameTestDe
         BlockPos barrelPos = new BlockPos(0, 2, 0);
         BlockPos hopperPos = new BlockPos(MANAGER_COUNT + 1, 2, 0);
 
-        helper.setBlock(barrelPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(barrelPos, SFMBlocks.TEST_BARREL.get());
         helper.setBlock(
                 hopperPos,
                 Blocks.HOPPER.defaultBlockState().setValue(HopperBlock.FACING, Direction.WEST)
         );
 
         for (int index = 0; index < MANAGER_COUNT; index++) {
-            helper.setBlock(managerPos(index), SFMBlocks.TUNNELLED_MANAGER_BLOCK.get());
+            helper.setBlock(managerPos(index), SFMBlocks.TUNNELLED_MANAGER.get());
         }
 
         IItemHandler barrel = helper.getItemHandler(barrelPos);
@@ -129,7 +129,7 @@ public class TunnelledManagerHopperLongInterruptedGameTest extends SFMGameTestDe
             tickCursor = scheduleAction(
                     helper,
                     tickCursor,
-                    () -> helper.setBlock(managerPos(managerIndex), SFMBlocks.TUNNELLED_MANAGER_BLOCK.get())
+                    () -> helper.setBlock(managerPos(managerIndex), SFMBlocks.TUNNELLED_MANAGER.get())
             );
 
             int hopperAfterRestore = expectedHopper - 1;

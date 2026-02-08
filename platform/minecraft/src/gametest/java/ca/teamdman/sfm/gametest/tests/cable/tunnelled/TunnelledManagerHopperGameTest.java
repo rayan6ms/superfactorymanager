@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.gametest.tests.cable.tunnelled;
 
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -37,8 +37,8 @@ public class TunnelledManagerHopperGameTest extends SFMGameTestDefinition {
         BlockPos hopperPos = new BlockPos(2, 2, 0);
 
         // set blocks
-        helper.setBlock(managerPos, SFMBlocks.TUNNELLED_MANAGER_BLOCK.get());
-        helper.setBlock(invPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.TUNNELLED_MANAGER.get());
+        helper.setBlock(invPos, SFMBlocks.TEST_BARREL.get());
         helper.setBlock(hopperPos, Blocks.HOPPER.defaultBlockState().setValue(HopperBlock.FACING, Direction.WEST));
 
         // get handlers

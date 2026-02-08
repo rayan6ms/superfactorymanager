@@ -5,7 +5,7 @@ import ca.teamdman.sfm.client.screen.SFMScreenChangeHelpers;
 import ca.teamdman.sfm.common.facade.FacadePlanner;
 import ca.teamdman.sfm.common.facade.IFacadePlan;
 import ca.teamdman.sfm.common.net.ServerboundFacadePacket;
-import ca.teamdman.sfm.common.registry.SFMPackets;
+import ca.teamdman.sfm.common.registry.registration.SFMPackets;
 import ca.teamdman.sfm.common.util.ConfirmationParams;
 import ca.teamdman.sfm.common.util.SFMEntityUtils;
 import net.minecraft.client.Minecraft;

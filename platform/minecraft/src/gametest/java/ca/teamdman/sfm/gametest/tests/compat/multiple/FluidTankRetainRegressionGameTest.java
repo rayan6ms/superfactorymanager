@@ -10,8 +10,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 
-import static ca.teamdman.sfm.common.registry.SFMBlocks.MANAGER_BLOCK;
-import static ca.teamdman.sfm.common.registry.SFMItems.DISK_ITEM;
+import static ca.teamdman.sfm.common.registry.registration.SFMBlocks.MANAGER;
+import static ca.teamdman.sfm.common.registry.registration.SFMItems.DISK;
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 import static com.buuz135.industrial.module.ModuleCore.LATEX;
 import static com.buuz135.industrial.module.ModuleCore.LATEX_PROCESSING;
@@ -46,9 +46,9 @@ public class FluidTankRetainRegressionGameTest extends SFMGameTestDefinition {
         var tank = helper.getFluidHandler(tankPos, Direction.UP);
 
         // Place manager at B
-        helper.setBlock(managerPos, MANAGER_BLOCK.get());
+        helper.setBlock(managerPos, MANAGER.get());
         ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
-        manager.setItem(0, new ItemStack(DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(DISK.get()));
 
         // Place Industrial Foregoing latex processing unit at C
         helper.setBlock(machinePos, LATEX_PROCESSING.getKey().get());

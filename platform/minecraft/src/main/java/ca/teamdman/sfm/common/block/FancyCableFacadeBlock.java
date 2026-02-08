@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.common.block;
 
 import ca.teamdman.sfm.common.facade.FacadeTransparency;
-import ca.teamdman.sfm.common.registry.SFMBlockEntities;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
@@ -29,7 +29,7 @@ public class FancyCableFacadeBlock extends FancyCableBlock implements EntityBloc
             BlockPos blockPos,
             BlockState blockState
     ) {
-        return SFMBlockEntities.FANCY_CABLE_FACADE_BLOCK_ENTITY.get().create(blockPos, blockState);
+        return SFMBlockEntities.FANCY_CABLE_FACADE.get().create(blockPos, blockState);
     }
 
     @SuppressWarnings("deprecation")
@@ -39,7 +39,7 @@ public class FancyCableFacadeBlock extends FancyCableBlock implements EntityBloc
             BlockPos pPos,
             BlockState pState
     ) {
-        return new ItemStack(SFMBlocks.FANCY_CABLE_BLOCK.get());
+        return new ItemStack(SFMBlocks.FANCY_CABLE.get());
     }
 
     @Override

@@ -2,7 +2,7 @@ package ca.teamdman.sfm.common.program.linting;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMProgramLinters;
+import ca.teamdman.sfm.common.registry.registration.SFMProgramLinters;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.network.chat.contents.TranslatableContents;
 import net.minecraft.world.item.ItemStack;
