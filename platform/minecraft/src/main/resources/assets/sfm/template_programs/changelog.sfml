@@ -22,6 +22,7 @@ NAME "Changelog"
 -- Fix ResourcesProgramLinter not tracking warningsp roperly, thanks @Mei for the contribution! #440
 -- Add missing block tags to tunnelled factory manager, thanks @jez4753 for the report! #457
 -- Add warnings for slots that don't support extraction, thanks @Mei for the contribution! #446
+-- Fix round robin example correctness, fixes #455
 
 ---- 4.28.0 ----
 -- Fix #430 where fancy cable improperly visually connects to blocks it should not
