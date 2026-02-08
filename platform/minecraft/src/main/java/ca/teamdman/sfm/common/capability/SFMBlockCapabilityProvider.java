@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.common.capability;
 
-import ca.teamdman.sfm.common.registry.SFMGlobalBlockCapabilityProviders;
+import ca.teamdman.sfm.common.registry.registration.SFMGlobalBlockCapabilityProviders;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;

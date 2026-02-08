@@ -2,7 +2,7 @@ package ca.teamdman.sfm.gametest.tests.cable;
 
 import ca.teamdman.sfm.common.facade.FacadeData;
 import ca.teamdman.sfm.common.facade.FacadeTextureMode;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -54,7 +54,7 @@ public class ToughCableWitherExplosionGameTest extends SFMGameTestDefinition {
                         cablePositions.add(absolute);
 
                         // Place tough cable facade
-                        helper.getLevel().setBlock(absolute, SFMBlocks.TOUGH_CABLE_FACADE_BLOCK.get().defaultBlockState(), 3);
+                        helper.getLevel().setBlock(absolute, SFMBlocks.TOUGH_CABLE_FACADE.get().defaultBlockState(), 3);
 
                         // Set facade to mimic bedrock
                         var be = helper.getLevel().getBlockEntity(absolute);
@@ -90,7 +90,7 @@ public class ToughCableWitherExplosionGameTest extends SFMGameTestDefinition {
         helper.runAfterDelay(250, () -> {
             BlockPos failPos = null;
             for (BlockPos absolute : cablePositions) {
-                if (!helper.getLevel().getBlockState(absolute).is(SFMBlocks.TOUGH_CABLE_FACADE_BLOCK.get())) {
+                if (!helper.getLevel().getBlockState(absolute).is(SFMBlocks.TOUGH_CABLE_FACADE.get())) {
                     failPos = absolute;
                     break;
                 }

@@ -4,7 +4,7 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.logging.TranslatableLogEvent;
 import ca.teamdman.sfm.common.net.ServerboundManagerSetLogLevelPacket;
-import ca.teamdman.sfm.common.registry.SFMMenus;
+import ca.teamdman.sfm.common.registry.registration.SFMMenus;
 import ca.teamdman.sfm.common.timing.SFMDurationNetworkUtils;
 import ca.teamdman.sfml.ast.Program;
 import net.minecraft.core.BlockPos;
@@ -45,7 +45,7 @@ public class ManagerContainerMenu extends AbstractContainerMenu {
             Duration[] tickTimes,
             ArrayDeque<TranslatableLogEvent> logs
     ) {
-        super(SFMMenus.MANAGER_MENU.get(), windowId);
+        super(SFMMenus.MANAGER.get(), windowId);
         checkContainerSize(container, 1);
         this.CONTAINER = container;
         this.PLAYER_INVENTORY = inv;

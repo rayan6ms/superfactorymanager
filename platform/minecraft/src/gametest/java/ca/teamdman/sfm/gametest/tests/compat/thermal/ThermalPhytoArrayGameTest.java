@@ -4,9 +4,9 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
-import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMResourceTypes;
 import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.gametest.SFMGameTest;
@@ -79,7 +79,7 @@ public class ThermalPhytoArrayGameTest extends SFMGameTestDefinition {
         for (int x = 0; x < 25; x++) {
             for (int z = 1; z < 25; z++) {
                 BlockPos cableBelow = new BlockPos(x, 2, z);
-                helper.setBlock(cableBelow, SFMBlocks.CABLE_BLOCK.get());
+                helper.setBlock(cableBelow, SFMBlocks.CABLE.get());
                 BlockPos phytoPos = new BlockPos(x, 3, z);
                 helper.setBlock(phytoPos, phytoBlock);
                 phytoPositions.add(phytoPos);
@@ -93,7 +93,7 @@ public class ThermalPhytoArrayGameTest extends SFMGameTestDefinition {
         SFM.LOGGER.debug("Setting up destinations");
         for (int i = 3; i <= 4; i++) {
             BlockPos pos = new BlockPos(i, 2, 0);
-            helper.setBlock(pos, SFMBlocks.TEST_BARREL_BLOCK.get());
+            helper.setBlock(pos, SFMBlocks.TEST_BARREL.get());
             resultChestPositions.add(pos);
         }
 
@@ -101,7 +101,7 @@ public class ThermalPhytoArrayGameTest extends SFMGameTestDefinition {
         //noinspection NonStrictComparisonCanBeEquality
         for (int i = 6; i <= 6; i++) {
             BlockPos pos = new BlockPos(i, 2, 0);
-            helper.setBlock(pos, SFMBlocks.TEST_BARREL_BLOCK.get());
+            helper.setBlock(pos, SFMBlocks.TEST_BARREL.get());
             seedChestPositions.add(pos);
             var items = new Item[]{
                     Items.BEETROOT_SEEDS,
@@ -121,9 +121,9 @@ public class ThermalPhytoArrayGameTest extends SFMGameTestDefinition {
         }
 
         // set up the manager
-        helper.setBlock(managerPos, SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(managerPos, SFMBlocks.MANAGER.get());
         ManagerBlockEntity manager = (ManagerBlockEntity) helper.getBlockEntity(managerPos);
-        manager.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager.setItem(0, new ItemStack(SFMItems.DISK.get()));
 
         // create the program
         var program = """

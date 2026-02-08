@@ -5,7 +5,7 @@ import ca.teamdman.sfm.client.screen.SFMFontUtils;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.item.LabelGunItem;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.common.util.SFMHandUtils;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
@@ -73,7 +73,7 @@ public class LabelGunReminderOverlay implements IGuiOverlay {
         LocalPlayer player = minecraft.player;
         if (player == null) return null;
         if (!SFMConfig.CLIENT_CONFIG.showLabelGunReminderOverlay.get()) return null;
-        ItemStack labelGun = SFMHandUtils.getItemInEitherHand(player, SFMItems.LABEL_GUN_ITEM.get());
+        ItemStack labelGun = SFMHandUtils.getItemInEitherHand(player, SFMItems.LABEL_GUN.get());
         if (labelGun.isEmpty()) return null;
         return LabelGunItem.getViewMode(labelGun);
     }

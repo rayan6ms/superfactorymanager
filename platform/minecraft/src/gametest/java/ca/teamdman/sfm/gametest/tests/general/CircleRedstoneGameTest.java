@@ -2,8 +2,8 @@ package ca.teamdman.sfm.gametest.tests.general;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
@@ -36,23 +36,23 @@ public class CircleRedstoneGameTest extends SFMGameTestDefinition {
 
         for (int x = 0; x < 5; x++) {
             for (int z = 0; z < 5; z++) {
-                helper.setBlock(new BlockPos(x, 1, z), SFMBlocks.CABLE_BLOCK.get());
+                helper.setBlock(new BlockPos(x, 1, z), SFMBlocks.CABLE.get());
             }
         }
 
         BlockPos barrelPos = new BlockPos(2, 2, 0);
-        helper.setBlock(barrelPos, SFMBlocks.TEST_BARREL_BLOCK.get());
+        helper.setBlock(barrelPos, SFMBlocks.TEST_BARREL.get());
         IItemHandler barrelHandler = helper.getItemHandler(barrelPos);
         barrelHandler.insertItem(0, new ItemStack(Items.DIRT, 64), false);
 
         BlockPos manager1Pos = new BlockPos(1, 2, 1);
-        helper.setBlock(manager1Pos, SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(manager1Pos, SFMBlocks.MANAGER.get());
         BlockPos manager2Pos = new BlockPos(3, 2, 3);
-        helper.setBlock(manager2Pos, SFMBlocks.MANAGER_BLOCK.get());
+        helper.setBlock(manager2Pos, SFMBlocks.MANAGER.get());
 
         // Set up manager1
         ManagerBlockEntity manager1 = (ManagerBlockEntity) helper.getBlockEntity(manager1Pos);
-        manager1.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager1.setItem(0, new ItemStack(SFMItems.DISK.get()));
         manager1.setProgram("""
                                        EVERY REDSTONE PULSE DO
                                            INPUT FROM barrel SLOTS 0
@@ -62,7 +62,7 @@ public class CircleRedstoneGameTest extends SFMGameTestDefinition {
 
         // Set up manager2
         ManagerBlockEntity manager2 = (ManagerBlockEntity) helper.getBlockEntity(manager2Pos);
-        manager2.setItem(0, new ItemStack(SFMItems.DISK_ITEM.get()));
+        manager2.setItem(0, new ItemStack(SFMItems.DISK.get()));
         manager2.setProgram("""
                                        EVERY REDSTONE PULSE DO
                                            INPUT FROM barrel SLOTS 1

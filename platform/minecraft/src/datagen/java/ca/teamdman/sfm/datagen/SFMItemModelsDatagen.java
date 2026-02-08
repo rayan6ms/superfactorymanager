@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.datagen;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.common.registry.SFMBlocks;
-import ca.teamdman.sfm.common.registry.SFMItems;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
+import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticItemModelsDataGen;
 import net.minecraft.client.renderer.block.model.BlockModel;
@@ -23,30 +23,30 @@ public class SFMItemModelsDatagen extends MCVersionAgnosticItemModelsDataGen {
 
     @Override
     protected void registerModels() {
-        justParent(SFMItems.MANAGER_ITEM, SFMBlocks.MANAGER_BLOCK);
-        justParent(SFMItems.TUNNELLED_MANAGER_ITEM, SFMBlocks.TUNNELLED_MANAGER_BLOCK);
-        justParent(SFMItems.CABLE_ITEM, SFMBlocks.CABLE_BLOCK);
-        justParent(SFMItems.FANCY_CABLE_ITEM, SFMBlocks.FANCY_CABLE_BLOCK, "_core");
+        justParent(SFMItems.MANAGER, SFMBlocks.MANAGER);
+        justParent(SFMItems.TUNNELLED_MANAGER, SFMBlocks.TUNNELLED_MANAGER);
+        justParent(SFMItems.CABLE, SFMBlocks.CABLE);
+        justParent(SFMItems.FANCY_CABLE, SFMBlocks.FANCY_CABLE, "_core");
 
         // Tough cable models
-        justParent(SFMItems.TOUGH_CABLE_ITEM, SFMBlocks.TOUGH_CABLE_BLOCK);
-        justParent(SFMItems.TOUGH_FANCY_CABLE_ITEM, SFMBlocks.TOUGH_FANCY_CABLE_BLOCK, "_core");
+        justParent(SFMItems.TOUGH_CABLE, SFMBlocks.TOUGH_CABLE);
+        justParent(SFMItems.TOUGH_FANCY_CABLE, SFMBlocks.TOUGH_FANCY_CABLE, "_core");
 
         // Tunnelled cable models
-        justParent(SFMItems.TUNNELLED_CABLE_ITEM, SFMBlocks.TUNNELLED_CABLE_BLOCK);
-        justParent(SFMItems.TUNNELLED_FANCY_CABLE_ITEM, SFMBlocks.TUNNELLED_FANCY_CABLE_BLOCK, "_core");
+        justParent(SFMItems.TUNNELLED_CABLE, SFMBlocks.TUNNELLED_CABLE);
+        justParent(SFMItems.TUNNELLED_FANCY_CABLE, SFMBlocks.TUNNELLED_FANCY_CABLE, "_core");
 
-        justParent(SFMItems.PRINTING_PRESS_ITEM, SFMBlocks.PRINTING_PRESS_BLOCK);
-        justParent(SFMItems.WATER_TANK_ITEM, SFMBlocks.WATER_TANK_BLOCK, "_active");
-        justParent(SFMItems.BUFFER_ITEM, SFMBlocks.BUFFER_BLOCK, "_item");
-        basicItem(SFMItems.DISK_ITEM);
-        basicItem(SFMItems.LABEL_GUN_ITEM);
-        basicItem(SFMItems.EXPERIENCE_GOOP_ITEM);
-        basicItem(SFMItems.EXPERIENCE_SHARD_ITEM);
-        basicItem(SFMItems.NETWORK_TOOL_ITEM);
+        justParent(SFMItems.PRINTING_PRESS, SFMBlocks.PRINTING_PRESS);
+        justParent(SFMItems.WATER_TANK, SFMBlocks.WATER_TANK, "_active");
+        justParent(SFMItems.BUFFER, SFMBlocks.BUFFER_BLOCK, "_item");
+        basicItem(SFMItems.DISK);
+        basicItem(SFMItems.LABEL_GUN);
+        basicItem(SFMItems.EXPERIENCE_GOOP);
+        basicItem(SFMItems.EXPERIENCE_SHARD);
+        basicItem(SFMItems.NETWORK_TOOL);
 
         // force custom renderer
-        getBuilder(SFMItems.FORM_ITEM)
+        getBuilder(SFMItems.FORM)
                 .parent(new ModelFile.UncheckedModelFile("builtin/entity"))
                 .guiLight(BlockModel.GuiLight.FRONT);
         getBuilder("form_base")
