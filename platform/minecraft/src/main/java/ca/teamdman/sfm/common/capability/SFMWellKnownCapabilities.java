@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.capability;
 
 
-import ca.teamdman.sfm.common.registry.SFMCapabilities;
+import ca.teamdman.sfm.common.registry.registration.SFMCapabilities;
 import ca.teamdman.sfm.common.registry.registration.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
