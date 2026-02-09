@@ -57,10 +57,10 @@ public class FallingAnvilHandler {
 
 
         // Check if the landed-on block can be turned into a printing press form
-        boolean tryFormCreation = SFMBlockTags.blockHasTag(blockLandedUpon, SFMBlockTags.ANVIL_PRINTING_PRESS_FORMING);
+        boolean tryFormCreation = SFMBlockTags.hasBlockTag(blockLandedUpon, SFMBlockTags.ANVIL_PRINTING_PRESS_FORMING);
 
         // Check if the landed-on block can be used for anvil-disenchanting
-        boolean tryCrushing = SFMBlockTags.blockHasTag(blockLandedUpon, SFMBlockTags.ANVIL_DISENCHANTING);
+        boolean tryCrushing = SFMBlockTags.hasBlockTag(blockLandedUpon, SFMBlockTags.ANVIL_DISENCHANTING);
 
         // Only proceed if the landed-upon block matches our recipes
         if (!tryCrushing && !tryFormCreation) return;

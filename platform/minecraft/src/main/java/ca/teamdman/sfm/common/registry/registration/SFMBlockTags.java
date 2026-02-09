@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.registry.registration;
 
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.TagKey;
@@ -16,7 +17,8 @@ public class SFMBlockTags {
             SFMResourceLocation.fromSFMPath("anvil_printing_press_forming"));
 
     @SuppressWarnings("deprecation")
-    public static boolean blockHasTag(Block block, TagKey<Block> tag) {
+    @MCVersionDependentBehaviour
+    public static boolean hasBlockTag(Block block, TagKey<Block> tag) {
         return block.builtInRegistryHolder().tags().anyMatch(tag::equals);
     }
 }

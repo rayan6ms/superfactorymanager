@@ -8,6 +8,7 @@ import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
 import ca.teamdman.sfm.common.item.FormItem;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
+import ca.teamdman.sfm.common.registry.registration.SFMBlockTags;
 import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMComponentUtils;
@@ -111,9 +112,16 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
         if (recipe instanceof FallingAnvilFormRecipe formRecipe) {
             builder.addSlot(RecipeIngredientRole.CATALYST, 0, 0).addItemStacks(anvil);
             builder.addSlot(RecipeIngredientRole.INPUT, 0, 18).addIngredients(formRecipe.PARENT.form());
-            ItemStack ironBlock = new ItemStack(Blocks.IRON_BLOCK);
-            SFMComponentUtils.appendLore(ironBlock, LocalizationKeys.FALLING_ANVIL_JEI_CONSUMED.getComponent());
-            builder.addSlot(RecipeIngredientRole.INPUT, 0, 36).addItemStack(ironBlock);
+            List<ItemStack> consumedCatalystBlocks = SFMWellKnownRegistries.BLOCKS.stream()
+                    .filter(block -> SFMBlockTags.hasBlockTag(block, SFMBlockTags.ANVIL_PRINTING_PRESS_FORMING))
+                    .map(ItemStack::new)
+                    .peek(stack ->
+                                  SFMComponentUtils.appendLore(
+                                          stack,
+                                          LocalizationKeys.FALLING_ANVIL_JEI_CONSUMED.getComponent()
+                                  )
+                    ).toList();
+            builder.addSlot(RecipeIngredientRole.INPUT, 0, 36).addItemStacks(consumedCatalystBlocks);
             builder
                     .addSlot(RecipeIngredientRole.OUTPUT, 50, 18)
                     .addItemStacks(Arrays
@@ -298,11 +306,18 @@ public class FallingAnvilJEICategory implements IRecipeCategory<FallingAnvilReci
                     .addItemStacks(anvil);
 
             // Track the obsidian catalyst
-            ItemStack obsidian = new ItemStack(Blocks.OBSIDIAN);
-            SFMComponentUtils.appendLore(obsidian, LocalizationKeys.FALLING_ANVIL_JEI_NOT_CONSUMED.getComponent());
+            List<ItemStack> crushingCompatibleBlocks = SFMWellKnownRegistries.BLOCKS
+                    .stream()
+                    .filter(block -> SFMBlockTags.hasBlockTag(block, SFMBlockTags.ANVIL_DISENCHANTING))
+                    .map(ItemStack::new)
+                    .peek(stack -> SFMComponentUtils.appendLore(
+                            stack,
+                            LocalizationKeys.FALLING_ANVIL_JEI_NOT_CONSUMED.getComponent()
+                    ))
+                    .toList();
             builder
                     .addSlot(RecipeIngredientRole.CATALYST, 8, 36)
-                    .addItemStack(obsidian);
+                    .addItemStacks(crushingCompatibleBlocks);
 
             // Track the book ingredient
             builder
