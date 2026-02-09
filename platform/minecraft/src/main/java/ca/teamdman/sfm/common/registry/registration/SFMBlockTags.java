@@ -16,7 +16,7 @@ public class SFMBlockTags {
             SFMResourceLocation.fromSFMPath("anvil_printing_press_forming"));
 
     @SuppressWarnings("deprecation")
-    public static boolean blockHasTag(Block block, TagKey<Block> tag) {
+    public static boolean hasBlockTag(Block block, TagKey<Block> tag) {
         return block.builtInRegistryHolder().tags().anyMatch(tag::equals);
     }
 }
