@@ -2,7 +2,7 @@ package ca.teamdman.sfm.client.export;
 
 import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.client.jei.SFMJEIPlugin;
-import ca.teamdman.sfm.common.registry.SFMResourceTypes;
+import ca.teamdman.sfm.common.registry.registration.SFMResourceTypes;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
