@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.containermenu.ManagerContainerMenu;
 import ca.teamdman.sfm.common.item.DiskItem;
 import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
+import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -91,10 +92,15 @@ public class ManagerBlock extends BaseEntityBlock implements EntityBlock, ICable
             && player instanceof ServerPlayer serverPlayer) {
             // update warnings on disk as we open the gui
             DiskItem.rebuildWarnings(manager);
-            NetworkHooks.openScreen(serverPlayer, manager, buf -> ManagerContainerMenu.encode(manager, buf));
+            openMenu(serverPlayer, manager);
             return InteractionResult.CONSUME;
         }
         return InteractionResult.SUCCESS;
+    }
+
+    @MCVersionDependentBehaviour
+    private void openMenu(ServerPlayer player, ManagerBlockEntity manager) {
+        NetworkHooks.openScreen(player, manager, buf -> ManagerContainerMenu.encode(manager, buf));
     }
 
     @Override
