@@ -1,6 +1,6 @@
 package ca.teamdman.sfm.common.registry.registration;
 
-import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
@@ -8,16 +8,13 @@ import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.event.CreativeModeTabEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
 
 @MCVersionDependentBehaviour
-@Mod.EventBusSubscriber(modid = SFM.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class SFMCreativeTabs {
     @SuppressWarnings("NotNullFieldNotInitialized")
     public static CreativeModeTab MAIN;
 
-    @SubscribeEvent
+    @SFMSubscribeEvent
     public static void onRegister(CreativeModeTabEvent.Register event) {
         MAIN = event.registerCreativeModeTab(
                 SFMResourceLocation.fromSFMPath("main"),
