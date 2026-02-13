@@ -118,37 +118,6 @@ fn get_worktree_status(worktree: &Worktree, short: bool) -> eyre::Result<Worktre
     })
 }
 
-/// Ensure all worktrees are clean (no uncommitted changes or merge state).
-///
-/// # Errors
-///
-/// Returns an error if any worktree has uncommitted changes or is merging.
-pub(crate) fn assert_worktrees_clean(worktrees: &[Worktree]) -> eyre::Result<()> {
-    let mut dirty = Vec::new();
-
-    for wt in worktrees {
-        let status = get_worktree_status(wt, false)?;
-        if !status.is_clean() || status.is_merging {
-            dirty.push(status);
-        }
-    }
-
-    if dirty.is_empty() {
-        return Ok(());
-    }
-
-    println!(
-        "{} of {} worktree(s) have uncommitted changes:",
-        dirty.len().to_string().yellow().bold(),
-        worktrees.len().to_string().cyan().bold()
-    );
-    for status in dirty {
-        status.display();
-    }
-
-    bail!("Uncommitted changes found; aborting")
-}
-
 /// Ensure all worktrees are clean. If only generated resources changed, prompt to auto-commit.
 ///
 /// # Errors
