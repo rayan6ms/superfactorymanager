@@ -89,6 +89,18 @@ pub enum Command {
         #[facet(flatten)]
         command: super::check::CheckCommand,
     },
+    /// Client instance tracking and management commands
+    Client {
+        /// Client subcommand
+        #[facet(args::subcommand)]
+        command: super::client::ClientCommand,
+    },
+    /// Server instance tracking and management commands
+    Server {
+        /// Server subcommand
+        #[facet(args::subcommand)]
+        command: super::server::ServerCommand,
+    },
     /// Push branches (runs `git push` in each worktree)
     Push {
         /// Push options
@@ -107,11 +119,11 @@ pub enum Command {
         #[facet(args::subcommand)]
         command: super::cache::CacheCommand,
     },
-    /// Jars directory and release artifact related commands
-    Jars {
-        /// Jars subcommand
+    /// Jar directory and release artifact related commands
+    Jar {
+        /// Jar subcommand
         #[facet(args::subcommand)]
-        command: super::jars::JarsCommand,
+        command: super::jar::JarCommand,
     },
     /// Repo root related commands
     RepoRoot {
@@ -136,10 +148,12 @@ impl Command {
             Command::Merge { command } => command.invoke(),
             Command::Gradle { command } => command.invoke(),
             Command::Check { command } => command.invoke(),
+            Command::Client { command } => command.invoke(),
+            Command::Server { command } => command.invoke(),
             Command::Push { command } => command.invoke(),
             Command::Home { command } => command.invoke(),
             Command::Cache { command } => command.invoke(),
-            Command::Jars { command } => command.invoke(),
+            Command::Jar { command } => command.invoke(),
             Command::RepoRoot { command } => command.invoke(),
             Command::Status { command } => command.unwrap_or_default().invoke(),
         }
