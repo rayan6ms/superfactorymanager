@@ -519,17 +519,23 @@ impl GradleCommand {
         }
 
         let mut worktrees = get_sorted_worktrees()?;
+        let all_worktree_branches: Vec<String> =
+            worktrees.iter().map(|wt| wt.branch.clone()).collect();
         let total_worktrees = worktrees.len();
         let mc_filter = self.mc.as_deref().map(McVersionFilter::parse).transpose()?;
+
+        let mut excluded_worktree_branches = Vec::new();
 
         if let Some(filter) = mc_filter {
             worktrees.retain(|wt| match filter.matches_branch(&wt.branch) {
                 Some(true) => true,
                 Some(false) => {
+                    excluded_worktree_branches.push(wt.branch.clone());
                     debug!(branch = %wt.branch, filter = ?self.mc, "Skipping branch due to --mc filter");
                     false
                 }
                 None => {
+                    excluded_worktree_branches.push(wt.branch.clone());
                     warn!(branch = %wt.branch, filter = ?self.mc, "Skipping non-version branch for --mc filter");
                     false
                 }
@@ -570,13 +576,20 @@ impl GradleCommand {
             })
             .collect();
 
+        let included_worktree_branches: Vec<String> =
+            worktrees.iter().map(|wt| wt.branch.clone()).collect();
+        let worktrees_included = included_worktree_branches.len();
         let worktrees_excluded = total_worktrees.saturating_sub(worktrees.len());
 
         info!(
             tasks = ?self.tasks,
             mc_filter = ?self.mc,
-            worktrees = worktrees.len(),
-            worktrees_excluded,
+            worktrees = ?all_worktree_branches,
+            worktrees_included = ?included_worktree_branches,
+            worktrees_included_count = worktrees_included,
+            worktrees_total = total_worktrees,
+            worktrees_excluded = ?excluded_worktree_branches,
+            worktrees_excluded_count = worktrees_excluded,
             "Running gradle tasks in strict sequence"
         );
 
@@ -702,7 +715,6 @@ impl GradleCommand {
                             }
                         }
 
-                        print_report_to_stderr(&branches, &tasks);
                         print_report_to_stdout(&branches, &tasks);
                         bail!(err.message);
                     }
