@@ -653,7 +653,6 @@ impl GradleCommand {
                             duration = %format_duration(output.duration),
                             "Task succeeded"
                         );
-                        print_report_to_stderr(&branches, &tasks);
                     }
                     Err(err) => {
                         let duration = err
@@ -679,9 +678,9 @@ impl GradleCommand {
                         );
 
                         if err.interrupted {
-                            eprintln!();
-                            eprintln!("{}", "ABORTED BY CTRL+C".yellow().bold());
-                            eprintln!(
+                            println!();
+                            println!("{}", "ABORTED BY CTRL+C".yellow().bold());
+                            println!(
                                 "{}",
                                 format!(
                                     "branch: {}, task: {}",
@@ -693,9 +692,9 @@ impl GradleCommand {
                         }
 
                         if let Some(output) = err.output {
-                            eprintln!();
-                            eprintln!("{}", "FAILED COMMAND OUTPUT".red().bold());
-                            eprintln!(
+                            println!();
+                            println!("{}", "FAILED COMMAND OUTPUT".red().bold());
+                            println!(
                                 "{}",
                                 format!(
                                     "branch: {}, task: {}, exit: {:?}",
@@ -706,12 +705,12 @@ impl GradleCommand {
                                 .red()
                             );
                             if !output.stdout.trim().is_empty() {
-                                eprintln!("{}", "--- stdout ---".red().bold());
-                                eprintln!("{}", output.stdout);
+                                println!("{}", "--- stdout ---".red().bold());
+                                println!("{}", output.stdout);
                             }
                             if !output.stderr.trim().is_empty() {
-                                eprintln!("{}", "--- stderr ---".red().bold());
-                                eprintln!("{}", output.stderr);
+                                println!("{}", "--- stderr ---".red().bold());
+                                println!("{}", output.stderr);
                             }
                         }
 
