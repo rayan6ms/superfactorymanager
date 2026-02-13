@@ -34,7 +34,6 @@ struct BranchRun {
 #[derive(Debug, Clone)]
 enum TaskState {
     Waiting,
-    UpNext,
     Running { start_time: Instant },
     Success { duration: Duration },
     Failed { duration: Duration },
@@ -61,6 +60,7 @@ struct TaskOutput {
 struct TaskError {
     message: String,
     output: Option<TaskOutput>,
+    interrupted: bool,
 }
 
 impl GradleTask {
@@ -103,7 +103,6 @@ impl TaskState {
     fn plain_text(&self) -> String {
         match self {
             Self::Waiting => "waiting".to_string(),
-            Self::UpNext => "up next".to_string(),
             Self::Running { start_time } => {
                 format!("running ({})", format_duration(start_time.elapsed()))
             }
@@ -118,8 +117,7 @@ impl TaskState {
         let text = self.plain_text();
         match self {
             Self::Waiting | Self::Skipped => text.dimmed().to_string(),
-            Self::UpNext => text.yellow().bold().to_string(),
-            Self::Running { .. } => text.yellow().to_string(),
+            Self::Running { .. } => text.yellow().bold().to_string(),
             Self::Success { .. } => text.green().bold().to_string(),
             Self::Failed { .. } => text.red().bold().to_string(),
             Self::NotFound { .. } => text.magenta().to_string(),
@@ -245,6 +243,10 @@ where
     Ok(out)
 }
 
+#[expect(
+    clippy::too_many_lines,
+    reason = "Task execution, streaming, and Ctrl+C handling are clearer in one place."
+)]
 async fn run_gradle_task(
     gradlew: &Path,
     minecraft_dir: &Path,
@@ -277,6 +279,7 @@ async fn run_gradle_task(
         .map_err(|err| TaskError {
             message: format!("Failed to start {}: {err}", task.as_gradle_arg()),
             output: None,
+            interrupted: false,
         })?;
 
     let stdout = child.stdout.take().ok_or_else(|| TaskError {
@@ -286,6 +289,7 @@ async fn run_gradle_task(
             minecraft_dir.display()
         ),
         output: None,
+        interrupted: false,
     })?;
     let stderr = child.stderr.take().ok_or_else(|| TaskError {
         message: format!(
@@ -294,40 +298,93 @@ async fn run_gradle_task(
             minecraft_dir.display()
         ),
         output: None,
+        interrupted: false,
     })?;
 
-    let (status_res, stdout_res, stderr_res) = tokio::join!(
-        child.wait(),
-        collect_output(stdout, hide_logs),
-        collect_output(stderr, hide_logs)
-    );
+    let stdout_task = tokio::spawn(collect_output(stdout, hide_logs));
+    let stderr_task = tokio::spawn(collect_output(stderr, hide_logs));
 
-    let status = status_res.map_err(|err| TaskError {
-        message: format!(
-            "Failed while waiting for {} in {}: {err}",
-            task.as_gradle_arg(),
-            minecraft_dir.display()
-        ),
-        output: None,
-    })?;
+    let (status, interrupted) = tokio::select! {
+        status_res = child.wait() => {
+            let status = status_res.map_err(|err| TaskError {
+                message: format!(
+                    "Failed while waiting for {} in {}: {err}",
+                    task.as_gradle_arg(),
+                    minecraft_dir.display()
+                ),
+                output: None,
+                interrupted: false,
+            })?;
+            (status, false)
+        }
+        signal_res = tokio::signal::ctrl_c() => {
+            if let Err(err) = signal_res {
+                warn!(
+                    path = %minecraft_dir.display(),
+                    task = %task.as_gradle_arg(),
+                    "Failed to listen for Ctrl+C: {err}"
+                );
+            }
+            warn!(
+                path = %minecraft_dir.display(),
+                task = %task.as_gradle_arg(),
+                "Received Ctrl+C, terminating running gradle task"
+            );
+            let _ = child.kill().await;
+            let status = child.wait().await.map_err(|err| TaskError {
+                message: format!(
+                    "Failed while terminating {} in {}: {err}",
+                    task.as_gradle_arg(),
+                    minecraft_dir.display()
+                ),
+                output: None,
+                interrupted: false,
+            })?;
+            (status, true)
+        }
+    };
 
-    let stdout = stdout_res.map_err(|err| TaskError {
-        message: format!(
-            "Failed while reading stdout for {} in {}: {err}",
-            task.as_gradle_arg(),
-            minecraft_dir.display()
-        ),
-        output: None,
-    })?;
+    let stdout = stdout_task
+        .await
+        .map_err(|err| TaskError {
+            message: format!(
+                "Failed while joining stdout reader for {} in {}: {err}",
+                task.as_gradle_arg(),
+                minecraft_dir.display()
+            ),
+            output: None,
+            interrupted: false,
+        })?
+        .map_err(|err| TaskError {
+            message: format!(
+                "Failed while reading stdout for {} in {}: {err}",
+                task.as_gradle_arg(),
+                minecraft_dir.display()
+            ),
+            output: None,
+            interrupted: false,
+        })?;
 
-    let stderr = stderr_res.map_err(|err| TaskError {
-        message: format!(
-            "Failed while reading stderr for {} in {}: {err}",
-            task.as_gradle_arg(),
-            minecraft_dir.display()
-        ),
-        output: None,
-    })?;
+    let stderr = stderr_task
+        .await
+        .map_err(|err| TaskError {
+            message: format!(
+                "Failed while joining stderr reader for {} in {}: {err}",
+                task.as_gradle_arg(),
+                minecraft_dir.display()
+            ),
+            output: None,
+            interrupted: false,
+        })?
+        .map_err(|err| TaskError {
+            message: format!(
+                "Failed while reading stderr for {} in {}: {err}",
+                task.as_gradle_arg(),
+                minecraft_dir.display()
+            ),
+            output: None,
+            interrupted: false,
+        })?;
 
     let task_output = TaskOutput {
         status,
@@ -335,6 +392,18 @@ async fn run_gradle_task(
         stderr,
         duration: start.elapsed(),
     };
+
+    if interrupted {
+        return Err(TaskError {
+            message: format!(
+                "Interrupted by Ctrl+C while running {} in {}",
+                task.as_gradle_arg(),
+                minecraft_dir.display()
+            ),
+            output: Some(task_output),
+            interrupted: true,
+        });
+    }
 
     if task.is_success(&task_output) {
         Ok(task_output)
@@ -347,6 +416,7 @@ async fn run_gradle_task(
                 task_output.status.code()
             ),
             output: Some(task_output),
+            interrupted: false,
         })
     }
 }
@@ -451,12 +521,10 @@ impl GradleCommand {
             }
 
             for task_idx in 0..tasks.len() {
-                branches[branch_idx].tasks[task_idx].state = TaskState::UpNext;
-                print_report_to_stderr(&branches, &tasks);
-
                 branches[branch_idx].tasks[task_idx].state = TaskState::Running {
                     start_time: Instant::now(),
                 };
+                print_report_to_stderr(&branches, &tasks);
 
                 let current_task = branches[branch_idx].tasks[task_idx].task.clone();
                 debug!(
@@ -504,6 +572,20 @@ impl GradleCommand {
                             error = %err.message,
                             "Task failed"
                         );
+
+                        if err.interrupted {
+                            eprintln!();
+                            eprintln!("{}", "ABORTED BY CTRL+C".yellow().bold());
+                            eprintln!(
+                                "{}",
+                                format!(
+                                    "branch: {}, task: {}",
+                                    wt.branch,
+                                    current_task.as_gradle_arg()
+                                )
+                                .yellow()
+                            );
+                        }
 
                         if let Some(output) = err.output {
                             eprintln!();
