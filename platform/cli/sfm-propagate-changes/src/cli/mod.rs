@@ -5,6 +5,7 @@ mod cli;
 pub mod compile;
 pub mod datagen;
 pub mod gametest;
+pub mod gradle;
 pub mod home;
 pub mod merge;
 pub mod push;

@@ -107,6 +107,12 @@ pub enum Command {
         #[facet(flatten)]
         command: super::test::TestCommand,
     },
+    /// Run arbitrary gradle task(s) for each worktree in strict sequence
+    Gradle {
+        /// Gradle options
+        #[facet(flatten)]
+        command: super::gradle::GradleCommand,
+    },
     /// Check workspace files for correctness
     Check {
         /// Check options
@@ -157,6 +163,7 @@ impl Command {
             Command::Datagen { command } => command.invoke(),
             Command::Gametest { command } => command.invoke(),
             Command::Test { command } => command.invoke(),
+            Command::Gradle { command } => command.invoke(),
             Command::Check { command } => command.invoke(),
             Command::Push { command } => command.invoke(),
             Command::Home { command } => command.invoke(),
