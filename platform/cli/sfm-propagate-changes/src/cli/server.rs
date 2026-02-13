@@ -6,10 +6,64 @@ use figue as args;
 use glob::Pattern;
 use std::path::Path;
 use std::path::PathBuf;
+use std::process::Command;
 use tracing::info;
 use tracing::warn;
 
 const SERVER_TARGETS_FILE: &str = "server_targets.tsv";
+
+#[derive(Debug, Clone, Copy)]
+enum VersionOp {
+    Lt,
+    Lte,
+    Gt,
+    Gte,
+    Eq,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct McVersionFilter {
+    op: VersionOp,
+    version: (u32, u32, u32),
+}
+
+impl McVersionFilter {
+    fn parse(input: &str) -> eyre::Result<Self> {
+        let trimmed = input.trim();
+        let (op, version_text) = if let Some(rest) = trimmed.strip_prefix(">=") {
+            (VersionOp::Gte, rest)
+        } else if let Some(rest) = trimmed.strip_prefix("<=") {
+            (VersionOp::Lte, rest)
+        } else if let Some(rest) = trimmed.strip_prefix("==") {
+            (VersionOp::Eq, rest)
+        } else if let Some(rest) = trimmed.strip_prefix('>') {
+            (VersionOp::Gt, rest)
+        } else if let Some(rest) = trimmed.strip_prefix('<') {
+            (VersionOp::Lt, rest)
+        } else if let Some(rest) = trimmed.strip_prefix('=') {
+            (VersionOp::Eq, rest)
+        } else {
+            (VersionOp::Eq, trimmed)
+        };
+
+        let version_text = version_text.trim();
+        let version = parse_version(version_text)
+            .ok_or_else(|| eyre::eyre!("Invalid mc version expression: '{input}'"))?;
+
+        Ok(Self { op, version })
+    }
+
+    fn matches_version(&self, version: &str) -> Option<bool> {
+        let parsed = parse_version(version)?;
+        Some(match self.op {
+            VersionOp::Lt => parsed < self.version,
+            VersionOp::Lte => parsed <= self.version,
+            VersionOp::Gt => parsed > self.version,
+            VersionOp::Gte => parsed >= self.version,
+            VersionOp::Eq => parsed == self.version,
+        })
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct ServerTarget {
@@ -39,6 +93,12 @@ pub enum ServerCommand {
         #[facet(default, args::positional)]
         glob: Option<String>,
     },
+    /// Launch tracked servers by running each `run.bat` and waiting for successful exit
+    Launch {
+        /// Minecraft version filter expression for tracked servers (examples: `>=1.21.0`, `<1.20`, `=1.20.4`).
+        #[facet(default, args::named)]
+        mc: Option<String>,
+    },
 }
 
 impl ServerCommand {
@@ -53,6 +113,7 @@ impl ServerCommand {
                 let glob = glob.unwrap_or_else(|| "*".to_string());
                 list_servers(&glob)
             }
+            ServerCommand::Launch { mc } => launch_servers(mc.as_deref()),
         }
     }
 }
@@ -142,6 +203,91 @@ fn list_servers(glob_pattern: &str) -> eyre::Result<()> {
         println!("{}\t{}", target.mc_version, target.path.display());
     }
 
+    Ok(())
+}
+
+fn launch_servers(mc_filter: Option<&str>) -> eyre::Result<()> {
+    let mut targets = load_server_targets()?;
+
+    if targets.is_empty() {
+        println!("No tracked servers. Use `sfm-propagate-changes server add <glob>`.");
+        return Ok(());
+    }
+
+    let parsed_filter = mc_filter.map(McVersionFilter::parse).transpose()?;
+
+    if let Some(filter) = parsed_filter {
+        targets.retain(|target| {
+            if let Some(matches) = filter.matches_version(&target.mc_version) {
+                matches
+            } else {
+                warn!(
+                    mc_version = %target.mc_version,
+                    path = %target.path.display(),
+                    "Skipping tracked server with non-version mc value for --mc filter"
+                );
+                false
+            }
+        });
+    }
+
+    if targets.is_empty() {
+        if mc_filter.is_some() {
+            println!("No tracked servers match the requested --mc filter.");
+        } else {
+            println!("No tracked servers.");
+        }
+        return Ok(());
+    }
+
+    for target in targets {
+        let run_bat = target.path.join("run.bat");
+        if !run_bat.exists() {
+            eyre::bail!(
+                "Missing run.bat for server target: {}",
+                target.path.display()
+            );
+        }
+
+        info!(
+            path = %target.path.display(),
+            mc_version = %target.mc_version,
+            "Launching server"
+        );
+
+        let status = if cfg!(windows) {
+            Command::new("cmd")
+                .args(["/C", "run.bat"])
+                .current_dir(&target.path)
+                .status()
+                .wrap_err_with(|| {
+                    format!(
+                        "Failed to execute run.bat for server target: {}",
+                        target.path.display()
+                    )
+                })?
+        } else {
+            Command::new(&run_bat)
+                .current_dir(&target.path)
+                .status()
+                .wrap_err_with(|| {
+                    format!(
+                        "Failed to execute run.bat for server target: {}",
+                        target.path.display()
+                    )
+                })?
+        };
+
+        if !status.success() {
+            eyre::bail!(
+                "Server exited unsuccessfully for {} with status {:?}",
+                target.path.display(),
+                status.code()
+            );
+        }
+    }
+
+    println!("All selected servers exited successfully.");
     Ok(())
 }
 

@@ -4,12 +4,19 @@ use eyre::Context;
 use facet::Facet;
 use figue as args;
 use glob::Pattern;
+#[cfg(windows)]
+use std::os::windows::process::CommandExt;
 use std::path::Path;
 use std::path::PathBuf;
+use std::process::Command;
 use tracing::info;
 use tracing::warn;
 
 const CLIENT_TARGETS_FILE: &str = "client_targets.tsv";
+const CLIENT_LAUNCHER_FILE: &str = "client_launcher.txt";
+
+#[cfg(windows)]
+const DETACHED_PROCESS: u32 = 0x0000_0008;
 
 #[derive(Debug, Clone)]
 pub struct ClientTarget {
@@ -39,6 +46,18 @@ pub enum ClientCommand {
         #[facet(default, args::positional)]
         glob: Option<String>,
     },
+    /// Set the launcher executable path used by `client launch`
+    #[facet(rename = "set-launcher")]
+    SetLauncher {
+        /// Path to the launcher executable
+        #[facet(args::positional)]
+        path: PathBuf,
+    },
+    /// Show the configured launcher executable path
+    #[facet(rename = "get-launcher")]
+    GetLauncher,
+    /// Launch configured client launcher detached (do not wait for it to exit)
+    Launch,
 }
 
 impl ClientCommand {
@@ -53,6 +72,9 @@ impl ClientCommand {
                 let glob = glob.unwrap_or_else(|| "*".to_string());
                 list_clients(&glob)
             }
+            ClientCommand::SetLauncher { path } => set_launcher(&path),
+            ClientCommand::GetLauncher => get_launcher(),
+            ClientCommand::Launch => launch_client(),
         }
     }
 }
@@ -143,6 +165,68 @@ fn list_clients(glob_pattern: &str) -> eyre::Result<()> {
     }
 
     Ok(())
+}
+
+fn set_launcher(path: &PathBuf) -> eyre::Result<()> {
+    let canonical = dunce::canonicalize(path)
+        .wrap_err_with(|| format!("Failed to canonicalize launcher path: {}", path.display()))?;
+
+    if !canonical.is_file() {
+        eyre::bail!("Launcher path is not a file: {}", canonical.display());
+    }
+
+    APP_HOME.ensure_dir()?;
+    let launcher_file = APP_HOME.file_path(CLIENT_LAUNCHER_FILE);
+
+    std::fs::write(&launcher_file, canonical.display().to_string())
+        .wrap_err_with(|| format!("Failed to write launcher file: {}", launcher_file.display()))?;
+
+    info!(path = %canonical.display(), "Set client launcher path");
+    Ok(())
+}
+
+fn launch_client() -> eyre::Result<()> {
+    let launcher = get_launcher_path()?;
+
+    let mut command = Command::new(&launcher);
+
+    #[cfg(windows)]
+    command.creation_flags(DETACHED_PROCESS);
+
+    command
+        .spawn()
+        .wrap_err_with(|| format!("Failed to launch client launcher: {}", launcher.display()))?;
+
+    info!(path = %launcher.display(), "Launched client launcher detached");
+    Ok(())
+}
+
+fn get_launcher() -> eyre::Result<()> {
+    let launcher = get_launcher_path()?;
+    println!("{}", launcher.display());
+    Ok(())
+}
+
+fn get_launcher_path() -> eyre::Result<PathBuf> {
+    let launcher_file = APP_HOME.file_path(CLIENT_LAUNCHER_FILE);
+    if !launcher_file.exists() {
+        eyre::bail!(
+            "Client launcher not set. Use `sfm-propagate-changes client set-launcher <path>` first."
+        );
+    }
+
+    let content = std::fs::read_to_string(&launcher_file)
+        .wrap_err_with(|| format!("Failed to read launcher file: {}", launcher_file.display()))?;
+    let path = PathBuf::from(content.trim());
+
+    if !path.exists() {
+        eyre::bail!(
+            "Configured client launcher does not exist: {}. Use `sfm-propagate-changes client set-launcher <path>` to update it.",
+            path.display()
+        );
+    }
+
+    Ok(path)
 }
 
 fn load_targets(file_name: &str) -> eyre::Result<Vec<ClientTarget>> {
