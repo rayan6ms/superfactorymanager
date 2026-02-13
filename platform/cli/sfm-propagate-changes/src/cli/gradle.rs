@@ -1,6 +1,6 @@
+use crate::cli::status::assert_worktrees_clean_or_autocommit_generated;
 use crate::worktree::get_sorted_worktrees;
 use crate::worktree::parse_version;
-use crate::cli::status::assert_worktrees_clean_or_autocommit_generated;
 use color_eyre::owo_colors::OwoColorize;
 use eyre::Context;
 use eyre::bail;
