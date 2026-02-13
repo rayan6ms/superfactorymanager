@@ -107,6 +107,12 @@ pub enum Command {
         #[facet(args::subcommand)]
         command: super::cache::CacheCommand,
     },
+    /// Jars directory and release artifact related commands
+    Jars {
+        /// Jars subcommand
+        #[facet(args::subcommand)]
+        command: super::jars::JarsCommand,
+    },
     /// Repo root related commands
     RepoRoot {
         /// Repo root subcommand
@@ -133,6 +139,7 @@ impl Command {
             Command::Push { command } => command.invoke(),
             Command::Home { command } => command.invoke(),
             Command::Cache { command } => command.invoke(),
+            Command::Jars { command } => command.invoke(),
             Command::RepoRoot { command } => command.invoke(),
             Command::Status { command } => command.unwrap_or_default().invoke(),
         }
