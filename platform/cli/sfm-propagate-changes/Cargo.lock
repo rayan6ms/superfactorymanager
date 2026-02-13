@@ -681,7 +681,7 @@ dependencies = [
 [[package]]
 name = "figue"
 version = "1.0.0"
-source = "git+https://github.com/bearcove/figue?branch=main#d918c0357e7a0973054e0e01546c127344978cd8"
+source = "git+https://github.com/TeamDman/figue?branch=teamy-positional-bug#77d6551cd5d3de072dc0ab203cb20b755f4997f2"
 dependencies = [
  "ariadne",
  "camino",
@@ -698,6 +698,7 @@ dependencies = [
  "owo-colors",
  "strip-ansi-escapes",
  "strsim",
+ "supports-color 3.0.2",
  "tracing",
  "unicode-width",
 ]
@@ -705,7 +706,7 @@ dependencies = [
 [[package]]
 name = "figue-attrs"
 version = "1.0.0"
-source = "git+https://github.com/bearcove/figue?branch=main#d918c0357e7a0973054e0e01546c127344978cd8"
+source = "git+https://github.com/TeamDman/figue?branch=teamy-positional-bug#77d6551cd5d3de072dc0ab203cb20b755f4997f2"
 dependencies = [
  "facet",
 ]
