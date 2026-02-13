@@ -16,10 +16,10 @@ Action: `sfm-propagate-changes.exe gradle runData`
 Action: `sfm-propagate-changes.exe merge`
 Action: `sfm-propagate-changes.exe gradle runGameTestServer`
 Action: `sfm-propagate-changes.exe build`
-Action: Wipe jars summary dir
-Action: Collect jars
-Action: Update PrismMC test instances to use latest build output
-Action: Update test servers to latest build output
+Action: `sfm-propagate-changes.exe jar clean`
+Action: `sfm-propagate-changes.exe jar collect`
+Action: `sfm-propagate-changes.exe jar update-clients`
+Action: `sfm-propagate-changes.exe jar update-servers`
 Action: Launch PrismMC
 Action: Launch test server
 
