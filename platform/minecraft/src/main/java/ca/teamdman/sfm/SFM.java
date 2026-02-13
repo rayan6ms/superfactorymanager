@@ -5,6 +5,7 @@ import ca.teamdman.sfm.client.registry.SFMTextEditors;
 import ca.teamdman.sfm.common.config.SFMConfig;
 import ca.teamdman.sfm.common.event_bus.SFMAutomaticEventSubscriber;
 import ca.teamdman.sfm.common.event_bus.SFMEventBus;
+import ca.teamdman.sfm.common.registry.registration.SFMDataComponents;
 import ca.teamdman.sfm.common.registry.registration.*;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.fml.ModLoadingContext;

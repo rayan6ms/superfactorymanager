@@ -6,7 +6,7 @@ import ca.teamdman.sfm.common.block_network.CableNetwork;
 import ca.teamdman.sfm.common.block_network.CableNetworkManager;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ServerboundNetworkToolUsePacket;
-import ca.teamdman.sfm.common.registry.SFMDataComponents;
+import ca.teamdman.sfm.common.registry.registration.SFMDataComponents;
 import ca.teamdman.sfm.common.registry.registration.SFMPackets;
 import ca.teamdman.sfm.common.util.BlockPosSet;
 import ca.teamdman.sfm.common.util.CompressedBlockPosSet;

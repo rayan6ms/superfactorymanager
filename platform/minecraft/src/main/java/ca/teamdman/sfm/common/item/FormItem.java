@@ -1,7 +1,7 @@
 package ca.teamdman.sfm.common.item;
 
 import ca.teamdman.sfm.common.component.ItemStackBox;
-import ca.teamdman.sfm.common.registry.SFMDataComponents;
+import ca.teamdman.sfm.common.registry.registration.SFMDataComponents;
 import ca.teamdman.sfm.common.registry.registration.SFMItems;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.network.chat.Component;

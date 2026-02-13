@@ -1,13 +1,11 @@
-package ca.teamdman.sfm.common.registry;
+package ca.teamdman.sfm.common.registry.registration;
 
 import ca.teamdman.sfm.common.capability.BufferBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.CauldronBlockCapabilityProvider;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
-import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
-import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
-import ca.teamdman.sfm.common.registry.registration.SFMResourceTypes;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.common.resourcetype.ResourceType;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
