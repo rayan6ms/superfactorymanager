@@ -3,6 +3,7 @@ pub mod check;
 mod cli;
 pub mod gradle;
 pub mod home;
+pub mod jars;
 pub mod merge;
 pub mod push;
 pub mod repo_root;
