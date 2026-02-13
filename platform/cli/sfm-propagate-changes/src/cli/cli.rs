@@ -77,36 +77,6 @@ pub enum Command {
         #[facet(flatten)]
         command: super::merge::MergeCommand,
     },
-    /// Compile all worktrees by running gradlew compileJava
-    Compile {
-        /// Compile options
-        #[facet(flatten)]
-        command: super::compile::CompileCommand,
-    },
-    /// Build all worktrees by running gradlew build
-    Build {
-        /// Build options
-        #[facet(flatten)]
-        command: super::build::BuildCommand,
-    },
-    /// Run data generation (gradlew runData) for each worktree
-    Datagen {
-        /// Datagen options
-        #[facet(flatten)]
-        command: super::datagen::DatagenCommand,
-    },
-    /// Run gametests (gradlew gameTestServer) for each worktree
-    Gametest {
-        /// Gametest options
-        #[facet(flatten)]
-        command: super::gametest::GametestCommand,
-    },
-    /// Run gradlew test for each worktree
-    Test {
-        /// Test options
-        #[facet(flatten)]
-        command: super::test::TestCommand,
-    },
     /// Run arbitrary gradle task(s) for each worktree in strict sequence
     Gradle {
         /// Gradle options
@@ -158,11 +128,6 @@ impl Command {
     pub fn invoke(self) -> eyre::Result<()> {
         match self {
             Command::Merge { command } => command.invoke(),
-            Command::Compile { command } => command.invoke(),
-            Command::Build { command } => command.invoke(),
-            Command::Datagen { command } => command.invoke(),
-            Command::Gametest { command } => command.invoke(),
-            Command::Test { command } => command.invoke(),
             Command::Gradle { command } => command.invoke(),
             Command::Check { command } => command.invoke(),
             Command::Push { command } => command.invoke(),
