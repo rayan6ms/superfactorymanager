@@ -1,5 +1,6 @@
 use crate::worktree::get_sorted_worktrees;
 use crate::worktree::parse_version;
+use crate::cli::status::assert_worktrees_clean_or_autocommit_generated;
 use color_eyre::owo_colors::OwoColorize;
 use eyre::Context;
 use eyre::bail;
@@ -136,6 +137,10 @@ impl GradleTask {
 
     fn header_name(&self) -> String {
         self.as_gradle_arg().to_string()
+    }
+
+    fn needs_generated_preflight(&self) -> bool {
+        matches!(self, Self::RunData)
     }
 
     fn is_success(&self, output: &TaskOutput) -> bool {
@@ -545,6 +550,10 @@ impl GradleCommand {
             .iter()
             .map(|task| GradleTask::from_input(task))
             .collect();
+
+        if tasks.iter().any(GradleTask::needs_generated_preflight) {
+            assert_worktrees_clean_or_autocommit_generated(&worktrees)?;
+        }
 
         let mut branches: Vec<BranchRun> = worktrees
             .iter()
