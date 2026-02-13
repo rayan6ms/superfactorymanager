@@ -11,11 +11,11 @@ Manual: Bump `mod_version` in gradle.properties
 Manual: Update heading in changelog.sfml
 Manual: Update thank_you.sfml
 Manual: Commit bump
-Action: Propagate changes
-Action: runData for all versions
-Action: Propagate changes
-Action: Run gameTestServer for all versions
-Action: Build
+Action: `sfm-propagate-changes.exe merge`
+Action: `sfm-propagate-changes.exe gradle runData`
+Action: `sfm-propagate-changes.exe merge`
+Action: `sfm-propagate-changes.exe gradle runGameTestServer`
+Action: `sfm-propagate-changes.exe build`
 Action: Wipe jars summary dir
 Action: Collect jars
 Action: Update PrismMC test instances to use latest build output
