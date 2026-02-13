@@ -4,6 +4,7 @@ import ca.teamdman.sfm.SFM;
 import ca.teamdman.sfm.common.util.SFMAnnotationUtils;
 import net.neoforged.bus.api.Event;
 import net.neoforged.bus.api.IEventBus;
+import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.fml.event.IModBusEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -14,9 +15,7 @@ import java.lang.invoke.MethodType;
 import java.lang.reflect.Method;
 import java.util.function.Consumer;
 
-import static net.neoforged.fml.common.EventBusSubscriber.Bus;
-
-@SuppressWarnings("FieldCanBeLocal")
+@SuppressWarnings({"FieldCanBeLocal", "removal"})
 public class SFMEventListenerMethod<T extends Event> {
     private final Method method;
 
@@ -137,7 +136,7 @@ public class SFMEventListenerMethod<T extends Event> {
         Consumer<T> consumer = createConsumer();
 
         // Determine bus
-        Bus busType = getEventBusType();
+        EventBusSubscriber.Bus busType = getEventBusType();
         IEventBus eventBus = SFMEventBus.getEventBus(busType);
 
         // Register listener
@@ -152,9 +151,9 @@ public class SFMEventListenerMethod<T extends Event> {
         SFM.LOGGER.info("Registered bus={} listener={}", busType, consumer);
     }
 
-    private @NotNull Bus getEventBusType() {
+    private EventBusSubscriber.Bus getEventBusType() {
 
-        Bus busType;
+        EventBusSubscriber.Bus busType;
         if (IModBusEvent.class.isAssignableFrom(eventClass)) {
             busType = SFMEventBus.EventBusType.MOD;
         } else {
