@@ -1,4 +1,5 @@
 use crate::worktree::get_sorted_worktrees;
+use crate::worktree::parse_version;
 use color_eyre::owo_colors::OwoColorize;
 use eyre::Context;
 use eyre::bail;
@@ -61,6 +62,59 @@ struct TaskError {
     message: String,
     output: Option<TaskOutput>,
     interrupted: bool,
+}
+
+#[derive(Debug, Clone, Copy)]
+enum VersionOp {
+    Lt,
+    Lte,
+    Gt,
+    Gte,
+    Eq,
+}
+
+#[derive(Debug, Clone, Copy)]
+struct McVersionFilter {
+    op: VersionOp,
+    version: (u32, u32, u32),
+}
+
+impl McVersionFilter {
+    fn parse(input: &str) -> eyre::Result<Self> {
+        let trimmed = input.trim();
+        let (op, version_text) = if let Some(rest) = trimmed.strip_prefix(">=") {
+            (VersionOp::Gte, rest)
+        } else if let Some(rest) = trimmed.strip_prefix("<=") {
+            (VersionOp::Lte, rest)
+        } else if let Some(rest) = trimmed.strip_prefix("==") {
+            (VersionOp::Eq, rest)
+        } else if let Some(rest) = trimmed.strip_prefix('>') {
+            (VersionOp::Gt, rest)
+        } else if let Some(rest) = trimmed.strip_prefix('<') {
+            (VersionOp::Lt, rest)
+        } else if let Some(rest) = trimmed.strip_prefix('=') {
+            (VersionOp::Eq, rest)
+        } else {
+            (VersionOp::Eq, trimmed)
+        };
+
+        let version_text = version_text.trim();
+        let version = parse_version(version_text)
+            .ok_or_else(|| eyre::eyre!("Invalid mc version expression: '{input}'"))?;
+
+        Ok(Self { op, version })
+    }
+
+    fn matches_branch(&self, branch: &str) -> Option<bool> {
+        let branch_version = parse_version(branch)?;
+        Some(match self.op {
+            VersionOp::Lt => branch_version < self.version,
+            VersionOp::Lte => branch_version <= self.version,
+            VersionOp::Gt => branch_version > self.version,
+            VersionOp::Gte => branch_version >= self.version,
+            VersionOp::Eq => branch_version == self.version,
+        })
+    }
 }
 
 impl GradleTask {
@@ -428,6 +482,10 @@ pub struct GradleCommand {
     #[facet(args::positional)]
     pub tasks: Vec<String>,
 
+    /// Minecraft version filter expression for branch names (examples: `>=1.21.0`, `<1.20`, `=1.20.4`).
+    #[facet(default, args::named)]
+    pub mc: Option<String>,
+
     /// If set, hide stdout of each gradle process while it runs.
     #[facet(rename = "hide-logs", args::named, default = false)]
     pub hide_logs: bool,
@@ -455,9 +513,30 @@ impl GradleCommand {
             bail!("No tasks provided. Usage: sfm-propagate-changes gradle <task1> <task2> ...");
         }
 
-        let worktrees = get_sorted_worktrees()?;
+        let mut worktrees = get_sorted_worktrees()?;
+        let total_worktrees = worktrees.len();
+        let mc_filter = self.mc.as_deref().map(McVersionFilter::parse).transpose()?;
+
+        if let Some(filter) = mc_filter {
+            worktrees.retain(|wt| match filter.matches_branch(&wt.branch) {
+                Some(true) => true,
+                Some(false) => {
+                    debug!(branch = %wt.branch, filter = ?self.mc, "Skipping branch due to --mc filter");
+                    false
+                }
+                None => {
+                    warn!(branch = %wt.branch, filter = ?self.mc, "Skipping non-version branch for --mc filter");
+                    false
+                }
+            });
+        }
+
         if worktrees.is_empty() {
-            println!("No worktrees found.");
+            if self.mc.is_some() {
+                println!("No worktrees match the requested --mc filter.");
+            } else {
+                println!("No worktrees found.");
+            }
             return Ok(());
         }
 
@@ -482,9 +561,13 @@ impl GradleCommand {
             })
             .collect();
 
+        let worktrees_excluded = total_worktrees.saturating_sub(worktrees.len());
+
         info!(
             tasks = ?self.tasks,
-            worktree_count = worktrees.len(),
+            mc_filter = ?self.mc,
+            worktrees = worktrees.len(),
+            worktrees_excluded,
             "Running gradle tasks in strict sequence"
         );
 
