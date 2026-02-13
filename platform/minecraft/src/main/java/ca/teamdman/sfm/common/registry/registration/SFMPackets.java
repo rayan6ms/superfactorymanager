@@ -8,7 +8,6 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerPlayer;
-import net.neoforged.fml.common.EventBusSubscriber;
 import net.neoforged.neoforge.network.PacketDistributor;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
@@ -17,7 +16,6 @@ import java.util.IdentityHashMap;
 import java.util.Locale;
 import java.util.function.Supplier;
 
-@EventBusSubscriber(modid = SFM.MOD_ID, bus = EventBusSubscriber.Bus.MOD)
 public class SFMPackets {
     private static final IdentityHashMap<Class<? extends SFMPacket>, SFMPacketDaddy<? extends SFMPacket>> DADDY_MAP = new IdentityHashMap<>();
     private static final IdentityHashMap<Class<? extends SFMPacket>, CustomPacketPayload.Type<? extends SFMWrappedPacket<? extends SFMPacket>>> TYPE_MAP = new IdentityHashMap<>();
