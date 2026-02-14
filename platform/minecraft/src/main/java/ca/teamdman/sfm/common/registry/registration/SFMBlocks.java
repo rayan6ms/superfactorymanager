@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
+import net.minecraft.world.level.material.MaterialColor;
 import net.minecraftforge.eventbus.api.IEventBus;
 
 
@@ -107,7 +108,9 @@ public class SFMBlocks {
                     "tough_cable",
                     () -> new ToughCableBlock(
                             BlockBehaviour.Properties
-                                    .of(Material.METAL)
+                                    .of(Material.STONE, MaterialColor.COLOR_BLACK)
+                                    .requiresCorrectToolForDrops()
+                                    .strength(50.0F, 1200.0F)
                                     .destroyTime(1f)
                                     .sound(SoundType.METAL)
                     )
@@ -118,7 +121,9 @@ public class SFMBlocks {
                     "tough_cable_facade",
                     () -> new ToughCableFacadeBlock(
                             BlockBehaviour.Properties
-                                    .of(Material.METAL)
+                                    .of(Material.STONE, MaterialColor.COLOR_BLACK)
+                                    .requiresCorrectToolForDrops()
+                                    .strength(50.0F, 1200.0F)
                                     .destroyTime(1f)
                                     .sound(SoundType.METAL)
                     )
@@ -129,7 +134,9 @@ public class SFMBlocks {
                     "tough_fancy_cable",
                     () -> new ToughFancyCableBlock(
                             BlockBehaviour.Properties
-                                    .of(Material.METAL)
+                                    .of(Material.STONE, MaterialColor.COLOR_BLACK)
+                                    .requiresCorrectToolForDrops()
+                                    .strength(50.0F, 1200.0F)
                                     .destroyTime(1f)
                                     .sound(SoundType.METAL)
                     )
@@ -140,7 +147,9 @@ public class SFMBlocks {
                     "tough_fancy_cable_facade",
                     () -> new ToughFancyCableFacadeBlock(
                             BlockBehaviour.Properties
-                                    .of(Material.METAL)
+                                    .of(Material.STONE, MaterialColor.COLOR_BLACK)
+                                    .requiresCorrectToolForDrops()
+                                    .strength(50.0F, 1200.0F)
                                     .destroyTime(1f)
                                     .sound(SoundType.METAL)
                     )

@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.gametest.tests.cable;
 
+import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
 import ca.teamdman.sfm.common.facade.FacadeData;
 import ca.teamdman.sfm.common.facade.FacadeTextureMode;
 import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
@@ -29,7 +30,7 @@ public class ToughCableExplosionGameTest extends SFMGameTestDefinition {
 
         // set facade to mimic obsidian
         var be = helper.getLevel().getBlockEntity(absolute);
-        if (be instanceof ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity facade) {
+        if (be instanceof IFacadeBlockEntity facade) {
             facade.updateFacadeData(new FacadeData(Blocks.OBSIDIAN.defaultBlockState(), Direction.NORTH, FacadeTextureMode.FILL));
         } else {
             helper.fail("Block entity at test position was not a facade BE");

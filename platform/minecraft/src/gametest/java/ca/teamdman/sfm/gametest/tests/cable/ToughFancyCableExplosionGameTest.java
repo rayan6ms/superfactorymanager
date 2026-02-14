@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.gametest.tests.cable;
 
+import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
 import ca.teamdman.sfm.common.facade.FacadeData;
 import ca.teamdman.sfm.common.facade.FacadeTextureMode;
 import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
@@ -10,6 +11,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.item.PrimedTnt;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 
 @SFMGameTest
 public class ToughFancyCableExplosionGameTest extends SFMGameTestDefinition {
@@ -29,7 +31,7 @@ public class ToughFancyCableExplosionGameTest extends SFMGameTestDefinition {
 
         // set facade to mimic obsidian
         var be = helper.getLevel().getBlockEntity(absolute);
-        if (be instanceof ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity facade) {
+        if (be instanceof IFacadeBlockEntity facade) {
             facade.updateFacadeData(new FacadeData(Blocks.OBSIDIAN.defaultBlockState(), Direction.NORTH, FacadeTextureMode.FILL));
         } else {
             helper.fail("Block entity at test position was not a facade BE");
@@ -37,7 +39,7 @@ public class ToughFancyCableExplosionGameTest extends SFMGameTestDefinition {
         }
 
         // spawn a lit TNT in the hollow center
-        var spawnVec = helper.absoluteVec(new net.minecraft.world.phys.Vec3(1.5, 2.5, 1.5));
+        var spawnVec = helper.absoluteVec(new Vec3(1.5, 2.5, 1.5));
         PrimedTnt primed = new PrimedTnt(helper.getLevel(), spawnVec.x, spawnVec.y, spawnVec.z, null);
         primed.setFuse((short)20);
         helper.getLevel().addFreshEntity(primed);

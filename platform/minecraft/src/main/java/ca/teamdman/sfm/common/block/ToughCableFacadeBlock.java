@@ -1,10 +1,13 @@
 package ca.teamdman.sfm.common.block;
 
+import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
+import ca.teamdman.sfm.common.facade.FacadeData;
 import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Explosion;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.LightBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -53,21 +56,34 @@ public class ToughCableFacadeBlock extends CableFacadeBlock implements EntityBlo
         return SFMBlocks.TOUGH_CABLE_FACADE.get();
     }
 
-    // TODO: implement destroyTime to inherit from facade block state
-
     @Override
     @SuppressWarnings("deprecation")
-    public float getExplosionResistance(net.minecraft.world.level.block.state.BlockState state, net.minecraft.world.level.BlockGetter world, net.minecraft.core.BlockPos pos, net.minecraft.world.level.Explosion explosion) {
-        try {
-            net.minecraft.world.level.block.entity.BlockEntity be = world.getBlockEntity(pos);
-            if (be instanceof ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity facadeBE) {
-                ca.teamdman.sfm.common.facade.FacadeData fd = facadeBE.getFacadeData();
-                if (fd != null) {
-                    return fd.facadeBlockState().getBlock().getExplosionResistance();
-                }
-            }
-        } catch (Throwable ignored) {
-        }
-        return super.getExplosionResistance();
+    public float getExplosionResistance(
+            BlockState state,
+            BlockGetter world,
+            BlockPos pos,
+            Explosion explosion
+    ) {
+
+        return getFacadedToughCableExplosionResistance(world, pos, super.getExplosionResistance());
     }
+
+    @SuppressWarnings("deprecation")
+    static float getFacadedToughCableExplosionResistance(
+            BlockGetter world,
+            BlockPos pos,
+            float defaultResistence
+    ) {
+
+        BlockEntity be = world.getBlockEntity(pos);
+        if (be instanceof IFacadeBlockEntity facadeBlockEntity) {
+            FacadeData fd = facadeBlockEntity.getFacadeData();
+            if (fd != null) {
+                float facadeResistance = fd.facadeBlockState().getBlock().getExplosionResistance();
+                return Math.max(facadeResistance, defaultResistence);
+            }
+        }
+        return defaultResistence;
+    }
+
 }
