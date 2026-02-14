@@ -10,6 +10,7 @@ import ca.teamdman.sfm.gametest.SFMGameTestGeneratorBase;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
@@ -24,6 +25,9 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+/// Note that {@link Blocks#OBSIDIAN} is resistant to the initial wither explosion.
+/// It is in {@link WitherBoss#canDestroy(BlockState)} that checks {@link BlockTags#WITHER_IMMUNE} which is called
+/// by {@link WitherBoss#customServerAiStep()} that causes the Wither to later break obsidian.
 @SFMGameTestGenerator
 public class ToughCableExplosionGameTestGenerator extends SFMGameTestGeneratorBase {
 
@@ -64,18 +68,18 @@ public class ToughCableExplosionGameTestGenerator extends SFMGameTestGeneratorBa
                     false
             ),
             new Scenario(
-                    "tough_cable_unfacaded_succumbs_to_wither_explosion",
+                    "tough_cable_unfacaded_resists_wither_explosion",
                     ExplosionType.WITHER,
                     SFMBlocks.TOUGH_CABLE::get,
                     Optional.empty(),
-                    false
+                    true
             ),
             new Scenario(
-                    "tough_fancy_cable_unfacaded_succumbs_to_wither_explosion",
+                    "tough_fancy_cable_unfacaded_resists_wither_explosion",
                     ExplosionType.WITHER,
                     SFMBlocks.TOUGH_FANCY_CABLE::get,
                     Optional.empty(),
-                    false
+                    true
             ),
             new Scenario(
                     "cable_unfacaded_succumbs_to_tnt_explosion",
@@ -99,18 +103,18 @@ public class ToughCableExplosionGameTestGenerator extends SFMGameTestGeneratorBa
                     true
             ),
             new Scenario(
-                    "tough_cable_facaded_as_obsidian_succumbs_to_wither_explosion",
+                    "tough_cable_facaded_as_obsidian_resists_wither_explosion",
                     ExplosionType.WITHER,
                     SFMBlocks.TOUGH_CABLE_FACADE::get,
                     Optional.of(Blocks.OBSIDIAN.defaultBlockState()),
-                    false
+                    true
             ),
             new Scenario(
-                    "obsidian_succumbs_to_wither_explosion",
+                    "obsidian_resists_wither_explosion",
                     ExplosionType.WITHER,
                     () -> Blocks.OBSIDIAN,
                     Optional.empty(),
-                    false
+                    true
             ),
             new Scenario(
                     "bedrock_resists_wither_explosion",
