@@ -4,6 +4,7 @@ import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import com.google.common.collect.Lists;
 import com.mojang.datafixers.util.Pair;
+import net.minecraft.data.loot.BlockLoot;
 import net.minecraft.data.loot.LootTableProvider;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.Block;
@@ -132,7 +133,7 @@ public abstract class MCVersionAgnosticLootTablesDataGen extends LootTableProvid
     }
 
     @MCVersionDependentBehaviour
-    private static class MyBlockLoot extends net.minecraft.data.loot.BlockLoot {
+    private static class MyBlockLoot extends BlockLoot {
         private final List<BlockLootBehaviour> behaviours;
 
         public MyBlockLoot(List<BlockLootBehaviour> behaviours) {
