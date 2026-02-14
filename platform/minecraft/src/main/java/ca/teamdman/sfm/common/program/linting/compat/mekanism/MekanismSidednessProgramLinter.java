@@ -86,7 +86,7 @@ public class MekanismSidednessProgramLinter implements IProgramLinter {
     ) {
 
         SideQualifier sides = statement.labelAccess().sides();
-        Stream<Pair<ca.teamdman.sfml.ast.Label, BlockPos>> mekanismBlocks = statement
+        Stream<Pair<Label, BlockPos>> mekanismBlocks = statement
                 .labelAccess()
                 .getLabelledPositions(labelPositionHolder)
                 .stream()
