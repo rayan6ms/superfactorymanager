@@ -12,6 +12,7 @@ import net.minecraftforge.fml.ModList;
 import net.minecraftforge.versions.forge.ForgeVersion;
 
 import java.text.SimpleDateFormat;
+import java.util.Date;
 
 public class SFMClientDiagnostics {
     public static String getDiagnosticsSummary(
@@ -27,7 +28,7 @@ public class SFMClientDiagnostics {
                     .append("\n\n");
 
             content.append("-- DateTime: ")
-                    .append(new SimpleDateFormat("yyyy-MM-dd HH:mm.ss").format(new java.util.Date()))
+                    .append(new SimpleDateFormat("yyyy-MM-dd HH:mm.ss").format(new Date()))
                     .append('\n');
 
             content

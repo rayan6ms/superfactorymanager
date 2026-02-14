@@ -20,7 +20,7 @@ import java.util.*;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-/// Helps reduce {@link ca.teamdman.sfm.common.util.MCVersionDependentBehaviour}
+/// Helps reduce {@link MCVersionDependentBehaviour}
 @MCVersionDependentBehaviour
 public final class SFMRegistryWrapper<T> implements Iterable<T> {
     private final ResourceKey<? extends Registry<T>> registryKey;

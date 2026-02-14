@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.function.Supplier;
 
 /// The thing that registers stuff to a registry.
-/// Helps reduce {@link ca.teamdman.sfm.common.util.MCVersionDependentBehaviour}.
+/// Helps reduce {@link MCVersionDependentBehaviour}.
 /// Can be acquired using {@link SFMDeferredRegisterBuilder}
 @MCVersionDependentBehaviour
 public class SFMDeferredRegister<T> {

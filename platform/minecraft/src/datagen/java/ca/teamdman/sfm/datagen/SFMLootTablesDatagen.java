@@ -1,8 +1,8 @@
 package ca.teamdman.sfm.datagen;
 
 import ca.teamdman.sfm.SFM;
-import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.common.registry.SFMRegistryObject;
+import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticLootTablesDataGen;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.data.event.GatherDataEvent;

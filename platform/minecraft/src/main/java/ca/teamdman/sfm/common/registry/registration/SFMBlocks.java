@@ -110,6 +110,8 @@ public class SFMBlocks {
                     () -> new ToughCableBlock(
                             BlockBehaviour.Properties
                                     .of()
+                                    .requiresCorrectToolForDrops()
+                                    .strength(50.0F, 1200.0F)
                                     .destroyTime(1f)
                                     .sound(SoundType.METAL)
                     )
@@ -121,6 +123,8 @@ public class SFMBlocks {
                     () -> new ToughCableFacadeBlock(
                             BlockBehaviour.Properties
                                     .of()
+                                    .requiresCorrectToolForDrops()
+                                    .strength(50.0F, 1200.0F)
                                     .destroyTime(1f)
                                     .sound(SoundType.METAL)
                     )
@@ -132,6 +136,8 @@ public class SFMBlocks {
                     () -> new ToughFancyCableBlock(
                             BlockBehaviour.Properties
                                     .of()
+                                    .requiresCorrectToolForDrops()
+                                    .strength(50.0F, 1200.0F)
                                     .destroyTime(1f)
                                     .sound(SoundType.METAL)
                     )
@@ -143,6 +149,8 @@ public class SFMBlocks {
                     () -> new ToughFancyCableFacadeBlock(
                             BlockBehaviour.Properties
                                     .of()
+                                    .requiresCorrectToolForDrops()
+                                    .strength(50.0F, 1200.0F)
                                     .destroyTime(1f)
                                     .sound(SoundType.METAL)
                     )
