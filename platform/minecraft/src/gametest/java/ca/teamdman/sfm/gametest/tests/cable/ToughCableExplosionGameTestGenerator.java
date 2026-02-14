@@ -1,15 +1,11 @@
 package ca.teamdman.sfm.gametest.tests.cable;
 
-import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
-import ca.teamdman.sfm.common.facade.FacadeData;
-import ca.teamdman.sfm.common.facade.FacadeTextureMode;
 import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestGenerator;
 import ca.teamdman.sfm.gametest.SFMGameTestGeneratorBase;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.EntityType;
@@ -227,9 +223,7 @@ public class ToughCableExplosionGameTestGenerator extends SFMGameTestGeneratorBa
             BlockPos absolute = helper.absolutePos(localPos);
 
             helper.getLevel().setBlock(absolute, scenario.blockSupplier.get().defaultBlockState(), 3);
-            if (!applyFacadeIfPresent(helper, absolute)) {
-                return;
-            }
+            scenario.facadeState.ifPresent(mimicBlockState -> helper.setFacade(localPos, mimicBlockState));
 
             Vec3 spawnVec = helper.absoluteVec(new Vec3(localPos.getX() + 0.5, localPos.getY() + 1.5, localPos.getZ() + 0.5));
             PrimedTnt primed = new PrimedTnt(helper.getLevel(), spawnVec.x, spawnVec.y, spawnVec.z, null);
@@ -251,9 +245,7 @@ public class ToughCableExplosionGameTestGenerator extends SFMGameTestGeneratorBa
             BlockPos absolute = helper.absolutePos(localPos);
 
             helper.getLevel().setBlock(absolute, scenario.blockSupplier.get().defaultBlockState(), 3);
-            if (!applyFacadeIfPresent(helper, absolute)) {
-                return;
-            }
+            scenario.facadeState.ifPresent(mimicBlockState -> helper.setFacade(localPos, mimicBlockState));
 
             Vec3 spawnVec = helper.absoluteVec(new Vec3(localPos.getX() + 0.5, localPos.getY() + 2.5, localPos.getZ() + 0.5));
             WitherBoss wither = EntityType.WITHER.create(helper.getLevel());
@@ -268,29 +260,6 @@ public class ToughCableExplosionGameTestGenerator extends SFMGameTestGeneratorBa
                         verifyResult(helper, absolute, "Wither explosion");
                     }
             );
-        }
-
-        private boolean applyFacadeIfPresent(
-                SFMGameTestHelper helper,
-                BlockPos absolute
-        ) {
-
-            if (scenario.facadeState.isEmpty()) {
-                return true;
-            }
-
-            var be = helper.getLevel().getBlockEntity(absolute);
-            if (be instanceof IFacadeBlockEntity facade) {
-                facade.updateFacadeData(new FacadeData(
-                        scenario.facadeState.get(),
-                        Direction.NORTH,
-                        FacadeTextureMode.FILL
-                ));
-                return true;
-            }
-
-            helper.fail("Block entity at test position was not a facade BE");
-            return false;
         }
 
         private void verifyResult(
