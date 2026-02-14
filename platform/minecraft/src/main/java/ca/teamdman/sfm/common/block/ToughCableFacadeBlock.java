@@ -6,6 +6,7 @@ import ca.teamdman.sfm.common.facade.FacadeTransparency;
 import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -54,6 +55,40 @@ public class ToughCableFacadeBlock extends CableFacadeBlock implements EntityBlo
     @Override
     public IFacadableBlock getFacadeBlock() {
         return SFMBlocks.TOUGH_CABLE_FACADE.get();
+    }
+
+    @Override
+    public boolean canEntityDestroy(
+            BlockState state,
+            BlockGetter level,
+            BlockPos blockPos,
+            Entity entity
+    ) {
+
+        return canEntityDestroyFacaded(state, level, blockPos, entity);
+    }
+
+    static boolean canEntityDestroyFacaded(
+            BlockState ignoredState,
+            BlockGetter level,
+            BlockPos blockPos,
+            Entity entity
+    ) {
+
+        BlockEntity blockEntity = level.getBlockEntity(blockPos);
+
+        // Ensure it has a facade
+        if (!(blockEntity instanceof IFacadeBlockEntity facadeBlockEntity)) {
+            return true;
+        }
+        FacadeData facadeData = facadeBlockEntity.getFacadeData();
+        if (facadeData == null) {
+            return true;
+        }
+
+        // delegate to the mimicked block to check if the destruction should succeed
+        BlockState mimickingBlockState = facadeData.facadeBlockState();
+        return mimickingBlockState.canEntityDestroy(level, blockPos, entity);
     }
 
     @Override

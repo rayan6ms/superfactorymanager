@@ -1,8 +1,5 @@
 package ca.teamdman.sfm.gametest.tests.cable.tunnelled;
 
-import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
-import ca.teamdman.sfm.common.facade.FacadeData;
-import ca.teamdman.sfm.common.facade.FacadeTextureMode;
 import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.common.util.SFMDirections;
 import ca.teamdman.sfm.gametest.*;
@@ -114,18 +111,7 @@ public class TunnelledBlockCapabilityGameTestGenerator extends SFMGameTestGenera
 
             // If the variant is a facade type, set the facade data to glowstone
             if (variant.name.contains("facade")) {
-                var absolute = helper.absolutePos(tunnelledPos);
-                var be = helper.getLevel().getBlockEntity(absolute);
-                if (be instanceof IFacadeBlockEntity facade) {
-                    facade.updateFacadeData(new FacadeData(
-                            Blocks.GLOWSTONE.defaultBlockState(),
-                            Direction.NORTH,
-                            FacadeTextureMode.FILL
-                    ));
-                } else {
-                    helper.fail("Expected facade block entity at " + tunnelledPos + " for variant " + variant.name);
-                    return;
-                }
+                helper.setFacade(tunnelledPos, Blocks.GLOWSTONE.defaultBlockState());
             }
 
             // Get the item handler from the tunnelled block, querying from the opposite face
