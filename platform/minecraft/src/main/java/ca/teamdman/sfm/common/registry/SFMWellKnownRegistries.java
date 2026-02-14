@@ -21,7 +21,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.material.Fluid;
 
-/// Helps reduce {@link ca.teamdman.sfm.common.util.MCVersionDependentBehaviour}
+/// Helps reduce {@link MCVersionDependentBehaviour}
 @SuppressWarnings("unused")
 @MCVersionDependentBehaviour
 public class SFMWellKnownRegistries {

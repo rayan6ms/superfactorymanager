@@ -1138,7 +1138,7 @@ public final class LocalizationKeys {
     );
     public static final LocalizationEntry TOUGH_CABLE_ITEM_TOOLTIP = new LocalizationEntry(
             () -> SFMBlocks.TOUGH_CABLE.get().getDescriptionId() + ".tooltip",
-            () -> "Resists explosions."
+            () -> "Resists explosions. Can be facaded as tougher blocks."
     );
     public static final LocalizationEntry TUNNELLED_CABLE_ITEM_TOOLTIP = new LocalizationEntry(
             () -> SFMBlocks.TUNNELLED_CABLE.get().getDescriptionId() + ".tooltip",

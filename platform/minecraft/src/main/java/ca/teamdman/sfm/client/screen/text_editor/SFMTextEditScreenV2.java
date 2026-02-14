@@ -17,6 +17,7 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.Tesselator;
 import net.minecraft.ChatFormatting;
 import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.client.gui.components.AbstractWidget;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.PanoramaRenderer;
@@ -243,8 +244,8 @@ public class SFMTextEditScreenV2 extends Screen implements ISFMTextEditScreen {
             // keep focus behavior consistent with V1 (avoid stray tooltips)
             this.renderables
                     .stream()
-                    .filter(net.minecraft.client.gui.components.AbstractWidget.class::isInstance)
-                    .map(net.minecraft.client.gui.components.AbstractWidget.class::cast)
+                    .filter(AbstractWidget.class::isInstance)
+                    .map(AbstractWidget.class::cast)
                     .forEach(w -> w.setFocused(false));
             return;
         }

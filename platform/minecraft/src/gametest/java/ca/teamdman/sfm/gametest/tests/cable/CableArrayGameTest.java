@@ -15,6 +15,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static ca.teamdman.sfm.gametest.SFMGameTestMethodHelpers.assertTrue;
 
 @SFMGameTest
@@ -31,7 +34,7 @@ public class CableArrayGameTest extends SFMGameTestDefinition {
         Variant[] variants = createVariants();
 
         // collect absolute positions of all placed cables so we can assert they belong to the same network
-        java.util.List<BlockPos> cablePositions = new java.util.ArrayList<>();
+        List<BlockPos> cablePositions = new ArrayList<>();
 
         for (int x = 0; x < variants.length; x++) {
             Variant v = variants[x];
