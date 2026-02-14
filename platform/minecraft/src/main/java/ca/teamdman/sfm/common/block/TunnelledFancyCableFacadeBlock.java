@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.common.block;
 
+import ca.teamdman.sfm.common.facade.FacadeTransparency;
 import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
@@ -17,7 +18,7 @@ public class TunnelledFancyCableFacadeBlock extends FancyCableFacadeBlock implem
         super(properties.lightLevel(LightBlock.LIGHT_EMISSION));
         registerDefaultState(
                 defaultBlockState()
-                        .setValue(ca.teamdman.sfm.common.facade.FacadeTransparency.FACADE_TRANSPARENCY_PROPERTY, ca.teamdman.sfm.common.facade.FacadeTransparency.TRANSLUCENT)
+                        .setValue(FacadeTransparency.FACADE_TRANSPARENCY_PROPERTY, FacadeTransparency.TRANSLUCENT)
                         .setValue(LightBlock.LEVEL, 0)
         );
     }

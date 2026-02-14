@@ -11,6 +11,9 @@ import com.github.javaparser.symbolsolver.resolution.typesolvers.JavaParserTypeS
 import com.github.javaparser.symbolsolver.resolution.typesolvers.ReflectionTypeSolver;
 import org.jetbrains.annotations.NotNull;
 
+import java.awt.*;
+import java.awt.datatransfer.DataFlavor;
+import java.awt.datatransfer.StringSelection;
 import java.awt.datatransfer.UnsupportedFlavorException;
 import java.io.File;
 import java.io.IOException;
@@ -405,12 +408,12 @@ public class FileImportWalker {
      */
     private static String getClipboardContents() {
         try {
-            var clipboard = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
+            var clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
             var contents = clipboard.getContents(null);
             boolean hasText = (contents != null) &&
-                              contents.isDataFlavorSupported(java.awt.datatransfer.DataFlavor.stringFlavor);
+                              contents.isDataFlavorSupported(DataFlavor.stringFlavor);
             if (hasText) {
-                return (String) contents.getTransferData(java.awt.datatransfer.DataFlavor.stringFlavor);
+                return (String) contents.getTransferData(DataFlavor.stringFlavor);
             } else {
                 throw new RuntimeException("[ERROR] Clipboard does not contain a string.");
             }
@@ -423,8 +426,8 @@ public class FileImportWalker {
      * Put a string onto the system clipboard.
      */
     private static void setClipboardContents(String text) {
-        var selection = new java.awt.datatransfer.StringSelection(text);
-        var clipboard = java.awt.Toolkit.getDefaultToolkit().getSystemClipboard();
+        var selection = new StringSelection(text);
+        var clipboard = Toolkit.getDefaultToolkit().getSystemClipboard();
         clipboard.setContents(selection, null);
     }
 }
