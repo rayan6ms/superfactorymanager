@@ -1,9 +1,9 @@
 package ca.teamdman.sfm.datagen;
 
 import ca.teamdman.sfm.SFM;
+import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.common.registry.registration.SFMItems;
-import ca.teamdman.sfm.common.registry.SFMRegistryObject;
 import ca.teamdman.sfm.datagen.version_plumbing.MCVersionAgnosticItemModelsDataGen;
 import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.resources.ResourceKey;

@@ -2,9 +2,9 @@ package ca.teamdman.sfm.gametest.tests.compat.thermal;
 
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.label.LabelPositionHolder;
+import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.common.registry.registration.SFMItems;
-import ca.teamdman.sfm.common.registry.SFMWellKnownRegistries;
 import ca.teamdman.sfm.common.util.SFMResourceLocation;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
