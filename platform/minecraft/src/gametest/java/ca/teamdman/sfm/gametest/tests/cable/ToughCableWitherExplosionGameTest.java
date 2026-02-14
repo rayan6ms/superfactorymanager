@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.gametest.tests.cable;
 
+import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
 import ca.teamdman.sfm.common.facade.FacadeData;
 import ca.teamdman.sfm.common.facade.FacadeTextureMode;
 import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
@@ -12,6 +13,7 @@ import net.minecraft.world.Difficulty;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.boss.wither.WitherBoss;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.phys.Vec3;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -58,7 +60,7 @@ public class ToughCableWitherExplosionGameTest extends SFMGameTestDefinition {
 
                         // Set facade to mimic bedrock
                         var be = helper.getLevel().getBlockEntity(absolute);
-                        if (be instanceof ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity facade) {
+                        if (be instanceof IFacadeBlockEntity facade) {
                             facade.updateFacadeData(new FacadeData(Blocks.BEDROCK.defaultBlockState(), Direction.NORTH, FacadeTextureMode.FILL));
                         }
                     }
@@ -75,7 +77,7 @@ public class ToughCableWitherExplosionGameTest extends SFMGameTestDefinition {
         double centerX = startX + cubeSize / 2.0;
         double centerY = startY + cubeSize / 2.0;
         double centerZ = startZ + cubeSize / 2.0;
-        var spawnVec = helper.absoluteVec(new net.minecraft.world.phys.Vec3(centerX, centerY, centerZ));
+        var spawnVec = helper.absoluteVec(new Vec3(centerX, centerY, centerZ));
 
         WitherBoss wither = EntityType.WITHER.create(helper.getLevel());
         if (wither == null) {
