@@ -12,7 +12,7 @@ import java.util.Optional;
 import java.util.function.Supplier;
 
 /// A pointer to something that is registered in a registry.
-/// Helps reduce {@link ca.teamdman.sfm.common.util.MCVersionDependentBehaviour}
+/// Helps reduce {@link MCVersionDependentBehaviour}
 @MCVersionDependentBehaviour
 public class SFMRegistryObject<R, T extends R> implements Supplier<T> {
     /// The registry that this object is registered in

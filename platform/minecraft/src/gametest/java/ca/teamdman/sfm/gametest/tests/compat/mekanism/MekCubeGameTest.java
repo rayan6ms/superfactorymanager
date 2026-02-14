@@ -9,6 +9,7 @@ import ca.teamdman.sfm.gametest.declarative.SFMTestBlockEntitySpec;
 import ca.teamdman.sfm.gametest.declarative.SFMTestSpec;
 import mekanism.api.RelativeSide;
 import mekanism.common.lib.transmitter.TransmissionType;
+import mekanism.common.registries.MekanismBlocks;
 import mekanism.common.tile.TileEntityEnergyCube;
 import mekanism.common.tile.component.config.DataType;
 import net.minecraft.core.BlockPos;
@@ -44,7 +45,7 @@ public class MekCubeGameTest extends SFMGameTestDefinition {
                 .addBlock(SFMTestBlockEntitySpec.<TileEntityEnergyCube>of(
                         "a",
                         new BlockPos(1, 0, 0),
-                        mekanism.common.registries.MekanismBlocks.BASIC_ENERGY_CUBE.getBlock(),
+                        MekanismBlocks.BASIC_ENERGY_CUBE.getBlock(),
                         (tileEntityCube) -> {
                             tileEntityCube.setEnergy(0, SFMMekanismCompat.createForgeEnergy(1000));
                             SFMMekanismCompat.configureExclusiveIO(
@@ -58,7 +59,7 @@ public class MekCubeGameTest extends SFMGameTestDefinition {
                 .addBlock(SFMTestBlockEntitySpec.<TileEntityEnergyCube>of(
                         "b",
                         new BlockPos(-1, 0, 0),
-                        mekanism.common.registries.MekanismBlocks.BASIC_ENERGY_CUBE.getBlock(),
+                        MekanismBlocks.BASIC_ENERGY_CUBE.getBlock(),
                         (tileEntityCube) -> SFMMekanismCompat.configureExclusiveIO(
                                 tileEntityCube,
                                 TransmissionType.ENERGY,
