@@ -110,8 +110,8 @@ public class SFMBlocks {
                             BlockBehaviour.Properties
                                     .of(Material.STONE, MaterialColor.COLOR_BLACK)
                                     .requiresCorrectToolForDrops()
-                                    .strength(50.0F, 1200.0F)
-                                    .destroyTime(1f)
+                                    .explosionResistance(1200.0F)
+                                    .destroyTime(10f)
                                     .sound(SoundType.METAL)
                     )
             );
@@ -123,8 +123,8 @@ public class SFMBlocks {
                             BlockBehaviour.Properties
                                     .of(Material.STONE, MaterialColor.COLOR_BLACK)
                                     .requiresCorrectToolForDrops()
-                                    .strength(50.0F, 1200.0F)
-                                    .destroyTime(1f)
+                                    .explosionResistance(1200.0F)
+                                    .destroyTime(10f)
                                     .sound(SoundType.METAL)
                     )
             );
@@ -136,8 +136,8 @@ public class SFMBlocks {
                             BlockBehaviour.Properties
                                     .of(Material.STONE, MaterialColor.COLOR_BLACK)
                                     .requiresCorrectToolForDrops()
-                                    .strength(50.0F, 1200.0F)
-                                    .destroyTime(1f)
+                                    .explosionResistance(1200.0F)
+                                    .destroyTime(5f)
                                     .sound(SoundType.METAL)
                     )
             );
@@ -149,8 +149,8 @@ public class SFMBlocks {
                             BlockBehaviour.Properties
                                     .of(Material.STONE, MaterialColor.COLOR_BLACK)
                                     .requiresCorrectToolForDrops()
-                                    .strength(50.0F, 1200.0F)
-                                    .destroyTime(1f)
+                                    .explosionResistance(1200.0F)
+                                    .destroyTime(5f)
                                     .sound(SoundType.METAL)
                     )
             );
