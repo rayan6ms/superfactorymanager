@@ -218,7 +218,7 @@ public class SFMCommand {
         }
 
         ServerLevel level = source.getLevel();
-        BlockPos sourcePos = new BlockPos(source.getPosition());
+        BlockPos sourcePos = BlockPos.containing(source.getPosition());
         int surfaceY = level.getHeightmapPos(Heightmap.Types.WORLD_SURFACE, sourcePos).getY();
         BlockPos startPos = new BlockPos(sourcePos.getX(), surfaceY, sourcePos.getZ() + 3);
 
