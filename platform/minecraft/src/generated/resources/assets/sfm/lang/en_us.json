@@ -10,7 +10,7 @@
   "block.sfm.test_barrel": "Test Barrel",
   "block.sfm.test_barrel_tank": "Test Barrel Tank",
   "block.sfm.tough_cable": "Tough Inventory Cable",
-  "block.sfm.tough_cable.tooltip": "Resists explosions.",
+  "block.sfm.tough_cable.tooltip": "Resists explosions. Can be facaded as tougher blocks.",
   "block.sfm.tough_cable_facade": "Tough Inventory Cable Facade",
   "block.sfm.tough_fancy_cable": "Tough Fancy Inventory Cable",
   "block.sfm.tough_fancy_cable_facade": "Tough Fancy Inventory Cable Facade",
