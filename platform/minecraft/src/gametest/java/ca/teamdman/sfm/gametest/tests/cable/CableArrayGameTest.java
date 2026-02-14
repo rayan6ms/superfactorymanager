@@ -3,14 +3,11 @@ package ca.teamdman.sfm.gametest.tests.cable;
 import ca.teamdman.sfm.common.block_network.CableNetwork;
 import ca.teamdman.sfm.common.block_network.CableNetworkManager;
 import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
-import ca.teamdman.sfm.common.facade.FacadeData;
-import ca.teamdman.sfm.common.facade.FacadeTextureMode;
 import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.gametest.SFMGameTest;
 import ca.teamdman.sfm.gametest.SFMGameTestDefinition;
 import ca.teamdman.sfm.gametest.SFMGameTestHelper;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import org.jetbrains.annotations.NotNull;
@@ -45,17 +42,7 @@ public class CableArrayGameTest extends SFMGameTestDefinition {
 
                 // If this is a facade variant, set the facade data to glowstone
                 if (v.facade) {
-                    var be = helper.getLevel().getBlockEntity(absolute);
-                    if (be instanceof IFacadeBlockEntity facade) {
-                        facade.updateFacadeData(new FacadeData(
-                                Blocks.GLOWSTONE.defaultBlockState(),
-                                Direction.NORTH,
-                                FacadeTextureMode.FILL
-                        ));
-                    } else {
-                        helper.fail("Expected facade block entity at " + localPos + " for variant " + x);
-                        return;
-                    }
+                    helper.setFacade(localPos, Blocks.GLOWSTONE.defaultBlockState());
                 }
 
                 cablePositions.add(absolute);
