@@ -1,5 +1,6 @@
 package ca.teamdman.sfm.gametest;
 
+import ca.teamdman.sfm.common.blockentity.IFacadeBlockEntity;
 import ca.teamdman.sfm.common.blockentity.ManagerBlockEntity;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityDiscovery;
 import ca.teamdman.sfm.common.capability.SFMBlockCapabilityKind;
@@ -7,6 +8,8 @@ import ca.teamdman.sfm.common.capability.SFMBlockCapabilityResult;
 import ca.teamdman.sfm.common.capability.SFMWellKnownCapabilities;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentEntry;
 import ca.teamdman.sfm.common.enchantment.SFMEnchantmentKey;
+import ca.teamdman.sfm.common.facade.FacadeData;
+import ca.teamdman.sfm.common.facade.FacadeTextureMode;
 import ca.teamdman.sfm.common.program.ExecuteProgramBehaviour;
 import ca.teamdman.sfm.common.program.IProgramHooks;
 import ca.teamdman.sfm.common.program.ProgramContext;
@@ -25,6 +28,7 @@ import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.entity.SignText;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.levelgen.structure.templatesystem.StructureTemplate;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 import net.neoforged.neoforge.fluids.capability.IFluidHandler;
@@ -210,4 +214,20 @@ public class SFMGameTestHelper extends GameTestHelper {
         return blockpos1.subtract(blockpos);
     }
 
+    public void setFacade(
+            BlockPos localBlockPos,
+            BlockState mimicBlockState
+    ) {
+
+        if (!(getBlockEntity(localBlockPos) instanceof IFacadeBlockEntity facadeBlockEntity)) {
+            fail("Block entity was not a facade", localBlockPos);
+            return;
+        }
+
+        facadeBlockEntity.updateFacadeData(new FacadeData(
+                mimicBlockState,
+                Direction.UP,
+                FacadeTextureMode.FILL
+        ));
+    }
 }

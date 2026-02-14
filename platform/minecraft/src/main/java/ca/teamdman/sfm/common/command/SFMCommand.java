@@ -7,6 +7,7 @@ import ca.teamdman.sfm.common.block_network.WaterNetworkManager;
 import ca.teamdman.sfm.common.event_bus.SFMSubscribeEvent;
 import ca.teamdman.sfm.common.localization.LocalizationKeys;
 import ca.teamdman.sfm.common.net.ClientboundShowChangelogPacket;
+import ca.teamdman.sfm.common.program.RegexCache;
 import ca.teamdman.sfm.common.registry.registration.SFMPackets;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import ca.teamdman.sfm.common.util.SFMEnvironmentUtils;
@@ -15,15 +16,24 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.client.Minecraft;
 import net.minecraft.commands.CommandSourceStack;
 import net.minecraft.commands.Commands;
+import com.mojang.brigadier.arguments.StringArgumentType;
 import net.minecraft.commands.arguments.blocks.BlockInput;
 import net.minecraft.commands.arguments.blocks.BlockStateArgument;
+import net.minecraft.core.BlockPos;
+import net.minecraft.gametest.framework.GameTestRegistry;
+import net.minecraft.gametest.framework.GameTestRunner;
+import net.minecraft.gametest.framework.GameTestTicker;
+import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.Rotation;
+import net.minecraft.world.level.levelgen.Heightmap;
 import net.minecraft.world.level.block.Block;
 import net.neoforged.neoforge.event.RegisterCommandsEvent;
 import net.neoforged.neoforge.server.command.EnumArgument;
 
+import java.util.List;
 import java.util.function.Supplier;
 
 import static com.mojang.brigadier.Command.SINGLE_SUCCESS;
@@ -136,6 +146,17 @@ public class SFMCommand {
                                  return SINGLE_SUCCESS;
                              }));
 
+        if (SFMEnvironmentUtils.isInIDE()) {
+            command.then(Commands.literal("test")
+                                 .requires(source -> source.hasPermission(Commands.LEVEL_GAMEMASTERS))
+                                 .then(Commands.literal("run")
+                                               .then(Commands.argument("pattern", StringArgumentType.greedyString())
+                                                             .executes(ctx -> {
+                                                                 var source = ctx.getSource();
+                                                                 var wildcardPattern = StringArgumentType.getString(ctx, "pattern");
+                                                                 return runTestsByWildcard(source, wildcardPattern);
+                                                             }))));
+        }
         if (SFMEnvironmentUtils.isClient()) {
             command.then(Commands.literal("export_info")
                                  .requires(source -> source.hasPermission(Commands.LEVEL_ALL))
@@ -181,6 +202,45 @@ public class SFMCommand {
                                                })));
         }
         event.getDispatcher().register(command);
+    }
+
+    private static int runTestsByWildcard(CommandSourceStack source, String wildcardPattern) {
+        var matcher = RegexCache.buildPredicate(wildcardToRegex(wildcardPattern));
+        List<TestFunction> matchingTests = GameTestRegistry
+                .getAllTestFunctions()
+                .stream()
+                .filter(testFunction -> matcher.test(testFunction.getTestName()))
+                .toList();
+
+        if (matchingTests.isEmpty()) {
+            sendSuccess(source, () -> Component.literal("No tests matched pattern: " + wildcardPattern));
+            return 0;
+        }
+
+        ServerLevel level = source.getLevel();
+        BlockPos sourcePos = new BlockPos(source.getPosition());
+        int surfaceY = level.getHeightmapPos(Heightmap.Types.WORLD_SURFACE, sourcePos).getY();
+        BlockPos startPos = new BlockPos(sourcePos.getX(), surfaceY, sourcePos.getZ() + 3);
+
+        GameTestRunner.clearMarkers(level);
+        GameTestRunner.runTests(
+                matchingTests,
+                startPos,
+                Rotation.NONE,
+                level,
+                GameTestTicker.SINGLETON,
+                8
+        );
+
+        sendSuccess(
+                source,
+                () -> Component.literal("Running " + matchingTests.size() + " tests matching '" + wildcardPattern + "'")
+        );
+        return SINGLE_SUCCESS;
+    }
+
+    private static String wildcardToRegex(String wildcardPattern) {
+                return wildcardPattern.replace("*", ".*");
     }
 
 }
