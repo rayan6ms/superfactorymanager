@@ -71,7 +71,7 @@ public class SFMASTUtils {
         );
         Limit limit = new Limit(
                 new ResourceQuantity(
-                        new ca.teamdman.sfml.ast.Number(resourceType.getAmount(stack)),
+                        new Number(resourceType.getAmount(stack)),
                         ResourceQuantity.IdExpansionBehaviour.NO_EXPAND
                 ),
                 new ResourceQuantity(

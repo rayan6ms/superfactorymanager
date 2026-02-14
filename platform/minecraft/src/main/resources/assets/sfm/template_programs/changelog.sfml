@@ -19,7 +19,7 @@ NAME "Changelog"
 -- Network tool can now be attuned to a block position, thanks @Mei for the contribution! #456
 -- Update PT_BR localization, thanks @PrincessStelllar for the contribution! #431, #497
 -- Update ZH_CN localization, thanks @ZHAY10086 for the contribution! #438, #439, #498
--- Fix ResourcesProgramLinter not tracking warningsp roperly, thanks @Mei for the contribution! #440
+-- Fix ResourcesProgramLinter not tracking warnings properly, thanks @Mei for the contribution! #440
 -- Add missing block tags to tunnelled factory manager, thanks @jez4753 for the report! #457
 -- Add warnings for slots that don't support extraction, thanks @Mei for the contribution! #446
 -- Fix round robin example correctness, fixes #455
