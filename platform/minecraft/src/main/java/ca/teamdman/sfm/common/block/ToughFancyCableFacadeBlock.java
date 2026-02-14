@@ -5,6 +5,7 @@ import ca.teamdman.sfm.common.registry.registration.SFMBlockEntities;
 import ca.teamdman.sfm.common.registry.registration.SFMBlocks;
 import ca.teamdman.sfm.common.util.MCVersionDependentBehaviour;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Explosion;
@@ -15,6 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.Nullable;
 
+import static ca.teamdman.sfm.common.block.ToughCableFacadeBlock.canEntityDestroyFacaded;
 import static ca.teamdman.sfm.common.block.ToughCableFacadeBlock.getFacadedToughCableExplosionResistance;
 
 public class ToughFancyCableFacadeBlock extends FancyCableFacadeBlock implements IFacadableBlock, EntityBlock {
@@ -64,6 +66,16 @@ public class ToughFancyCableFacadeBlock extends FancyCableFacadeBlock implements
     ) {
 
         return getFacadedToughCableExplosionResistance(world, pos, super.getExplosionResistance());
+    }
+
+    @Override
+    public boolean canEntityDestroy(
+            BlockState state,
+            BlockGetter level,
+            BlockPos blockPos,
+            Entity entity
+    ) {
+        return canEntityDestroyFacaded(state, level, blockPos, entity);
     }
 
 }
