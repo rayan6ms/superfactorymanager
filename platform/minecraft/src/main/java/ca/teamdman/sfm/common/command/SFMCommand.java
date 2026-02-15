@@ -21,8 +21,10 @@ import net.minecraft.commands.arguments.blocks.BlockInput;
 import net.minecraft.commands.arguments.blocks.BlockStateArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.gametest.framework.GameTestRegistry;
+import net.minecraft.gametest.framework.GameTestInfo;
 import net.minecraft.gametest.framework.GameTestRunner;
-import net.minecraft.gametest.framework.GameTestTicker;
+import net.minecraft.gametest.framework.RetryOptions;
+import net.minecraft.gametest.framework.StructureGridSpawner;
 import net.minecraft.gametest.framework.TestFunction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -209,7 +211,7 @@ public class SFMCommand {
         List<TestFunction> matchingTests = GameTestRegistry
                 .getAllTestFunctions()
                 .stream()
-                .filter(testFunction -> matcher.test(testFunction.getTestName()))
+                .filter(testFunction -> matcher.test(testFunction.testName()))
                 .toList();
 
         if (matchingTests.isEmpty()) {
@@ -223,20 +225,26 @@ public class SFMCommand {
         BlockPos startPos = new BlockPos(sourcePos.getX(), surfaceY, sourcePos.getZ() + 3);
 
         GameTestRunner.clearMarkers(level);
-        GameTestRunner.runTests(
-                matchingTests,
-                startPos,
-                Rotation.NONE,
-                level,
-                GameTestTicker.SINGLETON,
-                8
-        );
+        runTests(source, matchingTests, startPos, level);
 
         sendSuccess(
                 source,
                 () -> Component.literal("Running " + matchingTests.size() + " tests matching '" + wildcardPattern + "'")
         );
         return SINGLE_SUCCESS;
+    }
+
+    @MCVersionDependentBehaviour
+    private static void runTests(CommandSourceStack source, List<TestFunction> matchingTests, BlockPos startPos, ServerLevel level) {
+        var gameTestInfos = matchingTests
+                .stream()
+                .map(testFunction -> new GameTestInfo(testFunction, Rotation.NONE, level, RetryOptions.noRetries()))
+                .toList();
+
+        GameTestRunner.Builder.fromInfo(gameTestInfos, level)
+                .newStructureSpawner(new StructureGridSpawner(startPos, 8, false))
+                .build()
+                .start();
     }
 
     private static String wildcardToRegex(String wildcardPattern) {
