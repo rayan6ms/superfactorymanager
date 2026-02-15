@@ -1,5 +1,4 @@
 # You should copy the contents of this file to your profile instead of sourcing this file in your profile to prevent oopsie-daisies
-
 #region c java files
 function jf {
     param(
@@ -36,9 +35,15 @@ function cs {
 
     Get-ChildItem $repo_parent `
     | Where-Object { $_.Name -ne '.vscode' } `
-    | ForEach-Object { $_.FullName } `
+    | ForEach-Object {
+        $targets = @(Join-Path $_.FullName "platform\minecraft")
+        if ($_.Name -eq "1.19.2") {
+            $targets += Join-Path $_.FullName "platform\cli\sfm-propagate-changes"
+        }
+        $targets
+    } `
+    | Where-Object { Test-Path $_ } `
     | ct pick `
-    | ForEach-Object { Join-Path $_ "platform\minecraft" } `
     | Set-Location
 }
 #endregion
