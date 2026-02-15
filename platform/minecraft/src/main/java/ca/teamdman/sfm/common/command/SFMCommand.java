@@ -225,6 +225,17 @@ public class SFMCommand {
         BlockPos startPos = new BlockPos(sourcePos.getX(), surfaceY, sourcePos.getZ() + 3);
 
         GameTestRunner.clearMarkers(level);
+        runTests(source, matchingTests, startPos, level);
+
+        sendSuccess(
+                source,
+                () -> Component.literal("Running " + matchingTests.size() + " tests matching '" + wildcardPattern + "'")
+        );
+        return SINGLE_SUCCESS;
+    }
+
+    @MCVersionDependentBehaviour
+    private static void runTests(CommandSourceStack source, List<TestFunction> matchingTests, BlockPos startPos, ServerLevel level) {
         var gameTestInfos = matchingTests
                 .stream()
                 .map(testFunction -> new GameTestInfo(testFunction, Rotation.NONE, level, RetryOptions.noRetries()))
@@ -234,12 +245,6 @@ public class SFMCommand {
                 .newStructureSpawner(new StructureGridSpawner(startPos, 8, false))
                 .build()
                 .start();
-
-        sendSuccess(
-                source,
-                () -> Component.literal("Running " + matchingTests.size() + " tests matching '" + wildcardPattern + "'")
-        );
-        return SINGLE_SUCCESS;
     }
 
     private static String wildcardToRegex(String wildcardPattern) {
